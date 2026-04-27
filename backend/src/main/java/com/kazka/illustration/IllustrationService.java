@@ -65,4 +65,8 @@ public class IllustrationService {
             storyRepository.save(story);
         }).subscribeOn(Schedulers.boundedElastic()).then();
     }
+
+    public void deleteImage(String storyId) {
+        imageStorageService.delete(storyId);
+    }
 }
