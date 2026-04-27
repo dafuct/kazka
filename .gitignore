@@ -1,0 +1,26 @@
+# JVM / Gradle
+**/build/
+**/.gradle/
+**/out/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Node
+**/node_modules/
+**/dist/
+**/.vite/
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
+
+# Env
+.env
+.env.local
+
+# Runtime
+backend/uploads/
