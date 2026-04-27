@@ -1,0 +1,54 @@
+.hero {
+  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-surface-2) 100%);
+  padding: var(--spacing-16) var(--spacing-6);
+  text-align: center;
+}
+
+.heroInner {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  color: var(--color-magic);
+  margin-bottom: var(--spacing-4);
+}
+
+.heroTagline {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.formSection {
+  padding: var(--spacing-16) var(--spacing-6);
+}
+
+.formWrapper {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.error {
+  background: #FEE2E2;
+  color: #991B1B;
+  padding: var(--spacing-4) var(--spacing-5);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-5);
+  font-weight: 500;
+}
+
+.streaming {
+  width: 100%;
+}
+
+.streamingTitle {
+  font-size: 1.125rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-4);
+  text-align: center;
+}
