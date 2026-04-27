@@ -1,0 +1,90 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-8);
+  box-shadow: var(--shadow-md);
+  max-width: 640px;
+  width: 100%;
+}
+
+.title {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-2);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  flex: 1;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input,
+.select {
+  padding: var(--spacing-3) var(--spacing-4);
+  border: 1.5px solid var(--color-surface-deep);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  transition: border-color var(--transition);
+  appearance: none;
+}
+
+.input:focus,
+.select:focus {
+  border-color: var(--color-magic);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-text-faint);
+}
+
+.row {
+  display: flex;
+  gap: var(--spacing-4);
+  flex-wrap: wrap;
+}
+
+.row .field {
+  min-width: 120px;
+}
+
+.submit {
+  padding: var(--spacing-4) var(--spacing-8);
+  background: var(--color-magic);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: opacity var(--transition), transform 80ms ease;
+  align-self: flex-start;
+}
+
+.submit:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
