@@ -1,4 +1,5 @@
-CREATE TABLE IF NOT EXISTS stories (
+DROP TABLE IF EXISTS stories;
+CREATE TABLE stories (
     id                  VARCHAR(36)   NOT NULL PRIMARY KEY,
     title               TEXT          NOT NULL,
     theme               TEXT          NOT NULL,
