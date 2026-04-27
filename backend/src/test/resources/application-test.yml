@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16:///kazkar_test
+    username: test
+    password: test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  flyway:
+    enabled: true

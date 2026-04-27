@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: kazkar
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/kazkar}
+    username: ${DB_USER:kazkar}
+    password: ${DB_PASS:kazkar}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+server:
+  port: 8080
+kazka:
+  ollama:
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    text-model: ${OLLAMA_TEXT_MODEL:gemma3:4b}
+    image-model: ${OLLAMA_IMAGE_MODEL:x/flux2-klein}
+  uploads:
+    dir: ${UPLOADS_DIR:./uploads}
