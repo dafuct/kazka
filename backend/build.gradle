@@ -29,7 +29,6 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.21.3'
     testImplementation 'org.testcontainers:mysql:1.21.3'
     testImplementation 'org.testcontainers:jdbc:1.21.3'
-    testImplementation 'org.wiremock:wiremock-standalone:3.9.2'
 }
 
 tasks.withType(Test).configureEach {

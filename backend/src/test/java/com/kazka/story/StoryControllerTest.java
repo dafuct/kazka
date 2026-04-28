@@ -1,39 +1,18 @@
 package com.kazka.story;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 class StoryControllerTest {
-
-    private static WireMockServer wireMock;
-
-    @DynamicPropertySource
-    static void props(DynamicPropertyRegistry registry) {
-        wireMock = new WireMockServer(WireMockConfiguration.wireMockConfig().dynamicPort());
-        wireMock.start();
-        registry.add("kazka.ollama.base-url", () -> "http://localhost:" + wireMock.port());
-    }
-
-    @AfterEach
-    void resetWireMock() {
-        wireMock.resetAll();
-    }
 
     @LocalServerPort
     int port;

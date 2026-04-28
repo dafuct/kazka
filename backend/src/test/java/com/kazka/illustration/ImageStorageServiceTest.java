@@ -6,8 +6,6 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Base64;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ImageStorageServiceTest {
@@ -19,9 +17,8 @@ class ImageStorageServiceTest {
     void save_writesFileToDisk() throws IOException {
         ImageStorageService service = new ImageStorageService(tempDir.toString());
         byte[] imageBytes = "fake-png-data".getBytes();
-        String base64 = Base64.getEncoder().encodeToString(imageBytes);
 
-        String path = service.save("story-123", base64);
+        String path = service.save("story-123", imageBytes);
 
         assertThat(path).isEqualTo("/uploads/story-123.png");
         Path file = tempDir.resolve("story-123.png");
