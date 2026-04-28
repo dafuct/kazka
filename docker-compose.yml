@@ -1,19 +1,20 @@
 services:
-  postgres:
-    image: postgres:16
-    container_name: kazkar-postgres
+  mysql:
+    image: mysql:8.4
+    container_name: kazkar-mysql
     environment:
-      POSTGRES_USER: kazkar
-      POSTGRES_PASSWORD: kazkar
-      POSTGRES_DB: kazkar
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: kazkar
+      MYSQL_PASSWORD: kazkar
+      MYSQL_DATABASE: kazkar
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - mysqldata:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kazkar"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "kazkar", "-pkazkar"]
       interval: 5s
       timeout: 3s
       retries: 10
 volumes:
-  pgdata: {}
+  mysqldata: {}

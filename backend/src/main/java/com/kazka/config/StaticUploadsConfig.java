@@ -1,5 +1,6 @@
 package com.kazka.config;
 
+import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
@@ -14,7 +15,7 @@ public class StaticUploadsConfig implements WebFluxConfigurer {
     }
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
         String uploadsDir = uploadsProperties.getDir();
         if (!uploadsDir.endsWith("/")) {
             uploadsDir += "/";
