@@ -11,10 +11,36 @@ services:
       - "3306:3306"
     volumes:
       - mysqldata:/var/lib/mysql
+      - ./backend/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "kazkar", "-pkazkar"]
       interval: 5s
       timeout: 3s
       retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/kazkar
+      DB_USER: kazkar
+      DB_PASS: kazkar
+      HUGGINGFACE_API_TOKEN: ${HUGGINGFACE_API_TOKEN}
+      HF_TEXT_MODEL: ${HF_TEXT_MODEL:-google/gemma-3-4b-it}
+      HF_IMAGE_MODEL: ${HF_IMAGE_MODEL:-black-forest-labs/FLUX.1-schnell}
+      UPLOADS_DIR: /uploads
+    volumes:
+      - uploads:/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
 volumes:
   mysqldata: {}
+  uploads: {}
