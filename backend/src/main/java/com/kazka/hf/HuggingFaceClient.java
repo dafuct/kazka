@@ -27,6 +27,9 @@ public class HuggingFaceClient {
 
     public HuggingFaceClient(WebClient.Builder builder, HuggingFaceProperties props) {
         this.props = props;
+        if (props.getApiToken() == null || props.getApiToken().isBlank()) {
+            log.warn("kazka.huggingface.api-token is not set — HF API calls will fail with 401");
+        }
         String auth = "Bearer " + props.getApiToken();
         this.textClient = builder.clone()
                 .baseUrl(props.getTextBaseUrl())
