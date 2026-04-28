@@ -1,7 +1,6 @@
 package com.kazka.illustration;
 
-import com.kazka.config.OllamaProperties;
-import com.kazka.ollama.OllamaClient;
+import com.kazka.hf.HuggingFaceClient;
 import com.kazka.story.IllustrationStatus;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
@@ -17,17 +16,16 @@ public class IllustrationService {
 
     private static final Logger log = LoggerFactory.getLogger(IllustrationService.class);
 
-    private final OllamaClient ollamaClient;
-    private final OllamaProperties ollamaProperties;
+    private final HuggingFaceClient hfClient;
     private final ImageStorageService imageStorageService;
     private final StoryRepository storyRepository;
     private final PromptBuilder promptBuilder;
 
-    public IllustrationService(OllamaClient ollamaClient, OllamaProperties ollamaProperties,
-                               ImageStorageService imageStorageService, StoryRepository storyRepository,
+    public IllustrationService(HuggingFaceClient hfClient,
+                               ImageStorageService imageStorageService,
+                               StoryRepository storyRepository,
                                PromptBuilder promptBuilder) {
-        this.ollamaClient = ollamaClient;
-        this.ollamaProperties = ollamaProperties;
+        this.hfClient = hfClient;
         this.imageStorageService = imageStorageService;
         this.storyRepository = storyRepository;
         this.promptBuilder = promptBuilder;
@@ -40,8 +38,8 @@ public class IllustrationService {
                 .flatMap(story -> {
                     String prompt = promptBuilder.buildIllustrationPrompt(
                             story.getTitle(), story.getCharacters());
-                    return ollamaClient.generateImage(ollamaProperties.getImageModel(), prompt)
-                            .flatMap(base64 -> saveImage(story, base64))
+                    return hfClient.generateImage(prompt)
+                            .flatMap(bytes -> saveImage(story, bytes))
                             .switchIfEmpty(markFailed(story))
                             .onErrorResume(e -> {
                                 log.warn("Illustration failed for {}: {}", storyId, e.getMessage());
@@ -50,9 +48,9 @@ public class IllustrationService {
                 });
     }
 
-    private Mono<Void> saveImage(Story story, String base64) {
+    private Mono<Void> saveImage(Story story, byte[] imageBytes) {
         return Mono.fromRunnable(() -> {
-            String path = imageStorageService.save(story.getId(), base64);
+            String path = imageStorageService.save(story.getId(), imageBytes);
             story.setIllustrationPath(path);
             story.setIllustrationStatus(IllustrationStatus.READY);
             storyRepository.save(story);
