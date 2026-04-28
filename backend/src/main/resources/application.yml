@@ -18,9 +18,11 @@ spring:
 server:
   port: 8080
 kazka:
-  ollama:
-    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
-    text-model: ${OLLAMA_TEXT_MODEL:gemma3:4b}
-    image-model: ${OLLAMA_IMAGE_MODEL:x/flux2-klein}
+  huggingface:
+    api-token: ${HUGGINGFACE_API_TOKEN:}
+    text-model: ${HF_TEXT_MODEL:google/gemma-3-4b-it}
+    image-model: ${HF_IMAGE_MODEL:black-forest-labs/FLUX.1-schnell}
+    text-base-url: ${HF_TEXT_BASE_URL:https://router.huggingface.co}
+    image-base-url: ${HF_IMAGE_BASE_URL:https://api-inference.huggingface.co}
   uploads:
     dir: ${UPLOADS_DIR:./uploads}

@@ -1,0 +1,28 @@
+package com.kazka.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+@ConfigurationProperties("kazka.huggingface")
+public class HuggingFaceProperties {
+
+    private String apiToken = "";
+    private String textModel = "google/gemma-3-4b-it";
+    private String imageModel = "black-forest-labs/FLUX.1-schnell";
+    private String textBaseUrl = "https://router.huggingface.co";
+    private String imageBaseUrl = "https://api-inference.huggingface.co";
+
+    public String getApiToken() { return apiToken; }
+    public void setApiToken(String apiToken) { this.apiToken = apiToken; }
+
+    public String getTextModel() { return textModel; }
+    public void setTextModel(String textModel) { this.textModel = textModel; }
+
+    public String getImageModel() { return imageModel; }
+    public void setImageModel(String imageModel) { this.imageModel = imageModel; }
+
+    public String getTextBaseUrl() { return textBaseUrl; }
+    public void setTextBaseUrl(String textBaseUrl) { this.textBaseUrl = textBaseUrl; }
+
+    public String getImageBaseUrl() { return imageBaseUrl; }
+    public void setImageBaseUrl(String imageBaseUrl) { this.imageBaseUrl = imageBaseUrl; }
+}
