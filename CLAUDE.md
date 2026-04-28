@@ -7,25 +7,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Backend (Spring Boot 4, Java 25, Gradle 9)
 ```bash
 cd backend
-./gradlew bootRun          # start on port 8080
+./gradlew bootRun          # start on port 8080 (requires local MySQL)
 ./gradlew test             # run all tests (requires Docker for Testcontainers)
-./gradlew test --tests "com.kazka.story.StoryControllerTest#saveAndGetStory_roundtrip"  # single test
-./gradlew build            # compile + test
+./gradlew test --tests "com.kazka.story.StoryControllerTest#saveAndGetStory_roundtrip"
+./gradlew build
 ```
 
 ### Frontend (React 19, Vite 8, TypeScript 6)
 ```bash
 cd frontend
 npm run dev                # start on port 5173
-npm run build              # tsc -b && vite build
+npm run build
 npm run lint
 node_modules/.bin/tsc --noEmit  # type-check only (npx tsc installs wrong package)
 ```
 
-### Infrastructure
+### Full stack via Docker (recommended)
 ```bash
-docker-compose up -d       # start MySQL 8.4
-# First-time schema init (also run after schema.sql changes):
+# First time: copy and fill in your HF token
+cp .env.example .env
+# edit .env and set HUGGINGFACE_API_TOKEN=hf_...
+
+docker-compose up --build  # builds images, starts all services
+# App available at http://localhost
+
+docker-compose up          # subsequent runs (no rebuild)
+docker-compose down        # stop
+docker-compose down -v     # stop and delete all data (MySQL + uploads)
+```
+
+### Infrastructure (local dev only)
+```bash
+docker-compose up -d mysql                   # MySQL only
 docker exec -i kazkar-mysql mysql -ukazkar -pkazkar kazkar < backend/src/main/resources/schema.sql
 ```
 
@@ -72,3 +85,7 @@ Vite proxies `/api` and `/uploads` to `http://localhost:8080` in development.
 - Test config (`application-test.yml`) sets `spring.sql.init.mode: always` so schema.sql runs on each test container start. The schema uses `DROP TABLE IF EXISTS` to be idempotent across shared Testcontainers instances.
 - The `x/flux2-klein` illustration model only works on macOS (Apple Silicon). On other platforms it fails silently; the UI shows a decorative SVG placeholder.
 - Prompt templates are read from classpath at startup: `prompts/system-uk.txt`, `prompts/system-en.txt`, `prompts/illustration-style.txt`. Missing files cause a hard startup failure.
+- **HuggingFaceClient** owns two WebClient instances built in its constructor: `textClient` (base: `kazka.huggingface.text-base-url`) for OpenAI-compatible chat completions streaming, and `imageClient` (base: `kazka.huggingface.image-base-url`) for binary image generation. Both URLs are configurable so WireMock can intercept them in future tests.
+- **Image generation** returns `byte[]` from `HuggingFaceClient.generateImage()` and is saved directly by `ImageStorageService.save(storyId, byte[])` — no base64 decoding.
+- **Docker:** `docker-compose up --build` is the one-command start. The `HUGGINGFACE_API_TOKEN` env var must be set in `.env`. Schema is auto-initialized via MySQL `initdb` on first run only (volume must be empty).
+- **SSE proxy:** nginx has `proxy_buffering off` on `/api/` — required for story streaming tokens to reach the browser in real-time.
