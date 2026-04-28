@@ -1,8 +1,7 @@
 package com.kazka.story;
 
-import com.kazka.config.OllamaProperties;
+import com.kazka.hf.HuggingFaceClient;
 import com.kazka.illustration.IllustrationService;
-import com.kazka.ollama.OllamaClient;
 import com.kazka.story.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,17 +18,14 @@ import java.util.UUID;
 public class StoryService {
 
     private final StoryRepository repository;
-    private final OllamaClient ollamaClient;
-    private final OllamaProperties ollamaProperties;
+    private final HuggingFaceClient hfClient;
     private final PromptBuilder promptBuilder;
     private final IllustrationService illustrationService;
 
-    public StoryService(StoryRepository repository, OllamaClient ollamaClient,
-                        OllamaProperties ollamaProperties, PromptBuilder promptBuilder,
-                        IllustrationService illustrationService) {
+    public StoryService(StoryRepository repository, HuggingFaceClient hfClient,
+                        PromptBuilder promptBuilder, IllustrationService illustrationService) {
         this.repository = repository;
-        this.ollamaClient = ollamaClient;
-        this.ollamaProperties = ollamaProperties;
+        this.hfClient = hfClient;
         this.promptBuilder = promptBuilder;
         this.illustrationService = illustrationService;
     }
@@ -55,8 +51,7 @@ public class StoryService {
                     Flux<SseEvent> meta = Flux.just(SseEvent.meta(id));
 
                     StringBuilder contentBuffer = new StringBuilder();
-                    Flux<SseEvent> tokens = ollamaClient
-                            .streamGenerate(ollamaProperties.getTextModel(), prompt)
+                    Flux<SseEvent> tokens = hfClient.streamText(prompt)
                             .doOnNext(contentBuffer::append)
                             .map(SseEvent::token)
                             .concatWith(Mono.fromCallable(() -> {
