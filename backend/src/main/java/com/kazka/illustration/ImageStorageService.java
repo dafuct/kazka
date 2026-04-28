@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Base64;
 
 @Service
 public class ImageStorageService {
@@ -33,11 +32,10 @@ public class ImageStorageService {
         }
     }
 
-    public String save(String storyId, String base64Image) {
-        byte[] bytes = Base64.getDecoder().decode(base64Image);
+    public String save(String storyId, byte[] imageBytes) {
         Path file = uploadsDir.resolve(storyId + ".png");
         try {
-            Files.write(file, bytes);
+            Files.write(file, imageBytes);
         } catch (IOException e) {
             throw new UncheckedIOException("Cannot save image for story " + storyId, e);
         }
