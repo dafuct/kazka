@@ -10,6 +10,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+    defer-datasource-initialization: true
 kazka:
   huggingface:
     api-token: test-token

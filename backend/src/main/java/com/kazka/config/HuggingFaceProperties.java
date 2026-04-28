@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("kazka.huggingface")
 public class HuggingFaceProperties {
 
-    private String apiToken = "";
+    private String apiToken = null;
     private String textModel = "google/gemma-3-4b-it";
     private String imageModel = "black-forest-labs/FLUX.1-schnell";
     private String textBaseUrl = "https://router.huggingface.co";
