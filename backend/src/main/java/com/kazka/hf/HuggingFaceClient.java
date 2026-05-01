@@ -51,6 +51,25 @@ public class HuggingFaceClient {
         return streamRequest(props.getEditorModel(), system, user);
     }
 
+    public Mono<String> generateText(String system, String user) {
+        return textClient.post()
+                .uri("/v1/chat/completions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of(
+                        "model", props.getSvgModel(),
+                        "messages", List.of(
+                                Map.of("role", "system", "content", system),
+                                Map.of("role", "user", "content", user)
+                        ),
+                        "stream", false,
+                        "max_tokens", 4096
+                ))
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .map(node -> node.path("choices").path(0)
+                        .path("message").path("content").asText(""));
+    }
+
     private Flux<String> streamRequest(String model, String system, String user) {
         return textClient.post()
                 .uri("/v1/chat/completions")
