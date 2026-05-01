@@ -66,6 +66,8 @@ public class HuggingFaceClient {
                 ))
                 .retrieve()
                 .bodyToMono(JsonNode.class)
+                .defaultIfEmpty(com.fasterxml.jackson.databind.node.NullNode.getInstance())
+                .doOnError(e -> log.warn("generateText failed (model={}): {}", props.getSvgModel(), e.getMessage()))
                 .map(node -> node.path("choices").path(0)
                         .path("message").path("content").asText(""));
     }
