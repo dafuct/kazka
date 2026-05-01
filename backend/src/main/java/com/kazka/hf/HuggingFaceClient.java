@@ -2,6 +2,7 @@ package com.kazka.hf;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
 import com.kazka.config.HuggingFaceProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,7 @@ public class HuggingFaceClient {
                 ))
                 .retrieve()
                 .bodyToMono(JsonNode.class)
-                .defaultIfEmpty(com.fasterxml.jackson.databind.node.NullNode.getInstance())
+                .defaultIfEmpty(NullNode.getInstance())
                 .doOnError(e -> log.warn("generateText failed (model={}): {}", props.getSvgModel(), e.getMessage()))
                 .map(node -> node.path("choices").path(0)
                         .path("message").path("content").asText(""));
