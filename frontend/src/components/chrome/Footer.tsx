@@ -3,7 +3,20 @@ import styles from './Footer.module.css'
 export function Footer() {
   return (
     <footer className={styles.footer}>
-      <p className={styles.text}>Казкар — локальний генератор казок на базі Ollama</p>
+      <div className={styles.left}>
+        <svg viewBox="0 0 28 28" fill="none" className={styles.logoIcon} aria-hidden="true">
+          <path d="M6 4C6 4 8 6 8 14C8 22 6 24 6 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          <path d="M6 4C10 4 20 4 22 6C24 8 24 10 22 12C20 14 14 14 14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M6 14C10 14 18 14 20 16C22 18 22 20 20 22C18 24 10 24 6 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <span className={styles.tagline}>Казки які пам'ятають</span>
+      </div>
+      <div className={styles.links}>
+        <a href="#" className={styles.link}>Умови використання</a>
+        <a href="#" className={styles.link}>Конфіденційність</a>
+        <a href="#" className={styles.link}>Підтримка</a>
+      </div>
+      <div className={styles.bottom}>Зроблено з ❤️ для маленьких мрійників · Казкар 2026</div>
     </footer>
   )
 }

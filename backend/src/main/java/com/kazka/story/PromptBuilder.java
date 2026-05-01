@@ -14,31 +14,45 @@ import java.util.Map;
 public class PromptBuilder {
 
     private static final Map<String, Integer> LENGTH_WORDS = Map.of(
-            "short", 150,
-            "medium", 400,
-            "long", 800
+            "short", 300,
+            "medium", 600,
+            "long", 1000
     );
 
-    private final String systemUk;
-    private final String systemEn;
+    private final String storySystem;
+    private final String editorUk;
+    private final String editorEn;
     private final String illustrationStyle;
 
     public PromptBuilder() {
-        this.systemUk = readResource("prompts/system-uk.txt");
-        this.systemEn = readResource("prompts/system-en.txt");
+        this.storySystem = readResource("prompts/story-system.txt");
+        this.editorUk = readResource("prompts/editor-uk.txt");
+        this.editorEn = readResource("prompts/editor-en.txt");
         this.illustrationStyle = readResource("prompts/illustration-style.txt").strip();
     }
 
-    public String buildPrompt(GenerationRequest req) {
-        String system = "uk".equals(req.language()) ? systemUk : systemEn;
-        int words = LENGTH_WORDS.getOrDefault(req.length(), 400);
+    public String buildStorySystem() {
+        return storySystem.strip();
+    }
+
+    public String buildStoryUserMessage(GenerationRequest req) {
+        int words = LENGTH_WORDS.getOrDefault(req.length(), 600);
         String characters = String.join(", ", req.characters());
 
-        return system.strip() + "\n\n" +
+        return "Write a fairy tale with the following parameters:\n\n" +
+                "Language: " + req.language() + "\n" +
                 "Theme: " + req.theme() + "\n" +
                 "Characters: " + characters + "\n" +
-                "Age group: " + req.ageGroup() + "\n" +
-                "Target length: ~" + words + " words";
+                "Age: " + req.ageGroup() + "\n" +
+                "Length: " + req.length() + " (~" + words + " words)\n\n" +
+                "Age guidelines:\n" +
+                "  3–5 → very short sentences, gentle repetition, familiar home/forest world\n" +
+                "  6–8 → light adventure, clear moral, lively dialogue\n" +
+                "  9–12 → richer plot, character growth, subtle lesson";
+    }
+
+    public String buildEditorSystem(String language) {
+        return "uk".equals(language) ? editorUk.strip() : editorEn.strip();
     }
 
     public String buildIllustrationPrompt(String title, List<String> characters) {

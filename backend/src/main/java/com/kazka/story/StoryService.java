@@ -32,7 +32,9 @@ public class StoryService {
 
     public Flux<SseEvent> generate(GenerationRequest req) {
         String id = UUID.randomUUID().toString();
-        String prompt = promptBuilder.buildPrompt(req);
+        String storySystem = promptBuilder.buildStorySystem();
+        String storyUser = promptBuilder.buildStoryUserMessage(req);
+        String editorSystem = promptBuilder.buildEditorSystem(req.language());
 
         Story story = new Story();
         story.setId(id);
@@ -50,19 +52,31 @@ public class StoryService {
                 .flatMapMany(saved -> {
                     Flux<SseEvent> meta = Flux.just(SseEvent.meta(id));
 
-                    StringBuilder contentBuffer = new StringBuilder();
-                    Flux<SseEvent> tokens = hfClient.streamText(prompt)
-                            .doOnNext(contentBuffer::append)
+                    StringBuilder rawBuffer = new StringBuilder();
+                    // Step 1: stream raw story to user; Step 2: edit silently, save corrected version
+                    Flux<SseEvent> tokens = hfClient.streamText(storySystem, storyUser)
+                            .doOnNext(rawBuffer::append)
                             .map(SseEvent::token)
-                            .concatWith(Mono.fromCallable(() -> {
-                                String fullContent = contentBuffer.toString();
-                                String[] lines = fullContent.split("\n", 2);
-                                String title = lines[0].strip();
-                                saved.setTitle(title);
-                                saved.setContent(fullContent);
-                                repository.save(saved);
-                                return SseEvent.done(id, title);
-                            }).subscribeOn(Schedulers.boundedElastic()))
+                            .concatWith(Mono.defer(() ->
+                                hfClient.streamEdit(editorSystem, rawBuffer.toString())
+                                        .reduce("", String::concat)
+                                        .flatMap(corrected -> Mono.fromCallable(() -> {
+                                            String[] lines = corrected.split("\n");
+                                            String title = "";
+                                            int storyStart = 0;
+                                            for (int i = 0; i < lines.length; i++) {
+                                                String l = lines[i].strip();
+                                                if (!l.isEmpty()) { title = l; storyStart = i + 1; break; }
+                                            }
+                                            // skip blank lines after title to get clean story body
+                                            while (storyStart < lines.length && lines[storyStart].strip().isEmpty()) storyStart++;
+                                            String body = String.join("\n", java.util.Arrays.copyOfRange(lines, storyStart, lines.length));
+                                            saved.setTitle(title);
+                                            saved.setContent(body);
+                                            repository.save(saved);
+                                            return SseEvent.done(id, title);
+                                        }).subscribeOn(Schedulers.boundedElastic()))
+                            ))
                             .onErrorResume(e -> Flux.just(SseEvent.error(e.getMessage())));
 
                     return meta.concatWith(tokens);

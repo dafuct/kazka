@@ -8,9 +8,10 @@ import styles from './StoryForm.module.css'
 interface StoryFormProps {
   onSubmit: (req: GenerationRequest) => void
   loading: boolean
+  inModal?: boolean
 }
 
-export function StoryForm({ onSubmit, loading }: StoryFormProps) {
+export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
   const { t, lang } = useLocale()
   const [theme, setTheme] = useState('')
   const [characters, setCharacters] = useState<string[]>([])
@@ -25,7 +26,7 @@ export function StoryForm({ onSubmit, loading }: StoryFormProps) {
   }
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
+    <form className={`${styles.form} ${inModal ? styles.formInModal : ''}`} onSubmit={handleSubmit}>
       <h2 className={styles.title}>{t.form.title}</h2>
 
       <div className={styles.field}>

@@ -39,8 +39,12 @@ public class IllustrationService {
                     String prompt = promptBuilder.buildIllustrationPrompt(
                             story.getTitle(), story.getCharacters());
                     return hfClient.generateImage(prompt)
-                            .flatMap(bytes -> saveImage(story, bytes))
-                            .switchIfEmpty(markFailed(story))
+                            .flatMap(bytes -> saveImage(story, bytes).thenReturn(Boolean.TRUE))
+                            .defaultIfEmpty(Boolean.FALSE)
+                            .flatMap(ok -> {
+                                if (!ok) return markFailed(story);
+                                return Mono.empty();
+                            })
                             .onErrorResume(e -> {
                                 log.warn("Illustration failed for {}: {}", storyId, e.getMessage());
                                 return markFailed(story);

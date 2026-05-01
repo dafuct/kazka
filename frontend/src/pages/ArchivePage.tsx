@@ -30,7 +30,10 @@ export function ArchivePage() {
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
-        <h1 className={styles.heading}>{t.archive.title}</h1>
+        <div className={styles.pageHeader}>
+          <div className={styles.label}>Бібліотека</div>
+          <h1 className={styles.heading}>{t.archive.title}</h1>
+        </div>
 
         {loading && <p className={styles.msg}>...</p>}
         {error && <p className={styles.msg}>{error}</p>}

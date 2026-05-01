@@ -26,7 +26,8 @@ services:
       DB_USER: kazkar
       DB_PASS: kazkar
       HUGGINGFACE_API_TOKEN: ${HUGGINGFACE_API_TOKEN}
-      HF_TEXT_MODEL: ${HF_TEXT_MODEL:-google/gemma-3-4b-it}
+      HF_TEXT_MODEL: ${HF_TEXT_MODEL:-INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v1.0:featherless-ai}
+      HF_EDITOR_MODEL: ${HF_EDITOR_MODEL:-lapa-llm/lapa-12b-pt:featherless-ai}
       HF_IMAGE_MODEL: ${HF_IMAGE_MODEL:-black-forest-labs/FLUX.1-schnell}
       UPLOADS_DIR: /uploads
     volumes:

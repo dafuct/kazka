@@ -1,47 +1,201 @@
 .section {
-  padding: var(--spacing-16) var(--spacing-6);
-  background: var(--color-surface);
+  padding: 100px 48px;
+  position: relative;
+  overflow: hidden;
 }
 
-.heading {
-  font-size: 2rem;
-  text-align: center;
-  margin-bottom: var(--spacing-10);
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.grid {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--spacing-6);
-  max-width: 900px;
+.inner {
+  max-width: 1100px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
+.label {
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-magic);
+  margin-bottom: 12px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 3.5vw, 42px);
+  line-height: 1.25;
+  margin-bottom: 48px;
+}
+
+.bgIllust {
+  position: absolute;
+  left: -80px;
+  bottom: 20px;
+  width: 380px;
+  height: 480px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.07;
+  transform: scaleX(-1);
+}
+[data-theme="dark"] .bgIllust { opacity: 0.05; }
+
+.bento {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 20px;
+}
+
+/* Shared card base */
 .card {
-  background: var(--color-bg);
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-8);
-  text-align: center;
-  box-shadow: var(--shadow-sm);
+  background: var(--color-surface);
+  border: 1px solid rgba(160,120,96,0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(44,24,16,0.08), 0 8px 24px rgba(44,24,16,0.04);
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s;
+}
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(44,24,16,0.12), 0 24px 48px rgba(44,24,16,0.08);
+  border-color: rgba(124,58,237,0.2);
 }
 
-.icon {
-  font-size: 2.5rem;
-  display: block;
-  margin-bottom: var(--spacing-4);
+/* ── Large card ── */
+.cardLarge {
+  grid-column: 1 / -1;
+  min-height: 340px;
+}
+.cardLarge .bgImage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+.cardLarge .bgImage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(44,24,16,0.75) 0%, rgba(44,24,16,0.4) 50%, transparent 100%);
+}
+[data-theme="dark"] .cardLarge .bgImage::after {
+  background: linear-gradient(135deg, rgba(15,10,30,0.85) 0%, rgba(15,10,30,0.5) 50%, transparent 100%);
+}
+.largeText {
+  position: relative;
+  z-index: 1;
+  padding: 48px;
+  max-width: 480px;
+}
+.largeText h3 {
+  color: #FAF0DC;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.largeText p { color: rgba(250,240,220,0.8); font-size: 15px; line-height: 1.7; }
+
+/* ── Medium card ── */
+.cardMedium {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  align-items: center;
+}
+.mediumText { padding: 32px; }
+.mediumText h3 { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+.mediumText p { font-size: 14px; color: var(--color-text-muted); line-height: 1.7; }
+.mediumImg { height: 100%; overflow: hidden; }
+.mediumImg .illustForest { transition: transform 4s ease; }
+.cardMedium:hover .mediumImg .illustForest { transform: scale(1.05); }
+
+/* ── Text-only card ── */
+.cardText { padding: 32px; }
+.dropInitial {
+  float: left;
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 0.85;
+  color: var(--color-magic);
+  margin-right: 8px;
+  margin-top: 4px;
+}
+.cardText h3 { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+.cardText p { font-size: 14px; color: var(--color-text-muted); line-height: 1.7; }
+
+/* ── Image card ── */
+.cardImg { min-height: 220px; }
+.cardImg .bgImage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.cardImg .bgImage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(44,24,16,0.7) 0%, transparent 60%);
+}
+[data-theme="dark"] .cardImg .bgImage::after {
+  background: linear-gradient(to top, rgba(15,10,30,0.8) 0%, transparent 60%);
+}
+.imgText {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px;
+  z-index: 1;
+}
+.imgText h3 { color: #FAF0DC; font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.imgText p { color: rgba(250,240,220,0.75); font-size: 13px; }
+
+/* ── Illustrations ── */
+.illustCozy {
+  width: 100%;
+  height: 100%;
+  min-height: 340px;
+  background:
+    radial-gradient(ellipse at 40% 30%, rgba(217,119,6,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 70%, rgba(124,58,237,0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 80%, rgba(30,27,75,0.15) 0%, transparent 40%),
+    var(--color-surface-2);
+  transition: transform 6s ease;
+}
+.card:hover .illustCozy { transform: scale(1.05); }
+
+.illustForest {
+  width: 100%;
+  height: 100%;
+  min-height: 160px;
+  background:
+    radial-gradient(ellipse at 50% 90%, rgba(22,101,52,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 40%, rgba(124,58,237,0.2) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(217,119,6,0.15) 0%, transparent 40%),
+    var(--color-surface-2);
 }
 
-.cardTitle {
-  font-size: 1.125rem;
-  margin-bottom: var(--spacing-2);
+.illustBook {
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(217,119,6,0.35) 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 30%, rgba(194,65,12,0.15) 0%, transparent 40%),
+    radial-gradient(ellipse at 70% 80%, rgba(124,58,237,0.1) 0%, transparent 40%),
+    var(--color-surface-deep);
+  transition: transform 6s ease;
 }
+.card:hover .illustBook { transform: scale(1.05); }
 
-.cardDesc {
-  font-size: 0.9375rem;
-  color: var(--color-text-muted);
-  line-height: 1.6;
+@media (max-width: 860px) {
+  .section { padding: 80px 20px; }
+  .bento { grid-template-columns: 1fr; }
+  .cardLarge { min-height: 280px; }
+  .cardMedium { grid-template-columns: 1fr; }
+  .mediumImg { height: 160px; }
 }

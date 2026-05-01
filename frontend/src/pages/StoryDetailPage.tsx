@@ -34,22 +34,25 @@ export function StoryDetailPage() {
       .finally(() => setLoading(false))
   }, [id])
 
+  useEffect(() => {
+    if (!story || story.illustrationStatus !== 'PENDING') return
+    const poll = setInterval(async () => {
+      try {
+        const updated = await api.getStory(story.id)
+        setStory(updated)
+      } catch {
+        clearInterval(poll)
+      }
+    }, 3000)
+    return () => clearInterval(poll)
+  }, [story?.illustrationStatus, story?.id])
+
   const handleIllustrate = useCallback(async () => {
     if (!story) return
     setIllustrating(true)
     await api.illustrate(story.id).catch(() => null)
     setStory(prev => prev ? { ...prev, illustrationStatus: 'PENDING' } : prev)
     setIllustrating(false)
-
-    const poll = setInterval(async () => {
-      try {
-        const updated = await api.getStory(story.id)
-        setStory(updated)
-        if (updated.illustrationStatus !== 'PENDING') clearInterval(poll)
-      } catch {
-        clearInterval(poll)
-      }
-    }, 3000)
   }, [story])
 
   const handleSave = useCallback(async () => {

@@ -43,15 +43,26 @@ public class HuggingFaceClient {
                 .build();
     }
 
-    public Flux<String> streamText(String prompt) {
+    public Flux<String> streamText(String system, String user) {
+        return streamRequest(props.getTextModel(), system, user);
+    }
+
+    public Flux<String> streamEdit(String system, String user) {
+        return streamRequest(props.getEditorModel(), system, user);
+    }
+
+    private Flux<String> streamRequest(String model, String system, String user) {
         return textClient.post()
-                .uri("/hf-inference/v1/chat/completions")
+                .uri("/v1/chat/completions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of(
-                        "model", props.getTextModel(),
-                        "messages", List.of(Map.of("role", "user", "content", prompt)),
+                        "model", model,
+                        "messages", List.of(
+                                Map.of("role", "system", "content", system),
+                                Map.of("role", "user", "content", user)
+                        ),
                         "stream", true,
-                        "max_tokens", 2048
+                        "max_tokens", 4096
                 ))
                 .retrieve()
                 .bodyToFlux(String.class)
@@ -73,7 +84,7 @@ public class HuggingFaceClient {
 
     public Mono<byte[]> generateImage(String prompt) {
         return imageClient.post()
-                .uri("/models/" + props.getImageModel())
+                .uri("/hf-inference/models/" + props.getImageModel())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("inputs", prompt))
                 .retrieve()

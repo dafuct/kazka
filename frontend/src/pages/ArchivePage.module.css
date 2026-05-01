@@ -1,5 +1,6 @@
 .page {
-  padding: var(--spacing-10) var(--spacing-6);
+  padding: calc(64px + 60px) 48px 80px;
+  min-height: 100vh;
 }
 
 .inner {
@@ -7,21 +8,41 @@
   margin: 0 auto;
 }
 
+.pageHeader {
+  margin-bottom: 48px;
+}
+
+.label {
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-magic);
+  margin-bottom: 12px;
+}
+
 .heading {
-  font-size: 2rem;
-  margin-bottom: var(--spacing-8);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 3.5vw, 42px);
+  line-height: 1.25;
 }
 
 .msg {
   color: var(--color-text-muted);
   font-size: 1.0625rem;
   text-align: center;
-  padding: var(--spacing-12) 0;
+  padding: 48px 0;
+  font-family: var(--font-display);
 }
 
 .grid {
   list-style: none;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--spacing-6);
+  gap: 24px;
+}
+
+@media (max-width: 860px) {
+  .page { padding: calc(64px + 40px) 20px 60px; }
 }
