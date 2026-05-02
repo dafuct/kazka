@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.List;
+
 @Service
 public class IllustrationService {
 
@@ -41,8 +43,9 @@ public class IllustrationService {
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(opt -> opt.map(Mono::just).orElse(Mono.empty()))
                 .flatMap(story -> {
-                    String fallback = story.getCharacters().get(0)
-                            + " in a magical scene from " + story.getTitle();
+                    List<String> chars = story.getCharacters();
+                    String firstChar = (chars != null && !chars.isEmpty()) ? chars.get(0) : "a character";
+                    String fallback = firstChar + " in a magical scene from " + story.getTitle();
 
                     return hfClient.generateText(
                                     promptBuilder.buildSceneExtractionSystem(),
