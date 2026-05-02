@@ -103,4 +103,49 @@ class PromptBuilderTest {
         assertThat(user).contains("She walked into the forest");
         assertThat(user).contains("Story context: Once there was a girl. She walked into the forest.");
     }
+
+    @Test
+    void buildImageStylePreamble_3_5_light_containsCrayonAndCream() {
+        String style = builder.buildImageStylePreamble("3-5", Theme.LIGHT);
+        assertThat(style).contains("4-year-old");
+        assertThat(style).contains("crayons");
+        assertThat(style).contains("cream paper");
+    }
+
+    @Test
+    void buildImageStylePreamble_9_12_dark_containsPencilAndNavy() {
+        String style = builder.buildImageStylePreamble("9-12", Theme.DARK);
+        assertThat(style).contains("10-year-old");
+        assertThat(style).contains("pencil");
+        assertThat(style).contains("navy");
+    }
+
+    @Test
+    void buildImageStylePreamble_unknownAge_fallsBackTo6to8() {
+        String style = builder.buildImageStylePreamble("100-200", Theme.LIGHT);
+        assertThat(style).contains("7-year-old");
+    }
+
+    @Test
+    void buildImagePrompt_combinesStylePreambleAndScene() {
+        Story story = new Story();
+        story.setAgeGroup("6-8");
+        story.setCharacters(List.of("Mia"));
+
+        String prompt = builder.buildImagePrompt(story, "a fox under a tree", Theme.LIGHT);
+
+        assertThat(prompt).contains("7-year-old");
+        assertThat(prompt).contains("a fox under a tree");
+    }
+
+    @Test
+    void buildImagePrompt_withNullScene_usesEmpty() {
+        Story story = new Story();
+        story.setAgeGroup("3-5");
+
+        String prompt = builder.buildImagePrompt(story, null, Theme.DARK);
+
+        assertThat(prompt).contains("4-year-old");
+        assertThat(prompt).doesNotContain("null");
+    }
 }

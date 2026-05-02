@@ -24,6 +24,7 @@ public class PromptBuilder {
     private final String editorEn;
     private final String sceneExtractionSystem;
     private final String svgSystem;
+    private final Map<String, Map<Theme, String>> imageStyleByAge;
 
     public PromptBuilder() {
         this.storySystem = readResource("prompts/story-system.txt");
@@ -31,6 +32,17 @@ public class PromptBuilder {
         this.editorEn = readResource("prompts/editor-en.txt");
         this.sceneExtractionSystem = readResource("prompts/scene-extraction-system.txt");
         this.svgSystem = readResource("prompts/svg-system.txt");
+        this.imageStyleByAge = Map.of(
+                "3-5",  Map.of(
+                        Theme.LIGHT, readResource("prompts/image-style-3-5-light.txt"),
+                        Theme.DARK,  readResource("prompts/image-style-3-5-dark.txt")),
+                "6-8",  Map.of(
+                        Theme.LIGHT, readResource("prompts/image-style-6-8-light.txt"),
+                        Theme.DARK,  readResource("prompts/image-style-6-8-dark.txt")),
+                "9-12", Map.of(
+                        Theme.LIGHT, readResource("prompts/image-style-9-12-light.txt"),
+                        Theme.DARK,  readResource("prompts/image-style-9-12-dark.txt"))
+        );
     }
 
     public String buildStorySystem() {
@@ -101,6 +113,17 @@ public class PromptBuilder {
                "- Scale: character height = 35-40% of canvas height (210-240px)\n\n" +
                "Age group: " + story.getAgeGroup() + "\n" +
                "Story context: " + firstTwoSentences(story.getContent());
+    }
+
+    public String buildImageStylePreamble(String ageGroup, Theme theme) {
+        Map<Theme, String> byTheme = imageStyleByAge.getOrDefault(ageGroup, imageStyleByAge.get("6-8"));
+        return byTheme.get(theme).strip();
+    }
+
+    public String buildImagePrompt(Story story, String scene, Theme theme) {
+        String style = buildImageStylePreamble(story.getAgeGroup(), theme);
+        String safeScene = (scene == null || scene.isBlank()) ? "" : " " + scene.strip();
+        return style + safeScene;
     }
 
     private static String firstTwoSentences(String content) {
