@@ -34,3 +34,12 @@ dependencies {
 tasks.withType(Test).configureEach {
     useJUnitPlatform()
 }
+
+tasks.register('generateSamples', JavaExec) {
+    group = 'application'
+    description = 'Generate the 18 marketing PNG samples by calling the live HF pipeline.'
+    mainClass = 'com.kazka.KazkaApplication'
+    classpath = sourceSets.main.runtimeClasspath
+    systemProperty 'spring.profiles.active', 'sample-gen'
+    workingDir = projectDir
+}
