@@ -124,12 +124,11 @@
 [data-theme="dark"] .bgIllust { opacity: 0.05; }
 
 .illustWrap {
-  border-radius: 12px;
-  overflow: hidden;
   aspect-ratio: 3/4;
-  box-shadow: 0 4px 20px rgba(44,24,16,0.1);
   align-self: start;
   margin-top: -60px;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 55%, transparent 95%);
+          mask-image: radial-gradient(ellipse at center, #000 55%, transparent 95%);
 }
 
 .illustQuill {
