@@ -8,13 +8,11 @@ const AGE_KEYS = ['3-5', '6-8', '9-12'] as const
 
 interface Props {
   section: 'hero' | 'how' | 'preview'
-  width: number
-  height: number
   className?: string
   intervalMs?: number
 }
 
-export function IllustrationCarousel({ section, width, height, className, intervalMs }: Props) {
+export function IllustrationCarousel({ section, className, intervalMs }: Props) {
   const { theme } = useTheme()
   const { t } = useLocale()
   const [ageIndex, setAgeIndex] = useState(0)
@@ -53,7 +51,7 @@ export function IllustrationCarousel({ section, width, height, className, interv
 
   return (
     <div className={`${styles.wrap} ${className ?? ''}`}>
-      <div className={styles.frame} style={{ width, height }} role="img" aria-label={t.form.ageGroups[age]}>
+      <div className={styles.frame} role="img" aria-label={t.form.ageGroups[age]}>
         <img
           src={src}
           alt=""

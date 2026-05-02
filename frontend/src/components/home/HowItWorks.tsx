@@ -110,7 +110,7 @@ export function HowItWorks() {
             ref={illustRef}
             className={`${styles.illustWrap} reveal ${illustVisible ? 'visible' : ''}`}
           >
-            <IllustrationCarousel section="how" width={300} height={400} />
+            <IllustrationCarousel section="how" />
           </div>
         </div>
       </div>

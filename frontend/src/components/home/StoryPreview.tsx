@@ -68,7 +68,7 @@ export function StoryPreview() {
           </div>
 
           <div className={styles.bookRight}>
-            <IllustrationCarousel section="preview" width={520} height={390} />
+            <IllustrationCarousel section="preview" />
             <div className={styles.pageNumRight}>4</div>
           </div>
         </div>

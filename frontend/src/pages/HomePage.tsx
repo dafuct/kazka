@@ -110,7 +110,7 @@ export function HomePage() {
 
           <div ref={heroImgRef} className={styles.heroImageWrap}>
             <div className={styles.heroImage}>
-              <IllustrationCarousel section="hero" width={520} height={390} />
+              <IllustrationCarousel section="hero" />
             </div>
           </div>
         </div>
