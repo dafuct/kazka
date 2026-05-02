@@ -101,5 +101,6 @@ class PromptBuilderTest {
         assertThat(user).contains("6-8");
         assertThat(user).contains("Once there was a girl");
         assertThat(user).contains("She walked into the forest");
+        assertThat(user).contains("Story context: Once there was a girl. She walked into the forest.");
     }
 }

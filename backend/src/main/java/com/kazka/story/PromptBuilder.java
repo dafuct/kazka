@@ -106,7 +106,7 @@ public class PromptBuilder {
     private static String firstTwoSentences(String content) {
         if (content == null || content.isBlank()) return "";
         String[] parts = content.split("(?<=\\.)\\s+", 3);
-        return parts.length >= 2 ? parts[0] + ". " + parts[1] : parts[0];
+        return parts.length >= 2 ? parts[0] + " " + parts[1] : parts[0];
     }
 
     private static String readResource(String path) {
