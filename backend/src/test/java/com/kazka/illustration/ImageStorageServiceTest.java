@@ -42,4 +42,42 @@ class ImageStorageServiceTest {
         ImageStorageService service = new ImageStorageService(tempDir.toString());
         service.delete("nonexistent");
     }
+
+    @Test
+    void saveSvg_writesFileToDisk() throws IOException {
+        ImageStorageService service = new ImageStorageService(tempDir.toString());
+        String svgText = "<svg xmlns=\"http://www.w3.org/2000/svg\"><rect/></svg>";
+
+        String path = service.saveSvg("story-789", svgText);
+
+        assertThat(path).isEqualTo("/uploads/story-789.svg");
+        Path file = tempDir.resolve("story-789.svg");
+        assertThat(file).exists();
+        assertThat(Files.readString(file)).isEqualTo(svgText);
+    }
+
+    @Test
+    void delete_removesSvgFile() throws IOException {
+        ImageStorageService service = new ImageStorageService(tempDir.toString());
+        Path file = tempDir.resolve("story-abc.svg");
+        Files.writeString(file, "<svg/>");
+
+        service.delete("story-abc");
+
+        assertThat(file).doesNotExist();
+    }
+
+    @Test
+    void delete_removesBothPngAndSvg() throws IOException {
+        ImageStorageService service = new ImageStorageService(tempDir.toString());
+        Path png = tempDir.resolve("story-xyz.png");
+        Path svg = tempDir.resolve("story-xyz.svg");
+        Files.writeString(png, "png-data");
+        Files.writeString(svg, "<svg/>");
+
+        service.delete("story-xyz");
+
+        assertThat(png).doesNotExist();
+        assertThat(svg).doesNotExist();
+    }
 }

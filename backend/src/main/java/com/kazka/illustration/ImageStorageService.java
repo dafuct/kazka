@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -42,12 +43,26 @@ public class ImageStorageService {
         return "/uploads/" + storyId + ".png";
     }
 
+    public String saveSvg(String storyId, String svgText) {
+        Path file = uploadsDir.resolve(storyId + ".svg");
+        try {
+            Files.writeString(file, svgText, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Cannot save SVG for story " + storyId, e);
+        }
+        return "/uploads/" + storyId + ".svg";
+    }
+
     public void delete(String storyId) {
-        Path file = uploadsDir.resolve(storyId + ".png");
+        tryDelete(uploadsDir.resolve(storyId + ".png"));
+        tryDelete(uploadsDir.resolve(storyId + ".svg"));
+    }
+
+    private void tryDelete(Path file) {
         try {
             Files.deleteIfExists(file);
         } catch (IOException e) {
-            log.warn("Could not delete image for story {}: {}", storyId, e.getMessage());
+            log.warn("Could not delete file {}: {}", file, e.getMessage());
         }
     }
 }
