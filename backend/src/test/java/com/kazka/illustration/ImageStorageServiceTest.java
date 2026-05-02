@@ -84,12 +84,14 @@ class ImageStorageServiceTest {
     }
 
     @Test
-    void saveSvg_throwsUncheckedIOException_whenParentIsAFile() throws IOException {
-        Path notADir = tempDir.resolve("notadir");
-        Files.writeString(notADir, "I am a file");
+    void saveSvg_throwsUncheckedIOException_whenWriteFails() throws IOException {
+        ImageStorageService service = new ImageStorageService(tempDir.toString());
+        // Replace uploads dir with a file to make the write fail
+        Path blocker = tempDir.resolve("story-fail.svg");
+        Files.createDirectory(blocker); // directory where a file is expected = write will fail
 
-        assertThatThrownBy(() -> new ImageStorageService(notADir.toString()))
+        assertThatThrownBy(() -> service.saveSvg("story-fail", "<svg/>"))
                 .isInstanceOf(UncheckedIOException.class)
-                .hasMessageContaining("Cannot create uploads directory");
+                .hasMessageContaining("story-fail");
     }
 }
