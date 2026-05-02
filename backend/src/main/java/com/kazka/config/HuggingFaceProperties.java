@@ -9,7 +9,7 @@ public class HuggingFaceProperties {
     private String textModel = "Qwen/Qwen2.5-72B-Instruct";
     private String editorModel = "Qwen/Qwen2.5-72B-Instruct";
     private String imageModel = "black-forest-labs/FLUX.1-schnell";
-    private String svgModel = "Qwen/Qwen2.5-72B-Instruct";
+    private String sceneModel = "Qwen/Qwen2.5-72B-Instruct";
     private String textBaseUrl = "https://router.huggingface.co";
     private String imageBaseUrl = "https://router.huggingface.co";
 
@@ -25,8 +25,8 @@ public class HuggingFaceProperties {
     public String getImageModel() { return imageModel; }
     public void setImageModel(String imageModel) { this.imageModel = imageModel; }
 
-    public String getSvgModel() { return svgModel; }
-    public void setSvgModel(String svgModel) { this.svgModel = svgModel; }
+    public String getSceneModel() { return sceneModel; }
+    public void setSceneModel(String sceneModel) { this.sceneModel = sceneModel; }
 
     public String getTextBaseUrl() { return textBaseUrl; }
     public void setTextBaseUrl(String textBaseUrl) { this.textBaseUrl = textBaseUrl; }

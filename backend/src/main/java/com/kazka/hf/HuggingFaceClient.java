@@ -23,6 +23,7 @@ public class HuggingFaceClient {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final WebClient textClient;
+    private final WebClient imageClient;
     private final HuggingFaceProperties props;
 
     public HuggingFaceClient(WebClient.Builder builder, HuggingFaceProperties props) {
@@ -35,6 +36,11 @@ public class HuggingFaceClient {
                 .baseUrl(props.getTextBaseUrl())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, auth)
                 .codecs(c -> c.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
+                .build();
+        this.imageClient = builder.clone()
+                .baseUrl(props.getImageBaseUrl())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, auth)
+                .codecs(c -> c.defaultCodecs().maxInMemorySize(20 * 1024 * 1024))
                 .build();
     }
 
@@ -51,7 +57,7 @@ public class HuggingFaceClient {
                 .uri("/v1/chat/completions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of(
-                        "model", props.getSvgModel(),
+                        "model", props.getSceneModel(),
                         "messages", List.of(
                                 Map.of("role", "system", "content", system),
                                 Map.of("role", "user", "content", user)
@@ -62,7 +68,7 @@ public class HuggingFaceClient {
                 .retrieve()
                 .bodyToMono(JsonNode.class)
                 .defaultIfEmpty(NullNode.getInstance())
-                .doOnError(e -> log.warn("generateText failed (model={}): {}", props.getSvgModel(), e.getMessage()))
+                .doOnError(e -> log.warn("generateText failed (model={}): {}", props.getSceneModel(), e.getMessage()))
                 .map(node -> node.path("choices").path(0)
                         .path("message").path("content").asText(""));
     }
@@ -96,6 +102,29 @@ public class HuggingFaceClient {
                         return Flux.empty();
                     }
                 });
+    }
+
+    public Mono<byte[]> generateImage(String prompt, int width, int height) {
+        return generateImage(prompt, width, height, null);
+    }
+
+    public Mono<byte[]> generateImage(String prompt, int width, int height, Long seed) {
+        java.util.Map<String, Object> params = new java.util.HashMap<>();
+        params.put("width", width);
+        params.put("height", height);
+        if (seed != null) params.put("seed", seed);
+
+        return imageClient.post()
+                .uri("/hf-inference/models/" + props.getImageModel())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.IMAGE_PNG)
+                .bodyValue(Map.of(
+                        "inputs", prompt,
+                        "parameters", params
+                ))
+                .retrieve()
+                .bodyToMono(byte[].class)
+                .doOnError(e -> log.warn("generateImage failed (model={}): {}", props.getImageModel(), e.getMessage()));
     }
 
 }
