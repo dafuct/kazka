@@ -1,46 +1,56 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useReveal } from '../../lib/useReveal'
+import { useLocale } from '../../lib/LocaleContext'
 import { SectionParticles } from './SectionParticles'
 import styles from './StoryPreview.module.css'
-
-const STORY_FULL = "авним-давно, у самому серці Зачарованого лісу, жила маленька зірочка на ім'я Мія. Вона не світила на небі, як інші зірки — натомість мешкала у дуплі старезного дуба і щоночі вирушала у подорож стежками, вкритими сріблястим мохом."
+import { IllustrationCarousel } from '../illustrations/IllustrationCarousel'
 
 export function StoryPreview() {
+  const { t, lang } = useLocale()
   const { ref: headRef, visible: headVisible } = useReveal()
-  const { ref: bookRef, visible: bookVisible } = useReveal({ threshold: 0.3 })
+  const { ref: bookRef, visible: bookVisible } = useReveal({ threshold: 0 })
   const [typed, setTyped] = useState('')
-  const [typeStarted, setTypeStarted] = useState(false)
   const [done, setDone] = useState(false)
+  const typeStarted = useRef(false)
 
   useEffect(() => {
-    if (!bookVisible || typeStarted) return
-    setTypeStarted(true)
+    setTyped('')
+    typeStarted.current = false
+    setDone(false)
+  }, [lang])
+
+  useEffect(() => {
+    if (!bookVisible || typeStarted.current) return
+    typeStarted.current = true
+    const storyText = t.storyPreview.text
     if (window.innerWidth < 640) {
-      setTyped(STORY_FULL)
+      setTyped(storyText)
       setDone(true)
       return
     }
     let idx = 0
     const interval = setInterval(() => {
-      if (idx < STORY_FULL.length) {
-        setTyped(STORY_FULL.slice(0, idx + 1))
+      if (idx < storyText.length) {
+        setTyped(storyText.slice(0, idx + 1))
         idx++
       } else {
         clearInterval(interval)
         setDone(true)
       }
-    }, 22)
+    }, 10)
     return () => clearInterval(interval)
-  }, [bookVisible, typeStarted])
+  }, [bookVisible, t.storyPreview.text])
+
+  const titleLines = t.storyPreview.title.split('\n')
 
   return (
     <section className={styles.section} id="preview">
       <SectionParticles light />
       <div className={styles.inner}>
         <div ref={headRef} className={`reveal ${headVisible ? 'visible' : ''}`}>
-          <div className={styles.label}>Приклад казки</div>
+          <div className={styles.label}>{t.storyPreview.label}</div>
           <div className={styles.title}>
-            Ось яка казка може чекати<br />сьогодні ввечері
+            {titleLines[0]}<br />{titleLines[1]}
           </div>
         </div>
 
@@ -50,7 +60,7 @@ export function StoryPreview() {
         >
           <div className={styles.bookLeft}>
             <div className={styles.storyText}>
-              <span className={styles.dropCap}>Д</span>
+              <span className={styles.dropCap}>{t.storyPreview.dropCap}</span>
               {typed}
               {!done && <span className={styles.cursor} aria-hidden="true" />}
             </div>
@@ -58,14 +68,13 @@ export function StoryPreview() {
           </div>
 
           <div className={styles.bookRight}>
-            <div className={styles.illustHero} />
-            <span className={styles.illustCaption}>✦ Ілюстрація згенерована AI</span>
+            <IllustrationCarousel section="preview" width={520} height={390} />
             <div className={styles.pageNumRight}>4</div>
           </div>
         </div>
 
         <div className={`${styles.tagline} reveal ${headVisible ? 'visible' : ''}`}>
-          Кожна казка — унікальна. Жодного повторення.
+          {t.storyPreview.tagline}
         </div>
       </div>
     </section>
