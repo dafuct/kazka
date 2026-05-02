@@ -51,6 +51,10 @@ export function IllustrationCarousel({ section, width, height, className, interv
     })
   }, [section, theme, ageIndex])
 
+  useEffect(() => () => {
+    if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current)
+  }, [])
+
   const onTabClick = (i: number) => {
     setManual(true)
     setFading(true)
@@ -65,21 +69,21 @@ export function IllustrationCarousel({ section, width, height, className, interv
 
   return (
     <div className={`${styles.wrap} ${className ?? ''}`}>
-      <div className={styles.frame} style={{ width, height }} role="img" aria-label={`${ageLabel} drawing`}>
+      <div className={styles.frame} style={{ width, height }} role="img" aria-label={ageLabel}>
         <img
           src={src}
-          alt={`${ageLabel} child drawing`}
+          alt=""
           className={`${styles.img} ${fading ? styles.imgFading : ''}`}
           loading="eager"
           decoding="async"
         />
         <span className={styles.ageBadge} aria-hidden="true">{ageLabel}</span>
       </div>
-      <div className={styles.tabs} role="tablist">
+      <div className={styles.tabs}>
         {AGE_KEYS.map((a, i) => (
           <button
             key={a}
-            role="tab"
+            type="button"
             aria-pressed={i === ageIndex}
             className={`${styles.tab} ${i === ageIndex ? styles.tabActive : ''}`}
             onClick={() => onTabClick(i)}
