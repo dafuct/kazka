@@ -4,7 +4,6 @@ import com.kazka.hf.HuggingFaceClient;
 import com.kazka.story.IllustrationStatus;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
-import com.kazka.story.PromptBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,16 +18,13 @@ public class IllustrationService {
     private final HuggingFaceClient hfClient;
     private final ImageStorageService imageStorageService;
     private final StoryRepository storyRepository;
-    private final PromptBuilder promptBuilder;
 
     public IllustrationService(HuggingFaceClient hfClient,
                                ImageStorageService imageStorageService,
-                               StoryRepository storyRepository,
-                               PromptBuilder promptBuilder) {
+                               StoryRepository storyRepository) {
         this.hfClient = hfClient;
         this.imageStorageService = imageStorageService;
         this.storyRepository = storyRepository;
-        this.promptBuilder = promptBuilder;
     }
 
     public Mono<Void> generateAndStore(String storyId) {
@@ -36,8 +32,8 @@ public class IllustrationService {
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(opt -> opt.map(Mono::just).orElse(Mono.empty()))
                 .flatMap(story -> {
-                    String prompt = promptBuilder.buildIllustrationPrompt(
-                            story.getTitle(), story.getCharacters());
+                    String chars = story.getCharacters() == null ? "" : String.join(", ", story.getCharacters());
+                    String prompt = story.getTitle() + " featuring " + chars;
                     return hfClient.generateImage(prompt)
                             .flatMap(bytes -> saveImage(story, bytes).thenReturn(Boolean.TRUE))
                             .defaultIfEmpty(Boolean.FALSE)

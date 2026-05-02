@@ -3,6 +3,8 @@ package com.kazka.story;
 import com.kazka.story.dto.GenerationRequest;
 import org.junit.jupiter.api.Test;
 
+import com.kazka.story.Story;
+
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,8 +53,8 @@ class PromptBuilderTest {
     void buildEditorSystem_uk_containsUkrainianGrammarRules() {
         String system = builder.buildEditorSystem("uk");
 
-        assertThat(system).contains("відмінювання");
-        assertThat(system).contains("суржик");
+        assertThat(system).contains("Відмінювання");
+        assertThat(system).contains("Суржик");
     }
 
     @Test
@@ -64,12 +66,40 @@ class PromptBuilderTest {
     }
 
     @Test
-    void buildIllustrationPrompt_includesTitleAndCharacters() {
-        String prompt = builder.buildIllustrationPrompt("Мія та лисичка", List.of("Мія", "лисичка"));
+    void buildSceneExtractionSystem_returnsNonBlank() {
+        assertThat(builder.buildSceneExtractionSystem()).isNotBlank();
+    }
 
-        assertThat(prompt).contains("Мія та лисичка");
-        assertThat(prompt).contains("Мія");
-        assertThat(prompt).contains("лисичка");
-        assertThat(prompt).contains("Watercolor");
+    @Test
+    void buildSceneExtractionUser_wrapsStoryContent() {
+        String user = builder.buildSceneExtractionUser("Once upon a time a fox ran.");
+
+        assertThat(user).contains("Once upon a time a fox ran.");
+    }
+
+    @Test
+    void buildSvgSystem_containsSvgOutputRules() {
+        String system = builder.buildSvgSystem();
+
+        assertThat(system).contains("viewBox");
+        assertThat(system).contains("800");
+        assertThat(system).contains("filter");
+    }
+
+    @Test
+    void buildSvgUser_fillsSceneCharacterAndAgeGroup() {
+        Story story = new Story();
+        story.setCharacters(List.of("Mia", "the Fox"));
+        story.setAgeGroup("6-8");
+        story.setContent("Once there was a girl. She walked into the forest. More text here.");
+
+        String user = builder.buildSvgUser(story, "a girl standing near a tall oak tree");
+
+        assertThat(user).contains("a girl standing near a tall oak tree");
+        assertThat(user).contains("Mia");
+        assertThat(user).contains("the Fox");
+        assertThat(user).contains("6-8");
+        assertThat(user).contains("Once there was a girl");
+        assertThat(user).contains("She walked into the forest");
     }
 }

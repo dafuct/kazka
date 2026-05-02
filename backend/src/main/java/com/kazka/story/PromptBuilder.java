@@ -22,13 +22,15 @@ public class PromptBuilder {
     private final String storySystem;
     private final String editorUk;
     private final String editorEn;
-    private final String illustrationStyle;
+    private final String sceneExtractionSystem;
+    private final String svgSystem;
 
     public PromptBuilder() {
         this.storySystem = readResource("prompts/story-system.txt");
         this.editorUk = readResource("prompts/editor-uk.txt");
         this.editorEn = readResource("prompts/editor-en.txt");
-        this.illustrationStyle = readResource("prompts/illustration-style.txt").strip();
+        this.sceneExtractionSystem = readResource("prompts/scene-extraction-system.txt");
+        this.svgSystem = readResource("prompts/svg-system.txt");
     }
 
     public String buildStorySystem() {
@@ -55,9 +57,56 @@ public class PromptBuilder {
         return "uk".equals(language) ? editorUk.strip() : editorEn.strip();
     }
 
-    public String buildIllustrationPrompt(String title, List<String> characters) {
-        String chars = String.join(", ", characters);
-        return title + " featuring " + chars + ". " + illustrationStyle;
+    public String buildSceneExtractionSystem() {
+        return sceneExtractionSystem.strip();
+    }
+
+    public String buildSceneExtractionUser(String storyContent) {
+        return "Story:\n\n" + (storyContent == null ? "" : storyContent);
+    }
+
+    public String buildSvgSystem() {
+        return svgSystem.strip();
+    }
+
+    public String buildSvgUser(Story story, String sceneDescription) {
+        String mainChar = (story.getCharacters() == null || story.getCharacters().isEmpty())
+                ? "a child" : story.getCharacters().get(0);
+        List<String> supporting = (story.getCharacters() != null && story.getCharacters().size() > 1)
+                ? story.getCharacters().subList(1, story.getCharacters().size())
+                : List.of();
+        String supportingLine = supporting.isEmpty()
+                ? ""
+                : "Supporting characters: " + String.join(", ", supporting) + "\n";
+
+        return "Generate a flat vector SVG illustration for a children's fairy tale.\n\n" +
+               "Scene: " + sceneDescription + "\n" +
+               "Main character: " + mainChar + "\n" +
+               supportingLine +
+               "Character position: center-left of canvas\n" +
+               "Mood: warm, cheerful, safe\n" +
+               "Time of day: sunny afternoon or golden hour\n" +
+               "Sky color: soft blue (#a8d8f0) fading to peach (#fde8c8)\n" +
+               "Ground color: soft green (#7bc67e)\n\n" +
+               "Decorative elements (choose 2 maximum):\n" +
+               "- A lollipop-style tree to the right of character\n" +
+               "- 2-3 white clouds in upper sky\n" +
+               "- Small colorful flowers in ground strip\n" +
+               "- Sun in upper-left corner with short rays\n\n" +
+               "Character details:\n" +
+               "- Head shape: circle, choose an appropriate warm color for this character based on their name and type\n" +
+               "- Eyes: two small dark circles with white highlight dot\n" +
+               "- Expression: happy, slightly smiling (use a simple arc path for mouth)\n" +
+               "- Body: rounded rectangle, same color family as head\n" +
+               "- Scale: character height = 35-40% of canvas height (210-240px)\n\n" +
+               "Age group: " + story.getAgeGroup() + "\n" +
+               "Story context: " + firstTwoSentences(story.getContent());
+    }
+
+    private static String firstTwoSentences(String content) {
+        if (content == null || content.isBlank()) return "";
+        String[] parts = content.split("(?<=\\.)\\s+", 3);
+        return parts.length >= 2 ? parts[0] + ". " + parts[1] : parts[0];
     }
 
     private static String readResource(String path) {
