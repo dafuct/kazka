@@ -15,7 +15,8 @@ public record StoryDto(
         String length,
         String language,
         String content,
-        String illustrationPath,
+        String illustrationPathLight,
+        String illustrationPathDark,
         IllustrationStatus illustrationStatus,
         Instant createdAt,
         Instant updatedAt
@@ -24,7 +25,8 @@ public record StoryDto(
         return new StoryDto(
                 s.getId(), s.getTitle(), s.getTheme(), s.getCharacters(),
                 s.getAgeGroup(), s.getLength(), s.getLanguage(), s.getContent(),
-                s.getIllustrationPath(), s.getIllustrationStatus(),
+                s.getIllustrationPathLight(), s.getIllustrationPathDark(),
+                s.getIllustrationStatus(),
                 s.getCreatedAt(), s.getUpdatedAt()
         );
     }

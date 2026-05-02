@@ -1,5 +1,6 @@
 package com.kazka.illustration;
 
+import com.kazka.story.Theme;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -16,82 +18,58 @@ class ImageStorageServiceTest {
     Path tempDir;
 
     @Test
-    void save_writesFileToDisk() throws IOException {
+    void savePng_light_writesFileWithLightSuffix() throws IOException {
         ImageStorageService service = new ImageStorageService(tempDir.toString());
-        byte[] imageBytes = "fake-png-data".getBytes();
+        byte[] bytes = "fake-png-light".getBytes();
 
-        String path = service.save("story-123", imageBytes);
+        String path = service.savePng("story-123", Theme.LIGHT, bytes);
 
-        assertThat(path).isEqualTo("/uploads/story-123.png");
-        Path file = tempDir.resolve("story-123.png");
+        assertThat(path).isEqualTo("/uploads/story-123-light.png");
+        Path file = tempDir.resolve("story-123-light.png");
         assertThat(file).exists();
-        assertThat(Files.readAllBytes(file)).isEqualTo(imageBytes);
+        assertThat(Files.readAllBytes(file)).isEqualTo(bytes);
     }
 
     @Test
-    void delete_removesFile() throws IOException {
+    void savePng_dark_writesFileWithDarkSuffix() throws IOException {
         ImageStorageService service = new ImageStorageService(tempDir.toString());
-        Path file = tempDir.resolve("story-456.png");
-        Files.writeString(file, "data");
+        byte[] bytes = "fake-png-dark".getBytes();
 
-        service.delete("story-456");
+        String path = service.savePng("story-456", Theme.DARK, bytes);
 
-        assertThat(file).doesNotExist();
+        assertThat(path).isEqualTo("/uploads/story-456-dark.png");
+        assertThat(Files.readAllBytes(tempDir.resolve("story-456-dark.png"))).isEqualTo(bytes);
     }
 
     @Test
-    void delete_doesNothingIfFileAbsent() {
+    void savePng_throwsUncheckedIOException_whenWriteFails() throws IOException {
         ImageStorageService service = new ImageStorageService(tempDir.toString());
-        service.delete("nonexistent");
+        Files.createDirectory(tempDir.resolve("blocker-light.png"));
+
+        assertThatThrownBy(() -> service.savePng("blocker", Theme.LIGHT, new byte[]{1, 2}))
+                .isInstanceOf(UncheckedIOException.class)
+                .hasMessageContaining("blocker");
     }
 
     @Test
-    void saveSvg_writesFileToDisk() throws IOException {
+    void delete_removesAllVariants() throws IOException {
         ImageStorageService service = new ImageStorageService(tempDir.toString());
-        String svgText = "<svg xmlns=\"http://www.w3.org/2000/svg\"><rect/></svg>";
-
-        String path = service.saveSvg("story-789", svgText);
-
-        assertThat(path).isEqualTo("/uploads/story-789.svg");
-        Path file = tempDir.resolve("story-789.svg");
-        assertThat(file).exists();
-        assertThat(Files.readString(file)).isEqualTo(svgText);
-    }
-
-    @Test
-    void delete_removesSvgFile() throws IOException {
-        ImageStorageService service = new ImageStorageService(tempDir.toString());
-        Path file = tempDir.resolve("story-abc.svg");
-        Files.writeString(file, "<svg/>");
-
-        service.delete("story-abc");
-
-        assertThat(file).doesNotExist();
-    }
-
-    @Test
-    void delete_removesBothPngAndSvg() throws IOException {
-        ImageStorageService service = new ImageStorageService(tempDir.toString());
-        Path png = tempDir.resolve("story-xyz.png");
-        Path svg = tempDir.resolve("story-xyz.svg");
-        Files.writeString(png, "png-data");
-        Files.writeString(svg, "<svg/>");
+        Files.writeString(tempDir.resolve("story-xyz.png"), "legacy");
+        Files.writeString(tempDir.resolve("story-xyz.svg"), "<svg/>");
+        Files.writeString(tempDir.resolve("story-xyz-light.png"), "light");
+        Files.writeString(tempDir.resolve("story-xyz-dark.png"), "dark");
 
         service.delete("story-xyz");
 
-        assertThat(png).doesNotExist();
-        assertThat(svg).doesNotExist();
+        assertThat(tempDir.resolve("story-xyz.png")).doesNotExist();
+        assertThat(tempDir.resolve("story-xyz.svg")).doesNotExist();
+        assertThat(tempDir.resolve("story-xyz-light.png")).doesNotExist();
+        assertThat(tempDir.resolve("story-xyz-dark.png")).doesNotExist();
     }
 
     @Test
-    void saveSvg_throwsUncheckedIOException_whenWriteFails() throws IOException {
+    void delete_doesNothingIfFilesAbsent() {
         ImageStorageService service = new ImageStorageService(tempDir.toString());
-        // Replace uploads dir with a file to make the write fail
-        Path blocker = tempDir.resolve("story-fail.svg");
-        Files.createDirectory(blocker); // directory where a file is expected = write will fail
-
-        assertThatThrownBy(() -> service.saveSvg("story-fail", "<svg/>"))
-                .isInstanceOf(UncheckedIOException.class)
-                .hasMessageContaining("story-fail");
+        service.delete("nonexistent");
     }
 }

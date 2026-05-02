@@ -78,33 +78,6 @@ class PromptBuilderTest {
     }
 
     @Test
-    void buildSvgSystem_containsSvgOutputRules() {
-        String system = builder.buildSvgSystem();
-
-        assertThat(system).contains("viewBox");
-        assertThat(system).contains("800");
-        assertThat(system).contains("filter");
-    }
-
-    @Test
-    void buildSvgUser_fillsSceneCharacterAndAgeGroup() {
-        Story story = new Story();
-        story.setCharacters(List.of("Mia", "the Fox"));
-        story.setAgeGroup("6-8");
-        story.setContent("Once there was a girl. She walked into the forest. More text here.");
-
-        String user = builder.buildSvgUser(story, "a girl standing near a tall oak tree");
-
-        assertThat(user).contains("a girl standing near a tall oak tree");
-        assertThat(user).contains("Mia");
-        assertThat(user).contains("the Fox");
-        assertThat(user).contains("6-8");
-        assertThat(user).contains("Once there was a girl");
-        assertThat(user).contains("She walked into the forest");
-        assertThat(user).contains("Story context: Once there was a girl. She walked into the forest.");
-    }
-
-    @Test
     void buildImageStylePreamble_3_5_light_containsCrayonAndCream() {
         String style = builder.buildImageStylePreamble("3-5", Theme.LIGHT);
         assertThat(style).contains("4-year-old");

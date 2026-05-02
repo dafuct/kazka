@@ -125,7 +125,7 @@ public class StoryService {
                     Story story = opt.orElseThrow(
                             () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
                     return Mono.fromRunnable(() -> {
-                        if (story.getIllustrationPath() != null) {
+                        if (story.getIllustrationPathLight() != null || story.getIllustrationPathDark() != null) {
                             illustrationService.deleteImage(id);
                         }
                         repository.deleteById(id);

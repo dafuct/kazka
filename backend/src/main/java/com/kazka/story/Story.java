@@ -37,8 +37,11 @@ public class Story {
     @Column(columnDefinition = "LONGTEXT")
     private String content;
 
-    @Column(name = "illustration_path", length = 500)
-    private String illustrationPath;
+    @Column(name = "illustration_path_light", length = 500)
+    private String illustrationPathLight;
+
+    @Column(name = "illustration_path_dark", length = 500)
+    private String illustrationPathDark;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "illustration_status", length = 20)
@@ -76,8 +79,11 @@ public class Story {
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
 
-    public String getIllustrationPath() { return illustrationPath; }
-    public void setIllustrationPath(String illustrationPath) { this.illustrationPath = illustrationPath; }
+    public String getIllustrationPathLight() { return illustrationPathLight; }
+    public void setIllustrationPathLight(String illustrationPathLight) { this.illustrationPathLight = illustrationPathLight; }
+
+    public String getIllustrationPathDark() { return illustrationPathDark; }
+    public void setIllustrationPathDark(String illustrationPathDark) { this.illustrationPathDark = illustrationPathDark; }
 
     public IllustrationStatus getIllustrationStatus() { return illustrationStatus; }
     public void setIllustrationStatus(IllustrationStatus illustrationStatus) { this.illustrationStatus = illustrationStatus; }

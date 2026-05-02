@@ -1,6 +1,7 @@
 package com.kazka.illustration;
 
 import com.kazka.config.UploadsProperties;
+import com.kazka.story.Theme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -33,29 +33,22 @@ public class ImageStorageService {
         }
     }
 
-    public String save(String storyId, byte[] imageBytes) {
-        Path file = uploadsDir.resolve(storyId + ".png");
+    public String savePng(String storyId, Theme theme, byte[] imageBytes) {
+        String filename = storyId + "-" + theme.slug() + ".png";
+        Path file = uploadsDir.resolve(filename);
         try {
             Files.write(file, imageBytes);
         } catch (IOException e) {
-            throw new UncheckedIOException("Cannot save image for story " + storyId, e);
+            throw new UncheckedIOException("Cannot save PNG for story " + storyId + " theme " + theme, e);
         }
-        return "/uploads/" + storyId + ".png";
-    }
-
-    public String saveSvg(String storyId, String svgText) {
-        Path file = uploadsDir.resolve(storyId + ".svg");
-        try {
-            Files.writeString(file, svgText, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Cannot save SVG for story " + storyId, e);
-        }
-        return "/uploads/" + storyId + ".svg";
+        return "/uploads/" + filename;
     }
 
     public void delete(String storyId) {
         tryDelete(uploadsDir.resolve(storyId + ".png"));
         tryDelete(uploadsDir.resolve(storyId + ".svg"));
+        tryDelete(uploadsDir.resolve(storyId + "-light.png"));
+        tryDelete(uploadsDir.resolve(storyId + "-dark.png"));
     }
 
     private void tryDelete(Path file) {
