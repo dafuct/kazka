@@ -127,6 +127,8 @@
   aspect-ratio: 3/4;
   align-self: start;
   margin-top: -60px;
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 .illustQuill {
