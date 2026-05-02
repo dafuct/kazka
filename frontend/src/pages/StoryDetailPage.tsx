@@ -137,7 +137,8 @@ export function StoryDetailPage() {
 
           <aside className={styles.aside}>
             <IllustrationFrame
-              path={story.illustrationPath}
+              pathLight={story.illustrationPathLight}
+              pathDark={story.illustrationPathDark}
               status={story.illustrationStatus}
             />
             {story.illustrationStatus !== 'PENDING' && (

@@ -9,7 +9,8 @@ export interface Story {
   length: string
   language: string
   content: string
-  illustrationPath: string | null
+  illustrationPathLight: string | null
+  illustrationPathDark: string | null
   illustrationStatus: IllustrationStatus
   createdAt: string
   updatedAt: string

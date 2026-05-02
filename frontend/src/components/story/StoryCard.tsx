@@ -15,7 +15,8 @@ export function StoryCard({ story, onDelete }: StoryCardProps) {
     <article className={styles.card}>
       <Link to={`/stories/${story.id}`} className={styles.imageLink}>
         <IllustrationFrame
-          path={story.illustrationPath}
+          pathLight={story.illustrationPathLight}
+          pathDark={story.illustrationPathDark}
           status={story.illustrationStatus}
         />
       </Link>
