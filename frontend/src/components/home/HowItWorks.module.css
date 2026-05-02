@@ -127,8 +127,6 @@
   aspect-ratio: 3/4;
   align-self: start;
   margin-top: -60px;
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 55%, transparent 95%);
-          mask-image: radial-gradient(ellipse at center, #000 55%, transparent 95%);
 }
 
 .illustQuill {
