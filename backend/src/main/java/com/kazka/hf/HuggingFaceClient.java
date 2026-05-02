@@ -23,7 +23,6 @@ public class HuggingFaceClient {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final WebClient textClient;
-    private final WebClient imageClient;
     private final HuggingFaceProperties props;
 
     public HuggingFaceClient(WebClient.Builder builder, HuggingFaceProperties props) {
@@ -36,11 +35,6 @@ public class HuggingFaceClient {
                 .baseUrl(props.getTextBaseUrl())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, auth)
                 .codecs(c -> c.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
-                .build();
-        this.imageClient = builder.clone()
-                .baseUrl(props.getImageBaseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, auth)
-                .codecs(c -> c.defaultCodecs().maxInMemorySize(20 * 1024 * 1024))
                 .build();
     }
 
@@ -104,16 +98,4 @@ public class HuggingFaceClient {
                 });
     }
 
-    public Mono<byte[]> generateImage(String prompt) {
-        return imageClient.post()
-                .uri("/hf-inference/models/" + props.getImageModel())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("inputs", prompt))
-                .retrieve()
-                .bodyToMono(byte[].class)
-                .onErrorResume(e -> {
-                    log.warn("HF image generation failed: {}", e.getMessage());
-                    return Mono.empty();
-                });
-    }
 }

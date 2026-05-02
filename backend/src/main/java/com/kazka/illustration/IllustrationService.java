@@ -56,6 +56,7 @@ public class IllustrationService {
                                     hfClient.generateText(
                                             promptBuilder.buildSvgSystem(),
                                             promptBuilder.buildSvgUser(story, scene)))
+                            .onErrorReturn(PLACEHOLDER_SVG)
                             .map(this::extractSvgTag)
                             .flatMap(svg -> saveSvg(story, svg))
                             .onErrorResume(e -> {

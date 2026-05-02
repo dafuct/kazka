@@ -1,91 +1,41 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+# Project Guidelines
 
 ## Commands
 
-### Backend (Spring Boot 4, Java 25, Gradle 9)
-```bash
-cd backend
-./gradlew bootRun          # start on port 8080 (requires local MySQL)
-./gradlew test             # run all tests (requires Docker for Testcontainers)
-./gradlew test --tests "com.kazka.story.StoryControllerTest#saveAndGetStory_roundtrip"
-./gradlew build
-```
+### Backend (Spring Boot 4 · Java 25 · Gradle)
+- `cd backend && ./gradlew bootRun` — port 8080, requires running MySQL
+- `cd backend && ./gradlew test` — requires Docker (Testcontainers)
+- `cd backend && ./gradlew test --tests "com.kazka.Foo#method"`
 
-### Frontend (React 19, Vite 8, TypeScript 6)
-```bash
-cd frontend
-npm run dev                # start on port 5173
-npm run build
-npm run lint
-node_modules/.bin/tsc --noEmit  # type-check only (npx tsc installs wrong package)
-```
+### Frontend (React 19 · TypeScript 6 · Vite 8)
+- `cd frontend && npm run dev` — port 5173
+- `cd frontend && node_modules/.bin/tsc --noEmit` — type-check only (NOT `npx tsc`)
+- `cd frontend && npm run lint`
 
-### Full stack via Docker (recommended)
-```bash
-# First time: copy and fill in your HF token
-cp .env.example .env
-# edit .env and set HUGGINGFACE_API_TOKEN=hf_...
+### Full stack
+- Copy `.env.example` → `.env` and set `HUGGINGFACE_API_TOKEN=hf_...`
+- `docker-compose up --build` → http://localhost
 
-docker-compose up --build  # builds images, starts all services
-# App available at http://localhost
+## Git
+- Feature branches only — never commit to main
+- Descriptive commits: what + why
 
-docker-compose up          # subsequent runs (no rebuild)
-docker-compose down        # stop
-docker-compose down -v     # stop and delete all data (MySQL + uploads)
-```
+<important if="language=java">
+- All handlers return `Mono`/`Flux`; never call JPA from a reactor thread
+- JPA calls: wrap in `Mono.fromCallable(...).subscribeOn(Schedulers.boundedElastic())`
+- Spring Boot 4 dropped Flyway/Liquibase autoconfiguration — schema via `spring.sql.init` + `schema.sql`
+- `@DataJpaTest` does not exist in SB4 — use `@SpringBootTest @ActiveProfiles("test")` + Testcontainers MySQL
+- `WebTestClient` is not auto-configured — create manually: `WebTestClient.bindToServer().baseUrl("http://localhost:"+port).build()`
+- Jackson: SB4 ships Jackson 3.x (`tools.jackson`); project keeps Jackson 2.x explicit for Ollama — never mix the two
+- CORS only active in `dev` profile — set `SPRING_PROFILES_ACTIVE=dev` for local non-Docker dev
+- Hibernate is `validate` — update `schema.sql` and re-run init whenever entity fields change
+- Prompt templates read from classpath at startup (`prompts/system-uk.txt`, `system-en.txt`, `scene-extraction-system.txt`, `svg-system.txt`) — missing = hard startup failure
+</important>
 
-### Infrastructure (local dev only)
-```bash
-docker-compose up -d mysql                   # MySQL only
-docker exec -i kazkar-mysql mysql -ukazkar -pkazkar kazkar < backend/src/main/resources/schema.sql
-```
-
-## Architecture
-
-### Backend
-**Spring WebFlux reactive API** — all handlers return `Mono`/`Flux`. JPA is blocking, so every repository call is wrapped in `Mono.fromCallable(...).subscribeOn(Schedulers.boundedElastic())`. Never call JPA from a reactor thread directly.
-
-**Story generation flow:**
-1. `StoryController.generate()` returns `Flux<ServerSentEvent<Object>>`
-2. `StoryService` saves an empty `Story` entity (ID assigned upfront), then calls `OllamaClient.streamGenerate()`
-3. Tokens stream in real-time via `.doOnNext(contentBuffer::append).map(SseEvent::token)`
-4. After the stream completes, `.concatWith(Mono.fromCallable(...))` saves full content + extracted title (first line) and emits a `done` event
-
-**SSE event types:** `meta` (id), `token` (text), `done` (id + title), `error` (message)
-
-**Illustration generation** is fire-and-forget: `StoryController.illustrate()` calls `storyService.illustrate(id).subscribe()` and returns 202 immediately. The client polls `GET /api/stories/{id}` to check `illustrationStatus` (PENDING → READY or FAILED).
-
-**OllamaClient** uses `bodyToFlux(String.class)` + manual Jackson 2.x parsing (`MAPPER.readTree(line)`), **not** `bodyToFlux(JsonNode.class)`. Spring Boot 4 ships Jackson 3.x (`tools.jackson`) which is incompatible with Jackson 2.x `JsonNode`. The project includes `com.fasterxml.jackson.core:jackson-databind` (2.x) explicitly for Ollama response parsing and `CharactersConverter`.
-
-**CORS** is only enabled in the `dev` Spring profile (`CorsConfig` is `@Profile("dev")`). The dev profile is not activated by default — set `SPRING_PROFILES_ACTIVE=dev` or add `-Dspring.profiles.active=dev` to `bootRun`.
-
-### Database
-Single `stories` table. Schema lives in `schema.sql` (idempotent: DROP TABLE IF EXISTS + CREATE). Hibernate is set to `validate` — it checks that entities match the schema on startup but never modifies the DB. **Update `schema.sql` and re-run the init command whenever entity fields change.**
-
-`characters` (List<String>) is stored as JSON via `CharactersConverter` (custom `AttributeConverter`).
-
-### Frontend
-**Three pages:** `HomePage` (form + SSE streaming), `ArchivePage` (paginated grid), `StoryDetailPage` (full story + inline edit + illustration).
-
-**SSE client** (`lib/sseClient.ts`) uses `fetch()` + `ReadableStream` with manual line buffering, **not** `EventSource`. EventSource doesn't support POST or request bodies.
-
-**Contexts:** `ThemeContext` (light/dark, `data-theme` attribute on `<html>`) and `LocaleContext` (uk/en), both persisted to `localStorage`.
-
-**Design tokens** are CSS custom properties in `src/design/tokens.css`, applied via `[data-theme="dark"]` selector. Global styles and `@font-face` rules are in `src/design/global.css`.
-
-Vite proxies `/api` and `/uploads` to `http://localhost:8080` in development.
-
-## Key Constraints
-
-- **Spring Boot 4** dropped Flyway and Liquibase autoconfiguration entirely — schema init uses `spring.sql.init` (`DataSourceInitializationAutoConfiguration` from `spring-boot-jdbc`). Do not add Flyway or Liquibase starters expecting autoconfiguration.
-- **`@DataJpaTest` does not exist** in Spring Boot 4. Use `@SpringBootTest @ActiveProfiles("test")` instead.
-- **`WebTestClient` is not auto-configured** in `@SpringBootTest`. Create manually: `WebTestClient.bindToServer().baseUrl("http://localhost:" + port).build()`.
-- Test config (`application-test.yml`) sets `spring.sql.init.mode: always` so schema.sql runs on each test container start. The schema uses `DROP TABLE IF EXISTS` to be idempotent across shared Testcontainers instances.
-- The `x/flux2-klein` illustration model only works on macOS (Apple Silicon). On other platforms it fails silently; the UI shows a decorative SVG placeholder.
-- Prompt templates are read from classpath at startup: `prompts/system-uk.txt`, `prompts/system-en.txt`, `prompts/illustration-style.txt`. Missing files cause a hard startup failure.
-- **HuggingFaceClient** owns two WebClient instances built in its constructor: `textClient` (base: `kazka.huggingface.text-base-url`) for OpenAI-compatible chat completions streaming, and `imageClient` (base: `kazka.huggingface.image-base-url`) for binary image generation. Both URLs are configurable so WireMock can intercept them in future tests.
-- **Image generation** returns `byte[]` from `HuggingFaceClient.generateImage()` and is saved directly by `ImageStorageService.save(storyId, byte[])` — no base64 decoding.
-- **Docker:** `docker-compose up --build` is the one-command start. The `HUGGINGFACE_API_TOKEN` env var must be set in `.env`. Schema is auto-initialized via MySQL `initdb` on first run only (volume must be empty).
-- **SSE proxy:** nginx has `proxy_buffering off` on `/api/` — required for story streaming tokens to reach the browser in real-time.
+<important if="language=typescript,tsx">
+- SSE client (`lib/sseClient.ts`) uses `fetch()` + ReadableStream — never `EventSource` (doesn't support POST bodies)
+- All UI text via `useLocale()` `t` — no hardcoded Ukrainian or English strings in components
+- Vite dev proxy: `/api` and `/uploads` → `http://localhost:8080`
+- Design tokens in `src/design/tokens.css`; global styles and `@font-face` in `src/design/global.css`
+- No test framework — verify correctness with `tsc --noEmit` + `npm run lint`
+</important>
