@@ -4,9 +4,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ImageStorageServiceTest {
 
@@ -79,5 +81,15 @@ class ImageStorageServiceTest {
 
         assertThat(png).doesNotExist();
         assertThat(svg).doesNotExist();
+    }
+
+    @Test
+    void saveSvg_throwsUncheckedIOException_whenParentIsAFile() throws IOException {
+        Path notADir = tempDir.resolve("notadir");
+        Files.writeString(notADir, "I am a file");
+
+        assertThatThrownBy(() -> new ImageStorageService(notADir.toString()))
+                .isInstanceOf(UncheckedIOException.class)
+                .hasMessageContaining("Cannot create uploads directory");
     }
 }
