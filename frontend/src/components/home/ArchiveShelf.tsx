@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../../lib/apiClient'
 import type { Story } from '../../lib/types'
 import { useReveal } from '../../lib/useReveal'
+import { useLocale } from '../../lib/LocaleContext'
 import { SectionParticles } from './SectionParticles'
 import styles from './ArchiveShelf.module.css'
 
@@ -60,6 +61,7 @@ function Spine({ title, color, tilt, delay, href }: SpineProps) {
 }
 
 export function ArchiveShelf() {
+  const { t } = useLocale()
   const { ref: headRef, visible: headVisible } = useReveal()
   const [stories, setStories] = useState<Story[]>([])
 
@@ -69,25 +71,15 @@ export function ArchiveShelf() {
 
   const featured = stories[0]
   const spines = stories.slice(1)
-
-  const placeholderSpines = [
-    'Мія і Зачарований Ліс',
-    'Дракон який боявся літати',
-    'Зоряний кіт',
-    'Подорож до Місяця',
-    'Маленька хмаринка',
-    'Таємниця годинника',
-    'Лисиця та зорі',
-    'Сад на хмарині',
-  ]
+  const placeholders = t.archiveShelf.placeholders
 
   return (
     <section className={styles.section} id="archive">
       <SectionParticles />
       <div className={styles.inner}>
         <div ref={headRef} className={`reveal ${headVisible ? 'visible' : ''}`}>
-          <div className={styles.label}>Бібліотека</div>
-          <div className={styles.title}>Бібліотека ваших казок</div>
+          <div className={styles.label}>{t.archiveShelf.label}</div>
+          <div className={styles.title}>{t.archiveShelf.title}</div>
         </div>
 
         <div className={`${styles.shelf} reveal ${headVisible ? 'visible' : ''}`}>
@@ -95,20 +87,20 @@ export function ArchiveShelf() {
             <Link to={`/stories/${featured.id}`} className={styles.featuredLink}>
               <div className={styles.featured}>
                 <div className={styles.illustBook} />
-                <span className={styles.featuredLabel}>{featured.title || 'Найновіша казка'}</span>
+                <span className={styles.featuredLabel}>{featured.title || t.archiveShelf.latestStory}</span>
               </div>
             </Link>
           ) : (
             <div className={styles.featured}>
               <div className={styles.illustBook} />
-              <span className={styles.featuredLabel}>Найновіша казка</span>
+              <span className={styles.featuredLabel}>{t.archiveShelf.latestStory}</span>
             </div>
           )}
 
-          {(spines.length > 0 ? spines : placeholderSpines.map(t => ({ id: '', title: t } as Story))).map((s, i) => (
+          {(spines.length > 0 ? spines : placeholders.map(title => ({ id: '', title } as Story))).map((s, i) => (
             <Spine
               key={s.id || s.title}
-              title={s.title || placeholderSpines[i]}
+              title={s.title || placeholders[i]}
               color={SPINE_COLORS[i % SPINE_COLORS.length]}
               tilt={TILTS[i % TILTS.length]}
               delay={i * 100}

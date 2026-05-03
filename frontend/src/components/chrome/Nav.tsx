@@ -34,10 +34,10 @@ export function Nav() {
 
       <ul className={styles.links}>
         <li>
-          <a href="/#how" className={styles.link}>Як це працює</a>
+          <a href="/#how" className={styles.link}>{t.nav.howItWorks}</a>
         </li>
         <li>
-          <a href="/#features" className={styles.link}>Можливості</a>
+          <a href="/#features" className={styles.link}>{t.nav.features}</a>
         </li>
         <li>
           <Link
@@ -49,7 +49,7 @@ export function Nav() {
         </li>
         <li>
           <button onClick={toggleTheme} className={styles.themeToggle} aria-label={t.nav.toggleTheme}>
-            {theme === 'light' ? 'Нічний режим 🌙' : 'Денний режим ☀️'}
+            {theme === 'light' ? t.nav.themeLight : t.nav.themeDark}
           </button>
         </li>
         <li>
@@ -58,7 +58,7 @@ export function Nav() {
           </button>
         </li>
         <li>
-          <a href="#" className={styles.ctaBtn} onClick={(e) => { e.preventDefault(); openModal() }}>Спробувати</a>
+          <a href="#" className={styles.ctaBtn} onClick={(e) => { e.preventDefault(); openModal() }}>{t.nav.tryCta}</a>
         </li>
       </ul>
     </nav>

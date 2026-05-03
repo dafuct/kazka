@@ -68,61 +68,115 @@
 .cardLarge {
   grid-column: 1 / -1;
   min-height: 340px;
+  display: flex;
+  align-items: stretch;
 }
-.cardLarge .bgImage {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
+.largeLeft {
+  flex: 0 0 50%;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
 }
-.cardLarge .bgImage::after {
+.largeLeft::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(44,24,16,0.75) 0%, rgba(44,24,16,0.4) 50%, transparent 100%);
+  background: linear-gradient(135deg, rgba(217,119,6,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  border-radius: inherit;
 }
-[data-theme="dark"] .cardLarge .bgImage::after {
-  background: linear-gradient(135deg, rgba(15,10,30,0.85) 0%, rgba(15,10,30,0.5) 50%, transparent 100%);
+[data-theme="dark"] .largeLeft::before {
+  background: linear-gradient(135deg, rgba(124,58,237,0.08) 0%, transparent 70%);
 }
-.largeText {
-  position: relative;
-  z-index: 1;
-  padding: 48px;
-  max-width: 480px;
-}
-.largeText h3 {
-  color: #FAF0DC;
+.largeLeft h3 {
   font-family: var(--font-display);
   font-size: 26px;
   font-weight: 600;
+  color: var(--color-text);
   margin-bottom: 12px;
 }
-.largeText p { color: rgba(250,240,220,0.8); font-size: 15px; line-height: 1.7; }
+.largeLeft p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+}
+.largeRight {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 20px 32px 20px 0;
+}
+.largeRight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 65%;
+  height: 100%;
+  background: linear-gradient(to right, var(--color-surface) 0%, transparent 100%);
+  z-index: 1;
+  pointer-events: none;
+}
 
 /* ── Medium card ── */
 .cardMedium {
   display: grid;
-  grid-template-columns: 1fr 140px;
+  grid-template-columns: 1fr 120px;
   align-items: center;
 }
 .mediumText { padding: 32px; }
 .mediumText h3 { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-bottom: 8px; }
 .mediumText p { font-size: 14px; color: var(--color-text-muted); line-height: 1.7; }
-.mediumImg { height: 100%; overflow: hidden; }
-.mediumImg .illustForest { transition: transform 4s ease; }
-.cardMedium:hover .mediumImg .illustForest { transform: scale(1.05); }
+.mediumImg {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+}
+.mediumImg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 70%;
+  height: 100%;
+  background: linear-gradient(to right, var(--color-surface) 0%, transparent 100%);
+  z-index: 1;
+  pointer-events: none;
+}
 
 /* ── Text-only card ── */
-.cardText { padding: 32px; }
-.dropInitial {
-  float: left;
-  font-family: var(--font-display);
-  font-size: 64px;
-  font-weight: 700;
-  line-height: 0.85;
-  color: var(--color-magic);
-  margin-right: 8px;
-  margin-top: 4px;
+.cardText {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  align-items: center;
+}
+.cardTextContent { padding: 32px; }
+.cardTextImg {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+}
+.cardTextImg::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 70%; height: 100%;
+  background: linear-gradient(to right, var(--color-surface) 0%, transparent 100%);
+  z-index: 1;
+  pointer-events: none;
 }
 .cardText h3 { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-bottom: 8px; }
 .cardText p { font-size: 14px; color: var(--color-text-muted); line-height: 1.7; }
@@ -155,47 +209,35 @@
 .imgText p { color: rgba(250,240,220,0.75); font-size: 13px; }
 
 /* ── Illustrations ── */
-.illustCozy {
-  width: 100%;
-  height: 100%;
-  min-height: 340px;
-  background:
-    radial-gradient(ellipse at 40% 30%, rgba(217,119,6,0.3) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 70%, rgba(124,58,237,0.2) 0%, transparent 50%),
-    radial-gradient(ellipse at 20% 80%, rgba(30,27,75,0.15) 0%, transparent 40%),
-    var(--color-surface-2);
-  transition: transform 6s ease;
-}
-.card:hover .illustCozy { transform: scale(1.05); }
-
-.illustForest {
-  width: 100%;
-  height: 100%;
-  min-height: 160px;
-  background:
-    radial-gradient(ellipse at 50% 90%, rgba(22,101,52,0.3) 0%, transparent 50%),
-    radial-gradient(ellipse at 30% 40%, rgba(124,58,237,0.2) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(217,119,6,0.15) 0%, transparent 40%),
-    var(--color-surface-2);
-}
-
-.illustBook {
+.archiveIllust {
   width: 100%;
   height: 100%;
   min-height: 220px;
-  background:
-    radial-gradient(ellipse at 50% 50%, rgba(217,119,6,0.35) 0%, transparent 50%),
-    radial-gradient(ellipse at 30% 30%, rgba(194,65,12,0.15) 0%, transparent 40%),
-    radial-gradient(ellipse at 70% 80%, rgba(124,58,237,0.1) 0%, transparent 40%),
-    var(--color-surface-deep);
+  position: relative;
+  background: var(--color-surface);
   transition: transform 6s ease;
 }
-.card:hover .illustBook { transform: scale(1.05); }
+.card:hover .archiveIllust { transform: scale(1.05); }
+.archiveIllust::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right,  var(--color-surface) 0%, transparent 38%),
+    linear-gradient(to left,   var(--color-surface) 0%, transparent 38%),
+    linear-gradient(to bottom, var(--color-surface) 0%, transparent 28%);
+  z-index: 1;
+  pointer-events: none;
+}
 
 @media (max-width: 860px) {
   .section { padding: 80px 20px; }
   .bento { grid-template-columns: 1fr; }
-  .cardLarge { min-height: 280px; }
+  .cardLarge { flex-direction: column; min-height: auto; }
+  .largeLeft { flex: none; padding: 32px; }
+  .largeRight { min-height: 220px; padding: 16px; }
   .cardMedium { grid-template-columns: 1fr; }
   .mediumImg { height: 160px; }
+  .cardText { grid-template-columns: 1fr; }
+  .cardTextImg { height: 160px; }
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useReveal } from '../../lib/useReveal'
 import { handleRipple } from '../../lib/ripple'
 import { useStoryModal } from '../../lib/StoryModalContext'
+import { useLocale } from '../../lib/LocaleContext'
 import styles from './NightCta.module.css'
 
 function StarLayer() {
@@ -22,6 +23,7 @@ function StarLayer() {
 }
 
 export function NightCta() {
+  const { t } = useLocale()
   const { openModal } = useStoryModal()
   const { ref: r1, visible: v1 } = useReveal()
   const { ref: r2, visible: v2 } = useReveal()
@@ -39,10 +41,10 @@ export function NightCta() {
 
       <div className={styles.content}>
         <h2 ref={r1} className={`reveal ${v1 ? 'visible' : ''} ${styles.heading}`}>
-          Починайте казку<br />цього вечора
+          {t.nightCta.titleLine1}<br />{t.nightCta.titleLine2}
         </h2>
         <p ref={r2} className={`reveal ${v2 ? 'visible' : ''} ${styles.sub}`}>
-          Одна казка — і ваша дитина попросить ще
+          {t.nightCta.sub}
         </p>
         <a
           ref={r3}
@@ -50,10 +52,10 @@ export function NightCta() {
           className={`reveal ${v3 ? 'visible' : ''} ${styles.btn}`}
           onClick={(e) => { e.preventDefault(); openModal(); handleRipple(e) }}
         >
-          Створити першу казку — безкоштовно
+          {t.nightCta.button}
         </a>
         <p ref={r4} className={`reveal ${v4 ? 'visible' : ''} ${styles.fine}`}>
-          Без реєстрації · Перша казка миттєво
+          {t.nightCta.fine}
         </p>
       </div>
     </section>

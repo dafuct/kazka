@@ -31,7 +31,7 @@ export function ArchivePage() {
     <div className={styles.page}>
       <div className={styles.inner}>
         <div className={styles.pageHeader}>
-          <div className={styles.label}>Бібліотека</div>
+          <div className={styles.label}>{t.archive.label}</div>
           <h1 className={styles.heading}>{t.archive.title}</h1>
         </div>
 
