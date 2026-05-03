@@ -84,6 +84,13 @@ export function StoryBook({
   // Spread count: 2 page nodes per spread.
   const spreadCount = Math.floor(pages.length / 2)
 
+  // Dev-only contract check: pages.length must be even (each spread = story + illust).
+  useEffect(() => {
+    if (import.meta.env.DEV && pages.length % 2 !== 0) {
+      console.warn(`StoryBook: pages.length must be even, got ${pages.length}`)
+    }
+  }, [pages.length])
+
   const [logicalSpread, setLogicalSpread] = useState(0)  // 0..spreadCount-1
   const [inView, setInView] = useState(false)
   const [interacted, setInteracted] = useState(false)
@@ -113,7 +120,7 @@ export function StoryBook({
     return () => document.removeEventListener('visibilitychange', handler)
   }, [])
 
-  const autoEnabled = autoAdvance && inView && !interacted && !reducedMotion && !tabHidden
+  const autoEnabled = autoAdvance && inView && !interacted && !reducedMotion && !tabHidden && pages.length >= 2
 
   useAutoAdvance({
     enabled: autoEnabled,
