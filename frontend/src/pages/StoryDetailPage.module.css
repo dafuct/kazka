@@ -90,8 +90,16 @@
   font-size: 1.0625rem;
   line-height: 1.85;
   color: var(--color-text);
-  white-space: pre-wrap;
   margin-bottom: var(--spacing-8);
+}
+
+.content p {
+  text-indent: 2em;
+  margin: 0;
+}
+
+.content p:first-child {
+  text-indent: 0;
 }
 
 .contentInput {

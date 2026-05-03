@@ -96,7 +96,15 @@ export function StoryDetailPage() {
                 rows={20}
               />
             ) : (
-              <p className={styles.content}>{story.content}</p>
+              <div className={styles.content}>
+                {story.content
+                  .split(/\n\s*\n+/)
+                  .map(p => p.trim())
+                  .filter(Boolean)
+                  .map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
+              </div>
             )}
 
             <div className={styles.actions}>
