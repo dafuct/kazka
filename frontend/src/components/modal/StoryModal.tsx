@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useRef } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { StoryForm } from '../form/StoryForm'
@@ -21,7 +21,6 @@ export function StoryModal() {
   const [phase, setPhase] = useState<Phase>('form')
   const [request, setRequest] = useState<GenerationRequest | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const cancelRef = useRef<{ cancel: () => void } | null>(null)
 
   useEffect(() => {
     if (open) {
@@ -45,25 +44,12 @@ export function StoryModal() {
     return () => { document.body.style.overflow = '' }
   }, [open])
 
-  // Cancel any running creation when the modal closes/unmounts.
   useEffect(() => {
-    return () => cancelRef.current?.cancel()
-  }, [])
-
-  useEffect(() => {
-    if (phase !== 'creating' || !request) return
+    if (!open || phase !== 'creating' || !request) return
 
     const ctrl = new AbortController()
     let cancelled = false
     let pollTimer: number | undefined
-
-    cancelRef.current = {
-      cancel: () => {
-        cancelled = true
-        ctrl.abort()
-        if (pollTimer) window.clearTimeout(pollTimer)
-      },
-    }
 
     const pollUntilReady = async (id: string) => {
       const startedAt = Date.now()
@@ -99,6 +85,7 @@ export function StoryModal() {
         onToken: () => {},
         onDone: ({ id }) => {
           if (cancelled) return
+          // Best-effort: poll loop observes the resulting illustrationStatus.
           api.illustrate(id).catch(() => null)
           pollUntilReady(id)
         },
@@ -120,7 +107,7 @@ export function StoryModal() {
       ctrl.abort()
       if (pollTimer) window.clearTimeout(pollTimer)
     }
-  }, [phase, request, closeModal, navigate])
+  }, [open, phase, request, closeModal, navigate])
 
   const handleSubmit = useCallback((req: GenerationRequest) => {
     setRequest(req)
