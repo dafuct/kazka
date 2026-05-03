@@ -1,18 +1,17 @@
 import { forwardRef, useEffect, useState } from 'react'
-import { useTheme } from '../../lib/ThemeContext'
 import styles from './StoryBook.module.css'
 
 export interface IllustrationPageProps {
-  step: 1 | 2 | 3
+  src: string
+  /** Optional page number rendered in the bottom-right corner overlay. */
+  pageNum?: number
 }
 
 export const IllustrationPage = forwardRef<HTMLDivElement, IllustrationPageProps>(
-  function IllustrationPage({ step }, ref) {
-    const { theme } = useTheme()
-    const src = `/illustrations/how-step${step}-${theme}.png`
+  function IllustrationPage({ src, pageNum }, ref) {
     const [loaded, setLoaded] = useState(false)
 
-    // Reset loading state when src changes (theme toggle).
+    // Reset loading state when src changes (theme toggle, etc.)
     useEffect(() => {
       setLoaded(false)
     }, [src])
@@ -28,6 +27,11 @@ export const IllustrationPage = forwardRef<HTMLDivElement, IllustrationPageProps
           loading="eager"
           decoding="async"
         />
+        {pageNum !== undefined && (
+          <div className={`${styles.pageNumber} ${styles.pageNumberRight}`} aria-hidden="true">
+            {pageNum}
+          </div>
+        )}
       </div>
     )
   }
