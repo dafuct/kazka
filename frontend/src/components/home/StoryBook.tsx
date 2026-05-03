@@ -1,11 +1,17 @@
-import { lazy, useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
-import { useLocale } from '../../lib/LocaleContext'
-import { useTheme } from '../../lib/ThemeContext'
+import {
+  lazy,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+  type ReactNode,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from 'react'
 import { useReducedMotion } from '../../lib/useReducedMotion'
 import { useBreakpoint } from '../../lib/useBreakpoint'
 import { useAutoAdvance } from '../../lib/useAutoAdvance'
-import { StoryPage } from './StoryPage'
-import { IllustrationPage } from './IllustrationPage'
 import styles from './StoryBook.module.css'
 
 // react-pageflip is browser-only and ~50 KB. Lazy-load it.
@@ -28,62 +34,65 @@ interface FlipBookHandle {
   pageFlip: () => PageFlipApi
 }
 
-// react-pageflip onFlip event shape.
 interface FlipEvent {
   data: number
 }
 
-const AUTO_ADVANCE_MS = 6000
+const DEFAULT_AUTO_ADVANCE_MS = 6000
 const PORTRAIT_BREAKPOINT_PX = 860
 const PAGE_WIDTH_PX = 360
 const PAGE_HEIGHT_PX = 460
 
-export function StoryBook() {
-  const { t } = useLocale()
-  const { theme } = useTheme()
+export interface StoryBookProps {
+  /** Page nodes — must be an EVEN number; 2 nodes per spread (story + illust). */
+  pages: ReactNode[]
+  /** Region aria-label for screen readers. */
+  ariaLabel: string
+  /** When true, pages turn automatically every `intervalMs`. Default true. */
+  autoAdvance?: boolean
+  /** Auto-advance interval in milliseconds. Default 6000. Ignored when autoAdvance=false. */
+  intervalMs?: number
+  /** Aria-label for the previous-page arrow button. */
+  prevAria: string
+  /** Aria-label for the next-page arrow button. */
+  nextAria: string
+  /** Aria-label template for dot buttons; should contain the literal `{n}`. */
+  dotAria: string
+  /** Live-region announce template; should contain `{n}` and `{total}` literals. */
+  announce: string
+  /** Optional callback fired on the FIRST manual interaction (arrow/dot/keyboard). */
+  onUserInteract?: () => void
+}
+
+export function StoryBook({
+  pages,
+  ariaLabel,
+  autoAdvance = true,
+  intervalMs = DEFAULT_AUTO_ADVANCE_MS,
+  prevAria,
+  nextAria,
+  dotAria,
+  announce,
+  onUserInteract,
+}: StoryBookProps) {
   const reducedMotion = useReducedMotion()
   const isPortrait = useBreakpoint(PORTRAIT_BREAKPOINT_PX)
-
-  // Preload all 3 step illustrations for the current theme on mount and on
-  // theme change. Same trick as IllustrationCarousel — `new Image(); .src = …`
-  // pulls the file into the browser cache so subsequent <img> mounts paint
-  // instantly when the page curls.
-  useEffect(() => {
-    for (let step = 1; step <= 3; step++) {
-      const img = new Image()
-      img.src = `/illustrations/how-step${step}-${theme}.png`
-    }
-  }, [theme])
 
   const sectionRef = useRef<HTMLDivElement>(null)
   const bookRef = useRef<FlipBookHandle | null>(null)
 
-  const [logicalStep, setLogicalStep] = useState(0)   // 0..2 — which step is showing
+  // Spread count: 2 page nodes per spread.
+  const spreadCount = Math.floor(pages.length / 2)
+
+  const [logicalSpread, setLogicalSpread] = useState(0)  // 0..spreadCount-1
   const [inView, setInView] = useState(false)
   const [interacted, setInteracted] = useState(false)
   const [tabHidden, setTabHidden] = useState(false)
 
-  const steps = t.howItWorks.steps
-
-  // Build the page list. Desktop: 3 spreads = 6 page nodes (story + illust × 3).
-  // Portrait: same 6 nodes but rendered as single pages by usePortrait=true.
-  const pages = useMemo(() => {
-    return steps.flatMap((step, i) => {
-      const stepNum = (i + 1) as 1 | 2 | 3
-      const pageId = `storybook-step-${stepNum}`
-      return [
-        <StoryPage
-          key={`story-${stepNum}`}
-          num={step.num}
-          stepLabel={step.stepLabel}
-          title={step.title}
-          desc={step.desc}
-          pageId={pageId}
-        />,
-        <IllustrationPage key={`illust-${stepNum}`} step={stepNum} />,
-      ]
-    })
-  }, [steps])
+  // Keep a stable callback for the user-interaction notification (caller may
+  // pass a fresh closure each render; we only fire on the FIRST interaction).
+  const onUserInteractRef = useRef(onUserInteract)
+  useEffect(() => { onUserInteractRef.current = onUserInteract })
 
   // IntersectionObserver — pause auto-advance when the section leaves the viewport.
   useEffect(() => {
@@ -104,53 +113,60 @@ export function StoryBook() {
     return () => document.removeEventListener('visibilitychange', handler)
   }, [])
 
-  const autoEnabled = inView && !interacted && !reducedMotion && !tabHidden
+  const autoEnabled = autoAdvance && inView && !interacted && !reducedMotion && !tabHidden
 
   useAutoAdvance({
     enabled: autoEnabled,
-    intervalMs: AUTO_ADVANCE_MS,
+    intervalMs,
     onTick: () => {
       const api = bookRef.current?.pageFlip()
       if (!api) return
       const current = api.getCurrentPageIndex()
-      // 6 page nodes total; loop back to 0 after the last page.
+      // Step by 2 nodes in landscape (one spread), 1 node in portrait.
       const next = (current + (isPortrait ? 1 : 2)) % pages.length
       api.flip(next)
     },
   })
 
-  const goPrev = useCallback(() => {
-    setInteracted(true)
-    bookRef.current?.pageFlip().flipPrev()
+  const markInteracted = useCallback(() => {
+    setInteracted((prev) => {
+      if (!prev) onUserInteractRef.current?.()
+      return true
+    })
   }, [])
+
+  const goPrev = useCallback(() => {
+    markInteracted()
+    bookRef.current?.pageFlip().flipPrev()
+  }, [markInteracted])
 
   const goNext = useCallback(() => {
-    setInteracted(true)
+    markInteracted()
     bookRef.current?.pageFlip().flipNext()
-  }, [])
+  }, [markInteracted])
 
-  const goToStep = useCallback((stepIdx: number) => {
-    setInteracted(true)
-    // 2 page nodes per step in landscape, 2 page nodes per step in portrait too,
-    // but portrait shows one at a time — jump to the story page of that step.
-    const target = stepIdx * 2
+  const goToSpread = useCallback((spreadIdx: number) => {
+    markInteracted()
+    // 2 page nodes per spread; jump to the FIRST node of the target spread.
+    const target = spreadIdx * 2
     bookRef.current?.pageFlip().flip(target)
-  }, [])
+  }, [markInteracted])
 
-  // Track logical step from page-flip events.
+  // Track logical spread from page-flip events.
   const onFlip = useCallback((e: FlipEvent) => {
     const idx = e.data
-    // Story pages live at indices 0, 2, 4. Map page→logical step.
-    setLogicalStep(Math.floor(idx / 2))
+    setLogicalSpread(Math.floor(idx / 2))
   }, [])
 
-  // Keyboard nav within the book region.
-  const onKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'ArrowLeft')  { e.preventDefault(); goPrev() }
+  const onKeyDown = useCallback((e: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'ArrowLeft')       { e.preventDefault(); goPrev() }
     else if (e.key === 'ArrowRight') { e.preventDefault(); goNext() }
-    else if (e.key === 'Home')       { e.preventDefault(); goToStep(0) }
-    else if (e.key === 'End')        { e.preventDefault(); goToStep(steps.length - 1) }
-  }, [goPrev, goNext, goToStep, steps.length])
+    else if (e.key === 'Home')       { e.preventDefault(); goToSpread(0) }
+    else if (e.key === 'End')        { e.preventDefault(); goToSpread(spreadCount - 1) }
+  }, [goPrev, goNext, goToSpread, spreadCount])
+
+  // Materialize dot indices once per pages-length change to avoid array-allocation noise.
+  const dotIndices = useMemo(() => Array.from({ length: spreadCount }, (_, i) => i), [spreadCount])
 
   return (
     <div
@@ -158,7 +174,7 @@ export function StoryBook() {
       className={styles.wrap}
       role="region"
       aria-roledescription="storybook"
-      aria-label={t.howItWorks.title}
+      aria-label={ariaLabel}
       tabIndex={0}
       onKeyDown={onKeyDown}
     >
@@ -194,18 +210,18 @@ export function StoryBook() {
           type="button"
           className={styles.arrow}
           onClick={goPrev}
-          aria-label={t.howItWorks.prevAria}
+          aria-label={prevAria}
         >‹</button>
 
         <div className={styles.dots}>
-          {steps.map((_, i) => (
+          {dotIndices.map((i) => (
             <button
               key={i}
               type="button"
-              className={`${styles.dot} ${logicalStep === i ? styles.dotActive : ''}`}
-              onClick={() => goToStep(i)}
-              aria-label={t.howItWorks.dotAria.replace('{n}', String(i + 1))}
-              aria-pressed={logicalStep === i}
+              className={`${styles.dot} ${logicalSpread === i ? styles.dotActive : ''}`}
+              onClick={() => goToSpread(i)}
+              aria-label={dotAria.replace('{n}', String(i + 1))}
+              aria-pressed={logicalSpread === i}
             />
           ))}
         </div>
@@ -214,15 +230,14 @@ export function StoryBook() {
           type="button"
           className={styles.arrow}
           onClick={goNext}
-          aria-label={t.howItWorks.nextAria}
+          aria-label={nextAria}
         >›</button>
       </div>
 
       <div className={styles.srOnly} role="status" aria-live="polite">
-        {t.howItWorks.announce
-          .replace('{n}', String(logicalStep + 1))
-          .replace('{total}', String(steps.length))
-          .replace('{title}', steps[logicalStep]?.title ?? '')}
+        {announce
+          .replace('{n}', String(logicalSpread + 1))
+          .replace('{total}', String(spreadCount))}
       </div>
     </div>
   )
