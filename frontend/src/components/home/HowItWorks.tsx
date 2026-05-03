@@ -1,69 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
+import { Suspense } from 'react'
 import { useReveal } from '../../lib/useReveal'
 import { useLocale } from '../../lib/LocaleContext'
 import { SectionParticles } from './SectionParticles'
+import { StoryBook } from './StoryBook'
+import { StoryBookFallback } from './StoryBookFallback'
+import { StoryBookErrorBoundary } from './StoryBookErrorBoundary'
 import styles from './HowItWorks.module.css'
-import { IllustrationCarousel } from '../illustrations/IllustrationCarousel'
-
-const STEP_REVEAL_CLASSES = ['revealLeft', 'revealRight', 'revealLeft']
-
-interface StepItemProps {
-  step: { num: string; stepLabel: string; title: string; desc: string }
-  revealClass: string
-  index: number
-}
-
-function StepItem({ step, revealClass, index }: StepItemProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
-  const [numFlipped, setNumFlipped] = useState(false)
-  const [lineDrawn, setLineDrawn] = useState(false)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          setTimeout(() => setNumFlipped(true), 100)
-          setTimeout(() => setLineDrawn(true), 400)
-          obs.unobserve(el)
-        }
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-    )
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-
-  return (
-    <div
-      ref={ref}
-      className={`${styles.step} ${revealClass} ${visible ? 'visible' : ''}`}
-      style={{ transitionDelay: `${index * 0.1}s` }}
-    >
-      <div className={styles.stepNumWrap}>
-        <div className={`${styles.stepNum} ${numFlipped ? styles.flipped : ''}`}>
-          {step.num}
-        </div>
-      </div>
-      <div className={styles.stepContent}>
-        <div className={styles.stepLabel}>{step.stepLabel}</div>
-        <h3 className={styles.stepTitle}>{step.title}</h3>
-        <p className={styles.stepDesc}>{step.desc}</p>
-      </div>
-      {index < STEP_REVEAL_CLASSES.length - 1 && (
-        <div className={`${styles.stepLine} ${lineDrawn ? styles.drawn : ''}`} />
-      )}
-    </div>
-  )
-}
 
 export function HowItWorks() {
   const { t } = useLocale()
   const { ref: headRef, visible: headVisible } = useReveal()
-  const { ref: illustRef, visible: illustVisible } = useReveal()
 
   return (
     <section className={styles.section} id="how">
@@ -99,19 +45,12 @@ export function HowItWorks() {
           <div className={styles.title}>{t.howItWorks.title}</div>
         </div>
 
-        <div className={styles.layout}>
-          <div className={styles.steps}>
-            {t.howItWorks.steps.map((step, i) => (
-              <StepItem key={i} step={step} revealClass={STEP_REVEAL_CLASSES[i]} index={i} />
-            ))}
-          </div>
-
-          <div
-            ref={illustRef}
-            className={`${styles.illustWrap} reveal ${illustVisible ? 'visible' : ''}`}
-          >
-            <IllustrationCarousel section="how" />
-          </div>
+        <div className={styles.bookSlot}>
+          <StoryBookErrorBoundary fallback={<StoryBookFallback />}>
+            <Suspense fallback={<StoryBookFallback />}>
+              <StoryBook />
+            </Suspense>
+          </StoryBookErrorBoundary>
         </div>
       </div>
     </section>
