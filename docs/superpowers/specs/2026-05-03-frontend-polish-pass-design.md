@@ -105,11 +105,11 @@ Constrain via the system prompt — the right place to fix it. Add a belt-and-su
 
 ### Implementation
 
-**`backend/src/main/resources/prompts/system-uk.txt`** — add an instruction near the title-format section:
-> Заголовок казки повинен містити максимум 2–4 слова. Без двокрапок, без підзаголовків.
+**`backend/src/main/resources/prompts/story-system.txt`** — already constrains title to "3–6 words". Tighten to "2–4 words":
+- Change `Line 1: a short book-style title (3–6 words, no punctuation at the end, no quotes, no "Title:" prefix)`
+- To: `Line 1: a short book-style title (2–4 words maximum, no punctuation at the end, no quotes, no colons, no subtitles, no "Title:" prefix)`
 
-**`backend/src/main/resources/prompts/system-en.txt`** — same in English:
-> The story title must be 2–4 words maximum. No colons, no subtitles.
+(`system-uk.txt` and `system-en.txt` contain language quality rules only — no title format — leave them alone.)
 
 **`frontend/src/components/story/StoryCard.module.css`** — add to the title rule:
 ```css
@@ -230,8 +230,7 @@ with:
 - `frontend/src/components/story/StoryCard.module.css` — title clamp (modify)
 
 **Backend:**
-- `backend/src/main/resources/prompts/system-uk.txt` — title length cap (modify)
-- `backend/src/main/resources/prompts/system-en.txt` — title length cap (modify)
+- `backend/src/main/resources/prompts/story-system.txt` — tighten title length cap (modify)
 
 **No new components, no new tests, no API changes, no DB migrations.**
 
