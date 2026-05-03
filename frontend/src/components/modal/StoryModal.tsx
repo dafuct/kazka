@@ -91,6 +91,21 @@ export function StoryModal() {
           )}
           {phase === 'streaming' && request && (
             <div className={styles.streaming}>
+              <div className={styles.sun} aria-hidden="true">
+                <svg viewBox="0 0 64 64" width="64" height="64">
+                  <g className={styles.sunRays} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <line x1="32" y1="4"  x2="32" y2="12" />
+                    <line x1="32" y1="52" x2="32" y2="60" />
+                    <line x1="4"  y1="32" x2="12" y2="32" />
+                    <line x1="52" y1="32" x2="60" y2="32" />
+                    <line x1="12" y1="12" x2="17.5" y2="17.5" />
+                    <line x1="46.5" y1="46.5" x2="52" y2="52" />
+                    <line x1="52" y1="12" x2="46.5" y2="17.5" />
+                    <line x1="17.5" y1="46.5" x2="12" y2="52" />
+                  </g>
+                  <circle cx="32" cy="32" r="11" fill="currentColor" />
+                </svg>
+              </div>
               <h2 className={styles.streamingTitle}>{t.form.generating}</h2>
               <StoryStream request={request} onDone={handleDone} onError={handleError} />
             </div>

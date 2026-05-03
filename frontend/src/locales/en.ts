@@ -139,7 +139,7 @@ export const en: Locale = {
   storyPreview: {
     label: 'Story example',
     title: "Here's a story that could be waiting\nfor you tonight",
-    tagline: 'Every story is unique. No two alike.',
+    tagline: 'Every story is unique.',
     dropCap: 'O',
     text: "nce upon a time, deep in the heart of the Enchanted Forest, there lived a little star named Mia. She didn't shine in the sky like other stars — instead she lived in the hollow of an ancient oak and every night set out on a journey along paths covered in silvery moss.",
   },

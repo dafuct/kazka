@@ -32,13 +32,7 @@ export function NightCta() {
 
   return (
     <section className={styles.section}>
-      <div className={styles.bg}>
-        <div className={styles.illustSky} />
-      </div>
       <StarLayer />
-      <div className={styles.moonGlow} aria-hidden="true" />
-      <div className={styles.shootingStar} aria-hidden="true" />
-
       <div className={styles.content}>
         <h2 ref={r1} className={`reveal ${v1 ? 'visible' : ''} ${styles.heading}`}>
           {t.nightCta.titleLine1}<br />{t.nightCta.titleLine2}

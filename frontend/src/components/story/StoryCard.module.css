@@ -1,7 +1,7 @@
 .card {
   background: var(--color-surface);
   border: 1px solid rgba(160,120,96,0.2);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(44,24,16,0.08), 0 8px 24px rgba(44,24,16,0.04);
   transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s;
@@ -15,6 +15,14 @@
 
 .imageLink {
   display: block;
+}
+
+.imageLink > div {
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.imageLink img {
+  border-radius: 0;
 }
 
 .body {

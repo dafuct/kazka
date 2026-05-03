@@ -3,7 +3,6 @@ import { IllustrationCarousel } from '../components/illustrations/IllustrationCa
 import { HowItWorks } from '../components/home/HowItWorks'
 import { Features } from '../components/home/Features'
 import { StoryPreview } from '../components/home/StoryPreview'
-import { ArchiveShelf } from '../components/home/ArchiveShelf'
 import { NightCta } from '../components/home/NightCta'
 import { useLocale } from '../lib/LocaleContext'
 import { useStoryModal } from '../lib/StoryModalContext'
@@ -119,7 +118,6 @@ export function HomePage() {
       <HowItWorks />
       <Features />
       <StoryPreview />
-      <ArchiveShelf />
       <NightCta />
     </div>
   )

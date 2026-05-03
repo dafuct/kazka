@@ -22,7 +22,7 @@
   font-size: 12px;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--color-magic-glow);
+  color: var(--color-magic);
   margin-bottom: 12px;
 }
 
@@ -135,7 +135,7 @@
   text-align: center;
   margin-top: 32px;
   font-size: 15px;
-  color: var(--color-magic-glow);
+  color: var(--color-magic);
   font-weight: 500;
 }
 

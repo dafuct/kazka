@@ -104,6 +104,27 @@
   text-align: center;
 }
 
+.sun {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+  color: var(--color-gold);
+  filter: drop-shadow(0 0 12px rgba(217, 119, 6, 0.45));
+}
+
+.sunRays {
+  transform-origin: 32px 32px;
+  animation: sunSpin 4s linear infinite;
+}
+
+@keyframes sunSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sunRays { animation: none; }
+}
+
 @keyframes backdropIn {
   from { opacity: 0; }
   to { opacity: 1; }
