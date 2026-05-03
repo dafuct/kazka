@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 interface Options {
   enabled: boolean
@@ -6,13 +6,18 @@ interface Options {
   onTick: () => void
 }
 
+/**
+ * Calls `onTick` every `intervalMs` while `enabled` is true.
+ * Timer resets when `enabled` or `intervalMs` changes; passing a fresh
+ * `onTick` closure each render does NOT reset it.
+ */
 export function useAutoAdvance({ enabled, intervalMs, onTick }: Options): void {
   const tickRef = useRef(onTick)
-  // Keep ref fresh so a new closure doesn't reset the interval
-  useLayoutEffect(() => { tickRef.current = onTick })
+  useEffect(() => { tickRef.current = onTick })
 
   useEffect(() => {
     if (!enabled) return
+    if (typeof window === 'undefined') return
     const id = window.setInterval(() => tickRef.current(), intervalMs)
     return () => window.clearInterval(id)
   }, [enabled, intervalMs])
