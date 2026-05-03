@@ -45,29 +45,6 @@
   gap: 12px;
 }
 
-.stepLabel {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-faint);
-}
-
-.stepTitle {
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 600;
-  margin: 0;
-  color: var(--color-text);
-}
-
-.stepDesc {
-  font-size: 15px;
-  color: var(--color-text-muted);
-  line-height: 1.7;
-  margin: 0;
-}
-
 .pageNumber {
   position: absolute;
   bottom: 18px;
@@ -78,6 +55,13 @@
   color: var(--color-text-faint);
   opacity: 0.6;
   letter-spacing: 0.08em;
+}
+
+.pageNumberRight {
+  left: auto;
+  right: 36px;
+  color: rgba(255, 255, 255, 0.65);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .pageIllust {
