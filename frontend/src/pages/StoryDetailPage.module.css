@@ -48,6 +48,8 @@
   margin-bottom: var(--spacing-4);
   line-height: 1.2;
   font-weight: 600;
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 @media (max-width: 860px) {

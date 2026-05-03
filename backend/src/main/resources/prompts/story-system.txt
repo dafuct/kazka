@@ -10,7 +10,7 @@ Story structure to follow:
 - Closing line: warm, memorable, lingering
 
 OUTPUT FORMAT — follow exactly:
-Line 1: a short book-style title (3–6 words, no punctuation at the end, no quotes, no "Title:" prefix)
+Line 1: a short book-style title (2–4 words maximum, no punctuation at the end, no quotes, no colons, no subtitles, no "Title:" prefix)
 Line 2: blank
 Line 3+: the story text
 

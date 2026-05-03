@@ -38,6 +38,11 @@
   margin-bottom: var(--spacing-2);
   color: var(--color-text);
   line-height: 1.4;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .titleLink:hover .title {
