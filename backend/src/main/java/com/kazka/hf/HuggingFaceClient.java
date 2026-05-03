@@ -26,22 +26,13 @@ public class HuggingFaceClient {
     private final WebClient imageClient;
     private final HuggingFaceProperties props;
 
-    public HuggingFaceClient(WebClient.Builder builder, HuggingFaceProperties props) {
+    public HuggingFaceClient(HuggingFaceProperties props, WebClient textClient, WebClient imageClient) {
         this.props = props;
         if (props.getApiToken() == null || props.getApiToken().isBlank()) {
             log.warn("kazka.huggingface.api-token is not set — HF API calls will fail with 401");
         }
-        String auth = "Bearer " + props.getApiToken();
-        this.textClient = builder.clone()
-                .baseUrl(props.getTextBaseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, auth)
-                .codecs(c -> c.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
-                .build();
-        this.imageClient = builder.clone()
-                .baseUrl(props.getImageBaseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, auth)
-                .codecs(c -> c.defaultCodecs().maxInMemorySize(20 * 1024 * 1024))
-                .build();
+        this.imageClient = imageClient;
+        this.textClient = textClient;
     }
 
     public Flux<String> streamText(String system, String user) {
