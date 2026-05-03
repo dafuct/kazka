@@ -83,6 +83,31 @@
 .pageIllust {
   padding: 0;
   background: var(--color-surface-2);
+  position: relative;
+}
+.pageIllust::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg,
+    var(--color-surface-2) 0%,
+    var(--color-surface-deep) 50%,
+    var(--color-surface-2) 100%);
+  background-size: 200% 100%;
+  animation: storybookSkeleton 1.6s ease-in-out infinite;
+  opacity: 1;
+  transition: opacity 250ms ease;
+  pointer-events: none;
+}
+.pageIllust:has(.illustImgLoaded)::before {
+  opacity: 0;
+}
+@keyframes storybookSkeleton {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pageIllust::before { animation: none; }
 }
 
 .illustImg {

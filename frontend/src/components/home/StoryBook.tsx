@@ -1,4 +1,4 @@
-import { lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
 import { useLocale } from '../../lib/LocaleContext'
 import { useTheme } from '../../lib/ThemeContext'
 import { useReducedMotion } from '../../lib/useReducedMotion'
@@ -12,7 +12,7 @@ import styles from './StoryBook.module.css'
 const HTMLFlipBook = lazy(async () => {
   const mod = await import('react-pageflip')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return { default: mod.default as any }
+  return { default: mod.default as ComponentType<any> }
 })
 
 // react-pageflip's ref handle exposes a pageFlip() accessor that returns

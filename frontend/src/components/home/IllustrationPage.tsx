@@ -24,6 +24,7 @@ export const IllustrationPage = forwardRef<HTMLDivElement, IllustrationPageProps
           alt=""
           className={`${styles.illustImg} ${loaded ? styles.illustImgLoaded : ''}`}
           onLoad={() => setLoaded(true)}
+          onError={() => setLoaded(true)}
           loading="eager"
           decoding="async"
         />
