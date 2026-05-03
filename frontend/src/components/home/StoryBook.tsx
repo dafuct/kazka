@@ -35,6 +35,8 @@ interface FlipEvent {
 
 const AUTO_ADVANCE_MS = 6000
 const PORTRAIT_BREAKPOINT_PX = 860
+const PAGE_WIDTH_PX = 360
+const PAGE_HEIGHT_PX = 460
 
 export function StoryBook() {
   const { t } = useLocale()
@@ -150,11 +152,6 @@ export function StoryBook() {
     else if (e.key === 'End')        { e.preventDefault(); goToStep(steps.length - 1) }
   }, [goPrev, goNext, goToStep, steps.length])
 
-  // Book sizing. Desktop: ~360x460 per page (so spread is ~720 wide).
-  // Portrait: same per-page dimensions, library handles single-page layout.
-  const pageWidth = 360
-  const pageHeight = 460
-
   return (
     <div
       ref={sectionRef}
@@ -162,14 +159,15 @@ export function StoryBook() {
       role="region"
       aria-roledescription="storybook"
       aria-label={t.howItWorks.title}
+      tabIndex={0}
       onKeyDown={onKeyDown}
     >
       <div className={styles.bookFrame}>
         <HTMLFlipBook
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ref={bookRef as any}
-          width={pageWidth}
-          height={pageHeight}
+          width={PAGE_WIDTH_PX}
+          height={PAGE_HEIGHT_PX}
           size="fixed"
           minWidth={280}
           maxWidth={420}
@@ -186,14 +184,12 @@ export function StoryBook() {
           clickEventForward={false}
           disableFlipByClick={false}
           onFlip={onFlip}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          {...({} as any)}
         >
           {pages}
         </HTMLFlipBook>
       </div>
 
-      <div className={styles.controls} aria-hidden={false}>
+      <div className={styles.controls}>
         <button
           type="button"
           className={styles.arrow}
@@ -201,7 +197,7 @@ export function StoryBook() {
           aria-label={t.howItWorks.prevAria}
         >‹</button>
 
-        <div className={styles.dots} role="tablist">
+        <div className={styles.dots}>
           {steps.map((_, i) => (
             <button
               key={i}
