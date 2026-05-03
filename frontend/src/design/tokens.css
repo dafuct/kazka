@@ -51,3 +51,7 @@
   --color-ember: #EA580C;
   --color-gold: #F59E0B;
 }
+
+html[data-lang="uk"] {
+  --font-display: 'Manrope', 'Nunito', 'Helvetica Neue', sans-serif;
+}

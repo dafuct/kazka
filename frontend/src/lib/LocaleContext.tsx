@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { uk } from '../locales/uk'
 import { en } from '../locales/en'
@@ -19,6 +19,10 @@ const LocaleContext = createContext<LocaleCtx | null>(null)
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const stored = (localStorage.getItem('lang') as Lang) ?? 'uk'
   const [lang, setLang] = useState<Lang>(stored)
+
+  useEffect(() => {
+    document.documentElement.dataset.lang = lang
+  }, [lang])
 
   const toggleLang = useCallback(() => {
     setLang(prev => {
