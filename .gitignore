@@ -24,3 +24,9 @@
 
 # Runtime
 backend/uploads/
+
+# Git worktrees
+.worktrees/
+
+# Brainstorm sessions (visual companion)
+.superpowers/
