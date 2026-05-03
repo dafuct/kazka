@@ -90,6 +90,10 @@ export const en: Locale = {
         desc: 'AI weaves a unique story word by word — with illustrations, ready for bedtime reading.',
       },
     ],
+    prevAria: 'Previous step',
+    nextAria: 'Next step',
+    dotAria: 'Go to step {n}',
+    announce: 'Step {n} of {total}: {title}',
   },
   features: {
     label: 'Features',
