@@ -142,11 +142,6 @@ export const en: Locale = {
     tagline: 'Every story is unique. No two alike.',
     dropCap: 'O',
     text: "nce upon a time, deep in the heart of the Enchanted Forest, there lived a little star named Mia. She didn't shine in the sky like other stars — instead she lived in the hollow of an ancient oak and every night set out on a journey along paths covered in silvery moss.",
-    text2: 'She crossed a brook of moonlight, where silver fish leapt from rock to rock, and at last reached a clearing where seven fireflies sat in a circle, waiting for the smallest star in the world.',
-    prevAria: 'Previous page',
-    nextAria: 'Next page',
-    dotAria: 'Go to page {n}',
-    announce: 'Page {n} of {total}',
   },
   footer: {
     tagline: 'Stories that remember',
