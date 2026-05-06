@@ -1,0 +1,11 @@
+Hi {displayName},
+
+Welcome to Kazka. Please confirm your email by clicking the link below:
+
+{baseUrl}/api/auth/verify-email?token={token}
+
+The link expires in 24 hours.
+
+If you didn't create an account, you can safely ignore this message.
+
+— Kazka
