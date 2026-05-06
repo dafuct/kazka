@@ -19,21 +19,47 @@ services:
       retries: 10
       start_period: 30s
 
+  redis:
+    image: redis:7-alpine
+    container_name: kazkar-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   backend:
     build: ./backend
     environment:
       DB_URL: jdbc:mysql://mysql:3306/kazkar
       DB_USER: kazkar
       DB_PASS: kazkar
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: "6379"
       HUGGINGFACE_API_TOKEN: ${HUGGINGFACE_API_TOKEN}
       HF_TEXT_MODEL: ${HF_TEXT_MODEL:-INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v1.0:featherless-ai}
       HF_EDITOR_MODEL: ${HF_EDITOR_MODEL:-lapa-llm/lapa-12b-pt:featherless-ai}
       HF_IMAGE_MODEL: ${HF_IMAGE_MODEL:-black-forest-labs/FLUX.1-schnell}
       UPLOADS_DIR: /uploads
+      APP_BASE_URL: ${APP_BASE_URL:-http://localhost}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      MAIL_HOST: ${MAIL_HOST:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@kazka.local}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
     volumes:
       - uploads:/uploads
     depends_on:
       mysql:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   frontend:
