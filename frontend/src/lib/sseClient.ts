@@ -1,4 +1,5 @@
 import type { GenerationRequest } from './types'
+import { withCsrf } from './csrf'
 
 export interface SseMetaEvent {
   type: 'meta'
@@ -31,12 +32,12 @@ export async function streamStory(
   handlers: SseHandlers,
   signal?: AbortSignal
 ): Promise<void> {
-  const res = await fetch('/api/stories/generate', {
+  const res = await fetch('/api/stories/generate', withCsrf({
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
     body: JSON.stringify(req),
     signal,
-  })
+  }))
 
   if (!res.ok) {
     const text = await res.text().catch(() => '')
