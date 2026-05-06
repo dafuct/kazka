@@ -1,14 +1,22 @@
 import { useEffect, useRef } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { ThemeProvider } from './lib/ThemeContext'
 import { LocaleProvider } from './lib/LocaleContext'
 import { StoryModalProvider } from './lib/StoryModalContext'
+import { AuthProvider, useAuth } from './lib/AuthContext'
+import { AuthModalProvider } from './lib/AuthModalContext'
 import { StoryModal } from './components/modal/StoryModal'
+import { AuthModal } from './components/auth/AuthModal'
 import { Nav } from './components/chrome/Nav'
 import { Footer } from './components/chrome/Footer'
+import { RequireAuth } from './components/auth/RequireAuth'
+import { RequireAdmin } from './components/auth/RequireAdmin'
 import { HomePage } from './pages/HomePage'
 import { ArchivePage } from './pages/ArchivePage'
 import { StoryDetailPage } from './pages/StoryDetailPage'
+import { EmailVerifiedPage } from './pages/EmailVerifiedPage'
+import { PasswordResetPage } from './pages/PasswordResetPage'
+import { AdminUsersPage } from './pages/AdminUsersPage'
 
 function ScrollProgress() {
   const barRef = useRef<HTMLDivElement>(null)
@@ -54,25 +62,58 @@ function CursorTrail() {
   return null
 }
 
+function GoogleAuthLanding() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { refresh } = useAuth()
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    if (params.get('auth') === 'ok') {
+      params.delete('auth')
+      const search = params.toString()
+      navigate({ pathname: location.pathname, search: search ? '?' + search : '' }, { replace: true })
+      refresh()
+    }
+  }, [location, navigate, refresh])
+  return null
+}
+
+function AppShell() {
+  return (
+    <>
+      <ScrollProgress />
+      <CursorTrail />
+      <GoogleAuthLanding />
+      <Nav />
+      <main>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/stories" element={<RequireAuth><ArchivePage /></RequireAuth>} />
+          <Route path="/stories/:id" element={<RequireAuth><StoryDetailPage /></RequireAuth>} />
+          <Route path="/verify-email" element={<EmailVerifiedPage />} />
+          <Route path="/reset-password" element={<PasswordResetPage />} />
+          <Route path="/admin/users" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
+        </Routes>
+      </main>
+      <Footer />
+      <StoryModal />
+      <AuthModal />
+    </>
+  )
+}
+
 export default function App() {
   return (
     <ThemeProvider>
       <LocaleProvider>
         <BrowserRouter>
-          <StoryModalProvider>
-            <ScrollProgress />
-            <CursorTrail />
-            <Nav />
-            <main>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/stories" element={<ArchivePage />} />
-                <Route path="/stories/:id" element={<StoryDetailPage />} />
-              </Routes>
-            </main>
-            <Footer />
-            <StoryModal />
-          </StoryModalProvider>
+          <AuthProvider>
+            <AuthModalProvider>
+              <StoryModalProvider>
+                <AppShell />
+              </StoryModalProvider>
+            </AuthModalProvider>
+          </AuthProvider>
         </BrowserRouter>
       </LocaleProvider>
     </ThemeProvider>
