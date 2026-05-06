@@ -1,26 +1,75 @@
 package com.kazka.story;
 
+import com.kazka.auth.exception.EmailAlreadyExistsException;
+import com.kazka.auth.exception.EmailNotVerifiedException;
+import com.kazka.auth.exception.InvalidTokenException;
+import com.kazka.auth.exception.MailDeliveryException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ProblemDetail handleStatus(ResponseStatusException ex) {
-        return ProblemDetail.forStatusAndDetail(ex.getStatusCode(), ex.getReason());
+    public ResponseEntity<Map<String, Object>> handleStatus(ResponseStatusException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", codeFor(ex));
+        if (ex.getReason() != null) body.put("message", ex.getReason());
+        return ResponseEntity.status(ex.getStatusCode()).body(body);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "INVALID_CREDENTIALS"));
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleEmailTaken(EmailAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", "EMAIL_TAKEN"));
+    }
+
+    @ExceptionHandler(EmailNotVerifiedException.class)
+    public ResponseEntity<Map<String, Object>> handleNotVerified(EmailNotVerifiedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "EMAIL_NOT_VERIFIED"));
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidToken(InvalidTokenException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "TOKEN_INVALID"));
+    }
+
+    @ExceptionHandler(MailDeliveryException.class)
+    public ResponseEntity<Map<String, Object>> handleMailFailure(MailDeliveryException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(Map.of("error", "MAIL_SEND_FAILED"));
     }
 
     @ExceptionHandler(WebExchangeBindException.class)
-    public ProblemDetail handleValidation(WebExchangeBindException ex) {
-        String detail = ex.getBindingResult().getFieldErrors().stream()
-                .map(e -> e.getField() + ": " + e.getDefaultMessage())
-                .reduce((a, b) -> a + "; " + b)
-                .orElse("Validation failed");
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
+    public ResponseEntity<Map<String, Object>> handleValidation(WebExchangeBindException ex) {
+        Map<String, String> fields = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(fe ->
+                fields.put(fe.getField(), fe.getDefaultMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "VALIDATION", "fields", fields));
+    }
+
+    private static String codeFor(ResponseStatusException ex) {
+        int s = ex.getStatusCode().value();
+        if (s == 404) return "NOT_FOUND";
+        if (s == 401) return "UNAUTHENTICATED";
+        if (s == 403) return "FORBIDDEN";
+        return "ERROR";
     }
 }
