@@ -1,16 +1,23 @@
-import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useLocale } from '../../lib/LocaleContext'
 import { useTheme } from '../../lib/ThemeContext'
 import { useStoryModal } from '../../lib/StoryModalContext'
+import { useAuth } from '../../lib/AuthContext'
+import { useAuthModal } from '../../lib/AuthModalContext'
 import styles from './Nav.module.css'
 
 export function Nav() {
   const { toggleLang, t } = useLocale()
   const { theme, toggleTheme } = useTheme()
   const { openModal } = useStoryModal()
+  const { user, signOut } = useAuth()
+  const { openAuth } = useAuthModal()
+  const navigate = useNavigate()
   const { pathname } = useLocation()
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 80)
@@ -18,6 +25,19 @@ export function Nav() {
     handler()
     return () => window.removeEventListener('scroll', handler)
   }, [])
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false)
+    }
+    document.addEventListener('click', onClick)
+    return () => document.removeEventListener('click', onClick)
+  }, [])
+
+  const tryClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!user) openAuth('signIn'); else openModal()
+  }
 
   return (
     <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>
@@ -33,20 +53,16 @@ export function Nav() {
       </Link>
 
       <ul className={styles.links}>
-        <li>
-          <a href="/#how" className={styles.link}>{t.nav.howItWorks}</a>
-        </li>
-        <li>
-          <a href="/#features" className={styles.link}>{t.nav.features}</a>
-        </li>
-        <li>
-          <Link
-            to="/stories"
-            className={pathname.startsWith('/stories') ? `${styles.link} ${styles.active}` : styles.link}
-          >
-            {t.nav.archive}
-          </Link>
-        </li>
+        <li><a href="/#how" className={styles.link}>{t.nav.howItWorks}</a></li>
+        <li><a href="/#features" className={styles.link}>{t.nav.features}</a></li>
+        {user && (
+          <li>
+            <Link to="/stories"
+                  className={pathname.startsWith('/stories') ? `${styles.link} ${styles.active}` : styles.link}>
+              {t.nav.archive}
+            </Link>
+          </li>
+        )}
         <li>
           <button onClick={toggleTheme} className={styles.themeToggle} aria-label={t.nav.toggleTheme}>
             {theme === 'light' ? t.nav.themeLight : t.nav.themeDark}
@@ -57,9 +73,35 @@ export function Nav() {
             {t.nav.toggleLang}
           </button>
         </li>
-        <li>
-          <a href="#" className={styles.ctaBtn} onClick={(e) => { e.preventDefault(); openModal() }}>{t.nav.tryCta}</a>
-        </li>
+        {!user && (
+          <>
+            <li>
+              <button className={styles.link} onClick={() => openAuth('signIn')}>{t.auth.tabs.signIn}</button>
+            </li>
+            <li>
+              <button className={styles.ctaBtn} onClick={() => openAuth('signUp')}>{t.auth.tabs.signUp}</button>
+            </li>
+          </>
+        )}
+        {user && (
+          <>
+            <li>
+              <a href="#" className={styles.ctaBtn} onClick={tryClick}>{t.nav.tryCta}</a>
+            </li>
+            <li className={styles.userWrap} ref={menuRef}>
+              <button className={styles.userBtn} onClick={() => setMenuOpen(o => !o)}>{user.displayName} ▾</button>
+              {menuOpen && (
+                <div className={styles.userMenu}>
+                  <button onClick={() => { setMenuOpen(false); navigate('/stories') }}>{t.auth.actions.myArchive}</button>
+                  {user.role === 'ADMIN' && (
+                    <button onClick={() => { setMenuOpen(false); navigate('/admin/users') }}>{t.auth.actions.adminUsers}</button>
+                  )}
+                  <button onClick={async () => { setMenuOpen(false); await signOut(); navigate('/') }}>{t.auth.actions.signOut}</button>
+                </div>
+              )}
+            </li>
+          </>
+        )}
       </ul>
     </nav>
   )
