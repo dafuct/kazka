@@ -1,27 +1,13 @@
 package com.kazka.story;
 
+import com.kazka.AbstractIT;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.UUID;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class StoryControllerTest {
-
-    @LocalServerPort
-    int port;
-
-    WebTestClient webTestClient() {
-        return WebTestClient.bindToServer()
-                .baseUrl("http://localhost:" + port)
-                .build();
-    }
+class StoryControllerTest extends AbstractIT {
 
     @Autowired
     StoryRepository storyRepository;
@@ -33,16 +19,15 @@ class StoryControllerTest {
 
     @Test
     void getStories_withoutAuth_returns401() {
-        webTestClient().get().uri("/api/stories")
+        client().get().uri("/api/stories")
                 .exchange()
                 .expectStatus().isUnauthorized();
     }
 
     @Test
     void getStory_withoutAuth_returns401() {
-        webTestClient().get().uri("/api/stories/" + UUID.randomUUID())
+        client().get().uri("/api/stories/" + UUID.randomUUID())
                 .exchange()
                 .expectStatus().isUnauthorized();
     }
-
 }

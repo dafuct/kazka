@@ -1,11 +1,10 @@
 package com.kazka.story;
 
+import com.kazka.AbstractIT;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +12,19 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class StoryRepositoryTest {
+class StoryRepositoryTest extends AbstractIT {
 
     @Autowired
     StoryRepository repository;
+
+    @Autowired
+    com.kazka.user.UserRepository userRepository;
+
+    @BeforeEach
+    void clean() {
+        repository.deleteAll();
+        userRepository.deleteAll();
+    }
 
     @Test
     void saveAndFindById() {
@@ -65,9 +70,6 @@ class StoryRepositoryTest {
         s.setIllustrationStatus(IllustrationStatus.PENDING);
         return s;
     }
-
-    @Autowired
-    com.kazka.user.UserRepository userRepository;
 
     private String seedUser() {
         com.kazka.user.User u = new com.kazka.user.User();
