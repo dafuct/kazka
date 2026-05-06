@@ -6,14 +6,18 @@ import com.kazka.user.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
+import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 class JsonLoginSuccessHandler implements ServerAuthenticationSuccessHandler {
 
     private final ObjectMapper mapper;
+    private final WebSessionServerSecurityContextRepository contextRepo =
+            new WebSessionServerSecurityContextRepository();
     private UserRepository users;
 
     JsonLoginSuccessHandler(ObjectMapper mapper) { this.mapper = mapper; }
@@ -23,10 +27,12 @@ class JsonLoginSuccessHandler implements ServerAuthenticationSuccessHandler {
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange exchange, Authentication auth) {
         KazkaUserDetails kud = (KazkaUserDetails) auth.getPrincipal();
-        return Mono.fromCallable(() -> users.findById(kud.getUserId()).orElseThrow())
-                .subscribeOn(Schedulers.boundedElastic())
-                .map(UserDto::from)
-                .flatMap(dto -> writeBody(exchange, dto));
+        var context = new SecurityContextImpl(auth);
+        return contextRepo.save(exchange.getExchange(), context)
+                .then(Mono.fromCallable(() -> users.findById(kud.getUserId()).orElseThrow())
+                        .subscribeOn(Schedulers.boundedElastic())
+                        .map(UserDto::from)
+                        .flatMap(dto -> writeBody(exchange, dto)));
     }
 
     private Mono<Void> writeBody(WebFilterExchange exchange, UserDto dto) {
