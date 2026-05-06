@@ -11,6 +11,29 @@ spring:
     hibernate:
       ddl-auto: none
     defer-datasource-initialization: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  session:
+    store-type: redis
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:3025}
+    username: ""
+    password: ""
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
 kazka:
   huggingface:
     api-token: test-token
+  auth:
+    app-base-url: http://localhost
+    mail-from: test@kazka.local
+    token-ttl:
+      email-verification: 24h
+      password-reset: 1h
+    admin:
+      email: ""
+      password: ""

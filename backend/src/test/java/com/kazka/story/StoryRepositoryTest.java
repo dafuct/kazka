@@ -54,6 +54,7 @@ class StoryRepositoryTest {
     private Story story(String title) {
         Story s = new Story();
         s.setId(UUID.randomUUID().toString());
+        s.setUserId(seedUser());
         s.setTitle(title);
         s.setTheme("theme");
         s.setCharacters(List.of("Мія", "лисичка"));
@@ -63,5 +64,19 @@ class StoryRepositoryTest {
         s.setContent("content");
         s.setIllustrationStatus(IllustrationStatus.PENDING);
         return s;
+    }
+
+    @Autowired
+    com.kazka.user.UserRepository userRepository;
+
+    private String seedUser() {
+        com.kazka.user.User u = new com.kazka.user.User();
+        u.setId(UUID.randomUUID().toString());
+        u.setEmail(u.getId() + "@example.com");
+        u.setDisplayName("Test");
+        u.setRole(com.kazka.user.UserRole.USER);
+        u.setEmailVerified(true);
+        userRepository.save(u);
+        return u.getId();
     }
 }

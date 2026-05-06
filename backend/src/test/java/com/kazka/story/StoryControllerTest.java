@@ -33,20 +33,17 @@ class StoryControllerTest {
     }
 
     @Test
-    void getStories_returnsEmptyPage() {
+    void getStories_withoutAuth_returns401() {
         webTestClient().get().uri("/api/stories")
                 .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.items").isArray()
-                .jsonPath("$.total").isEqualTo(0);
+                .expectStatus().isUnauthorized();
     }
 
     @Test
-    void getStory_notFound_returns404() {
+    void getStory_withoutAuth_returns401() {
         webTestClient().get().uri("/api/stories/" + UUID.randomUUID())
                 .exchange()
-                .expectStatus().isNotFound();
+                .expectStatus().isUnauthorized();
     }
 
     @Test
