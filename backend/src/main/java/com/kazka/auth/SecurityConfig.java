@@ -54,7 +54,8 @@ public class SecurityConfig {
             UserDetailsRepositoryReactiveAuthenticationManager authManager,
             OAuth2SuccessHandler oauthSuccess,
             ObjectMapper objectMapper,
-            com.kazka.user.UserRepository userRepository) {
+            com.kazka.user.UserRepository userRepository,
+            org.springframework.beans.factory.ObjectProvider<CorsConfigurationSource> corsProvider) {
 
         var loginFilter = new AuthenticationWebFilter(authManager);
         loginFilter.setRequiresAuthenticationMatcher(
@@ -67,7 +68,10 @@ public class SecurityConfig {
                 writeError(webFilterExchange.getExchange(), HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", objectMapper));
 
         return http
-                .cors(c -> c.configurationSource(corsConfigSource()))
+                .cors(c -> {
+                    CorsConfigurationSource src = corsProvider.getIfAvailable();
+                    if (src != null) c.configurationSource(src); else c.disable();
+                })
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
                         .requireCsrfProtectionMatcher(new AndServerWebExchangeMatcher(

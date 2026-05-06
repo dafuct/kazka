@@ -1,6 +1,7 @@
 package com.kazka.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
@@ -15,18 +16,19 @@ class JsonLoginConverter implements ServerAuthenticationConverter {
 
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
-        return exchange.getRequest().getBody()
-                .reduce(new java.io.ByteArrayOutputStream(), (out, buf) -> {
+        return DataBufferUtils.join(exchange.getRequest().getBody())
+                .map(buf -> {
                     try {
-                        out.writeBytes(buf.asInputStream().readAllBytes());
-                    } catch (java.io.IOException e) {
-                        throw new IllegalStateException("failed to read request body", e);
+                        byte[] bytes = new byte[buf.readableByteCount()];
+                        buf.read(bytes);
+                        return bytes;
+                    } finally {
+                        DataBufferUtils.release(buf);
                     }
-                    return out;
                 })
-                .map(out -> {
+                .map(bytes -> {
                     try {
-                        var node = mapper.readTree(out.toByteArray());
+                        var node = mapper.readTree(bytes);
                         String email = node.path("email").asText("").trim().toLowerCase();
                         String password = node.path("password").asText("");
                         return (Authentication) new UsernamePasswordAuthenticationToken(email, password);
