@@ -1,0 +1,16 @@
+.page {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+}
+.heading { max-width: 600px; font-size: clamp(1.4rem, 3vw, 2rem); }
+.btn {
+  background: linear-gradient(90deg, var(--color-ember, #D97706), var(--color-magic, #7C3AED));
+  color: #fff; border: none; border-radius: 999px;
+  padding: 12px 24px; font-family: inherit; font-size: 1rem; cursor: pointer;
+}
