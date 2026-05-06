@@ -151,6 +151,7 @@ public class AuthService {
         sessionInvalidator.invalidateAllForUser(user.getId());
     }
 
+    @Transactional(readOnly = true)
     public UserDto findCurrent(String userId) {
         return users.findById(userId).map(UserDto::from).orElseThrow();
     }
