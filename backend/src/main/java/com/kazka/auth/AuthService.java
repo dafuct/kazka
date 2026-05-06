@@ -3,6 +3,8 @@ package com.kazka.auth;
 import com.kazka.auth.exception.EmailAlreadyExistsException;
 import com.kazka.user.EmailVerificationToken;
 import com.kazka.user.EmailVerificationTokenRepository;
+import com.kazka.user.PasswordResetToken;
+import com.kazka.user.PasswordResetTokenRepository;
 import com.kazka.user.User;
 import com.kazka.user.UserDto;
 import com.kazka.user.UserRepository;
@@ -23,22 +25,28 @@ public class AuthService {
 
     private final UserRepository users;
     private final EmailVerificationTokenRepository emailTokens;
+    private final PasswordResetTokenRepository resetTokens;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
     private final MailService mailService;
+    private final SessionInvalidator sessionInvalidator;
     private final AuthProperties props;
 
     public AuthService(UserRepository users,
                        EmailVerificationTokenRepository emailTokens,
+                       PasswordResetTokenRepository resetTokens,
                        PasswordEncoder passwordEncoder,
                        TokenService tokenService,
                        MailService mailService,
+                       SessionInvalidator sessionInvalidator,
                        AuthProperties props) {
         this.users = users;
         this.emailTokens = emailTokens;
+        this.resetTokens = resetTokens;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
         this.mailService = mailService;
+        this.sessionInvalidator = sessionInvalidator;
         this.props = props;
     }
 
@@ -101,5 +109,49 @@ public class AuthService {
         if (user.isEmailVerified()) return;
         emailTokens.consumeAllByUserId(userId, Instant.now());
         sendVerification(user);
+    }
+
+    @Transactional
+    public void requestPasswordReset(String email) {
+        String normalized = email.trim().toLowerCase();
+        var userOpt = users.findByEmail(normalized);
+        if (userOpt.isEmpty()) return;
+        User user = userOpt.get();
+        if (user.getPasswordHash() == null) return;
+
+        PasswordResetToken token = new PasswordResetToken();
+        token.setToken(tokenService.generate());
+        token.setUserId(user.getId());
+        token.setExpiresAt(Instant.now().plus(props.tokenTtl().passwordReset()));
+        resetTokens.save(token);
+
+        try {
+            mailService.sendPasswordResetEmail(user.getEmail(), user.getDisplayName(), token.getToken());
+        } catch (Exception e) {
+            log.warn("Password reset email failed for {}", user.getEmail());
+        }
+    }
+
+    @Transactional
+    public void confirmPasswordReset(String token, String newPassword) {
+        var opt = resetTokens.findById(token);
+        if (opt.isEmpty()) throw new com.kazka.auth.exception.InvalidTokenException();
+        PasswordResetToken prt = opt.get();
+        if (prt.getConsumedAt() != null) throw new com.kazka.auth.exception.InvalidTokenException();
+        if (prt.getExpiresAt().isBefore(Instant.now())) throw new com.kazka.auth.exception.InvalidTokenException();
+
+        User user = users.findById(prt.getUserId())
+                .orElseThrow(com.kazka.auth.exception.InvalidTokenException::new);
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        users.save(user);
+
+        prt.setConsumedAt(Instant.now());
+        resetTokens.save(prt);
+
+        sessionInvalidator.invalidateAllForUser(user.getId());
+    }
+
+    public UserDto findCurrent(String userId) {
+        return users.findById(userId).map(UserDto::from).orElseThrow();
     }
 }
