@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { StoryForm } from '../form/StoryForm'
 import { useStoryModal } from '../../lib/StoryModalContext'
 import { useLocale } from '../../lib/LocaleContext'
+import { useAuth } from '../../lib/AuthContext'
 import { streamStory } from '../../lib/sseClient'
 import { api } from '../../lib/apiClient'
 import type { GenerationRequest } from '../../lib/types'
@@ -18,6 +19,9 @@ export function StoryModal() {
   const { open, closeModal } = useStoryModal()
   const { t } = useLocale()
   const navigate = useNavigate()
+  const { user, resendVerification } = useAuth()
+  const needsVerify = !!user && !user.emailVerified
+  const [resendDone, setResendDone] = useState(false)
   const [phase, setPhase] = useState<Phase>('form')
   const [request, setRequest] = useState<GenerationRequest | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -149,7 +153,20 @@ export function StoryModal() {
         )}
         <div className={styles.body}>
           {error && <div className={styles.error}>{error}</div>}
-          {phase === 'form' && (
+          {phase === 'form' && needsVerify && (
+            <div className={styles.verifyPanel}>
+              <h2 className={styles.creatingTitle}>{t.auth.messages.verifyPanelTitle}</h2>
+              <p className={styles.creatingHint}>{t.auth.messages.verifyPanelBody(user!.email)}</p>
+              <button
+                className={styles.resendBtn}
+                disabled={resendDone}
+                onClick={async () => { await resendVerification(); setResendDone(true) }}
+              >
+                {resendDone ? '✓' : t.auth.actions.resend}
+              </button>
+            </div>
+          )}
+          {phase === 'form' && !needsVerify && (
             <StoryForm onSubmit={handleSubmit} loading={false} inModal />
           )}
           {phase === 'creating' && (
@@ -170,6 +187,7 @@ export function StoryModal() {
                 </svg>
               </div>
               <h2 className={styles.creatingTitle}>{t.form.generating}</h2>
+              <p className={styles.creatingHint}>{t.form.generatingHint}</p>
             </div>
           )}
         </div>
