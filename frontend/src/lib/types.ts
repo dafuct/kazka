@@ -35,3 +35,38 @@ export interface UpdateStoryRequest {
   title: string
   content: string
 }
+
+export type UserRole = 'USER' | 'ADMIN'
+
+export interface User {
+  id: string
+  email: string
+  displayName: string
+  role: UserRole
+  emailVerified: boolean
+  googleLinked: boolean
+}
+
+export type AuthErrorCode =
+  | 'INVALID_CREDENTIALS'
+  | 'EMAIL_TAKEN'
+  | 'EMAIL_NOT_VERIFIED'
+  | 'TOKEN_INVALID'
+  | 'MAIL_SEND_FAILED'
+  | 'VALIDATION'
+  | 'UNAUTHENTICATED'
+  | 'FORBIDDEN'
+  | 'NOT_FOUND'
+  | 'ERROR'
+
+export interface ApiErrorBody {
+  error: AuthErrorCode | string
+  message?: string
+  fields?: Record<string, string>
+}
+
+export class ApiError extends Error {
+  constructor(public status: number, public body: ApiErrorBody) {
+    super(body.error)
+  }
+}
