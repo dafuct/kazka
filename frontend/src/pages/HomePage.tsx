@@ -6,6 +6,8 @@ import { StoryPreview } from '../components/home/StoryPreview'
 import { NightCta } from '../components/home/NightCta'
 import { useLocale } from '../lib/LocaleContext'
 import { useStoryModal } from '../lib/StoryModalContext'
+import { useAuth } from '../lib/AuthContext'
+import { useAuthModal } from '../lib/AuthModalContext'
 import { handleRipple } from '../lib/ripple'
 import styles from './HomePage.module.css'
 
@@ -54,6 +56,13 @@ function ParticleField() {
 export function HomePage() {
   const { t } = useLocale()
   const { openModal } = useStoryModal()
+  const { user } = useAuth()
+  const { openAuth } = useAuthModal()
+  const tryClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!user) openAuth('signIn'); else openModal()
+    handleRipple(e)
+  }
   const heroImgRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -96,7 +105,7 @@ export function HomePage() {
               <a
                 href="#"
                 className={styles.btnPrimary}
-                onClick={(e) => { e.preventDefault(); openModal(); handleRipple(e) }}
+                onClick={tryClick}
               >
                 {t.home.cta} →
               </a>

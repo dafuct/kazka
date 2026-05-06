@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 import { useReveal } from '../../lib/useReveal'
 import { handleRipple } from '../../lib/ripple'
 import { useStoryModal } from '../../lib/StoryModalContext'
+import { useAuth } from '../../lib/AuthContext'
+import { useAuthModal } from '../../lib/AuthModalContext'
 import { useLocale } from '../../lib/LocaleContext'
 import styles from './NightCta.module.css'
 
@@ -25,6 +27,13 @@ function StarLayer() {
 export function NightCta() {
   const { t } = useLocale()
   const { openModal } = useStoryModal()
+  const { user } = useAuth()
+  const { openAuth } = useAuthModal()
+  const tryClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (!user) openAuth('signIn'); else openModal()
+    handleRipple(e)
+  }
   const { ref: r1, visible: v1 } = useReveal()
   const { ref: r2, visible: v2 } = useReveal()
   const { ref: r3, visible: v3 } = useReveal()
@@ -44,7 +53,7 @@ export function NightCta() {
           ref={r3}
           href="#"
           className={`reveal ${v3 ? 'visible' : ''} ${styles.btn}`}
-          onClick={(e) => { e.preventDefault(); openModal(); handleRipple(e) }}
+          onClick={tryClick}
         >
           {t.nightCta.button}
         </a>
