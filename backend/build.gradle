@@ -37,6 +37,7 @@ dependencies {
     testImplementation 'org.testcontainers:jdbc:1.21.3'
     testImplementation 'com.redis:testcontainers-redis:2.2.2'
     testImplementation 'com.icegreen:greenmail-junit5:2.1.0'
+    testImplementation 'org.awaitility:awaitility:4.2.2'
 }
 
 tasks.withType(Test).configureEach {

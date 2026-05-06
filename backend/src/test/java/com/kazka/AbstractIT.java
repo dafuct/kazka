@@ -24,7 +24,7 @@ public abstract class AbstractIT {
             new RedisContainer(DockerImageName.parse("redis:7-alpine"));
 
     @RegisterExtension
-    static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
+    public static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
             .withConfiguration(com.icegreen.greenmail.configuration.GreenMailConfiguration
                     .aConfig().withDisabledAuthentication());
 
