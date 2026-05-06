@@ -75,4 +75,31 @@ public class AuthService {
             log.warn("Verification email failed for {}; user can resend later", user.getEmail());
         }
     }
+
+    @Transactional
+    public boolean verifyEmail(String token) {
+        var opt = emailTokens.findById(token);
+        if (opt.isEmpty()) return false;
+        EmailVerificationToken evt = opt.get();
+        if (evt.getConsumedAt() != null) return false;
+        if (evt.getExpiresAt().isBefore(Instant.now())) return false;
+
+        User user = users.findById(evt.getUserId()).orElse(null);
+        if (user == null) return false;
+
+        user.setEmailVerified(true);
+        users.save(user);
+
+        evt.setConsumedAt(Instant.now());
+        emailTokens.save(evt);
+        return true;
+    }
+
+    @Transactional
+    public void resendVerification(String userId) {
+        User user = users.findById(userId).orElseThrow();
+        if (user.isEmailVerified()) return;
+        emailTokens.consumeAllByUserId(userId, Instant.now());
+        sendVerification(user);
+    }
 }
