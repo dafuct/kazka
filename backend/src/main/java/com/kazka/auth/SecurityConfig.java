@@ -78,7 +78,9 @@ public class SecurityConfig {
                                 CsrfWebFilter.DEFAULT_CSRF_MATCHER,
                                 new NegatedServerWebExchangeMatcher(
                                         ServerWebExchangeMatchers.pathMatchers(
-                                                "/oauth2/**", "/login/oauth2/**")))))
+                                                "/oauth2/**", "/login/oauth2/**",
+                                                "/api/auth/signup", "/api/auth/login",
+                                                "/api/auth/password-reset/**")))))
                 .authorizeExchange(auth -> auth
                         .pathMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                         .pathMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
