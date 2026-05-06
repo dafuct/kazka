@@ -15,8 +15,40 @@ spring:
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQLDialect
     defer-datasource-initialization: true
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+  session:
+    store-type: redis
+    timeout: 14d
+    redis:
+      namespace: kazka:session
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:}
+            client-secret: ${GOOGLE_CLIENT_SECRET:}
+            scope: openid,email,profile
 server:
   port: 8080
+  reactive:
+    session:
+      cookie:
+        same-site: lax
+        secure: ${COOKIE_SECURE:false}
+        http-only: true
 kazka:
   huggingface:
     api-token: ${HUGGINGFACE_API_TOKEN:}
@@ -28,3 +60,12 @@ kazka:
     image-base-url: ${HF_IMAGE_BASE_URL:https://router.huggingface.co}
   uploads:
     dir: ${UPLOADS_DIR:./uploads}
+  auth:
+    app-base-url: ${APP_BASE_URL:http://localhost}
+    mail-from: ${MAIL_FROM:no-reply@kazka.local}
+    token-ttl:
+      email-verification: 24h
+      password-reset: 1h
+    admin:
+      email: ${ADMIN_EMAIL:}
+      password: ${ADMIN_PASSWORD:}
