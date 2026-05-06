@@ -1,8 +1,12 @@
 package com.kazka.story;
 
+import com.kazka.auth.CurrentUserResolver.CurrentUser;
+import com.kazka.auth.exception.EmailNotVerifiedException;
 import com.kazka.hf.HuggingFaceClient;
 import com.kazka.illustration.IllustrationService;
 import com.kazka.story.dto.*;
+import com.kazka.user.User;
+import com.kazka.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -18,19 +22,27 @@ import java.util.UUID;
 public class StoryService {
 
     private final StoryRepository repository;
+    private final UserRepository users;
     private final HuggingFaceClient hfClient;
     private final PromptBuilder promptBuilder;
     private final IllustrationService illustrationService;
 
-    public StoryService(StoryRepository repository, HuggingFaceClient hfClient,
-                        PromptBuilder promptBuilder, IllustrationService illustrationService) {
+    public StoryService(StoryRepository repository, UserRepository users,
+                        HuggingFaceClient hfClient, PromptBuilder promptBuilder,
+                        IllustrationService illustrationService) {
         this.repository = repository;
+        this.users = users;
         this.hfClient = hfClient;
         this.promptBuilder = promptBuilder;
         this.illustrationService = illustrationService;
     }
 
-    public Flux<SseEvent> generate(GenerationRequest req) {
+    public Flux<SseEvent> generate(GenerationRequest req, CurrentUser currentUser) {
+        return ensureVerified(currentUser)
+                .thenMany(Flux.defer(() -> generateInternal(req, currentUser.userId())));
+    }
+
+    private Flux<SseEvent> generateInternal(GenerationRequest req, String userId) {
         String id = UUID.randomUUID().toString();
         String storySystem = promptBuilder.buildStorySystem();
         String storyUser = promptBuilder.buildStoryUserMessage(req);
@@ -38,6 +50,7 @@ public class StoryService {
 
         Story story = new Story();
         story.setId(id);
+        story.setUserId(userId);
         story.setTitle("");
         story.setTheme(req.theme());
         story.setCharacters(req.characters());
@@ -51,9 +64,7 @@ public class StoryService {
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMapMany(saved -> {
                     Flux<SseEvent> meta = Flux.just(SseEvent.meta(id));
-
                     StringBuilder rawBuffer = new StringBuilder();
-                    // Step 1: stream raw story to user; Step 2: edit silently, save corrected version
                     Flux<SseEvent> tokens = hfClient.streamText(storySystem, storyUser)
                             .doOnNext(rawBuffer::append)
                             .map(SseEvent::token)
@@ -66,9 +77,16 @@ public class StoryService {
                                             int storyStart = 0;
                                             for (int i = 0; i < lines.length; i++) {
                                                 String l = lines[i].strip();
-                                                if (!l.isEmpty()) { title = l; storyStart = i + 1; break; }
+                                                if (l.isEmpty()) continue;
+                                                if (looksLikeTitle(l)) {
+                                                    title = l;
+                                                    storyStart = i + 1;
+                                                } else {
+                                                    title = req.theme();
+                                                    storyStart = i;
+                                                }
+                                                break;
                                             }
-                                            // skip blank lines after title to get clean story body
                                             while (storyStart < lines.length && lines[storyStart].strip().isEmpty()) storyStart++;
                                             String body = String.join("\n", java.util.Arrays.copyOfRange(lines, storyStart, lines.length));
                                             saved.setTitle(title);
@@ -78,58 +96,77 @@ public class StoryService {
                                         }).subscribeOn(Schedulers.boundedElastic()))
                             ))
                             .onErrorResume(e -> Flux.just(SseEvent.error(e.getMessage())));
-
                     return meta.concatWith(tokens);
                 });
     }
 
-    public Mono<Void> illustrate(String id) {
-        return illustrationService.generateAndStore(id)
-                .subscribeOn(Schedulers.boundedElastic());
+    private static boolean looksLikeTitle(String line) {
+        if (line.length() > 60) return false;
+        if (line.contains(". ") || line.contains("! ") || line.contains("? ")) return false;
+        if (line.endsWith(".") || line.endsWith("!") || line.endsWith("?")) return false;
+        return line.split("\\s+").length <= 6;
     }
 
-    public Mono<PageResponse<StoryDto>> list(int page, int size) {
+    public Mono<Void> illustrate(String id, CurrentUser currentUser) {
+        return ensureVerified(currentUser)
+                .then(Mono.fromCallable(() -> findOwned(id, currentUser))
+                        .subscribeOn(Schedulers.boundedElastic()))
+                .then(illustrationService.generateAndStore(id)
+                        .subscribeOn(Schedulers.boundedElastic()));
+    }
+
+    public Mono<PageResponse<StoryDto>> list(int page, int size, CurrentUser currentUser) {
         return Mono.fromCallable(() -> {
-            Page<Story> p = repository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size));
+            Page<Story> p = currentUser.isAdmin()
+                    ? repository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size))
+                    : repository.findAllByUserIdOrderByCreatedAtDesc(currentUser.userId(), PageRequest.of(page, size));
             return new PageResponse<>(
                     p.getContent().stream().map(StoryDto::from).toList(),
                     p.getNumber(), p.getSize(), p.getTotalElements());
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
-    public Mono<StoryDto> findById(String id) {
-        return Mono.fromCallable(() -> repository.findById(id))
+    public Mono<StoryDto> findById(String id, CurrentUser currentUser) {
+        return Mono.fromCallable(() -> findOwned(id, currentUser))
                 .subscribeOn(Schedulers.boundedElastic())
-                .map(opt -> opt.map(StoryDto::from)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
-    }
-
-    public Mono<StoryDto> update(String id, UpdateStoryRequest req) {
-        return Mono.fromCallable(() -> repository.findById(id))
-                .subscribeOn(Schedulers.boundedElastic())
-                .flatMap(opt -> {
-                    Story story = opt.orElseThrow(
-                            () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-                    story.setTitle(req.title());
-                    story.setContent(req.content());
-                    return Mono.fromCallable(() -> repository.save(story))
-                            .subscribeOn(Schedulers.boundedElastic());
-                })
                 .map(StoryDto::from);
     }
 
-    public Mono<Void> delete(String id) {
-        return Mono.fromCallable(() -> repository.findById(id))
+    public Mono<StoryDto> update(String id, UpdateStoryRequest req, CurrentUser currentUser) {
+        return Mono.fromCallable(() -> {
+            Story story = findOwned(id, currentUser);
+            story.setTitle(req.title());
+            story.setContent(req.content());
+            return repository.save(story);
+        }).subscribeOn(Schedulers.boundedElastic()).map(StoryDto::from);
+    }
+
+    public Mono<Void> delete(String id, CurrentUser currentUser) {
+        return Mono.fromCallable(() -> findOwned(id, currentUser))
                 .subscribeOn(Schedulers.boundedElastic())
-                .flatMap(opt -> {
-                    Story story = opt.orElseThrow(
-                            () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-                    return Mono.fromRunnable(() -> {
-                        if (story.getIllustrationPathLight() != null || story.getIllustrationPathDark() != null) {
-                            illustrationService.deleteImage(id);
-                        }
-                        repository.deleteById(id);
-                    }).subscribeOn(Schedulers.boundedElastic());
-                }).then();
+                .flatMap(story -> Mono.fromRunnable(() -> {
+                    if (story.getIllustrationPathLight() != null || story.getIllustrationPathDark() != null) {
+                        illustrationService.deleteImage(id);
+                    }
+                    repository.deleteById(id);
+                }).subscribeOn(Schedulers.boundedElastic()))
+                .then();
+    }
+
+    private Story findOwned(String id, CurrentUser currentUser) {
+        var opt = currentUser.isAdmin()
+                ? repository.findById(id)
+                : repository.findByIdAndUserId(id, currentUser.userId());
+        return opt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    private Mono<Void> ensureVerified(CurrentUser currentUser) {
+        return Mono.fromCallable(() -> users.findById(currentUser.userId())
+                        .map(User::isEmailVerified)
+                        .orElse(false))
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(verified -> verified
+                        ? Mono.empty()
+                        : Mono.error(new EmailNotVerifiedException()));
     }
 }
