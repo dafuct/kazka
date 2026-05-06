@@ -1,0 +1,60 @@
+import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
+import { useAuthModal } from '../../lib/AuthModalContext'
+import { useLocale } from '../../lib/LocaleContext'
+import { SignInForm } from './SignInForm'
+import { SignUpForm } from './SignUpForm'
+import { ForgotPasswordForm } from './ForgotPasswordForm'
+import { GoogleButton } from './GoogleButton'
+import storyStyles from '../modal/StoryModal.module.css'
+import styles from './AuthModal.module.css'
+
+export function AuthModal() {
+  const { open, tab, closeAuth, setTab } = useAuthModal()
+  const { t } = useLocale()
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeAuth() }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open, closeAuth])
+
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [open])
+
+  if (!open) return null
+
+  return createPortal(
+    <div className={storyStyles.backdrop} onClick={closeAuth} role="dialog" aria-modal="true">
+      <div className={storyStyles.panel} onClick={e => e.stopPropagation()}>
+        <div className={storyStyles.topBorder} />
+        <div className={storyStyles.header}>
+          <button className={storyStyles.closeBtn} onClick={closeAuth} aria-label="Close">✕</button>
+        </div>
+        <div className={styles.tabs}>
+          <button className={`${styles.tab} ${tab === 'signIn' ? styles.tabActive : ''}`} onClick={() => setTab('signIn')}>
+            {t.auth.tabs.signIn}
+          </button>
+          <button className={`${styles.tab} ${tab === 'signUp' ? styles.tabActive : ''}`} onClick={() => setTab('signUp')}>
+            {t.auth.tabs.signUp}
+          </button>
+        </div>
+        <div className={storyStyles.body}>
+          {tab === 'signIn' && <SignInForm onSuccess={closeAuth} />}
+          {tab === 'signUp' && <SignUpForm onSuccess={closeAuth} />}
+          {tab === 'forgot' && <ForgotPasswordForm />}
+        </div>
+        {tab !== 'forgot' && (
+          <>
+            <div className={styles.divider}>or</div>
+            <GoogleButton />
+          </>
+        )}
+      </div>
+    </div>,
+    document.body,
+  )
+}
