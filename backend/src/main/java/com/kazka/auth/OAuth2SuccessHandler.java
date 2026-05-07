@@ -4,10 +4,13 @@ import com.kazka.user.User;
 import com.kazka.user.UserRepository;
 import com.kazka.user.UserRole;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
+import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -21,6 +24,8 @@ public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler 
 
     private final UserRepository users;
     private final AuthProperties props;
+    private final WebSessionServerSecurityContextRepository contextRepo =
+            new WebSessionServerSecurityContextRepository();
 
     public OAuth2SuccessHandler(UserRepository users, AuthProperties props) {
         this.users = users;
@@ -36,7 +41,14 @@ public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler 
 
         return Mono.fromCallable(() -> resolveOrCreateUser(subject, email, name))
                 .subscribeOn(Schedulers.boundedElastic())
-                .flatMap(user -> redirect(exchange.getExchange(), props.appBaseUrl() + "/?auth=ok"));
+                .flatMap(user -> {
+                    KazkaUserDetails principal = new KazkaUserDetails(user);
+                    var token = new UsernamePasswordAuthenticationToken(
+                            principal, null, principal.getAuthorities());
+                    var context = new SecurityContextImpl(token);
+                    return contextRepo.save(exchange.getExchange(), context)
+                            .then(redirect(exchange.getExchange(), props.appBaseUrl() + "/?auth=ok"));
+                });
     }
 
     User resolveOrCreateUser(String subject, String email, String name) {
