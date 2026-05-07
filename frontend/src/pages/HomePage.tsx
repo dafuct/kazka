@@ -58,7 +58,7 @@ export function HomePage() {
   const { openModal } = useStoryModal()
   const { user } = useAuth()
   const { openAuth } = useAuthModal()
-  const tryClick = (e: React.MouseEvent) => {
+  const tryClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault()
     if (!user) openAuth('signIn'); else openModal()
     handleRipple(e)

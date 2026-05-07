@@ -17,7 +17,7 @@ export function Nav() {
   const { pathname } = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLLIElement>(null)
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 80)

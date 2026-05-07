@@ -66,7 +66,11 @@ export interface ApiErrorBody {
 }
 
 export class ApiError extends Error {
-  constructor(public status: number, public body: ApiErrorBody) {
+  status: number
+  body: ApiErrorBody
+  constructor(status: number, body: ApiErrorBody) {
     super(body.error)
+    this.status = status
+    this.body = body
   }
 }
