@@ -4,6 +4,7 @@ import com.kazka.hf.HuggingFaceClient;
 import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
 import com.kazka.story.Theme;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -50,7 +51,7 @@ public class IllustrationSampleGenerator implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String @NonNull ... args) throws Exception {
         Files.createDirectories(OUT_DIR);
         int total = 0;
         int failed = 0;

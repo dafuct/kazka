@@ -1,6 +1,7 @@
 package com.kazka.user;
 
 import com.kazka.auth.AuthProperties;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -28,7 +29,7 @@ public class UserSeedRunner implements ApplicationRunner {
 
     @Override
     @Transactional
-    public void run(ApplicationArguments args) {
+    public void run(@NonNull ApplicationArguments args) {
         String email = props.admin() == null ? null : props.admin().email();
         String password = props.admin() == null ? null : props.admin().password();
         if (email == null || email.isBlank() || password == null || password.isBlank()) {

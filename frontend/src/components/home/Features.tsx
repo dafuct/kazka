@@ -113,18 +113,7 @@ function MagicBookSvg({ dark }: { dark: boolean }) {
 function DayCycleSvg({ dark }: { dark: boolean }) {
   return (
     <svg viewBox="0 0 110 200" fill="none" xmlns="http://www.w3.org/2000/svg"
-      style={{ width: '100%', height: '100%' }} aria-hidden="true">
-      <defs>
-        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor={dark ? '#0A1B38' : '#5AACCE'} stopOpacity="0.28"/>
-          <stop offset="48%"  stopColor={dark ? '#2D1060' : '#A78BFA'} stopOpacity="0.18"/>
-          <stop offset="100%" stopColor={dark ? '#060C14' : '#1E1B4B'} stopOpacity="0.32"/>
-        </linearGradient>
-        <clipPath id="svgClip"><rect width="110" height="200" rx="8"/></clipPath>
-      </defs>
-
-      <rect width="110" height="200" fill="url(#skyGrad)" clipPath="url(#svgClip)"/>
-
+      style={{ width: '100%', height: '100%', transform: 'translateX(-10px)' }} aria-hidden="true">
       {/* ── Sun (top half) ── */}
       <g>
         <animateTransform attributeName="transform" type="rotate"

@@ -85,12 +85,14 @@
   color: #E8DCC8;
   margin-bottom: 16px;
 }
+[data-theme="light"] .heading { color: var(--color-text); }
 
 .sub {
   font-size: 16px;
   color: rgba(232,220,200,0.7);
   margin-bottom: 32px;
 }
+[data-theme="light"] .sub { color: var(--color-text-muted); }
 
 .btn {
   display: inline-block;
@@ -117,6 +119,7 @@
   font-size: 13px;
   color: rgba(232,220,200,0.45);
 }
+[data-theme="light"] .fine { color: var(--color-text-faint); }
 
 @media (max-width: 860px) {
   .section { padding: 100px 20px; }

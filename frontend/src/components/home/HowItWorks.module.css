@@ -5,6 +5,7 @@
   position: relative;
   overflow: hidden;
 }
+[data-theme="dark"] .section { background: var(--color-bg); }
 
 .inner {
   max-width: 1100px;
