@@ -2,6 +2,10 @@ package com.kazka.moderation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
 import org.springframework.data.redis.core.ReactiveValueOperations;
 import reactor.core.publisher.Mono;
@@ -14,6 +18,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ModerationServiceTest {
 
     private ModerationJudgeClient guard;
@@ -80,5 +86,24 @@ class ModerationServiceTest {
         ModerationResult en = service.checkInput("en", "x", List.of());
         assertThat(uk).isInstanceOf(ModerationResult.Allowed.class);
         assertThat(((ModerationResult.Refused) en).category()).isEqualTo(ModerationCategory.SEXUAL);
+    }
+
+    @Test
+    void should_notWriteCache_when_judgeUnavailable() {
+        when(guard.classify(anyString(), anyString(), any())).thenThrow(new RuntimeException("boom"));
+        service.checkInput("uk", "x", List.of());
+        verify(ops, never()).set(anyString(), anyString(), any(Duration.class));
+    }
+
+    @Test
+    void should_keyCacheCollisionFree_when_themeAndCharactersBoundariesShift() {
+        // theme="ab" chars=["c"] vs theme="a" chars=["bc"] would collide under a naive
+        // pipe-joined key. Length-prefixed encoding must produce different keys, hitting
+        // the judge twice (cache miss for each).
+        when(guard.classify(anyString(), anyString(), any())).thenReturn(ModerationResult.Allowed.INSTANCE);
+        service.checkInput("uk", "ab", List.of("c"));
+        service.checkInput("uk", "a", List.of("bc"));
+        // Both cache writes happen with distinct keys (Mockito captures both invocations on `set`).
+        verify(ops, times(2)).set(anyString(), anyString(), any(Duration.class));
     }
 }

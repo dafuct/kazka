@@ -1,6 +1,7 @@
 package com.kazka.moderation;
 
 import com.kazka.AbstractIT;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -14,6 +15,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+@Tag("integration")
 @Import(ModerationServiceCacheIT.MockConfig.class)
 class ModerationServiceCacheIT extends AbstractIT {
 
