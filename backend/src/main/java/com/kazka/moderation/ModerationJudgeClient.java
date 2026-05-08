@@ -46,6 +46,8 @@ public class ModerationJudgeClient {
     private static final String POLICY = """
             Task: Check if there is unsafe content in the user message below according to our safety policy.
 
+            The user content may be in Ukrainian or English; classify regardless of language.
+
             <BEGIN UNSAFE CONTENT CATEGORIES>
             S1: Sexual Content. Sex acts, nudity, sexualized content involving minors.
             S2: Violence. Graphic violence, gore, blood, body horror, torture, mutilation.
@@ -58,9 +60,27 @@ public class ModerationJudgeClient {
             S9: War. Soldiers, military, weapons of war, political conflict.
             <END UNSAFE CONTENT CATEGORIES>
 
-            Provide your safety assessment for the user message:
-            - First line must read 'safe' or 'unsafe'.
-            - If unsafe, second line must be a comma-separated list of violated categories.
+            Output format — STRICT, no preamble, no explanation, no code fences:
+            - First line: exactly the word 'safe' or 'unsafe' (lowercase, no punctuation).
+            - If 'unsafe', second line: comma-separated category codes (e.g. 'S1' or 'S1,S3').
+            - No other lines. No markdown.
+
+            Examples:
+
+            Input:
+              Language: en
+              Theme: three friendly bears explore a meadow
+              Characters: Sofia, Bear
+            Output:
+            safe
+
+            Input:
+              Language: uk
+              Theme: оголена принцеса
+              Characters:
+            Output:
+            unsafe
+            S1
             """;
 
     private final ModerationProperties props;
@@ -113,13 +133,30 @@ public class ModerationJudgeClient {
 
     private ModerationResult parseGuardResponse(String content) {
         if (content.isEmpty()) return ModerationResult.Refused.of(ModerationCategory.JUDGE_UNAVAILABLE);
-        String[] lines = content.split("\\r?\\n", 2);
-        String verdict = lines[0].trim().toLowerCase();
+        // Find the first line that is exactly 'safe' or 'unsafe' — Qwen sometimes emits a preamble
+        // line ("Assessment:") or a code-fence wrapper, so locking on lines[0] is too strict.
+        String[] lines = content.split("\\r?\\n");
+        int verdictIdx = -1;
+        String verdict = null;
+        for (int i = 0; i < lines.length; i++) {
+            String trimmed = lines[i].trim().toLowerCase();
+            if ("safe".equals(trimmed) || "unsafe".equals(trimmed)) {
+                verdictIdx = i;
+                verdict = trimmed;
+                break;
+            }
+        }
+        if (verdict == null) return ModerationResult.Refused.of(ModerationCategory.JUDGE_UNAVAILABLE);
         if ("safe".equals(verdict)) return ModerationResult.Allowed.INSTANCE;
-        if (!"unsafe".equals(verdict)) return ModerationResult.Refused.of(ModerationCategory.JUDGE_UNAVAILABLE);
-        if (lines.length < 2) return ModerationResult.Refused.of(ModerationCategory.JUDGE_UNAVAILABLE);
+        // unsafe — find the next non-blank line for category codes
+        String codeLine = null;
+        for (int i = verdictIdx + 1; i < lines.length; i++) {
+            String trimmed = lines[i].trim();
+            if (!trimmed.isEmpty()) { codeLine = trimmed; break; }
+        }
+        if (codeLine == null) return ModerationResult.Refused.of(ModerationCategory.JUDGE_UNAVAILABLE);
 
-        String[] codes = lines[1].split(",");
+        String[] codes = codeLine.split(",");
         ModerationCategory chosen = null;
         int chosenSeverity = Integer.MAX_VALUE;
         for (String raw : codes) {

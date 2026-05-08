@@ -87,6 +87,22 @@ class ModerationJudgeClientTest {
         assertThat(((ModerationResult.Refused) r).category()).isEqualTo(ModerationCategory.JUDGE_UNAVAILABLE);
     }
 
+    @Test
+    void should_findVerdict_when_judgePrefacesWithExplanation() {
+        // Qwen instruct models sometimes emit a one-line preamble before the verdict.
+        // The parser must scan all lines, not lock on lines[0].
+        stubGuard("Assessment:\nunsafe\nS1");
+        ModerationResult r = client.classify("en", "x", List.of());
+        assertThat(((ModerationResult.Refused) r).category()).isEqualTo(ModerationCategory.SEXUAL);
+    }
+
+    @Test
+    void should_findCategoriesAfterBlankLine_when_unsafeVerdictIsFollowedByEmptyLine() {
+        stubGuard("unsafe\n\nS1,S3");
+        ModerationResult r = client.classify("en", "x", List.of());
+        assertThat(((ModerationResult.Refused) r).category()).isEqualTo(ModerationCategory.SEXUAL);
+    }
+
     private void stubGuard(String content) {
         wm.stubFor(post(urlEqualTo("/v1/chat/completions"))
                 .willReturn(aResponse().withStatus(200)
