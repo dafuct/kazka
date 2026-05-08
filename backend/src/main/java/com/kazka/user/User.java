@@ -33,6 +33,15 @@ public class User {
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified;
 
+    @Column(name = "suspended_at")
+    private Instant suspendedAt;
+
+    @Column(name = "suspended_reason", length = 40)
+    private String suspendedReason;
+
+    @Column(name = "suspended_by", length = 36)
+    private String suspendedBy;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
@@ -55,6 +64,15 @@ public class User {
     public void setRole(UserRole role) { this.role = role; }
     public boolean isEmailVerified() { return emailVerified; }
     public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
+    public Instant getSuspendedAt() { return suspendedAt; }
+    public void setSuspendedAt(Instant suspendedAt) { this.suspendedAt = suspendedAt; }
+    public String getSuspendedReason() { return suspendedReason; }
+    public void setSuspendedReason(String suspendedReason) { this.suspendedReason = suspendedReason; }
+    public String getSuspendedBy() { return suspendedBy; }
+    public void setSuspendedBy(String suspendedBy) { this.suspendedBy = suspendedBy; }
+
+    public boolean isSuspended() { return suspendedAt != null; }
+
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
 }
