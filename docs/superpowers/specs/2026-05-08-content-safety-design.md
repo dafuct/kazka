@@ -392,3 +392,20 @@ These are deferred decisions, not blockers for v1.
 - Project guidelines: `CLAUDE.md`
 - Auth design (gives current state of user model, sessions, admin role): `docs/superpowers/specs/2026-05-03-auth-design.md`
 - Llama-Guard-3 model card: `meta-llama/Llama-Guard-3-8B` on Hugging Face
+
+## Implementation Notes
+
+**Judge model (resolved 2026-05-08):**
+
+`meta-llama/Llama-Guard-3-8B` is *not enabled on any provider* of this HF Router account — checked across `groq`, `fireworks-ai`, `together`, plus default routing. Fireworks explicitly returns *"deprecated and no longer supported"*. Older Llama-Guard variants (`LlamaGuard-7b`, `Llama-Guard-3-1B`, `Meta-Llama-Guard-2-8B`) are also unavailable.
+
+**Decision:** Use `Qwen/Qwen2.5-72B-Instruct` as the moderation judge — already wired in `HuggingFaceClient` for scene extraction, confirmed reachable, single provider, single token. The Llama-Guard-style `S1..S9` policy taxonomy is generic and works as a system prompt for a strong instruct model; the judge is asked for `safe` / `unsafe\nS1,S2` output and the parser is identical.
+
+**Naming consequence:** the moderation client class is named `ModerationJudgeClient` (not `LlamaGuardClient`) to avoid the class name lying about its model. Throughout the implementation plan, every reference to `LlamaGuardClient` or `Llama-Guard` should be read as the moderation judge wrapping Qwen-72B-Instruct via the same custom-policy prompt.
+
+**Quality posture:** Qwen-72B is general-purpose, not fine-tuned for moderation. The golden test set (Task 13) carries the burden of verifying acceptable accuracy. If Qwen falls below the ≥95% safe / ≥90% unsafe-recall thresholds during Task 13, tuning options (in priority order):
+1. Reword the policy system prompt — add few-shot examples in the policy block.
+2. Lower the unsafe-recall threshold to 0.85 only if the false negatives are all in low-severity categories (PROFANITY, SUBSTANCE).
+3. Switch to a different available HF model and re-run.
+
+If Qwen-72B latency proves too high (the policy prompt is ~700 tokens, response is ≤32 tokens, so ~1–2 s typical), consider `Qwen/Qwen2.5-7B-Instruct` as a faster fallback — but only after the 72B baseline is established as a quality reference.

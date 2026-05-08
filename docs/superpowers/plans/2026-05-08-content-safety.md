@@ -4,9 +4,11 @@
 
 **Goal:** Block sexual / violent / inappropriate prompts on the text and image pipelines, refuse with a localized message, auto-suspend accounts on 3 flagged attempts in 24 h, and give admins a dashboard to review and reverse decisions.
 
-**Architecture:** A new `com.kazka.moderation` package wraps `meta-llama/Llama-Guard-3-8B` via Hugging Face Router. `ModerationService` is the single entry point — `checkInput` for the text pipeline (called inside `StoryService.generate` before any HF generation), `checkScene` for the image pipeline (called inside `IllustrationService` between scene-extraction and FLUX). A `SuspensionService` records every flagged attempt to a new `flagged_attempts` table and atomically suspends accounts that hit the threshold via `SELECT ... FOR UPDATE` on the `users` row. Frontend gets a `RefusalCard` for the per-request refusal, a `SuspensionBanner` in `AppShell` for the per-account state, and an `AdminModerationPage` for review. All new user-facing strings live in `frontend/src/locales/{uk,en}.ts` under a `moderation` namespace; the backend never sends localized text — only stable error codes.
+**Architecture:** A new `com.kazka.moderation` package wraps `Qwen/Qwen2.5-72B-Instruct` via Hugging Face Router. `ModerationService` is the single entry point — `checkInput` for the text pipeline (called inside `StoryService.generate` before any HF generation), `checkScene` for the image pipeline (called inside `IllustrationService` between scene-extraction and FLUX). A `SuspensionService` records every flagged attempt to a new `flagged_attempts` table and atomically suspends accounts that hit the threshold via `SELECT ... FOR UPDATE` on the `users` row. Frontend gets a `RefusalCard` for the per-request refusal, a `SuspensionBanner` in `AppShell` for the per-account state, and an `AdminModerationPage` for review. All new user-facing strings live in `frontend/src/locales/{uk,en}.ts` under a `moderation` namespace; the backend never sends localized text — only stable error codes.
 
-**Tech Stack:** Spring Boot 4.0.0 / Java 25 / Spring WebFlux / Spring Data JPA / MySQL 8 / Redis 7 (Spring Session + cache) / Hugging Face Router for Llama-Guard-3-8B. JUnit 5 / Testcontainers / WireMock / GreenMail / Awaitility. React 19 / TypeScript 6 / Vite 8 / CSS Modules. **No Flyway** — schema lives in `backend/src/main/resources/schema.sql`. **No frontend test framework** — verify with `node_modules/.bin/tsc --noEmit` and `npm run lint`.
+**Tech Stack:** Spring Boot 4.0.0 / Java 25 / Spring WebFlux / Spring Data JPA / MySQL 8 / Redis 7 (Spring Session + cache) / Hugging Face Router for `Qwen/Qwen2.5-72B-Instruct` as the moderation judge. JUnit 5 / Testcontainers / WireMock / GreenMail / Awaitility. React 19 / TypeScript 6 / Vite 8 / CSS Modules. **No Flyway** — schema lives in `backend/src/main/resources/schema.sql`. **No frontend test framework** — verify with `node_modules/.bin/tsc --noEmit` and `npm run lint`.
+
+> **Judge model note:** Task 0 (preflight) discovered that `meta-llama/Llama-Guard-3-8B` is not enabled on this account's HF Router providers. Fell back to `Qwen/Qwen2.5-72B-Instruct` — same model already used for scene extraction. The Llama-Guard-style `S1..S9` policy taxonomy works as a system prompt for any strong instruct model. The judge client class is named `ModerationJudgeClient` (not `LlamaGuardClient`) to avoid the name lying about its model. See `docs/superpowers/specs/2026-05-08-content-safety-design.md#implementation-notes` for details.
 
 ---
 
@@ -20,7 +22,7 @@ backend/src/main/java/com/kazka/moderation/
 │                                                SUBSTANCE, PROFANITY, DEATH, WAR, JUDGE_UNAVAILABLE
 ├── ModerationResult.java              sealed: Allowed | Refused(category, confidence)
 ├── ModerationPipeline.java            enum TEXT_INPUT, IMAGE_SCENE
-├── LlamaGuardClient.java              WebClient wrapper, custom-policy prompt
+├── ModerationJudgeClient.java              WebClient wrapper, custom-policy prompt
 ├── ModerationService.java             checkInput / checkScene + Redis cache
 ├── SuspensionService.java             threshold + FOR UPDATE + email
 ├── ModerationCleanupJob.java          @Scheduled daily 03:30
@@ -54,7 +56,7 @@ backend/src/main/java/com/kazka/
 ### Backend tests (created)
 ```
 backend/src/test/java/com/kazka/moderation/
-├── LlamaGuardClientTest.java          unit + WireMock
+├── ModerationJudgeClientTest.java          unit + WireMock
 ├── ModerationServiceTest.java         unit (Mockito)
 ├── ModerationServiceCacheIT.java      Redis Testcontainer
 ├── SuspensionServiceTest.java         unit (Mockito)
@@ -95,48 +97,14 @@ frontend/src/
 
 ---
 
-## Task 0: Preflight — Verify Llama-Guard-3-8B reachability
+## Task 0: Preflight — Verify moderation-judge reachability ✅ COMPLETED
 
-**Files:**
-- Read: existing `.env` to grab the `HUGGINGFACE_API_TOKEN`
-- Append to: `docs/superpowers/specs/2026-05-08-content-safety-design.md` (an "Implementation Notes" section)
+**Outcome (2026-05-08):**
+- `meta-llama/Llama-Guard-3-8B` is unavailable on this account's HF Router providers (`groq` / `fireworks-ai` / `together` / default). Fireworks returns *"deprecated and no longer supported"*. Older variants (`LlamaGuard-7b`, `Llama-Guard-3-1B`, `Meta-Llama-Guard-2-8B`) are also unavailable.
+- `Qwen/Qwen2.5-72B-Instruct` is reachable and is the chosen judge.
+- Spec updated under `## Implementation Notes`. Plan updated to reference `ModerationJudgeClient` and `Qwen/Qwen2.5-72B-Instruct`.
 
-This is a discovery item from the spec's Open Questions, not a code commit. Resolve before starting Task 1 because if Llama-Guard is unreachable, every later task uses a different model.
-
-- [ ] **Step 1: Probe HF Router for the Llama-Guard model**
-
-```bash
-TOKEN=$(grep '^HUGGINGFACE_API_TOKEN=' /Users/makar/dev/kazka/.env | cut -d= -f2)
-curl -sS -X POST https://router.huggingface.co/v1/chat/completions \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "meta-llama/Llama-Guard-3-8B",
-    "messages": [{"role":"user","content":"Theme: friendly dragon\nCharacters: Sofia"}],
-    "max_tokens": 32
-  }' | head -c 400
-```
-
-Expected: a JSON response whose `choices[0].message.content` starts with `safe` or `unsafe`. If the response is `{"error":"Model ... not found"}` or similar, fall back to plan B below.
-
-- [ ] **Step 2: Document the chosen model + (if needed) fallback**
-
-Append to the spec file under a new heading `## Implementation Notes`:
-
-```markdown
-## Implementation Notes
-
-**Llama-Guard reachability (resolved 2026-05-08):**
-- Confirmed: `meta-llama/Llama-Guard-3-8B` returns `safe`/`unsafe` via `https://router.huggingface.co/v1/chat/completions`. Use as primary judge.
-- (OR, if unreachable:) Falling back to `<model-id-here>` because `Llama-Guard-3-8B` returned 404. Update `MODERATION_MODEL` env var accordingly.
-```
-
-- [ ] **Step 3: Commit the doc update**
-
-```bash
-git add docs/superpowers/specs/2026-05-08-content-safety-design.md
-git commit -m "docs(safety): record Llama-Guard reachability check"
-```
+Tasks 1–13 below proceed against this revised model choice. No code commits are produced by Task 0; only the spec + plan documentation updates (committed alongside the rest of this branch's work).
 
 ---
 
@@ -206,7 +174,7 @@ class FlaggedAttemptRepositoryTest extends AbstractIT {
         fa.setLanguage("uk");
         fa.setPromptText("оголена принцеса");
         fa.setConfidence(new BigDecimal("0.987"));
-        fa.setJudgeModel("meta-llama/Llama-Guard-3-8B");
+        fa.setJudgeModel("Qwen/Qwen2.5-72B-Instruct");
         repo.save(fa);
 
         FlaggedAttempt loaded = repo.findById(fa.getId()).orElseThrow();
@@ -216,7 +184,7 @@ class FlaggedAttemptRepositoryTest extends AbstractIT {
         assertThat(loaded.getLanguage()).isEqualTo("uk");
         assertThat(loaded.getPromptText()).isEqualTo("оголена принцеса");
         assertThat(loaded.getConfidence()).isEqualByComparingTo("0.987");
-        assertThat(loaded.getJudgeModel()).isEqualTo("meta-llama/Llama-Guard-3-8B");
+        assertThat(loaded.getJudgeModel()).isEqualTo("Qwen/Qwen2.5-72B-Instruct");
         assertThat(loaded.getCreatedAt()).isNotNull();
     }
 
@@ -512,15 +480,15 @@ git commit -m "feat(moderation): flagged_attempts table + suspension columns on 
 
 ---
 
-## Task 2: ModerationProperties + LlamaGuardClient with WireMock-driven tests
+## Task 2: ModerationProperties + ModerationJudgeClient with WireMock-driven tests
 
 **Files:**
 - Modify: `backend/src/main/resources/application.yml`
 - Modify: `backend/src/test/resources/application-test.yml`
 - Create: `backend/src/main/java/com/kazka/moderation/ModerationProperties.java`
 - Create: `backend/src/main/java/com/kazka/moderation/ModerationResult.java`
-- Create: `backend/src/main/java/com/kazka/moderation/LlamaGuardClient.java`
-- Create: `backend/src/test/java/com/kazka/moderation/LlamaGuardClientTest.java`
+- Create: `backend/src/main/java/com/kazka/moderation/ModerationJudgeClient.java`
+- Create: `backend/src/test/java/com/kazka/moderation/ModerationJudgeClientTest.java`
 - Modify: `backend/build.gradle` — add `testImplementation 'org.wiremock:wiremock-standalone:3.9.1'` if not already present
 
 WireMock is already used in the project (per spec), but verify it is on the classpath.
@@ -539,7 +507,7 @@ If no match, edit `backend/build.gradle` and add inside the `dependencies { ... 
 
 - [ ] **Step 2: Write the failing client test**
 
-Create `backend/src/test/java/com/kazka/moderation/LlamaGuardClientTest.java`:
+Create `backend/src/test/java/com/kazka/moderation/ModerationJudgeClientTest.java`:
 
 ```java
 package com.kazka.moderation;
@@ -557,21 +525,21 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class LlamaGuardClientTest {
+class ModerationJudgeClientTest {
 
     private WireMockServer wm;
-    private LlamaGuardClient client;
+    private ModerationJudgeClient client;
 
     @BeforeEach
     void start() {
         wm = new WireMockServer(options().dynamicPort());
         wm.start();
         ModerationProperties props = new ModerationProperties();
-        props.setJudgeModel("meta-llama/Llama-Guard-3-8B");
+        props.setJudgeModel("Qwen/Qwen2.5-72B-Instruct");
         props.setJudgeBaseUrl("http://localhost:" + wm.port());
         props.setJudgeTimeout(Duration.ofSeconds(2));
         WebClient webClient = WebClient.builder().baseUrl(props.getJudgeBaseUrl()).build();
-        client = new LlamaGuardClient(props, webClient);
+        client = new ModerationJudgeClient(props, webClient);
     }
 
     @AfterEach
@@ -650,8 +618,8 @@ class LlamaGuardClientTest {
 
 - [ ] **Step 3: Run the test — confirm it fails (compile)**
 
-Run: `cd backend && ./gradlew test --tests com.kazka.moderation.LlamaGuardClientTest`
-Expected: compile failure on `ModerationProperties`, `ModerationResult`, `LlamaGuardClient`.
+Run: `cd backend && ./gradlew test --tests com.kazka.moderation.ModerationJudgeClientTest`
+Expected: compile failure on `ModerationProperties`, `ModerationResult`, `ModerationJudgeClient`.
 
 - [ ] **Step 4: Add the YAML config block**
 
@@ -659,7 +627,7 @@ Edit `backend/src/main/resources/application.yml`. After the `kazka.uploads:` bl
 
 ```yaml
   moderation:
-    judge-model: ${MODERATION_MODEL:meta-llama/Llama-Guard-3-8B}
+    judge-model: ${MODERATION_MODEL:Qwen/Qwen2.5-72B-Instruct}
     judge-base-url: ${MODERATION_BASE_URL:https://router.huggingface.co}
     judge-timeout: 5s
     suspension-threshold: 3
@@ -673,7 +641,7 @@ Edit `backend/src/test/resources/application-test.yml`. Append at the end (under
 
 ```yaml
   moderation:
-    judge-model: meta-llama/Llama-Guard-3-8B
+    judge-model: Qwen/Qwen2.5-72B-Instruct
     judge-base-url: http://localhost:0
     judge-timeout: 2s
     suspension-threshold: 3
@@ -697,7 +665,7 @@ import java.time.Duration;
 @ConfigurationProperties("kazka.moderation")
 public class ModerationProperties {
 
-    private String judgeModel = "meta-llama/Llama-Guard-3-8B";
+    private String judgeModel = "Qwen/Qwen2.5-72B-Instruct";
     private String judgeBaseUrl = "https://router.huggingface.co";
     private Duration judgeTimeout = Duration.ofSeconds(5);
     private int suspensionThreshold = 3;
@@ -749,9 +717,9 @@ public sealed interface ModerationResult {
 }
 ```
 
-- [ ] **Step 7: Create `LlamaGuardClient`**
+- [ ] **Step 7: Create `ModerationJudgeClient`**
 
-Create `backend/src/main/java/com/kazka/moderation/LlamaGuardClient.java`:
+Create `backend/src/main/java/com/kazka/moderation/ModerationJudgeClient.java`:
 
 ```java
 package com.kazka.moderation;
@@ -769,9 +737,9 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class LlamaGuardClient {
+public class ModerationJudgeClient {
 
-    private static final Logger log = LoggerFactory.getLogger(LlamaGuardClient.class);
+    private static final Logger log = LoggerFactory.getLogger(ModerationJudgeClient.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final Map<String, ModerationCategory> CODE_MAP = Map.ofEntries(
@@ -823,7 +791,7 @@ public class LlamaGuardClient {
     private final ModerationProperties props;
     private final WebClient webClient;
 
-    public LlamaGuardClient(ModerationProperties props, WebClient judgeWebClient) {
+    public ModerationJudgeClient(ModerationProperties props, WebClient judgeWebClient) {
         this.props = props;
         this.webClient = judgeWebClient;
     }
@@ -862,7 +830,7 @@ public class LlamaGuardClient {
             String content = response.path("choices").path(0).path("message").path("content").asText("").trim();
             return parseGuardResponse(content);
         } catch (Exception e) {
-            log.warn("Llama-Guard classification failed: {}", e.getMessage());
+            log.warn("Moderation judge classification failed: {}", e.getMessage());
             return ModerationResult.Refused.of(ModerationCategory.JUDGE_UNAVAILABLE);
         }
     }
@@ -913,7 +881,7 @@ Edit `backend/src/main/java/com/kazka/config/HuggingFaceConfig.java`. Append a n
 
 - [ ] **Step 9: Run the test — confirm it passes**
 
-Run: `cd backend && ./gradlew test --tests com.kazka.moderation.LlamaGuardClientTest`
+Run: `cd backend && ./gradlew test --tests com.kazka.moderation.ModerationJudgeClientTest`
 Expected: 7 tests pass.
 
 - [ ] **Step 10: Commit**
@@ -925,8 +893,8 @@ git add backend/build.gradle \
         backend/src/test/resources/application-test.yml \
         backend/src/main/java/com/kazka/moderation/ \
         backend/src/main/java/com/kazka/config/HuggingFaceConfig.java \
-        backend/src/test/java/com/kazka/moderation/LlamaGuardClientTest.java
-git commit -m "feat(moderation): Llama-Guard-3-8B client with custom policy"
+        backend/src/test/java/com/kazka/moderation/ModerationJudgeClientTest.java
+git commit -m "feat(moderation): ModerationJudgeClient with custom-policy prompt"
 ```
 
 ---
@@ -938,7 +906,7 @@ git commit -m "feat(moderation): Llama-Guard-3-8B client with custom policy"
 - Create: `backend/src/test/java/com/kazka/moderation/ModerationServiceTest.java`
 - Create: `backend/src/test/java/com/kazka/moderation/ModerationServiceCacheIT.java`
 
-`ModerationService` is the service-layer entry point. It calls `LlamaGuardClient` and caches results in Redis (TTL = `kazka.moderation.cache-ttl`). The cache key includes language so the same prompt in two languages does not collide.
+`ModerationService` is the service-layer entry point. It calls `ModerationJudgeClient` and caches results in Redis (TTL = `kazka.moderation.cache-ttl`). The cache key includes language so the same prompt in two languages does not collide.
 
 - [ ] **Step 1: Write the failing unit test**
 
@@ -963,7 +931,7 @@ import static org.mockito.Mockito.*;
 
 class ModerationServiceTest {
 
-    private LlamaGuardClient guard;
+    private ModerationJudgeClient guard;
     private ReactiveStringRedisTemplate redis;
     private ReactiveValueOperations<String, String> ops;
     private ModerationProperties props;
@@ -971,7 +939,7 @@ class ModerationServiceTest {
 
     @BeforeEach
     void setUp() {
-        guard = mock(LlamaGuardClient.class);
+        guard = mock(ModerationJudgeClient.class);
         redis = mock(ReactiveStringRedisTemplate.class);
         ops = mock(ReactiveValueOperations.class);
         when(redis.opsForValue()).thenReturn(ops);
@@ -1061,11 +1029,11 @@ public class ModerationService {
     private static final Logger log = LoggerFactory.getLogger(ModerationService.class);
     private static final String CACHE_PREFIX = "kazka:moderation:";
 
-    private final LlamaGuardClient guard;
+    private final ModerationJudgeClient guard;
     private final ReactiveStringRedisTemplate redis;
     private final ModerationProperties props;
 
-    public ModerationService(LlamaGuardClient guard,
+    public ModerationService(ModerationJudgeClient guard,
                              ReactiveStringRedisTemplate redis,
                              ModerationProperties props) {
         this.guard = guard;
@@ -1175,7 +1143,7 @@ class ModerationServiceCacheIT extends AbstractIT {
 
     @Autowired ModerationService service;
     @Autowired ReactiveStringRedisTemplate redis;
-    @MockBean LlamaGuardClient guard;
+    @MockBean ModerationJudgeClient guard;
 
     @Test
     void should_consultJudgeOnlyOnce_when_samePromptCheckedTwice() {
@@ -1611,7 +1579,7 @@ class ModerationFlowIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired FlaggedAttemptRepository flags;
     @Autowired PasswordEncoder passwordEncoder;
-    @MockBean LlamaGuardClient guard;
+    @MockBean ModerationJudgeClient guard;
 
     @BeforeEach
     void clean() {
@@ -1789,7 +1757,7 @@ Update the constructor to accept and assign them. Then replace the body of `gene
                                         userId == null ? "" :
                                             req.theme() + " | " + String.join(", ", req.characters()),
                                         refused.confidence(),
-                                        "meta-llama/Llama-Guard-3-8B"))
+                                        "Qwen/Qwen2.5-72B-Instruct"))
                                 .subscribeOn(Schedulers.boundedElastic())
                                 .thenMany(Flux.just(
                                         SseEvent.errorCode(refused.category() ==
@@ -1930,7 +1898,7 @@ public class IllustrationService {
     private static final Logger log = LoggerFactory.getLogger(IllustrationService.class);
     private static final int IMAGE_W = 1024;
     private static final int IMAGE_H = 768;
-    private static final String JUDGE_MODEL_LABEL = "meta-llama/Llama-Guard-3-8B";
+    private static final String JUDGE_MODEL_LABEL = "Qwen/Qwen2.5-72B-Instruct";
 
     private final HuggingFaceClient hfClient;
     private final ImageStorageService imageStorageService;
@@ -3367,7 +3335,7 @@ git commit -m "feat(moderation/frontend): admin moderation review page"
 
 **Files:**
 - Create: `backend/src/test/resources/moderation/golden.csv`
-- Create: `backend/src/test/java/com/kazka/moderation/LlamaGuardGoldenIT.java`
+- Create: `backend/src/test/java/com/kazka/moderation/ModerationJudgeGoldenIT.java`
 - Run: full backend + frontend builds + manual e2e
 
 The golden test makes real HF calls. It's gated behind an environment variable so CI does not pay the cost.
@@ -3400,7 +3368,7 @@ unsafe,en,DANGEROUS,"how the brave child plays with matches"
 
 - [ ] **Step 2: Create the gated golden test**
 
-Create `backend/src/test/java/com/kazka/moderation/LlamaGuardGoldenIT.java`:
+Create `backend/src/test/java/com/kazka/moderation/ModerationJudgeGoldenIT.java`:
 
 ```java
 package com.kazka.moderation;
@@ -3421,9 +3389,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("golden")
 @EnabledIfEnvironmentVariable(named = "RUN_GOLDEN_TESTS", matches = "true")
-class LlamaGuardGoldenIT extends AbstractIT {
+class ModerationJudgeGoldenIT extends AbstractIT {
 
-    @Autowired LlamaGuardClient client;
+    @Autowired ModerationJudgeClient client;
 
     @Test
     void should_meetGoldenSetThresholds_when_classifyingAllRows() throws Exception {
@@ -3489,13 +3457,13 @@ class LlamaGuardGoldenIT extends AbstractIT {
 
 ```bash
 cd /Users/makar/dev/kazka/backend
-RUN_GOLDEN_TESTS=true ./gradlew test --tests com.kazka.moderation.LlamaGuardGoldenIT -i
+RUN_GOLDEN_TESTS=true ./gradlew test --tests com.kazka.moderation.ModerationJudgeGoldenIT -i
 ```
 
 Expected: prints `Safe accuracy: ≥95%, Unsafe recall: ≥90%`. If it fails, do NOT lower the thresholds — investigate the failing rows. Likely fixes:
 - Reword Ukrainian prompts to be less ambiguous.
-- Adjust the system policy in `LlamaGuardClient.POLICY` for false-positives.
-- Tune the severity ordering in `LlamaGuardClient.SEVERITY` if a wrong category is being chosen.
+- Adjust the system policy in `ModerationJudgeClient.POLICY` for false-positives.
+- Tune the severity ordering in `ModerationJudgeClient.SEVERITY` if a wrong category is being chosen.
 
 - [ ] **Step 4: Run the entire (non-golden) backend test suite**
 
@@ -3539,8 +3507,8 @@ Wait for startup. Open http://localhost:
 ```bash
 cd /Users/makar/dev/kazka
 git add backend/src/test/resources/moderation/golden.csv \
-        backend/src/test/java/com/kazka/moderation/LlamaGuardGoldenIT.java
-git commit -m "test(moderation): golden CSV + gated LlamaGuardGoldenIT"
+        backend/src/test/java/com/kazka/moderation/ModerationJudgeGoldenIT.java
+git commit -m "test(moderation): golden CSV + gated ModerationJudgeGoldenIT"
 ```
 
 ---
@@ -3553,7 +3521,7 @@ git commit -m "test(moderation): golden CSV + gated LlamaGuardGoldenIT"
 - Suspension UX (403 + banner + form gate) → Tasks 5, 7, 11.
 - Localized strings via locale dictionaries → Task 10.
 - New backend package `com.kazka.moderation` → Tasks 1–4, 8.
-- Llama-Guard custom-policy call → Task 2.
+- Moderation judge (Qwen-72B) custom-policy call → Task 2.
 - Redis cache 1h TTL → Task 3.
 - Fail-closed on judge errors → Task 2 + Task 3.
 - `flagged_attempts` table + `users.suspended_*` columns → Task 1.
