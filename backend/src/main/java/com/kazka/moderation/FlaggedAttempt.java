@@ -39,6 +39,8 @@ public class FlaggedAttempt {
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 
+    // Hibernate 7's @CreationTimestamp overwrites preset values; @PrePersist with a null-guard
+    // lets tests backdate rows and admin-imported rows preserve their created_at.
     @PrePersist
     void prePersist() {
         if (createdAt == null) {

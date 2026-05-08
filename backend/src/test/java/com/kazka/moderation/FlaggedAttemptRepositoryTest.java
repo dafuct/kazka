@@ -63,10 +63,11 @@ class FlaggedAttemptRepositoryTest extends AbstractIT {
     @Test
     void should_countFlagsInWindow_when_userHasMultipleAttempts() {
         Instant now = Instant.now();
-        save(userId, ModerationCategory.SEXUAL, now.minusSeconds(60));
-        save(userId, ModerationCategory.VIOLENCE, now.minusSeconds(120));
-        save(userId, ModerationCategory.JUDGE_UNAVAILABLE, now.minusSeconds(180));   // excluded
-        save(userId, ModerationCategory.WAR, now.minusSeconds(60 * 60 * 25));        // outside window
+        save(userId, ModerationPipeline.TEXT_INPUT, ModerationCategory.SEXUAL, now.minusSeconds(60));
+        save(userId, ModerationPipeline.TEXT_INPUT, ModerationCategory.VIOLENCE, now.minusSeconds(120));
+        save(userId, ModerationPipeline.TEXT_INPUT, ModerationCategory.JUDGE_UNAVAILABLE, now.minusSeconds(180));   // excluded by category
+        save(userId, ModerationPipeline.IMAGE_SCENE, ModerationCategory.VIOLENCE, now.minusSeconds(90));             // excluded by pipeline
+        save(userId, ModerationPipeline.TEXT_INPUT, ModerationCategory.WAR, now.minusSeconds(60 * 60 * 25));         // excluded by window
 
         Instant since = now.minusSeconds(60 * 60 * 24);
         long counted = repo.countCountableInWindow(userId, since);
@@ -84,10 +85,14 @@ class FlaggedAttemptRepositoryTest extends AbstractIT {
     }
 
     private void save(String uid, ModerationCategory cat, Instant when) {
+        save(uid, ModerationPipeline.TEXT_INPUT, cat, when);
+    }
+
+    private void save(String uid, ModerationPipeline pipeline, ModerationCategory cat, Instant when) {
         FlaggedAttempt fa = new FlaggedAttempt();
         fa.setId(UUID.randomUUID().toString());
         fa.setUserId(uid);
-        fa.setPipeline(ModerationPipeline.TEXT_INPUT);
+        fa.setPipeline(pipeline);
         fa.setCategory(cat);
         fa.setLanguage("uk");
         fa.setPromptText("test");
