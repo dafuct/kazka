@@ -60,6 +60,15 @@ kazka:
     image-base-url: ${HF_IMAGE_BASE_URL:https://router.huggingface.co}
   uploads:
     dir: ${UPLOADS_DIR:./uploads}
+  moderation:
+    judge-model: ${MODERATION_MODEL:Qwen/Qwen2.5-72B-Instruct}
+    judge-base-url: ${MODERATION_BASE_URL:https://router.huggingface.co}
+    judge-timeout: 5s
+    suspension-threshold: 3
+    suspension-window: 24h
+    retention-days: 90
+    cache-ttl: 1h
+    safe-fallback-scene: "two friends in a sunlit forest at sunset"
   auth:
     app-base-url: ${APP_BASE_URL:http://localhost}
     mail-from: ${MAIL_FROM:no-reply@kazka.local}

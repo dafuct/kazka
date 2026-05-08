@@ -26,6 +26,18 @@ public class HuggingFaceConfig {
                 .build();
     }
 
+    @Bean
+    public WebClient judgeWebClient(WebClient.Builder builder,
+                                    HuggingFaceProperties hfProps,
+                                    com.kazka.moderation.ModerationProperties modProps) {
+        return builder.clone()
+                .baseUrl(modProps.getJudgeBaseUrl())
+                .defaultHeader(org.springframework.http.HttpHeaders.AUTHORIZATION,
+                               "Bearer " + hfProps.getApiToken())
+                .codecs(c -> c.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
+                .build();
+    }
+
     private String getToken(HuggingFaceProperties huggingFaceProperties) {
         return "Bearer " + huggingFaceProperties.getApiToken();
     }
