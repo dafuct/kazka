@@ -98,6 +98,9 @@ export function Nav() {
                   {user.role === 'ADMIN' && (
                     <button onClick={() => { setMenuOpen(false); navigate('/admin/users') }}>{t.auth.actions.adminUsers}</button>
                   )}
+                  {user.role === 'ADMIN' && (
+                    <button onClick={() => { setMenuOpen(false); navigate('/admin/moderation') }}>Admin → Moderation</button>
+                  )}
                   <button onClick={async () => { setMenuOpen(false); await signOut(); navigate('/') }}>{t.auth.actions.signOut}</button>
                 </div>
               )}

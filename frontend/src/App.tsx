@@ -18,6 +18,7 @@ import { StoryDetailPage } from './pages/StoryDetailPage'
 import { EmailVerifiedPage } from './pages/EmailVerifiedPage'
 import { PasswordResetPage } from './pages/PasswordResetPage'
 import { AdminUsersPage } from './pages/AdminUsersPage'
+import { AdminModerationPage } from './pages/AdminModerationPage'
 
 function ScrollProgress() {
   const barRef = useRef<HTMLDivElement>(null)
@@ -95,6 +96,7 @@ function AppShell() {
           <Route path="/verify-email" element={<EmailVerifiedPage />} />
           <Route path="/reset-password" element={<PasswordResetPage />} />
           <Route path="/admin/users" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
+          <Route path="/admin/moderation" element={<RequireAdmin><AdminModerationPage /></RequireAdmin>} />
         </Routes>
       </main>
       <Footer />
