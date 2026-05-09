@@ -4,6 +4,11 @@ import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.auth.exception.EmailNotVerifiedException;
 import com.kazka.hf.HuggingFaceClient;
 import com.kazka.illustration.IllustrationService;
+import com.kazka.moderation.ModerationCategory;
+import com.kazka.moderation.ModerationPipeline;
+import com.kazka.moderation.ModerationResult;
+import com.kazka.moderation.ModerationService;
+import com.kazka.moderation.SuspensionService;
 import com.kazka.story.dto.*;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
@@ -26,20 +31,57 @@ public class StoryService {
     private final HuggingFaceClient hfClient;
     private final PromptBuilder promptBuilder;
     private final IllustrationService illustrationService;
+    private final ModerationService moderationService;
+    private final SuspensionService suspensionService;
 
     public StoryService(StoryRepository repository, UserRepository users,
                         HuggingFaceClient hfClient, PromptBuilder promptBuilder,
-                        IllustrationService illustrationService) {
+                        IllustrationService illustrationService,
+                        ModerationService moderationService,
+                        SuspensionService suspensionService) {
         this.repository = repository;
         this.users = users;
         this.hfClient = hfClient;
         this.promptBuilder = promptBuilder;
         this.illustrationService = illustrationService;
+        this.moderationService = moderationService;
+        this.suspensionService = suspensionService;
     }
 
     public Flux<SseEvent> generate(GenerationRequest req, CurrentUser currentUser) {
         return ensureVerified(currentUser)
-                .thenMany(Flux.defer(() -> generateInternal(req, currentUser.userId())));
+                .then(loadUser(currentUser))
+                .doOnNext(suspensionService::assertNotSuspended)
+                .thenMany(Flux.defer(() -> moderateThenGenerate(req, currentUser.userId())));
+    }
+
+    private Mono<User> loadUser(CurrentUser currentUser) {
+        return Mono.fromCallable(() -> users.findById(currentUser.userId())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED)))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    private Flux<SseEvent> moderateThenGenerate(GenerationRequest req, String userId) {
+        return Mono.fromCallable(() -> moderationService.checkInput(req.language(), req.theme(), req.characters()))
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMapMany(result -> {
+                    if (result instanceof ModerationResult.Refused refused) {
+                        return Mono.fromRunnable(() -> suspensionService.recordAndMaybeSuspend(
+                                        userId,
+                                        ModerationPipeline.TEXT_INPUT,
+                                        refused.category(),
+                                        req.language(),
+                                        req.theme() + " | " + String.join(", ", req.characters()),
+                                        refused.confidence(),
+                                        "Qwen/Qwen2.5-72B-Instruct"))
+                                .subscribeOn(Schedulers.boundedElastic())
+                                .thenMany(Flux.just(
+                                        SseEvent.errorCode(refused.category() ==
+                                                ModerationCategory.JUDGE_UNAVAILABLE
+                                                ? "JUDGE_UNAVAILABLE" : "BLOCKED_INPUT")));
+                    }
+                    return generateInternal(req, userId);
+                });
     }
 
     private Flux<SseEvent> generateInternal(GenerationRequest req, String userId) {

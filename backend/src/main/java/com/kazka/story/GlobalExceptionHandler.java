@@ -56,6 +56,12 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "MAIL_SEND_FAILED"));
     }
 
+    @ExceptionHandler(com.kazka.moderation.AccountSuspendedException.class)
+    public ResponseEntity<Map<String, Object>> handleSuspended(com.kazka.moderation.AccountSuspendedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "ACCOUNT_SUSPENDED"));
+    }
+
     @ExceptionHandler(WebExchangeBindException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(WebExchangeBindException ex) {
         Map<String, String> fields = new HashMap<>();
