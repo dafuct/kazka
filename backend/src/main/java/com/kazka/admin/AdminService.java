@@ -18,6 +18,15 @@ public class AdminService {
         this.stories = stories;
     }
 
+    @Transactional
+    public void unsuspend(String userId) {
+        com.kazka.user.User u = users.findById(userId).orElseThrow();
+        u.setSuspendedAt(null);
+        u.setSuspendedReason(null);
+        u.setSuspendedBy(null);
+        users.save(u);
+    }
+
     @Transactional(readOnly = true)
     public List<AdminUserDto> listUsers() {
         return users.findAllByOrderByCreatedAtDesc().stream()
