@@ -95,7 +95,7 @@ export function StoryModal() {
         },
         onError: ({ message }) => {
           if (cancelled) return
-          setError(message)
+          setError(message ?? null)
           setPhase('form')
         },
       },

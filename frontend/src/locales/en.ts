@@ -198,4 +198,12 @@ export const en: Locale = {
         `We sent a confirmation link to ${email}. Verify your email to start creating stories.`,
     },
   },
+  moderation: {
+    BLOCKED_INPUT: "Let's try a different theme! Tell me about adventures, animals, or magical worlds.",
+    JUDGE_UNAVAILABLE: 'Story generation is temporarily unavailable. Please try again in a moment.',
+    accountSuspended: 'Your account has been suspended for review. Contact support:',
+    formDisabledSuspended: 'Story generation is unavailable for suspended accounts',
+    contactSupport: 'Contact support',
+    tryAnotherTheme: 'Try another theme',
+  },
 }

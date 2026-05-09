@@ -45,6 +45,7 @@ export interface User {
   role: UserRole
   emailVerified: boolean
   googleLinked: boolean
+  suspended: boolean
 }
 
 export type AuthErrorCode =
@@ -57,6 +58,7 @@ export type AuthErrorCode =
   | 'UNAUTHENTICATED'
   | 'FORBIDDEN'
   | 'NOT_FOUND'
+  | 'ACCOUNT_SUSPENDED'
   | 'ERROR'
 
 export interface ApiErrorBody {
@@ -74,3 +76,5 @@ export class ApiError extends Error {
     this.body = body
   }
 }
+
+export type ModerationErrorCode = 'BLOCKED_INPUT' | 'JUDGE_UNAVAILABLE'

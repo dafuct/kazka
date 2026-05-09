@@ -24,7 +24,7 @@ export function StoryStream({ request, onDone, onError }: StoryStreamProps) {
       {
         onToken: ({ text }) => setTokens(prev => [...prev, text]),
         onDone: ({ id, title }) => onDone(id, title),
-        onError: ({ message }) => onError(message),
+        onError: ({ message }) => onError(message ?? ''),
       },
       ctrl.signal
     ).catch(err => {
