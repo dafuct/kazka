@@ -1,6 +1,12 @@
 package com.kazka.illustration;
 
 import com.kazka.hf.HuggingFaceClient;
+import com.kazka.moderation.ModerationCategory;
+import com.kazka.moderation.ModerationPipeline;
+import com.kazka.moderation.ModerationProperties;
+import com.kazka.moderation.ModerationResult;
+import com.kazka.moderation.ModerationService;
+import com.kazka.moderation.SuspensionService;
 import com.kazka.story.IllustrationStatus;
 import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
@@ -25,15 +31,24 @@ public class IllustrationService {
     private final ImageStorageService imageStorageService;
     private final StoryRepository storyRepository;
     private final PromptBuilder promptBuilder;
+    private final ModerationService moderationService;
+    private final SuspensionService suspensionService;
+    private final ModerationProperties modProps;
 
     public IllustrationService(HuggingFaceClient hfClient,
                                ImageStorageService imageStorageService,
                                StoryRepository storyRepository,
-                               PromptBuilder promptBuilder) {
+                               PromptBuilder promptBuilder,
+                               ModerationService moderationService,
+                               SuspensionService suspensionService,
+                               ModerationProperties modProps) {
         this.hfClient = hfClient;
         this.imageStorageService = imageStorageService;
         this.storyRepository = storyRepository;
         this.promptBuilder = promptBuilder;
+        this.moderationService = moderationService;
+        this.suspensionService = suspensionService;
+        this.modProps = modProps;
     }
 
     public Mono<Void> generateAndStore(String storyId) {
@@ -43,27 +58,51 @@ public class IllustrationService {
                 .flatMap(story -> {
                     List<String> chars = story.getCharacters();
                     String firstChar = (chars != null && !chars.isEmpty()) ? chars.get(0) : "a character";
-                    String fallback = firstChar + " in a magical scene from " + story.getTitle();
+                    String fallbackOnError = firstChar + " in a magical scene from " + story.getTitle();
 
                     return hfClient.generateText(
                                     promptBuilder.buildSceneExtractionSystem(),
                                     promptBuilder.buildSceneExtractionUser(story.getContent()))
-                            .onErrorReturn(fallback)
-                            .map(scene -> scene.isBlank() ? fallback : scene)
+                            .onErrorReturn(fallbackOnError)
+                            .map(scene -> scene.isBlank() ? fallbackOnError : scene)
+                            .map(scene -> chooseSafeScene(story, scene))
                             .flatMap(scene -> Mono.zip(
-                                    hfClient.generateImage(
-                                            promptBuilder.buildImagePrompt(story, scene, Theme.LIGHT),
-                                            IMAGE_W, IMAGE_H),
-                                    hfClient.generateImage(
-                                            promptBuilder.buildImagePrompt(story, scene, Theme.DARK),
-                                            IMAGE_W, IMAGE_H)
-                            ))
+                                    hfClient.generateImage(promptBuilder.buildImagePrompt(story, scene, Theme.LIGHT), IMAGE_W, IMAGE_H),
+                                    hfClient.generateImage(promptBuilder.buildImagePrompt(story, scene, Theme.DARK), IMAGE_W, IMAGE_H)))
                             .flatMap(tuple -> savePair(story, tuple.getT1(), tuple.getT2()))
                             .onErrorResume(e -> {
                                 log.warn("PNG illustration failed for {}: {}", storyId, e.getMessage());
                                 return markFailed(story);
                             });
                 });
+    }
+
+    /**
+     * Run scene moderation; on a non-JUDGE_UNAVAILABLE refusal, log an IMAGE_SCENE flag
+     * (which SuspensionService excludes from the suspension count) and swap to the
+     * configured safe fallback scene. JUDGE_UNAVAILABLE falls through to the original
+     * scene — image generation is best-effort and not worth blocking on a transient
+     * judge outage.
+     */
+    private String chooseSafeScene(Story story, String scene) {
+        ModerationResult r = moderationService.checkScene(story.getLanguage(), scene);
+        if (r instanceof ModerationResult.Refused refused
+                && refused.category() != ModerationCategory.JUDGE_UNAVAILABLE) {
+            try {
+                suspensionService.recordAndMaybeSuspend(
+                        story.getUserId(),
+                        ModerationPipeline.IMAGE_SCENE,
+                        refused.category(),
+                        story.getLanguage(),
+                        scene,
+                        refused.confidence(),
+                        modProps.getJudgeModel());
+            } catch (Exception logFailure) {
+                log.warn("Failed to log image-scene flag: {}", logFailure.getMessage());
+            }
+            return modProps.getSafeFallbackScene();
+        }
+        return scene;
     }
 
     private Mono<Void> savePair(Story story, byte[] light, byte[] dark) {
