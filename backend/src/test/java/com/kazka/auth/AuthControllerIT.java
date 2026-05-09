@@ -73,6 +73,32 @@ class AuthControllerIT extends AbstractIT {
                 .expectBody().jsonPath("$.error").isEqualTo("EMAIL_TAKEN");
     }
 
+    @Test
+    void should_includeSuspendedFalse_when_meCalledForActiveUser() {
+        signupAndVerify("active@example.com");
+        client().get().uri("/api/auth/me")
+                .cookie("SESSION", login("active@example.com"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.user.suspended").isEqualTo(false);
+    }
+
+    @Test
+    void should_includeSuspendedTrue_when_meCalledForSuspendedUser() {
+        signupAndVerify("blocked@example.com");
+        var u = users.findByEmail("blocked@example.com").orElseThrow();
+        u.setSuspendedAt(java.time.Instant.now());
+        u.setSuspendedReason("CONTENT_POLICY");
+        users.save(u);
+        client().get().uri("/api/auth/me")
+                .cookie("SESSION", login("blocked@example.com"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.user.suspended").isEqualTo(true);
+    }
+
     private String signupAndGetSessionCookie(String email, String displayName) {
         var result = client().post().uri("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -84,5 +110,27 @@ class AuthControllerIT extends AbstractIT {
         ResponseCookie session = result.getResponseCookies().getFirst("SESSION");
         assertThat(session).isNotNull();
         return "SESSION=" + session.getValue();
+    }
+
+    private void signupAndVerify(String email) {
+        client().post().uri("/api/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("email", email, "password", "password123", "displayName", "Tester"))
+                .exchange().expectStatus().isCreated();
+        var u = users.findByEmail(email).orElseThrow();
+        u.setEmailVerified(true);
+        users.save(u);
+    }
+
+    private String login(String email) {
+        var result = client().post().uri("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("email", email, "password", "password123"))
+                .exchange()
+                .expectStatus().is2xxSuccessful()
+                .returnResult(String.class);
+        ResponseCookie session = result.getResponseCookies().getFirst("SESSION");
+        assertThat(session).isNotNull();
+        return session.getValue();
     }
 }
