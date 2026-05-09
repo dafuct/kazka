@@ -85,9 +85,11 @@ export function Nav() {
         )}
         {user && (
           <>
-            <li>
-              <a href="#" className={styles.ctaBtn} onClick={tryClick}>{t.nav.tryCta}</a>
-            </li>
+            {!user.suspended && (
+              <li>
+                <a href="#" className={styles.ctaBtn} onClick={tryClick}>{t.nav.tryCta}</a>
+              </li>
+            )}
             <li className={styles.userWrap} ref={menuRef}>
               <button className={styles.userBtn} onClick={() => setMenuOpen(o => !o)}>{user.displayName} ▾</button>
               {menuOpen && (

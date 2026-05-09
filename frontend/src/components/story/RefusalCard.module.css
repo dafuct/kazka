@@ -1,0 +1,31 @@
+.card {
+  padding: 32px 28px;
+  border-radius: 18px;
+  background: var(--surface-2, #fffbe9);
+  box-shadow: 0 6px 26px rgba(60, 40, 0, 0.08);
+  text-align: center;
+  max-width: 520px;
+  margin: 32px auto;
+}
+
+.message {
+  font-family: var(--font-body, 'Lora', serif);
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--text-1, #3a2a10);
+  margin: 0 0 20px;
+}
+
+.button {
+  appearance: none;
+  border: 0;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: var(--accent, #d97706);
+  color: #fff;
+  font-family: var(--font-ui, 'Nunito', sans-serif);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.button:hover { filter: brightness(1.05); }

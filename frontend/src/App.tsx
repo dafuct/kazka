@@ -8,6 +8,7 @@ import { AuthModalProvider } from './lib/AuthModalContext'
 import { StoryModal } from './components/modal/StoryModal'
 import { AuthModal } from './components/auth/AuthModal'
 import { Nav } from './components/chrome/Nav'
+import { SuspensionBanner } from './components/chrome/SuspensionBanner'
 import { Footer } from './components/chrome/Footer'
 import { RequireAuth } from './components/auth/RequireAuth'
 import { RequireAdmin } from './components/auth/RequireAdmin'
@@ -85,6 +86,7 @@ function AppShell() {
       <CursorTrail />
       <GoogleAuthLanding />
       <Nav />
+      <SuspensionBanner />
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />

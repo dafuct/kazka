@@ -1,30 +1,46 @@
 import { useEffect, useRef, useState } from 'react'
 import { streamStory } from '../../lib/sseClient'
-import type { GenerationRequest } from '../../lib/types'
+import type { GenerationRequest, ModerationErrorCode } from '../../lib/types'
+import { RefusalCard } from './RefusalCard'
+import { useAuth } from '../../lib/AuthContext'
 import styles from './StoryStream.module.css'
 
 interface StoryStreamProps {
   request: GenerationRequest
   onDone: (id: string, title: string) => void
   onError: (message: string) => void
+  onTryAnother: () => void
 }
 
-export function StoryStream({ request, onDone, onError }: StoryStreamProps) {
+const MODERATION_CODES: readonly ModerationErrorCode[] = ['BLOCKED_INPUT', 'JUDGE_UNAVAILABLE']
+
+export function StoryStream({ request, onDone, onError, onTryAnother }: StoryStreamProps) {
   const [tokens, setTokens] = useState<string[]>([])
+  const [refusal, setRefusal] = useState<ModerationErrorCode | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const { refresh } = useAuth()
 
   useEffect(() => {
     const ctrl = new AbortController()
     abortRef.current = ctrl
     setTokens([])
+    setRefusal(null)
 
     streamStory(
       request,
       {
         onToken: ({ text }) => setTokens(prev => [...prev, text]),
         onDone: ({ id, title }) => onDone(id, title),
-        onError: ({ message }) => onError(message ?? ''),
+        onError: ({ code, message }) => {
+          if (code && (MODERATION_CODES as readonly string[]).includes(code)) {
+            setRefusal(code as ModerationErrorCode)
+            // Suspension may have just kicked in; refresh AuthContext
+            refresh()
+            return
+          }
+          onError(message ?? code ?? 'ERROR')
+        },
       },
       ctrl.signal
     ).catch(err => {
@@ -40,8 +56,9 @@ export function StoryStream({ request, onDone, onError }: StoryStreamProps) {
     }
   }, [tokens])
 
-  const text = tokens.join('')
+  if (refusal) return <RefusalCard code={refusal} onTryAnother={onTryAnother} />
 
+  const text = tokens.join('')
   return (
     <div ref={containerRef} className={styles.container}>
       <p className={styles.text}>
