@@ -91,7 +91,41 @@ class SuspensionServiceTest {
         service.recordAndMaybeSuspend(user.getId(), ModerationPipeline.IMAGE_SCENE,
                 ModerationCategory.VIOLENCE, "uk", "scene text", null, "guard");
         verify(flags).save(any(FlaggedAttempt.class));     // attempt persisted
-        // image-scene rows are excluded from countCountableInWindow, so suspension never triggers from them
+        // image-scene rows are excluded — no lock acquired, no user write, no email sent
+        verify(users, never()).lockById(anyString());
+        verify(users, never()).save(any(User.class));
+        verify(mail, never()).sendAccountSuspendedEmail(anyString(), anyString());
+    }
+
+    @Test
+    void should_suspendWithoutAdminEmail_when_adminConfigUnset() {
+        AuthProperties propsNoAdmin = new AuthProperties("http://localhost", "no-reply@kazka.local",
+                new AuthProperties.TokenTtl(java.time.Duration.ofHours(24), java.time.Duration.ofHours(1)),
+                null);
+        SuspensionService svc = new SuspensionService(users, flags, mail, propsNoAdmin, modProps);
+        when(flags.countCountableInWindow(eq(user.getId()), any(Instant.class))).thenReturn(3L);
+
+        svc.recordAndMaybeSuspend(user.getId(), ModerationPipeline.TEXT_INPUT,
+                ModerationCategory.SEXUAL, "uk", "x", null, "guard");
+
+        assertThat(user.getSuspendedAt()).isNotNull();
+        verify(mail).sendAccountSuspendedEmail("user@example.com", "Test User");
+        verify(mail, never()).sendAdminSuspensionNotice(anyString(), anyString());
+    }
+
+    @Test
+    void should_suspendWithoutAdminEmail_when_adminEmailIsBlank() {
+        AuthProperties propsBlankAdmin = new AuthProperties("http://localhost", "no-reply@kazka.local",
+                new AuthProperties.TokenTtl(java.time.Duration.ofHours(24), java.time.Duration.ofHours(1)),
+                new AuthProperties.Admin("  ", "x"));
+        SuspensionService svc = new SuspensionService(users, flags, mail, propsBlankAdmin, modProps);
+        when(flags.countCountableInWindow(eq(user.getId()), any(Instant.class))).thenReturn(3L);
+
+        svc.recordAndMaybeSuspend(user.getId(), ModerationPipeline.TEXT_INPUT,
+                ModerationCategory.SEXUAL, "uk", "x", null, "guard");
+
+        assertThat(user.getSuspendedAt()).isNotNull();
+        verify(mail, never()).sendAdminSuspensionNotice(anyString(), anyString());
     }
 
     @Test
