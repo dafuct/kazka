@@ -1,0 +1,10 @@
+Hello {displayName},
+
+Your Kazka account has been suspended pending review because multiple
+recent story prompts were flagged by our content-safety filter.
+
+If you believe this was a mistake, reply to this message or contact us at
+{supportEmail}.
+
+— The Kazka team
+{baseUrl}
