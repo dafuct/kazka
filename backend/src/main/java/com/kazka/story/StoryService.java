@@ -6,6 +6,7 @@ import com.kazka.hf.HuggingFaceClient;
 import com.kazka.illustration.IllustrationService;
 import com.kazka.moderation.ModerationCategory;
 import com.kazka.moderation.ModerationPipeline;
+import com.kazka.moderation.ModerationProperties;
 import com.kazka.moderation.ModerationResult;
 import com.kazka.moderation.ModerationService;
 import com.kazka.moderation.SuspensionService;
@@ -33,12 +34,14 @@ public class StoryService {
     private final IllustrationService illustrationService;
     private final ModerationService moderationService;
     private final SuspensionService suspensionService;
+    private final ModerationProperties moderationProperties;
 
     public StoryService(StoryRepository repository, UserRepository users,
                         HuggingFaceClient hfClient, PromptBuilder promptBuilder,
                         IllustrationService illustrationService,
                         ModerationService moderationService,
-                        SuspensionService suspensionService) {
+                        SuspensionService suspensionService,
+                        ModerationProperties moderationProperties) {
         this.repository = repository;
         this.users = users;
         this.hfClient = hfClient;
@@ -46,6 +49,7 @@ public class StoryService {
         this.illustrationService = illustrationService;
         this.moderationService = moderationService;
         this.suspensionService = suspensionService;
+        this.moderationProperties = moderationProperties;
     }
 
     public Flux<SseEvent> generate(GenerationRequest req, CurrentUser currentUser) {
@@ -73,7 +77,7 @@ public class StoryService {
                                         req.language(),
                                         req.theme() + " | " + String.join(", ", req.characters()),
                                         refused.confidence(),
-                                        "Qwen/Qwen2.5-72B-Instruct"))
+                                        moderationProperties.getJudgeModel()))
                                 .subscribeOn(Schedulers.boundedElastic())
                                 .thenMany(Flux.just(
                                         SseEvent.errorCode(refused.category() ==
