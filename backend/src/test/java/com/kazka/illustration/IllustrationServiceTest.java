@@ -55,7 +55,7 @@ class IllustrationServiceTest {
         lenient().when(modProps.getSafeFallbackScene())
                 .thenReturn("two friends in a sunlit forest at sunset");
         lenient().when(modProps.getJudgeModel())
-                .thenReturn("Qwen/Qwen2.5-72B-Instruct");
+                .thenReturn("Qwen/Qwen3-32B");
     }
 
     private Story sampleStory() {

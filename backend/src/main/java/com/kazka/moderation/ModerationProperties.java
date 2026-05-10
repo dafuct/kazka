@@ -7,7 +7,7 @@ import java.time.Duration;
 @ConfigurationProperties("kazka.moderation")
 public class ModerationProperties {
 
-    private String judgeModel = "Qwen/Qwen2.5-72B-Instruct";
+    private String judgeModel = "Qwen/Qwen3-32B";
     private String judgeBaseUrl = "https://router.huggingface.co";
     private Duration judgeTimeout = Duration.ofSeconds(5);
     private int suspensionThreshold = 3;

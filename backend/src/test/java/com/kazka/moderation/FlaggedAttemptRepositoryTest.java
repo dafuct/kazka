@@ -46,7 +46,7 @@ class FlaggedAttemptRepositoryTest extends AbstractIT {
         fa.setLanguage("uk");
         fa.setPromptText("оголена принцеса");
         fa.setConfidence(new BigDecimal("0.987"));
-        fa.setJudgeModel("Qwen/Qwen2.5-72B-Instruct");
+        fa.setJudgeModel("Qwen/Qwen3-32B");
         repo.save(fa);
 
         FlaggedAttempt loaded = repo.findById(fa.getId()).orElseThrow();
@@ -56,7 +56,7 @@ class FlaggedAttemptRepositoryTest extends AbstractIT {
         assertThat(loaded.getLanguage()).isEqualTo("uk");
         assertThat(loaded.getPromptText()).isEqualTo("оголена принцеса");
         assertThat(loaded.getConfidence()).isEqualByComparingTo("0.987");
-        assertThat(loaded.getJudgeModel()).isEqualTo("Qwen/Qwen2.5-72B-Instruct");
+        assertThat(loaded.getJudgeModel()).isEqualTo("Qwen/Qwen3-32B");
         assertThat(loaded.getCreatedAt()).isNotNull();
     }
 

@@ -23,7 +23,7 @@ class ModerationJudgeClientTest {
         wm = new WireMockServer(options().dynamicPort());
         wm.start();
         ModerationProperties props = new ModerationProperties();
-        props.setJudgeModel("Qwen/Qwen2.5-72B-Instruct");
+        props.setJudgeModel("Qwen/Qwen3-32B");
         props.setJudgeBaseUrl("http://localhost:" + wm.port());
         props.setJudgeTimeout(Duration.ofSeconds(2));
         WebClient webClient = WebClient.builder().baseUrl(props.getJudgeBaseUrl()).build();
