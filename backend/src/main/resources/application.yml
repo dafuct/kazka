@@ -55,11 +55,20 @@ kazka:
     text-model: ${HF_TEXT_MODEL:INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v1.0:featherless-ai}
     editor-model: ${HF_EDITOR_MODEL:INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v1.0:featherless-ai}
     image-model: ${HF_IMAGE_MODEL:black-forest-labs/FLUX.1-schnell}
-    scene-model: ${HF_SCENE_MODEL:Qwen/Qwen2.5-72B-Instruct}
+    scene-model: ${HF_SCENE_MODEL:Qwen/Qwen3-32B}
     text-base-url: ${HF_TEXT_BASE_URL:https://router.huggingface.co}
     image-base-url: ${HF_IMAGE_BASE_URL:https://router.huggingface.co}
   uploads:
     dir: ${UPLOADS_DIR:./uploads}
+  moderation:
+    judge-model: ${MODERATION_MODEL:Qwen/Qwen3-32B}
+    judge-base-url: ${MODERATION_BASE_URL:https://router.huggingface.co}
+    judge-timeout: 5s
+    suspension-threshold: 3
+    suspension-window: 24h
+    retention-days: 90
+    cache-ttl: 1h
+    safe-fallback-scene: "two friends in a sunlit forest at sunset"
   auth:
     app-base-url: ${APP_BASE_URL:http://localhost}
     mail-from: ${MAIL_FROM:no-reply@kazka.local}

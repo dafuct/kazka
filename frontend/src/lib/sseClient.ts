@@ -1,4 +1,4 @@
-import type { GenerationRequest } from './types'
+import type { GenerationRequest, ModerationErrorCode } from './types'
 import { withCsrf } from './csrf'
 
 export interface SseMetaEvent {
@@ -15,7 +15,7 @@ export interface SseDoneEvent {
 }
 export interface SseErrorEvent {
   type: 'error'
-  data: { message: string }
+  data: { code?: ModerationErrorCode; message?: string }
 }
 
 export type SseEvent = SseMetaEvent | SseTokenEvent | SseDoneEvent | SseErrorEvent

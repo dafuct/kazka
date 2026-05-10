@@ -38,6 +38,7 @@ dependencies {
     testImplementation 'com.redis:testcontainers-redis:2.2.2'
     testImplementation 'com.icegreen:greenmail-junit5:2.1.0'
     testImplementation 'org.awaitility:awaitility:4.2.2'
+    testImplementation 'org.wiremock:wiremock-standalone:3.9.1'
 }
 
 tasks.withType(Test).configureEach {

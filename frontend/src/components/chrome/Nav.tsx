@@ -85,9 +85,11 @@ export function Nav() {
         )}
         {user && (
           <>
-            <li>
-              <a href="#" className={styles.ctaBtn} onClick={tryClick}>{t.nav.tryCta}</a>
-            </li>
+            {!user.suspended && (
+              <li>
+                <a href="#" className={styles.ctaBtn} onClick={tryClick}>{t.nav.tryCta}</a>
+              </li>
+            )}
             <li className={styles.userWrap} ref={menuRef}>
               <button className={styles.userBtn} onClick={() => setMenuOpen(o => !o)}>{user.displayName} ▾</button>
               {menuOpen && (
@@ -95,6 +97,9 @@ export function Nav() {
                   <button onClick={() => { setMenuOpen(false); navigate('/stories') }}>{t.auth.actions.myArchive}</button>
                   {user.role === 'ADMIN' && (
                     <button onClick={() => { setMenuOpen(false); navigate('/admin/users') }}>{t.auth.actions.adminUsers}</button>
+                  )}
+                  {user.role === 'ADMIN' && (
+                    <button onClick={() => { setMenuOpen(false); navigate('/admin/moderation') }}>Admin → Moderation</button>
                   )}
                   <button onClick={async () => { setMenuOpen(false); await signOut(); navigate('/') }}>{t.auth.actions.signOut}</button>
                 </div>

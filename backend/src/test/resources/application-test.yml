@@ -36,6 +36,15 @@ spring:
 kazka:
   huggingface:
     api-token: test-token
+  moderation:
+    judge-model: Qwen/Qwen3-32B
+    judge-base-url: http://localhost:0
+    judge-timeout: 2s
+    suspension-threshold: 3
+    suspension-window: 24h
+    retention-days: 90
+    cache-ttl: 1h
+    safe-fallback-scene: "two friends in a sunlit forest at sunset"
   auth:
     app-base-url: http://localhost
     mail-from: test@kazka.local

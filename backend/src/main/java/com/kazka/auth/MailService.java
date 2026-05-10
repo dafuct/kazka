@@ -36,6 +36,24 @@ public class MailService {
                 Map.of("displayName", displayName, "token", token, "baseUrl", props.appBaseUrl()));
     }
 
+    public void sendAccountSuspendedEmail(String to, String displayName) {
+        send(to,
+             "mail/account-suspended-subject.txt",
+             "mail/account-suspended-body.txt",
+             Map.of("displayName", displayName,
+                    "supportEmail", props.mailFrom(),
+                    "baseUrl", props.appBaseUrl()));
+    }
+
+    public void sendAdminSuspensionNotice(String adminTo, String userEmail) {
+        send(adminTo,
+             "mail/admin-suspension-notice-subject.txt",
+             "mail/admin-suspension-notice-body.txt",
+             Map.of("userEmail", userEmail,
+                    "suspendedAt", java.time.Instant.now().toString(),
+                    "baseUrl", props.appBaseUrl()));
+    }
+
     private void send(String to, String subjectPath, String bodyPath, Map<String, String> vars) {
         try {
             String subject = render(subjectPath, vars).trim();

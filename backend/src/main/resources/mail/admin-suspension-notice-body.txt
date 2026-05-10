@@ -1,0 +1,6 @@
+An account has been auto-suspended for repeated content-policy violations.
+
+User email: {userEmail}
+Time:       {suspendedAt}
+
+Review at:  {baseUrl}/admin/moderation

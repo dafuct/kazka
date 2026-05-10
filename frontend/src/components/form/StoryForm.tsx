@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { TagInput } from './TagInput'
 import { useLocale } from '../../lib/LocaleContext'
+import { useAuth } from '../../lib/AuthContext'
 import type { GenerationRequest } from '../../lib/types'
 import styles from './StoryForm.module.css'
 
@@ -13,6 +14,8 @@ interface StoryFormProps {
 
 export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
   const { t, lang } = useLocale()
+  const { user } = useAuth()
+  const isSuspended = !!user?.suspended
   const [theme, setTheme] = useState('')
   const [characters, setCharacters] = useState<string[]>([])
   const [ageGroup, setAgeGroup] = useState<GenerationRequest['ageGroup']>('6-8')
@@ -99,7 +102,8 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
       <button
         type="submit"
         className={styles.submit}
-        disabled={loading || !theme.trim() || characters.length === 0}
+        disabled={loading || isSuspended || !theme.trim() || characters.length === 0}
+        title={isSuspended ? t.moderation.formDisabledSuspended : undefined}
       >
         {loading ? t.form.generating : t.form.submit}
       </button>

@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS flagged_attempts;
 DROP TABLE IF EXISTS stories;
 DROP TABLE IF EXISTS password_reset_tokens;
 DROP TABLE IF EXISTS email_verification_tokens;
@@ -11,6 +12,9 @@ CREATE TABLE users (
     display_name    VARCHAR(100) NOT NULL,
     role            VARCHAR(20)  NOT NULL DEFAULT 'USER',
     email_verified  BOOLEAN      NOT NULL DEFAULT FALSE,
+    suspended_at      DATETIME(3) NULL,
+    suspended_reason  VARCHAR(40) NULL,
+    suspended_by      VARCHAR(36) NULL,
     created_at      DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     updated_at      DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     UNIQUE KEY uk_users_email (email),
@@ -54,4 +58,19 @@ CREATE TABLE stories (
     updated_at               DATETIME(3)   NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
     CONSTRAINT fk_stories_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_stories_user_created (user_id, created_at DESC)
+);
+
+CREATE TABLE flagged_attempts (
+    id              VARCHAR(36)  NOT NULL PRIMARY KEY,
+    user_id         VARCHAR(36)  NOT NULL,
+    pipeline        VARCHAR(20)  NOT NULL,
+    category        VARCHAR(40)  NOT NULL,
+    language        VARCHAR(5)   NOT NULL,
+    prompt_text     TEXT         NOT NULL,
+    confidence      DECIMAL(4,3) NULL,
+    judge_model     VARCHAR(100) NULL,
+    created_at      DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    CONSTRAINT fk_fa_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_fa_user_created (user_id, created_at DESC),
+    INDEX idx_fa_created (created_at)
 );

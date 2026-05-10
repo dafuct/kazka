@@ -30,3 +30,10 @@ backend/uploads/
 
 # Brainstorm sessions (visual companion)
 .superpowers/
+
+# Local agent / tooling state
+.claude/
+.remember/
+.serena/
+docs/
+CLAUDE.md

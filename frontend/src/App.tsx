@@ -8,6 +8,7 @@ import { AuthModalProvider } from './lib/AuthModalContext'
 import { StoryModal } from './components/modal/StoryModal'
 import { AuthModal } from './components/auth/AuthModal'
 import { Nav } from './components/chrome/Nav'
+import { SuspensionBanner } from './components/chrome/SuspensionBanner'
 import { Footer } from './components/chrome/Footer'
 import { RequireAuth } from './components/auth/RequireAuth'
 import { RequireAdmin } from './components/auth/RequireAdmin'
@@ -17,6 +18,7 @@ import { StoryDetailPage } from './pages/StoryDetailPage'
 import { EmailVerifiedPage } from './pages/EmailVerifiedPage'
 import { PasswordResetPage } from './pages/PasswordResetPage'
 import { AdminUsersPage } from './pages/AdminUsersPage'
+import { AdminModerationPage } from './pages/AdminModerationPage'
 
 function ScrollProgress() {
   const barRef = useRef<HTMLDivElement>(null)
@@ -85,6 +87,7 @@ function AppShell() {
       <CursorTrail />
       <GoogleAuthLanding />
       <Nav />
+      <SuspensionBanner />
       <main>
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -93,6 +96,7 @@ function AppShell() {
           <Route path="/verify-email" element={<EmailVerifiedPage />} />
           <Route path="/reset-password" element={<PasswordResetPage />} />
           <Route path="/admin/users" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
+          <Route path="/admin/moderation" element={<RequireAdmin><AdminModerationPage /></RequireAdmin>} />
         </Routes>
       </main>
       <Footer />

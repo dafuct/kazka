@@ -6,7 +6,8 @@ public record UserDto(
         String displayName,
         UserRole role,
         boolean emailVerified,
-        boolean googleLinked
+        boolean googleLinked,
+        boolean suspended
 ) {
     public static UserDto from(User u) {
         return new UserDto(
@@ -15,7 +16,7 @@ public record UserDto(
                 u.getDisplayName(),
                 u.getRole(),
                 u.isEmailVerified(),
-                u.getGoogleSubject() != null
-        );
+                u.getGoogleSubject() != null,
+                u.isSuspended());
     }
 }

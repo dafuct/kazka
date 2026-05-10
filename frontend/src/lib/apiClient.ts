@@ -84,3 +84,37 @@ export const admin = {
     return request(`/api/admin/users`)
   },
 }
+
+export interface FlaggedAttemptDto {
+  id: string
+  userId: string
+  userEmail: string
+  pipeline: 'TEXT_INPUT' | 'IMAGE_SCENE'
+  category: string
+  language: string
+  promptText: string
+  confidence: number | null
+  judgeModel: string | null
+  createdAt: string
+}
+
+export interface SuspendedUserDto {
+  id: string
+  email: string
+  displayName: string
+  suspendedAt: string
+  suspendedReason: string
+  suspendedBy: string | null
+}
+
+export const adminModeration = {
+  listFlagged(page = 0, size = 50): Promise<PageResponse<FlaggedAttemptDto>> {
+    return request(`/api/admin/moderation/flagged?page=${page}&size=${size}`)
+  },
+  listSuspended(): Promise<SuspendedUserDto[]> {
+    return request(`/api/admin/moderation/suspended`)
+  },
+  unsuspend(userId: string): Promise<void> {
+    return request(`/api/admin/users/${userId}/unsuspend`, { method: 'POST' })
+  },
+}

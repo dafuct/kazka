@@ -6,10 +6,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class HuggingFaceProperties {
 
     private String apiToken = null;
-    private String textModel = "Qwen/Qwen2.5-72B-Instruct";
-    private String editorModel = "Qwen/Qwen2.5-72B-Instruct";
+    private String textModel = "Qwen/Qwen3-32B";
+    private String editorModel = "Qwen/Qwen3-32B";
     private String imageModel = "black-forest-labs/FLUX.1-schnell";
-    private String sceneModel = "Qwen/Qwen2.5-72B-Instruct";
+    private String sceneModel = "Qwen/Qwen3-32B";
     private String textBaseUrl = "https://router.huggingface.co";
     private String imageBaseUrl = "https://router.huggingface.co";
 

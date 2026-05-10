@@ -7,7 +7,7 @@ import { useLocale } from '../../lib/LocaleContext'
 import { useAuth } from '../../lib/AuthContext'
 import { streamStory } from '../../lib/sseClient'
 import { api } from '../../lib/apiClient'
-import type { GenerationRequest } from '../../lib/types'
+import type { GenerationRequest, ModerationErrorCode } from '../../lib/types'
 import styles from './StoryModal.module.css'
 
 type Phase = 'form' | 'creating'
@@ -19,7 +19,8 @@ export function StoryModal() {
   const { open, closeModal } = useStoryModal()
   const { t } = useLocale()
   const navigate = useNavigate()
-  const { user, resendVerification } = useAuth()
+  const { user, resendVerification, refresh } = useAuth()
+  const MODERATION_CODES: readonly ModerationErrorCode[] = ['BLOCKED_INPUT', 'JUDGE_UNAVAILABLE']
   const needsVerify = !!user && !user.emailVerified
   const [resendDone, setResendDone] = useState(false)
   const [phase, setPhase] = useState<Phase>('form')
@@ -93,9 +94,15 @@ export function StoryModal() {
           api.illustrate(id).catch(() => null)
           pollUntilReady(id)
         },
-        onError: ({ message }) => {
+        onError: ({ code, message }) => {
           if (cancelled) return
-          setError(message)
+          if (code && (MODERATION_CODES as readonly string[]).includes(code)) {
+            setError(t.moderation[code as ModerationErrorCode])
+            // Suspension may have just kicked in — refresh AuthContext so the banner appears.
+            refresh()
+          } else {
+            setError(message ?? null)
+          }
           setPhase('form')
         },
       },
