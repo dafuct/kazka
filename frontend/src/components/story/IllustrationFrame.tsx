@@ -5,8 +5,8 @@ import type { IllustrationStatus } from '../../lib/types'
 import styles from './IllustrationFrame.module.css'
 
 interface IllustrationFrameProps {
-  pathLight: string | null
-  pathDark: string | null
+  pathLight: string | null | undefined
+  pathDark: string | null | undefined
   status: IllustrationStatus
 }
 
