@@ -2,24 +2,25 @@ package com.kazka.story.dto;
 
 import com.kazka.story.IllustrationStatus;
 import com.kazka.story.Story;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
 import java.util.List;
 
 public record StoryDto(
-        String id,
-        String title,
-        String theme,
-        List<String> characters,
-        String ageGroup,
-        String length,
-        String language,
-        String content,
-        String illustrationPathLight,
-        String illustrationPathDark,
-        IllustrationStatus illustrationStatus,
-        Instant createdAt,
-        Instant updatedAt
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String id,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String title,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String theme,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) List<String> characters,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String ageGroup,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String length,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String language,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String content,
+        @Schema(nullable = true) String illustrationPathLight,
+        @Schema(nullable = true) String illustrationPathDark,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) IllustrationStatus illustrationStatus,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant createdAt,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant updatedAt
 ) {
     public static StoryDto from(Story s) {
         return new StoryDto(
