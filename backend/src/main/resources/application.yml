@@ -6,17 +6,15 @@ spring:
     username: ${DB_USER:kazkar}
     password: ${DB_PASS:kazkar}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: never
   jpa:
     hibernate:
       ddl-auto: validate
     properties:
       hibernate.dialect: org.hibernate.dialect.MySQLDialect
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
-    baseline-version: 0
-    validate-migration-naming: true
+    defer-datasource-initialization: true
   data:
     redis:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
