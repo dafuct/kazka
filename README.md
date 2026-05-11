@@ -34,13 +34,60 @@ The backend starts on `http://localhost:8080`. On first run it pulls the Ollama 
 
 ### 4. Start the frontend
 
+See the [Monorepo layout](#monorepo-layout) section for workspace commands.
+The short version:
+
 ```bash
-cd frontend
 npm install
-npm run dev
+npm run frontend:dev
 ```
 
 Open `http://localhost:5173`.
+
+## Monorepo layout
+
+The repo is an npm workspaces monorepo:
+
+```
+kazka/
+├─ backend/                # Spring Boot 4 (WebFlux) — Gradle
+├─ frontend/               # React 19 + Vite — npm workspace "frontend"
+├─ packages/
+│  └─ shared/              # @kazka/shared — TS types generated from backend OpenAPI
+├─ scripts/
+│  └─ gen-types.sh         # codegen script
+└─ package.json            # root workspaces config
+```
+
+### Setup
+
+```bash
+npm install                 # installs all workspaces
+```
+
+### Generating shared TypeScript types
+
+The frontend (and future mobile app) consume API types from `@kazka/shared`,
+which is generated from the backend's OpenAPI spec at `/v3/api-docs`.
+
+```bash
+# Terminal 1: start the backend
+cd backend && ./gradlew bootRun
+
+# Terminal 2: regenerate types
+npm run gen:types
+```
+
+Commit the regenerated `packages/shared/src/api-types.ts`. CI runs
+`npm run verify:types` to fail any PR that ships stale generated types.
+
+### Running the frontend
+
+```bash
+npm run frontend:dev        # http://localhost:5173
+npm run frontend:build
+npm run frontend:lint
+```
 
 ## Environment Variables
 
