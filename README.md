@@ -17,10 +17,30 @@ A full-stack app that generates personalized Ukrainian fairy tales using local A
 docker-compose up -d
 ```
 
-### 2. Initialize the database schema
+### 2. Database migrations
+
+The backend uses **Liquibase** to manage schema. The root changelog lives at
+`backend/src/main/resources/db/changelog/db.changelog-master.yaml`, which
+includes the changesets under `db/changelog/changes/`. Migrations run
+automatically on every backend start — no manual step required.
+
+If you have a pre-Liquibase database (i.e., one that was previously
+initialised by the hand-applied `schema.sql`), the baseline changeset
+auto-detects existing tables via a precondition and marks itself as
+already-applied without re-running. No `liquibase changelog-sync` step is
+needed.
+
+To inspect migration state from the host:
 
 ```bash
-docker exec -i kazkar-mysql mysql -ukazkar -pkazkar kazkar < backend/src/main/resources/schema.sql
+docker exec -i kazkar-mysql mysql -ukazkar -pkazkar kazkar \
+  -e "SELECT id, author, filename, dateexecuted, exectype FROM DATABASECHANGELOG ORDER BY orderexecuted"
+```
+
+If you ever need to reset the dev database completely:
+
+```bash
+docker-compose down -v && docker-compose up -d
 ```
 
 ### 3. Start the backend
