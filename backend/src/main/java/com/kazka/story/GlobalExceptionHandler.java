@@ -1,5 +1,6 @@
 package com.kazka.story;
 
+import com.kazka.auth.apple.AppleIdentityTokenVerifier;
 import com.kazka.auth.exception.EmailAlreadyExistsException;
 import com.kazka.auth.exception.EmailNotVerifiedException;
 import com.kazka.auth.exception.InvalidCredentialsException;
@@ -62,6 +63,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleInvalidToken(InvalidTokenException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", "TOKEN_INVALID"));
+    }
+
+    @ExceptionHandler(AppleIdentityTokenVerifier.InvalidAppleTokenException.class)
+    public ResponseEntity<Map<String, String>> invalidApple(AppleIdentityTokenVerifier.InvalidAppleTokenException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "INVALID_APPLE_TOKEN"));
     }
 
     @ExceptionHandler(MailDeliveryException.class)
