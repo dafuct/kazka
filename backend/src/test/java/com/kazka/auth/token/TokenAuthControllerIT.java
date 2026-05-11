@@ -98,4 +98,46 @@ class TokenAuthControllerIT extends AbstractIT {
                 .expectStatus().isOk()
                 .expectBody().jsonPath("$.user.email").isEqualTo("carol@example.com");
     }
+
+    @Test
+    void should_issueNewTokens_when_refreshWithValidRefreshToken() {
+        seedUser("dave@example.com", "password123");
+
+        @SuppressWarnings("rawtypes")
+        Map loginBody = client().post().uri("/api/auth/token/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("email", "dave@example.com", "password", "password123"))
+                .exchange().expectStatus().isOk()
+                .returnResult(Map.class).getResponseBody().blockFirst();
+        String oldAccess = loginBody.get("accessToken").toString();
+        String oldRefresh = loginBody.get("refreshToken").toString();
+
+        @SuppressWarnings("rawtypes")
+        Map refreshBody = client().post().uri("/api/auth/token/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("refreshToken", oldRefresh))
+                .exchange().expectStatus().isOk()
+                .returnResult(Map.class).getResponseBody().blockFirst();
+
+        String newAccess = refreshBody.get("accessToken").toString();
+        String newRefresh = refreshBody.get("refreshToken").toString();
+        assertThat(newAccess).isNotEqualTo(oldAccess);
+        assertThat(newRefresh).isNotEqualTo(oldRefresh);
+
+        // Old refresh token is now revoked
+        client().post().uri("/api/auth/token/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("refreshToken", oldRefresh))
+                .exchange().expectStatus().isUnauthorized()
+                .expectBody().jsonPath("$.error").isEqualTo("INVALID_REFRESH_TOKEN");
+    }
+
+    @Test
+    void should_return401_when_refreshWithUnknownToken() {
+        client().post().uri("/api/auth/token/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("refreshToken", "not-a-real-token-just-padding-to-the-right-length"))
+                .exchange().expectStatus().isUnauthorized()
+                .expectBody().jsonPath("$.error").isEqualTo("INVALID_REFRESH_TOKEN");
+    }
 }

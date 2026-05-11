@@ -38,6 +38,21 @@ public class TokenAuthController {
         this.props = props;
     }
 
+    @PostMapping("/refresh")
+    public Mono<TokenResponse> refresh(@RequestBody @Valid com.kazka.auth.token.dto.TokenRefreshRequest req) {
+        return refreshTokens.rotate(req.refreshToken())
+                .onErrorMap(RefreshTokenService.UnknownRefreshTokenException.class,
+                        e -> new com.kazka.auth.exception.InvalidRefreshTokenException())
+                .flatMap(rotated -> Mono.fromCallable(() -> users.findById(rotated.userId()))
+                        .subscribeOn(Schedulers.boundedElastic())
+                        .map(opt -> opt.orElseThrow(com.kazka.auth.exception.InvalidRefreshTokenException::new))
+                        .map(u -> new TokenResponse(
+                                tokenIssuer.issueAccessToken(u.getId(), u.getRole()),
+                                rotated.newToken(),
+                                props.jwt().accessTtl().toSeconds(),
+                                UserDto.from(u))));
+    }
+
     @PostMapping("/login")
     public Mono<TokenResponse> login(@RequestBody @Valid TokenLoginRequest req) {
         String normalized = req.email().trim().toLowerCase();

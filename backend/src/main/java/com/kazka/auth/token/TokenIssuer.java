@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class TokenIssuer {
@@ -33,6 +34,7 @@ public class TokenIssuer {
         return Jwts.builder()
                 .issuer(jwt.issuer())
                 .subject(userId)
+                .id(UUID.randomUUID().toString())
                 .claim("role", role.name())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(jwt.accessTtl())))
