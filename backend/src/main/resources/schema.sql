@@ -1,11 +1,8 @@
--- Migration: V1__baseline
--- Purpose: Baseline schema captured from the pre-Flyway schema.sql. Defines
---          users, email_verification_tokens, password_reset_tokens, stories,
---          flagged_attempts.
--- Risk: low — applied to fresh databases only; existing environments are
---       baselined with `flyway baseline -baselineVersion=1` (handled by
---       `spring.flyway.baseline-on-migrate=true`).
--- Reversible: no — DROP migrations are intentionally not provided.
+DROP TABLE IF EXISTS flagged_attempts;
+DROP TABLE IF EXISTS stories;
+DROP TABLE IF EXISTS password_reset_tokens;
+DROP TABLE IF EXISTS email_verification_tokens;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
     id              VARCHAR(36)  NOT NULL PRIMARY KEY,
