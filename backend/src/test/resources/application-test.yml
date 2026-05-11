@@ -53,3 +53,16 @@ kazka:
     admin:
       email: ""
       password: ""
+    jwt:
+      secret: test-secret-32-characters-minimum-for-hs256-signing-ok
+      access-ttl: 5m
+      refresh-ttl: 1h
+      issuer: kazka-test
+    apple:
+      team-id: TEST-TEAM
+      client-id: app.kazka.ios.test
+      key-id: TEST-KEY
+      private-key-pem: ""
+      jwks-uri: http://localhost:0
+      issuer: https://appleid.apple.com
+      client-secret-ttl: 1m

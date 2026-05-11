@@ -77,3 +77,16 @@ kazka:
     admin:
       email: ${ADMIN_EMAIL:}
       password: ${ADMIN_PASSWORD:}
+    jwt:
+      secret: ${KAZKA_JWT_SECRET:dev-only-secret-please-rotate-in-production-min-32-chars}
+      access-ttl: 1h
+      refresh-ttl: 30d
+      issuer: ${KAZKA_JWT_ISSUER:kazka}
+    apple:
+      team-id: ${APPLE_TEAM_ID:not-configured}
+      client-id: ${APPLE_CLIENT_ID:app.kazka.ios}
+      key-id: ${APPLE_KEY_ID:not-configured}
+      private-key-pem: ${APPLE_PRIVATE_KEY_PEM:}
+      jwks-uri: ${APPLE_JWKS_URI:https://appleid.apple.com/auth/keys}
+      issuer: ${APPLE_ISSUER:https://appleid.apple.com}
+      client-secret-ttl: 1h

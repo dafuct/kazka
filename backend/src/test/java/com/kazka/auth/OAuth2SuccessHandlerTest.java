@@ -19,7 +19,8 @@ class OAuth2SuccessHandlerTest {
     private final AuthProperties props = new AuthProperties(
             "http://localhost", "from@example.com",
             new AuthProperties.TokenTtl(java.time.Duration.ofHours(24), java.time.Duration.ofHours(1)),
-            new AuthProperties.Admin("", ""));
+            new AuthProperties.Admin("", ""),
+            null, null);
     private final OAuth2SuccessHandler handler = new OAuth2SuccessHandler(users, props);
 
     @Test

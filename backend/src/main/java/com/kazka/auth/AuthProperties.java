@@ -9,8 +9,28 @@ public record AuthProperties(
         String appBaseUrl,
         String mailFrom,
         TokenTtl tokenTtl,
-        Admin admin
+        Admin admin,
+        Jwt jwt,
+        Apple apple
 ) {
     public record TokenTtl(Duration emailVerification, Duration passwordReset) {}
+
     public record Admin(String email, String password) {}
+
+    public record Jwt(
+            String secret,
+            Duration accessTtl,
+            Duration refreshTtl,
+            String issuer
+    ) {}
+
+    public record Apple(
+            String teamId,
+            String clientId,
+            String keyId,
+            String privateKeyPem,
+            String jwksUri,
+            String issuer,
+            Duration clientSecretTtl
+    ) {}
 }

@@ -39,7 +39,8 @@ class SuspensionServiceTest {
         mail = mock(MailService.class);
         authProps = new AuthProperties("http://localhost", "no-reply@kazka.local",
                 new AuthProperties.TokenTtl(java.time.Duration.ofHours(24), java.time.Duration.ofHours(1)),
-                new AuthProperties.Admin("admin@kazka.local", "x"));
+                new AuthProperties.Admin("admin@kazka.local", "x"),
+                null, null);
         modProps = new ModerationProperties();
         service = new SuspensionService(users, flags, mail, authProps, modProps);
 
@@ -101,7 +102,7 @@ class SuspensionServiceTest {
     void should_suspendWithoutAdminEmail_when_adminConfigUnset() {
         AuthProperties propsNoAdmin = new AuthProperties("http://localhost", "no-reply@kazka.local",
                 new AuthProperties.TokenTtl(java.time.Duration.ofHours(24), java.time.Duration.ofHours(1)),
-                null);
+                null, null, null);
         SuspensionService svc = new SuspensionService(users, flags, mail, propsNoAdmin, modProps);
         when(flags.countCountableInWindow(eq(user.getId()), any(Instant.class))).thenReturn(3L);
 
@@ -117,7 +118,8 @@ class SuspensionServiceTest {
     void should_suspendWithoutAdminEmail_when_adminEmailIsBlank() {
         AuthProperties propsBlankAdmin = new AuthProperties("http://localhost", "no-reply@kazka.local",
                 new AuthProperties.TokenTtl(java.time.Duration.ofHours(24), java.time.Duration.ofHours(1)),
-                new AuthProperties.Admin("  ", "x"));
+                new AuthProperties.Admin("  ", "x"),
+                null, null);
         SuspensionService svc = new SuspensionService(users, flags, mail, propsBlankAdmin, modProps);
         when(flags.countCountableInWindow(eq(user.getId()), any(Instant.class))).thenReturn(3L);
 
