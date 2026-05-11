@@ -140,4 +140,37 @@ class TokenAuthControllerIT extends AbstractIT {
                 .exchange().expectStatus().isUnauthorized()
                 .expectBody().jsonPath("$.error").isEqualTo("INVALID_REFRESH_TOKEN");
     }
+
+    @Test
+    void should_revokeRefreshToken_when_logoutCalled() {
+        seedUser("eve@example.com", "password123");
+
+        @SuppressWarnings("rawtypes")
+        Map loginBody = client().post().uri("/api/auth/token/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("email", "eve@example.com", "password", "password123"))
+                .exchange().expectStatus().isOk()
+                .returnResult(Map.class).getResponseBody().blockFirst();
+        String refresh = loginBody.get("refreshToken").toString();
+
+        client().post().uri("/api/auth/token/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("refreshToken", refresh))
+                .exchange().expectStatus().isNoContent();
+
+        // Subsequent refresh fails
+        client().post().uri("/api/auth/token/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("refreshToken", refresh))
+                .exchange().expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void should_acceptUnknownRefreshToken_when_logoutCalled() {
+        // Logout is idempotent — unknown tokens succeed silently
+        client().post().uri("/api/auth/token/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("refreshToken", "unknown-token-padded-out-to-some-length"))
+                .exchange().expectStatus().isNoContent();
+    }
 }

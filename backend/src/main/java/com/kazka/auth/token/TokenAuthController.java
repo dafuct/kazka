@@ -53,6 +53,12 @@ public class TokenAuthController {
                                 UserDto.from(u))));
     }
 
+    @PostMapping("/logout")
+    @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
+    public Mono<Void> logout(@RequestBody @Valid com.kazka.auth.token.dto.TokenLogoutRequest req) {
+        return refreshTokens.revoke(req.refreshToken());
+    }
+
     @PostMapping("/login")
     public Mono<TokenResponse> login(@RequestBody @Valid TokenLoginRequest req) {
         String normalized = req.email().trim().toLowerCase();
