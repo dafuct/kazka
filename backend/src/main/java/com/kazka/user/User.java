@@ -23,6 +23,12 @@ public class User {
     @Column(name = "google_subject", length = 255)
     private String googleSubject;
 
+    @Column(name = "apple_subject", length = 255)
+    private String appleSubject;
+
+    @Column(name = "apple_email_relay", length = 255)
+    private String appleEmailRelay;
+
     @Column(name = "display_name", nullable = false, length = 100)
     private String displayName;
 
@@ -58,6 +64,10 @@ public class User {
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public String getGoogleSubject() { return googleSubject; }
     public void setGoogleSubject(String googleSubject) { this.googleSubject = googleSubject; }
+    public String getAppleSubject() { return appleSubject; }
+    public void setAppleSubject(String appleSubject) { this.appleSubject = appleSubject; }
+    public String getAppleEmailRelay() { return appleEmailRelay; }
+    public void setAppleEmailRelay(String appleEmailRelay) { this.appleEmailRelay = appleEmailRelay; }
     public String getDisplayName() { return displayName; }
     public void setDisplayName(String displayName) { this.displayName = displayName; }
     public UserRole getRole() { return role; }
