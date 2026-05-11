@@ -1,15 +1,18 @@
 // Friendly aliases over the generated api-types. Importers should prefer
 // these names over reaching into `components['schemas']` directly.
 
+import type { components as Components } from './api-types';
+
 export type { components, paths } from './api-types';
 
 // openapi-typescript v7 with --root-types emits each schema as a top-level
 // `Schema{Name}` alias (e.g. SchemaStoryDto = components['schemas']['StoryDto']).
 // We re-export them under their bare DTO names so callers can write `Story`
 // instead of `SchemaStoryDto`.
+//
+// NB: `Story` and `User` are NOT re-exported from api-types here — they are
+// narrowed below to match the runtime contract (see comments).
 export type {
-  SchemaStoryDto as Story,
-  SchemaUserDto as User,
   SchemaGenerationRequest as GenerationRequest,
   SchemaUpdateStoryRequest as UpdateStoryRequest,
   SchemaAuthResponse as AuthResponse,
@@ -20,6 +23,24 @@ export type {
   SchemaFlaggedAttemptDto as FlaggedAttemptDto,
   SchemaSuspendedUserDto as SuspendedUserDto,
 } from './api-types';
+
+// Backend Java records emit every field as optional in the generated OpenAPI
+// schema (springdoc treats record components as non-required by default).
+// At runtime however the controllers always populate these fields, and the
+// frontend was authored against the required shape. Narrow the generated
+// types here so call sites don't have to deal with spurious `undefined`s.
+//
+// The two illustration paths are genuinely nullable on the wire (StoryDto
+// preserves them as `null` until the image generation completes), so we
+// widen them to `string | null` rather than `string`.
+type StoryBase = Components['schemas']['StoryDto'];
+export type Story = Required<Omit<StoryBase, 'illustrationPathLight' | 'illustrationPathDark'>> & {
+  illustrationPathLight: string | null;
+  illustrationPathDark: string | null;
+};
+
+type UserBase = Components['schemas']['UserDto'];
+export type User = Required<UserBase>;
 
 // The backend's `PageResponse<T>` is a Java generic that springdoc emits as
 // concrete instantiations (PageResponseStoryDto, PageResponseFlaggedAttemptDto,
