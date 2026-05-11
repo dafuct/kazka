@@ -1,8 +1,10 @@
-DROP TABLE IF EXISTS flagged_attempts;
-DROP TABLE IF EXISTS stories;
-DROP TABLE IF EXISTS password_reset_tokens;
-DROP TABLE IF EXISTS email_verification_tokens;
-DROP TABLE IF EXISTS users;
+--liquibase formatted sql
+
+--changeset kazka:001-baseline splitStatements:true endDelimiter:; runInTransaction:false
+--preconditions onFail:MARK_RAN onError:HALT
+--precondition-sql-check expectedResult:0 SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'users'
+--comment Baseline schema from pre-Liquibase schema.sql. Defines users, email_verification_tokens, password_reset_tokens, stories, flagged_attempts. Precondition makes this a no-op on existing dev/prod databases that already have the users table (the changeset is recorded as MARK_RAN in DATABASECHANGELOG).
+--rollback empty
 
 CREATE TABLE users (
     id              VARCHAR(36)  NOT NULL PRIMARY KEY,
