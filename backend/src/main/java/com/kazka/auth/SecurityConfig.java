@@ -56,6 +56,7 @@ public class SecurityConfig {
             OAuth2SuccessHandler oauthSuccess,
             ObjectMapper objectMapper,
             com.kazka.user.UserRepository userRepository,
+            com.kazka.auth.token.BearerTokenAuthenticationWebFilter bearerFilter,
             org.springframework.beans.factory.ObjectProvider<CorsConfigurationSource> corsProvider) {
 
         var loginFilter = new AuthenticationWebFilter(authManager);
@@ -82,20 +83,28 @@ public class SecurityConfig {
                                         ServerWebExchangeMatchers.pathMatchers(
                                                 "/oauth2/**", "/login/oauth2/**",
                                                 "/api/auth/signup", "/api/auth/login",
-                                                "/api/auth/password-reset/**")))))
+                                                "/api/auth/password-reset/**",
+                                                "/api/auth/token/**",
+                                                "/api/auth/oauth/**")))))
                 .authorizeExchange(auth -> auth
                         .pathMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                         .pathMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/auth/signup",
+                        .pathMatchers(HttpMethod.POST,
+                                "/api/auth/signup",
                                 "/api/auth/login",
                                 "/api/auth/logout",
                                 "/api/auth/password-reset/request",
-                                "/api/auth/password-reset/confirm").permitAll()
+                                "/api/auth/password-reset/confirm",
+                                "/api/auth/token/login",
+                                "/api/auth/token/refresh",
+                                "/api/auth/token/logout",
+                                "/api/auth/oauth/apple").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/auth/me", "/api/auth/verify-email").permitAll()
                         .pathMatchers("/api/admin/**").hasRole("ADMIN")
                         .pathMatchers("/api/**").authenticated()
                         .anyExchange().permitAll())
                 .addFilterAt(loginFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                .addFilterAt(bearerFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .oauth2Login(o -> o.authenticationSuccessHandler(oauthSuccess))
                 .logout(l -> l.logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler((webFilterExchange, authentication) -> {
