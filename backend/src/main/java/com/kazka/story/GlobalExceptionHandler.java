@@ -2,6 +2,7 @@ package com.kazka.story;
 
 import com.kazka.auth.exception.EmailAlreadyExistsException;
 import com.kazka.auth.exception.EmailNotVerifiedException;
+import com.kazka.auth.exception.InvalidCredentialsException;
 import com.kazka.auth.exception.InvalidTokenException;
 import com.kazka.auth.exception.MailDeliveryException;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "INVALID_CREDENTIALS"));
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidCredentials(InvalidCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "INVALID_CREDENTIALS"));
     }
