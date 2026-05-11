@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('backend/**/*.gradle', 'backend/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Run backend tests
+        working-directory: backend
+        run: ./gradlew test --no-daemon
+
+  frontend:
+    name: Frontend build + lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install
+        run: npm ci
+      - name: Build
+        run: npm run frontend:build
+      - name: Lint
+        run: npm run frontend:lint
+
+  types-verify:
+    name: Shared types up to date
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_DATABASE: kazkar
+          MYSQL_USER: kazkar
+          MYSQL_PASSWORD: kazkar
+          MYSQL_ROOT_PASSWORD: rootpw
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost -ukazkar -pkazkar"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('backend/**/*.gradle', 'backend/gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Install
+        run: npm ci
+      - name: Start backend
+        working-directory: backend
+        env:
+          DB_URL: jdbc:mysql://localhost:3306/kazkar
+          DB_USER: kazkar
+          DB_PASS: kazkar
+          SPRING_DATA_REDIS_HOST: localhost
+          SPRING_DATA_REDIS_PORT: '6379'
+          HUGGINGFACE_API_TOKEN: ci-dummy
+          KAZKA_JWT_SECRET: ci-dummy-secret-32-characters-minimum-for-hs256-ok
+        run: |
+          ./gradlew bootRun --no-daemon > /tmp/boot.log 2>&1 &
+          echo $! > /tmp/boot.pid
+          for i in $(seq 1 120); do
+            if curl -fsS http://localhost:8080/v3/api-docs > /dev/null 2>&1; then
+              echo "Backend ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Backend failed to start in 120s"
+          tail -50 /tmp/boot.log
+          exit 1
+      - name: Verify types are up to date
+        run: npm run verify:types
+      - name: Stop backend
+        if: always()
+        run: |
+          if [ -f /tmp/boot.pid ]; then
+            kill "$(cat /tmp/boot.pid)" 2>/dev/null || true
+          fi
