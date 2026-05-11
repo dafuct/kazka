@@ -68,6 +68,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/token/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["refresh"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/token/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/token/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/signup": {
         parameters: {
             query?: never;
@@ -110,6 +158,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["confirmPasswordReset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/auth/oauth/apple": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["apple"];
         delete?: never;
         options?: never;
         head?: never;
@@ -237,31 +301,61 @@ export interface components {
             content: string;
         };
         StoryDto: {
-            id?: string;
-            title?: string;
-            theme?: string;
-            characters?: string[];
-            ageGroup?: string;
-            length?: string;
-            language?: string;
-            content?: string;
-            illustrationPathLight?: string;
-            illustrationPathDark?: string;
+            id: string;
+            title: string;
+            theme: string;
+            characters: string[];
+            ageGroup: string;
+            length: string;
+            language: string;
+            content: string;
+            illustrationPathLight?: string | null;
+            illustrationPathDark?: string | null;
             /** @enum {string} */
-            illustrationStatus?: "PENDING" | "READY" | "FAILED";
+            illustrationStatus: "PENDING" | "READY" | "FAILED";
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
         };
         GenerationRequest: {
             theme: string;
             characters: string[];
-            ageGroup?: string;
-            length?: string;
-            language?: string;
+            /** @enum {string} */
+            ageGroup: "3-5" | "6-8" | "9-12";
+            /** @enum {string} */
+            length: "short" | "medium" | "long";
+            /** @enum {string} */
+            language: "uk" | "en";
         };
         ServerSentEventObject: Record<string, never>;
+        TokenRefreshRequest: {
+            refreshToken: string;
+        };
+        TokenResponse: {
+            accessToken?: string;
+            refreshToken?: string;
+            /** Format: int64 */
+            accessExpiresInSeconds?: number;
+            user?: components["schemas"]["UserDto"];
+        };
+        UserDto: {
+            id: string;
+            email: string;
+            displayName: string;
+            /** @enum {string} */
+            role: "USER" | "ADMIN";
+            emailVerified: boolean;
+            googleLinked: boolean;
+            suspended: boolean;
+        };
+        TokenLogoutRequest: {
+            refreshToken: string;
+        };
+        TokenLoginRequest: {
+            email: string;
+            password: string;
+        };
         SignupRequest: {
             email: string;
             password: string;
@@ -270,22 +364,18 @@ export interface components {
         AuthResponse: {
             user?: components["schemas"]["UserDto"];
         };
-        UserDto: {
-            id?: string;
-            email?: string;
-            displayName?: string;
-            /** @enum {string} */
-            role?: "USER" | "ADMIN";
-            emailVerified?: boolean;
-            googleLinked?: boolean;
-            suspended?: boolean;
-        };
         PasswordResetRequestRequest: {
             email: string;
         };
         PasswordResetConfirmRequest: {
             token: string;
             newPassword: string;
+        };
+        AppleLoginRequest: {
+            identityToken: string;
+            authorizationCode?: string;
+            fullName?: string;
+            email?: string;
         };
         PageResponseStoryDto: {
             items?: components["schemas"]["StoryDto"][];
@@ -353,11 +443,16 @@ export type SchemaUpdateStoryRequest = components['schemas']['UpdateStoryRequest
 export type SchemaStoryDto = components['schemas']['StoryDto'];
 export type SchemaGenerationRequest = components['schemas']['GenerationRequest'];
 export type SchemaServerSentEventObject = components['schemas']['ServerSentEventObject'];
+export type SchemaTokenRefreshRequest = components['schemas']['TokenRefreshRequest'];
+export type SchemaTokenResponse = components['schemas']['TokenResponse'];
+export type SchemaUserDto = components['schemas']['UserDto'];
+export type SchemaTokenLogoutRequest = components['schemas']['TokenLogoutRequest'];
+export type SchemaTokenLoginRequest = components['schemas']['TokenLoginRequest'];
 export type SchemaSignupRequest = components['schemas']['SignupRequest'];
 export type SchemaAuthResponse = components['schemas']['AuthResponse'];
-export type SchemaUserDto = components['schemas']['UserDto'];
 export type SchemaPasswordResetRequestRequest = components['schemas']['PasswordResetRequestRequest'];
 export type SchemaPasswordResetConfirmRequest = components['schemas']['PasswordResetConfirmRequest'];
+export type SchemaAppleLoginRequest = components['schemas']['AppleLoginRequest'];
 export type SchemaPageResponseStoryDto = components['schemas']['PageResponseStoryDto'];
 export type SchemaAdminUserDto = components['schemas']['AdminUserDto'];
 export type SchemaSuspendedUserDto = components['schemas']['SuspendedUserDto'];
@@ -495,6 +590,76 @@ export interface operations {
             };
         };
     };
+    refresh: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TokenRefreshRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TokenResponse"];
+                };
+            };
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TokenLogoutRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    login: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TokenLoginRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TokenResponse"];
+                };
+            };
+        };
+    };
     signup: {
         parameters: {
             query?: never;
@@ -560,6 +725,30 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    apple: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppleLoginRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TokenResponse"];
+                };
             };
         };
     };
