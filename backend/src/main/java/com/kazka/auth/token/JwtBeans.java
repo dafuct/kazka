@@ -11,4 +11,9 @@ class JwtBeans {
     AuthProperties.Jwt jwtProperties(AuthProperties authProperties) {
         return authProperties.jwt();
     }
+
+    @Bean
+    AuthProperties.Apple appleProperties(AuthProperties authProperties) {
+        return authProperties.apple();
+    }
 }
