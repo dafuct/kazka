@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native-unistyles';
 import { Button } from '@/src/components/Button';
 import { Input } from '@/src/components/Input';
@@ -15,6 +16,7 @@ const PRESETS = [
 ];
 
 export default function StepWorldScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { ageGroup } = useLocalSearchParams<{ ageGroup: '3-5' | '6-8' | '9-12' }>();
 
@@ -41,14 +43,14 @@ export default function StepWorldScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} hitSlop={12}>
-          <Text style={styles.cancel}>Назад</Text>
+          <Text style={styles.cancel}>{t('create.back')}</Text>
         </Pressable>
-        <Text style={styles.stepLabel}>Крок 2 з 2</Text>
+        <Text style={styles.stepLabel}>{t('create.stepN', { n: 2, total: 2 })}</Text>
         <View style={{ width: 80 }} />
       </View>
 
       <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
-        <Text style={styles.title}>Оберіть світ</Text>
+        <Text style={styles.title}>{t('create.worldTitle')}</Text>
         <View style={styles.grid}>
           {PRESETS.map((p) => (
             <Pressable
@@ -61,9 +63,9 @@ export default function StepWorldScreen() {
           ))}
         </View>
         <View style={styles.customRow}>
-          <Text style={styles.label}>або опишіть свій:</Text>
+          <Text style={styles.label}>{t('create.customLabel')}</Text>
           <Input
-            placeholder="Наприклад: космічна станція 2150 року..."
+            placeholder={t('create.customPlaceholder')}
             value={custom}
             onChangeText={(v) => { setCustom(v); if (v) setSelectedId(null); }}
             multiline
@@ -72,7 +74,7 @@ export default function StepWorldScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button title="Створити казку" onPress={start} disabled={!canSubmit} />
+        <Button title={t('create.submit')} onPress={start} disabled={!canSubmit} />
       </View>
     </View>
   );

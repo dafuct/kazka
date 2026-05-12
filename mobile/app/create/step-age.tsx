@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native-unistyles';
 import { Button } from '@/src/components/Button';
 
@@ -11,6 +12,7 @@ const AGE_GROUPS: { value: '3-5' | '6-8' | '9-12'; label: string }[] = [
 ];
 
 export default function StepAgeScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [ageGroup, setAgeGroup] = useState<'3-5' | '6-8' | '9-12'>('3-5');
 
@@ -18,14 +20,14 @@ export default function StepAgeScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} hitSlop={12}>
-          <Text style={styles.cancel}>Скасувати</Text>
+          <Text style={styles.cancel}>{t('create.cancel')}</Text>
         </Pressable>
-        <Text style={styles.stepLabel}>Крок 1 з 2</Text>
+        <Text style={styles.stepLabel}>{t('create.stepN', { n: 1, total: 2 })}</Text>
         <View style={{ width: 80 }} />
       </View>
 
       <View style={styles.body}>
-        <Text style={styles.title}>Для якого віку?</Text>
+        <Text style={styles.title}>{t('create.ageTitle')}</Text>
         <View style={styles.row}>
           {AGE_GROUPS.map((a) => (
             <Pressable
@@ -42,7 +44,7 @@ export default function StepAgeScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Button title="Далі" onPress={() => router.push({ pathname: '/create/step-world', params: { ageGroup } })} />
+        <Button title={t('create.next')} onPress={() => router.push({ pathname: '/create/step-world', params: { ageGroup } })} />
       </View>
     </View>
   );

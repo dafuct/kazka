@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, Pressable, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native-unistyles';
 import { PageView } from '@/src/components/PageView';
 import { useStory } from '@/src/query/hooks';
@@ -22,6 +23,7 @@ function splitPages(content: string): Page[] {
 }
 
 export default function ReaderScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { data: story, isLoading } = useStory(id!);
@@ -39,7 +41,7 @@ export default function ReaderScreen() {
   if (!story) {
     return (
       <View style={styles.center}>
-        <Text style={styles.body}>Не вдалося завантажити історію.</Text>
+        <Text style={styles.body}>{t('reader.loadFailed')}</Text>
       </View>
     );
   }
@@ -53,10 +55,10 @@ export default function ReaderScreen() {
   }
 
   function onShare() {
-    Alert.alert('Поділитися', '', [
-      { text: 'Скасувати', style: 'cancel' },
-      { text: 'Посилання', onPress: () => shareLink(loadedStory.id, loadedStory.title) },
-      { text: 'PDF', onPress: () => sharePdf(loadedStory) },
+    Alert.alert(t('reader.shareTitle'), '', [
+      { text: t('reader.cancel'), style: 'cancel' },
+      { text: t('reader.shareLink'), onPress: () => shareLink(loadedStory.id, loadedStory.title) },
+      { text: t('reader.sharePdf'), onPress: () => sharePdf(loadedStory) },
     ]);
   }
 
@@ -64,11 +66,11 @@ export default function ReaderScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} hitSlop={12}>
-          <Text style={styles.headerText}>Закрити</Text>
+          <Text style={styles.headerText}>{t('reader.close')}</Text>
         </Pressable>
         <Text style={styles.title} numberOfLines={1}>{loadedStory.title}</Text>
         <Pressable onPress={onShare} hitSlop={12}>
-          <Text style={styles.headerText}>Поділитися</Text>
+          <Text style={styles.headerText}>{t('reader.share')}</Text>
         </Pressable>
       </View>
 

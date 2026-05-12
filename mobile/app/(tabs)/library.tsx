@@ -1,11 +1,13 @@
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Particles } from '@/src/components/Particles';
 import { StoryCard } from '@/src/components/StoryCard';
 import { useStoriesInfinite } from '@/src/query/hooks';
 
 export default function LibraryScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { theme } = useUnistyles();
   const query = useStoriesInfinite(20);
@@ -14,7 +16,7 @@ export default function LibraryScreen() {
   return (
     <View style={styles.container}>
       <Particles />
-      <Text style={styles.title}>Бібліотека</Text>
+      <Text style={styles.title}>{t('library.title')}</Text>
       <FlatList
         data={items}
         keyExtractor={(s) => s.id}
@@ -33,7 +35,7 @@ export default function LibraryScreen() {
         refreshControl={<RefreshControl refreshing={query.isRefetching} onRefresh={() => query.refetch()} tintColor={theme.colors.accent} />}
         ListEmptyComponent={
           !query.isLoading ? (
-            <Text style={styles.empty}>Ще немає історій.</Text>
+            <Text style={styles.empty}>{t('library.empty')}</Text>
           ) : null
         }
       />

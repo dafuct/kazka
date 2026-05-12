@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { StyleSheet } from 'react-native-unistyles';
 import { openSseStream } from '@/src/api/sse';
 import { queryKeys } from '@/src/query/keys';
 
 export default function GeneratingScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const qc = useQueryClient();
   const { ageGroup, theme } = useLocalSearchParams<{ ageGroup: string; theme: string }>();
@@ -58,7 +60,7 @@ export default function GeneratingScreen() {
             break;
           } else if (ev.type === 'error') {
             // Backend emits error with JSON payload { message } or { code }
-            let message = ev.data || 'Помилка';
+            let message = ev.data || t('errors.ERROR');
             try {
               const parsed = JSON.parse(ev.data);
               if (parsed && typeof parsed === 'object') {
@@ -97,11 +99,11 @@ export default function GeneratingScreen() {
     <View style={styles.container}>
       <ActivityIndicator size="large" />
       <Text style={styles.title}>
-        {phase === 'starting' && 'Готуємо казку...'}
-        {phase === 'streaming' && 'Пишемо текст...'}
-        {phase === 'illustrating' && 'Малюємо ілюстрації...'}
-        {phase === 'done' && 'Готово!'}
-        {phase === 'error' && (error ?? 'Помилка')}
+        {phase === 'starting' && t('create.starting')}
+        {phase === 'streaming' && t('create.streaming')}
+        {phase === 'illustrating' && t('create.illustrating')}
+        {phase === 'done' && t('create.done')}
+        {phase === 'error' && (error ?? t('errors.ERROR'))}
       </Text>
     </View>
   );

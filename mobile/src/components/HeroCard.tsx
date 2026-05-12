@@ -1,6 +1,7 @@
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native-unistyles';
 import { API_BASE_URL } from '@/src/api/config';
 import type { Story } from '@/src/api/types';
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function HeroCard({ story, onPress }: Props) {
+  const { t } = useTranslation();
   const path = story.illustrationPathLight ?? story.illustrationPathDark;
   const uri = path ? `${API_BASE_URL}${path}` : undefined;
 
@@ -26,7 +28,7 @@ export function HeroCard({ story, onPress }: Props) {
         style={styles.overlay}
       />
       <View style={styles.titleContainer}>
-        <Text style={styles.subtitle}>Сьогоднішня казка</Text>
+        <Text style={styles.subtitle}>{t('home.featuredLabel')}</Text>
         <Text style={styles.title} numberOfLines={2}>{story.title}</Text>
       </View>
     </TouchableOpacity>

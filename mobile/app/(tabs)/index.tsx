@@ -1,5 +1,6 @@
 import { ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native-unistyles';
 import { HeroCard } from '@/src/components/HeroCard';
 import { Particles } from '@/src/components/Particles';
@@ -8,6 +9,7 @@ import { useFeatured, useStoriesInfinite } from '@/src/query/hooks';
 import { useAuthStore } from '@/src/stores/auth.store';
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const featured = useFeatured();
@@ -23,13 +25,13 @@ export default function HomeScreen() {
     <View style={{ flex: 1 }}>
       <Particles />
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <Text style={styles.greeting}>Привіт, {user?.displayName ?? 'друже'}!</Text>
+        <Text style={styles.greeting}>{t('home.greeting', { name: user?.displayName ?? 'друже' })}</Text>
 
         {featured.data && <HeroCard story={featured.data} onPress={() => open(featured.data!.id)} />}
 
         {recents.length > 0 && (
           <View>
-            <Text style={styles.sectionTitle}>Нещодавні</Text>
+            <Text style={styles.sectionTitle}>{t('home.recents')}</Text>
             <View style={styles.list}>
               {recents.map((s) => (
                 <StoryCard key={s.id} story={s} onPress={() => open(s.id)} variant="compact" />
@@ -39,7 +41,7 @@ export default function HomeScreen() {
         )}
 
         {!featured.isLoading && !featured.data && recents.length === 0 && (
-          <Text style={styles.body}>Ще немає історій. Створи першу!</Text>
+          <Text style={styles.body}>{t('home.empty')}</Text>
         )}
       </ScrollView>
     </View>

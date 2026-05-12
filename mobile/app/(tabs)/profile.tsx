@@ -45,7 +45,7 @@ export default function ProfileScreen() {
         <Text style={styles.body}>{user?.email ?? ''}</Text>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Стиль</Text>
+          <Text style={styles.sectionTitle}>{t('profile.styleLabel')}</Text>
           <View style={styles.row}>
             {STYLES.map((s) => (
               <TouchableOpacity
@@ -62,13 +62,13 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Тема</Text>
+          <Text style={styles.sectionTitle}>{t('profile.themeLabel')}</Text>
           <TouchableOpacity
             onPress={toggleDarkMode}
             style={[styles.chip, darkMode && styles.chipActive]}
           >
             <Text style={[styles.chipText, darkMode && styles.chipTextActive]}>
-              {darkMode ? 'Нічна' : 'Денна'}
+              {darkMode ? t('profile.nightTheme') : t('profile.dayTheme')}
             </Text>
           </TouchableOpacity>
         </View>
