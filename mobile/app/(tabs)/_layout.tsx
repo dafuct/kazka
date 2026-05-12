@@ -1,7 +1,8 @@
 import { Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { useUnistyles } from 'react-native-unistyles';
 import { View } from 'react-native';
+import { useUnistyles } from 'react-native-unistyles';
+import { TabBarCenterButton } from '@/src/components/TabBarCenterButton';
 
 export default function TabsLayout() {
   const { t } = useTranslation();
@@ -28,6 +29,16 @@ export default function TabsLayout() {
         options={{
           title: t('tabs.library'),
           tabBarIcon: ({ color }) => <View style={{ width: 22, height: 22, borderRadius: 4, backgroundColor: color }} />,
+        }}
+      />
+      <Tabs.Screen
+        name="create-pseudo"
+        options={{
+          title: '',
+          tabBarButton: () => <TabBarCenterButton />,
+        }}
+        listeners={{
+          tabPress: (e) => { e.preventDefault(); },
         }}
       />
       <Tabs.Screen
