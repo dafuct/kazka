@@ -77,6 +77,7 @@ export default function RootLayout() {
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="story/[id]" options={{ presentation: 'modal', headerShown: false }} />
+        <Stack.Screen name="create" options={{ presentation: 'modal', headerShown: false }} />
       </Stack>
     </PersistQueryClientProvider>
   );
