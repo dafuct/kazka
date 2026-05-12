@@ -13,3 +13,20 @@
 
 ### Apple
 Configured via Xcode signing — see ios/ project settings after `expo prebuild`.
+
+## TestFlight build
+
+Prerequisites:
+- Apple Developer Program membership ($99/year)
+- App Store Connect app registered with bundle id `app.kazka.ios`
+- Production backend reachable at an HTTPS URL — set `EXPO_PUBLIC_API_BASE_URL` accordingly
+
+Steps:
+1. Open `mobile/ios/Kazkar.xcworkspace` in Xcode (use the .xcworkspace, not the .xcodeproj, so CocoaPods are linked).
+2. Set the signing team in `Kazkar > Targets > Kazkar > Signing & Capabilities`.
+3. Configure release env: `EXPO_PUBLIC_API_BASE_URL=https://api.kazka.app` (or your prod URL).
+4. Build for "Any iOS Device (arm64)" with the release scheme.
+5. `Product > Archive`, then "Distribute App" → App Store Connect → Upload.
+6. Wait for the build to appear in App Store Connect → assign to internal testers → TestFlight.
+
+Bump `buildNumber` in `app.config.ts` for each new upload (App Store Connect rejects duplicate build numbers for the same version).
