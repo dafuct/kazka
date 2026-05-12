@@ -36,7 +36,7 @@ public class AppleOAuthService {
 
         String storedEmail = normalizedEmail != null
                 ? normalizedEmail
-                : appleSubject + "@privaterelay.appleid.local";
+                : appleSubject + "@privaterelay.appleid.invalid";
 
         User u = new User();
         u.setId(UUID.randomUUID().toString());

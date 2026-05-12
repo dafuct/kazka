@@ -91,7 +91,7 @@ class AppleOAuthServiceTest {
 
         User result = service.linkOrCreate("apple-sub-3", null, "Hidden User");
 
-        assertThat(result.getEmail()).isEqualTo("apple-sub-3@privaterelay.appleid.local");
+        assertThat(result.getEmail()).isEqualTo("apple-sub-3@privaterelay.appleid.invalid");
         assertThat(result.getAppleSubject()).isEqualTo("apple-sub-3");
         assertThat(result.getAppleEmailRelay()).isNull();
     }
