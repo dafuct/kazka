@@ -5,3 +5,6 @@ databaseChangeLog:
   - include:
       file: changes/002-add-apple-oauth-columns.sql
       relativeToChangelogFile: true
+  - include:
+      file: changes/003-add-stories-cursor-index.sql
+      relativeToChangelogFile: true
