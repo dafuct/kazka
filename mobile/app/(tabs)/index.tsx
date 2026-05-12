@@ -2,6 +2,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native-unistyles';
 import { HeroCard } from '@/src/components/HeroCard';
+import { Particles } from '@/src/components/Particles';
 import { StoryCard } from '@/src/components/StoryCard';
 import { useFeatured, useStoriesInfinite } from '@/src/query/hooks';
 import { useAuthStore } from '@/src/stores/auth.store';
@@ -19,26 +20,29 @@ export default function HomeScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.greeting}>Привіт, {user?.displayName ?? 'друже'}!</Text>
+    <View style={{ flex: 1 }}>
+      <Particles />
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Text style={styles.greeting}>Привіт, {user?.displayName ?? 'друже'}!</Text>
 
-      {featured.data && <HeroCard story={featured.data} onPress={() => open(featured.data!.id)} />}
+        {featured.data && <HeroCard story={featured.data} onPress={() => open(featured.data!.id)} />}
 
-      {recents.length > 0 && (
-        <View>
-          <Text style={styles.sectionTitle}>Нещодавні</Text>
-          <View style={styles.list}>
-            {recents.map((s) => (
-              <StoryCard key={s.id} story={s} onPress={() => open(s.id)} variant="compact" />
-            ))}
+        {recents.length > 0 && (
+          <View>
+            <Text style={styles.sectionTitle}>Нещодавні</Text>
+            <View style={styles.list}>
+              {recents.map((s) => (
+                <StoryCard key={s.id} story={s} onPress={() => open(s.id)} variant="compact" />
+              ))}
+            </View>
           </View>
-        </View>
-      )}
+        )}
 
-      {!featured.isLoading && !featured.data && recents.length === 0 && (
-        <Text style={styles.body}>Ще немає історій. Створи першу!</Text>
-      )}
-    </ScrollView>
+        {!featured.isLoading && !featured.data && recents.length === 0 && (
+          <Text style={styles.body}>Ще немає історій. Створи першу!</Text>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 

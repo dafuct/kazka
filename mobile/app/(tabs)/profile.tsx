@@ -2,6 +2,7 @@ import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native-unistyles';
 import { Button } from '@/src/components/Button';
+import { Particles } from '@/src/components/Particles';
 import { useAuthStore } from '@/src/stores/auth.store';
 import { useThemeStore } from '@/src/stores/theme.store';
 import { authApi } from '@/src/api/auth';
@@ -37,50 +38,53 @@ export default function ProfileScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{user?.displayName ?? ''}</Text>
-      <Text style={styles.body}>{user?.email ?? ''}</Text>
+    <View style={{ flex: 1 }}>
+      <Particles />
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+        <Text style={styles.title}>{user?.displayName ?? ''}</Text>
+        <Text style={styles.body}>{user?.email ?? ''}</Text>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Стиль</Text>
-        <View style={styles.row}>
-          {STYLES.map((s) => (
-            <TouchableOpacity
-              key={s.value}
-              onPress={() => setVisualStyle(s.value)}
-              style={[styles.chip, visualStyle === s.value && styles.chipActive]}
-            >
-              <Text style={[styles.chipText, visualStyle === s.value && styles.chipTextActive]}>
-                {s.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Стиль</Text>
+          <View style={styles.row}>
+            {STYLES.map((s) => (
+              <TouchableOpacity
+                key={s.value}
+                onPress={() => setVisualStyle(s.value)}
+                style={[styles.chip, visualStyle === s.value && styles.chipActive]}
+              >
+                <Text style={[styles.chipText, visualStyle === s.value && styles.chipTextActive]}>
+                  {s.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Тема</Text>
-        <TouchableOpacity
-          onPress={toggleDarkMode}
-          style={[styles.chip, darkMode && styles.chipActive]}
-        >
-          <Text style={[styles.chipText, darkMode && styles.chipTextActive]}>
-            {darkMode ? 'Нічна' : 'Денна'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Тема</Text>
+          <TouchableOpacity
+            onPress={toggleDarkMode}
+            style={[styles.chip, darkMode && styles.chipActive]}
+          >
+            <Text style={[styles.chipText, darkMode && styles.chipTextActive]}>
+              {darkMode ? 'Нічна' : 'Денна'}
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={{ flex: 1 }} />
+        <View style={{ flex: 1 }} />
 
-      <Button
-        title={t('profile.signOut')}
-        variant="secondary"
-        onPress={() => Alert.alert(t('profile.signOut'), '', [
-          { text: 'Cancel', style: 'cancel' },
-          { text: t('profile.signOut'), style: 'destructive', onPress: signOut },
-        ])}
-      />
-    </ScrollView>
+        <Button
+          title={t('profile.signOut')}
+          variant="secondary"
+          onPress={() => Alert.alert(t('profile.signOut'), '', [
+            { text: 'Cancel', style: 'cancel' },
+            { text: t('profile.signOut'), style: 'destructive', onPress: signOut },
+          ])}
+        />
+      </ScrollView>
+    </View>
   );
 }
 

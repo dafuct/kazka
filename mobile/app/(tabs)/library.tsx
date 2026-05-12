@@ -1,6 +1,7 @@
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { Particles } from '@/src/components/Particles';
 import { StoryCard } from '@/src/components/StoryCard';
 import { useStoriesInfinite } from '@/src/query/hooks';
 
@@ -12,6 +13,7 @@ export default function LibraryScreen() {
 
   return (
     <View style={styles.container}>
+      <Particles />
       <Text style={styles.title}>Бібліотека</Text>
       <FlatList
         data={items}
