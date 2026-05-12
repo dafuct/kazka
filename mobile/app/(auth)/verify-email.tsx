@@ -20,10 +20,10 @@ export default function VerifyEmailScreen() {
     }
   }, [token]);
 
-  async function verify(t: string) {
+  async function verify(verifyToken: string) {
     setVerifying(true);
     try {
-      const res = await authApi.verifyEmail(t);
+      const res = await authApi.verifyEmail(verifyToken);
       await saveTokens({ accessToken: res.accessToken, refreshToken: res.refreshToken });
       useAuthStore.getState().signIn({
         user: res.user,
@@ -32,7 +32,7 @@ export default function VerifyEmailScreen() {
       });
     } catch (e) {
       const code = e instanceof ApiError ? (e.body.error as string) : 'NETWORK';
-      Alert.alert('Verify email', `${code}`);
+      Alert.alert(t('verifyEmail.title'), t(`errors.${code}`, { defaultValue: t('errors.ERROR') }));
     } finally {
       setVerifying(false);
     }
