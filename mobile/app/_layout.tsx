@@ -2,7 +2,9 @@ import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { UnistylesRuntime } from 'react-native-unistyles';
 import { useAuthStore } from '@/src/stores/auth.store';
+import { useThemeStore } from '@/src/stores/theme.store';
 import { readTokens } from '@/src/secure/tokenStorage';
 import { authApi } from '@/src/api/auth';
 import { queryClient, queryPersister } from '@/src/query/client';
@@ -15,6 +17,12 @@ export default function RootLayout() {
   const status = useAuthStore((s) => s.status);
   const segments = useSegments();
   const router = useRouter();
+  const themeName = useThemeStore((s) => s.themeName());
+
+  // Sync theme store → Unistyles runtime whenever style/mode changes.
+  useEffect(() => {
+    UnistylesRuntime.setTheme(themeName);
+  }, [themeName]);
 
   // Bootstrap: read tokens from Keychain → hydrate store → call /me to verify
   useEffect(() => {
