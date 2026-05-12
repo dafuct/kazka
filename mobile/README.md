@@ -22,7 +22,11 @@ Prerequisites:
 - Production backend reachable at an HTTPS URL — set `EXPO_PUBLIC_API_BASE_URL` accordingly
 
 Steps:
-1. Open `mobile/ios/Kazkar.xcworkspace` in Xcode (use the .xcworkspace, not the .xcodeproj, so CocoaPods are linked).
+1. From `mobile/ios/`, install CocoaPods dependencies (one-time per checkout, or after any native dep change):
+   ```bash
+   cd mobile/ios && pod install
+   ```
+   This creates `Kazkar.xcworkspace`. Open it in Xcode (always use the `.xcworkspace`, never the `.xcodeproj`, so CocoaPods are linked).
 2. Set the signing team in `Kazkar > Targets > Kazkar > Signing & Capabilities`.
 3. Configure release env: `EXPO_PUBLIC_API_BASE_URL=https://api.kazka.app` (or your prod URL).
 4. Build for "Any iOS Device (arm64)" with the release scheme.
