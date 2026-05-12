@@ -98,14 +98,18 @@ class AuthCoexistenceIT extends AbstractIT {
                 .exchange().returnResult(Map.class).getResponseBody().blockFirst();
         String bearerToken = tokenBody.get("accessToken").toString();
 
-        // Both cookie AND bearer in the same request — document de-facto behavior.
+        // Both cookie AND bearer in the same request: bearer wins.
+        // Filter order in SecurityConfig: loginFilter then bearerFilter are both
+        // registered at SecurityWebFiltersOrder.AUTHENTICATION. loginFilter only
+        // matches POST /api/auth/login so it's a no-op here. bearerFilter runs and
+        // sets the authentication from the Authorization header, overriding any
+        // cookie-session SecurityContext that may already be present.
         client().get().uri("/api/auth/me")
                 .cookie("SESSION", cookieSession.getValue())
                 .header("Authorization", "Bearer " + bearerToken)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody().jsonPath("$.user.email").value(email ->
-                        assertThat(email).isIn("cookie@example.com", "bearer@example.com"));
+                .expectBody().jsonPath("$.user.email").isEqualTo("bearer@example.com");
     }
 
     private void seedUser(String email) {
