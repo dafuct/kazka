@@ -5,6 +5,7 @@
   "description": "Kazkar monorepo: backend (Spring Boot), frontend (React+Vite), mobile (Expo+RN), shared packages",
   "workspaces": [
     "frontend",
+    "mobile",
     "packages/*"
   ],
   "scripts": {
@@ -12,7 +13,11 @@
     "verify:types": "bash scripts/gen-types.sh && git diff --exit-code packages/shared/src/api-types.ts",
     "frontend:dev": "npm --workspace frontend run dev",
     "frontend:build": "npm --workspace frontend run build",
-    "frontend:lint": "npm --workspace frontend run lint"
+    "frontend:lint": "npm --workspace frontend run lint",
+    "mobile:start": "npm --workspace @kazka/mobile run start",
+    "mobile:ios": "npm --workspace @kazka/mobile run ios",
+    "mobile:lint": "npm --workspace @kazka/mobile run lint",
+    "mobile:test": "npm --workspace @kazka/mobile run test"
   },
   "devDependencies": {
     "openapi-typescript": "^7.4.0"
