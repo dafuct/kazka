@@ -49,6 +49,18 @@ public class StoryController {
         return currentUserResolver.requireUser().flatMap(cu -> storyService.list(page, size, cu));
     }
 
+    @GetMapping("/cursor")
+    public Mono<CursorPageResponse<StoryDto>> listByCursor(
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "20") int limit) {
+        int effective = Math.min(Math.max(limit, 1), 100);
+        return currentUserResolver.requireUser()
+                .flatMap(cu -> storyService.listByCursor(
+                        cursor == null || cursor.isBlank() ? null : cursor,
+                        effective,
+                        cu));
+    }
+
     @GetMapping("/{id}")
     public Mono<StoryDto> findById(@PathVariable String id) {
         return currentUserResolver.requireUser().flatMap(cu -> storyService.findById(id, cu));

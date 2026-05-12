@@ -172,6 +172,26 @@ public class StoryService {
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
+    public Mono<CursorPageResponse<StoryDto>> listByCursor(String cursor, int limit, CurrentUser currentUser) {
+        StoryCursor c = (cursor == null || cursor.isBlank()) ? null : StoryCursor.decode(cursor);
+        return Mono.fromCallable(() -> {
+            java.util.List<Story> rows = repository.findByCursor(
+                    currentUser.userId(),
+                    c == null ? null : c.createdAt(),
+                    c == null ? null : c.id(),
+                    PageRequest.of(0, limit + 1));
+            boolean hasMore = rows.size() > limit;
+            java.util.List<Story> page = hasMore ? rows.subList(0, limit) : rows;
+            java.util.List<StoryDto> items = page.stream().map(StoryDto::from).toList();
+            String next = hasMore
+                    ? new StoryCursor(
+                            page.get(page.size() - 1).getCreatedAt(),
+                            page.get(page.size() - 1).getId()).encode()
+                    : null;
+            return new CursorPageResponse<>(items, next);
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
     public Mono<StoryDto> findById(String id, CurrentUser currentUser) {
         return Mono.fromCallable(() -> findOwned(id, currentUser))
                 .subscribeOn(Schedulers.boundedElastic())
