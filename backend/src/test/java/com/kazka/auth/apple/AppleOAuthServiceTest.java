@@ -83,4 +83,16 @@ class AppleOAuthServiceTest {
         u.setDisplayName("Test");
         return u;
     }
+
+    @Test
+    void should_synthesisePlaceholderEmail_when_appleOmitsEmail() {
+        when(users.findByAppleSubject("apple-sub-3")).thenReturn(Optional.empty());
+        when(users.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        User result = service.linkOrCreate("apple-sub-3", null, "Hidden User");
+
+        assertThat(result.getEmail()).isEqualTo("apple-sub-3@privaterelay.appleid.local");
+        assertThat(result.getAppleSubject()).isEqualTo("apple-sub-3");
+        assertThat(result.getAppleEmailRelay()).isNull();
+    }
 }

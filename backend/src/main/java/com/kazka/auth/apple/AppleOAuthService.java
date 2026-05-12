@@ -34,11 +34,15 @@ public class AppleOAuthService {
             }
         }
 
+        String storedEmail = normalizedEmail != null
+                ? normalizedEmail
+                : appleSubject + "@privaterelay.appleid.local";
+
         User u = new User();
         u.setId(UUID.randomUUID().toString());
-        u.setEmail(normalizedEmail);
+        u.setEmail(storedEmail);
         u.setAppleSubject(appleSubject);
-        u.setAppleEmailRelay(normalizedEmail);
+        u.setAppleEmailRelay(normalizedEmail);  // null if Apple omitted email
         u.setDisplayName(displayName == null || displayName.isBlank()
                 ? "Apple user"
                 : displayName.trim());
