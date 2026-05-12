@@ -6,6 +6,9 @@ const config: ExpoConfig = {
   version: '0.1.0',
   orientation: 'portrait',
   icon: './assets/images/icon.png',
+  // expo prebuild also adds 'app.kazka.ios' as a second URL scheme automatically
+  // (used by Google sign-in's OAuth callback). Don't list it here — it's derived
+  // from ios.bundleIdentifier.
   scheme: 'kazka',
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
