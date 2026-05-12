@@ -16,6 +16,29 @@ jest.mock('expo-secure-store', () => {
   };
 });
 
+// Mock react-native-mmkv (v4 API: createMMKV factory + remove method).
+jest.mock('react-native-mmkv', () => {
+  class FakeMMKV {
+    private store = new Map<string, string>();
+    getString(key: string): string | undefined {
+      return this.store.get(key);
+    }
+    set(key: string, value: string): void {
+      this.store.set(key, value);
+    }
+    remove(key: string): void {
+      this.store.delete(key);
+    }
+    delete(key: string): void {
+      this.store.delete(key);
+    }
+  }
+  return {
+    MMKV: FakeMMKV,
+    createMMKV: (_opts?: { id?: string }) => new FakeMMKV(),
+  };
+});
+
 // Reset between tests so tests don't leak state.
 afterEach(() => {
   const ss = require('expo-secure-store');
