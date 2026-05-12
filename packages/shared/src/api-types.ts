@@ -333,11 +333,11 @@ export interface components {
             refreshToken: string;
         };
         TokenResponse: {
-            accessToken?: string;
-            refreshToken?: string;
+            accessToken: string;
+            refreshToken: string;
             /** Format: int64 */
-            accessExpiresInSeconds?: number;
-            user?: components["schemas"]["UserDto"];
+            accessExpiresInSeconds: number;
+            user: components["schemas"]["UserDto"];
         };
         UserDto: {
             id: string;
@@ -362,7 +362,7 @@ export interface components {
             displayName: string;
         };
         AuthResponse: {
-            user?: components["schemas"]["UserDto"];
+            user: components["schemas"]["UserDto"];
         };
         PasswordResetRequestRequest: {
             email: string;
