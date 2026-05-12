@@ -9,6 +9,7 @@ import { Input } from '@/src/components/Input';
 import { authApi } from '@/src/api/auth';
 import { saveTokens } from '@/src/secure/tokenStorage';
 import { useAuthStore } from '@/src/stores/auth.store';
+import { AppleSignInButton } from '@/src/components/AppleSignInButton';
 
 export default function LoginScreen() {
   const { t } = useTranslation();
@@ -57,6 +58,7 @@ export default function LoginScreen() {
         />
         <Button title={t('login.submit')} onPress={onSubmit} loading={loading} />
         <Button title={t('login.forgot')} variant="secondary" onPress={() => router.push('/(auth)/forgot')} />
+        <AppleSignInButton />
       </View>
     </KeyboardAvoidingView>
   );

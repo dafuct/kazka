@@ -13,6 +13,7 @@ const config: ExpoConfig = {
     supportsTablet: false,
     bundleIdentifier: 'app.kazka.ios',
     associatedDomains: ['applinks:kazka.app'],
+    usesAppleSignIn: true,
   },
   android: {
     package: 'app.kazka.android',
@@ -45,6 +46,7 @@ const config: ExpoConfig = {
     ],
     'expo-secure-store',
     'expo-localization',
+    'expo-apple-authentication',
   ],
   experiments: {
     typedRoutes: true,

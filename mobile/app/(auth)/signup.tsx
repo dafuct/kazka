@@ -7,6 +7,7 @@ import { ApiError } from '@kazka/shared';
 import { Button } from '@/src/components/Button';
 import { Input } from '@/src/components/Input';
 import { authApi } from '@/src/api/auth';
+import { AppleSignInButton } from '@/src/components/AppleSignInButton';
 
 export default function SignupScreen() {
   const { t } = useTranslation();
@@ -49,6 +50,7 @@ export default function SignupScreen() {
         <Input placeholder={t('signup.password')} value={password} onChangeText={setPassword} secureTextEntry />
         <Button title={t('signup.submit')} onPress={onSubmit} loading={loading} />
         <Button title={t('signup.alreadyHave')} variant="secondary" onPress={() => router.replace('/(auth)/login')} />
+        <AppleSignInButton />
       </View>
     </KeyboardAvoidingView>
   );
