@@ -92,6 +92,12 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "VALIDATION", "fields", fields));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> badArgument(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "INVALID_ARGUMENT"));
+    }
+
     private static String codeFor(ResponseStatusException ex) {
         int s = ex.getStatusCode().value();
         if (s == 404) return "NOT_FOUND";
