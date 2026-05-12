@@ -5,6 +5,7 @@ import com.kazka.story.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -59,6 +60,14 @@ public class StoryController {
                         cursor == null || cursor.isBlank() ? null : cursor,
                         effective,
                         cu));
+    }
+
+    @GetMapping("/featured")
+    public Mono<ResponseEntity<StoryDto>> featured() {
+        return currentUserResolver.requireUser()
+                .flatMap(cu -> storyService.featured(cu))
+                .map(dto -> ResponseEntity.ok(dto))
+                .defaultIfEmpty(ResponseEntity.noContent().build());
     }
 
     @GetMapping("/{id}")

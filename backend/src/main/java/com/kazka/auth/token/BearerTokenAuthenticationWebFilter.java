@@ -43,14 +43,15 @@ public class BearerTokenAuthenticationWebFilter implements WebFilter {
                 .flatMap(claims -> Mono.fromCallable(() -> users.findById(claims.userId()).orElse(null))
                         .subscribeOn(Schedulers.boundedElastic()))
                 .flatMap(user -> {
-                    if (user == null) return chain.filter(exchange);
                     var principal = new KazkaUserDetails(user);
                     var auth = new UsernamePasswordAuthenticationToken(
                             principal, null, principal.getAuthorities());
                     var context = new SecurityContextImpl(auth);
                     return chain.filter(exchange)
-                            .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(context)));
+                            .contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(context)))
+                            .thenReturn(Boolean.TRUE);
                 })
-                .switchIfEmpty(chain.filter(exchange));
+                .switchIfEmpty(Mono.defer(() -> chain.filter(exchange).thenReturn(Boolean.TRUE)))
+                .then();
     }
 }

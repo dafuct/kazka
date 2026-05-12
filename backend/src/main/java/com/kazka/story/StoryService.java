@@ -172,6 +172,14 @@ public class StoryService {
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
+    public Mono<StoryDto> featured(CurrentUser currentUser) {
+        return Mono.fromCallable(() ->
+                repository.findByCursor(currentUser.userId(), null, null,
+                                PageRequest.of(0, 1))
+                        .stream().findFirst().map(StoryDto::from).orElse(null))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
     public Mono<CursorPageResponse<StoryDto>> listByCursor(String cursor, int limit, CurrentUser currentUser) {
         StoryCursor c = (cursor == null || cursor.isBlank()) ? null : StoryCursor.decode(cursor);
         return Mono.fromCallable(() -> {
