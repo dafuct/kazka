@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { useAuthStore } from '@/src/stores/auth.store';
 import { readTokens } from '@/src/secure/tokenStorage';
 import { authApi } from '@/src/api/auth';
+import { queryClient, queryPersister } from '@/src/query/client';
 import '@/src/theme/unistyles.config';
 import { i18n } from '@/src/i18n';
 
@@ -59,9 +61,14 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister: queryPersister, maxAge: 24 * 60 * 60 * 1000 }}
+    >
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+    </PersistQueryClientProvider>
   );
 }
