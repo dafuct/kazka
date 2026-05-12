@@ -212,6 +212,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/stories/featured": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["featured"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/stories/cursor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listByCursor"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/verify-email": {
         parameters: {
             query?: never;
@@ -386,6 +418,10 @@ export interface components {
             /** Format: int64 */
             total?: number;
         };
+        CursorPageResponseStoryDto: {
+            items: components["schemas"]["StoryDto"][];
+            nextCursor?: string | null;
+        };
         AdminUserDto: {
             id?: string;
             email?: string;
@@ -454,6 +490,7 @@ export type SchemaPasswordResetRequestRequest = components['schemas']['PasswordR
 export type SchemaPasswordResetConfirmRequest = components['schemas']['PasswordResetConfirmRequest'];
 export type SchemaAppleLoginRequest = components['schemas']['AppleLoginRequest'];
 export type SchemaPageResponseStoryDto = components['schemas']['PageResponseStoryDto'];
+export type SchemaCursorPageResponseStoryDto = components['schemas']['CursorPageResponseStoryDto'];
 export type SchemaAdminUserDto = components['schemas']['AdminUserDto'];
 export type SchemaSuspendedUserDto = components['schemas']['SuspendedUserDto'];
 export type SchemaFlaggedAttemptDto = components['schemas']['FlaggedAttemptDto'];
@@ -791,6 +828,49 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PageResponseStoryDto"];
+                };
+            };
+        };
+    };
+    featured: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["StoryDto"];
+                };
+            };
+        };
+    };
+    listByCursor: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CursorPageResponseStoryDto"];
                 };
             };
         };

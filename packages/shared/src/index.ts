@@ -17,6 +17,7 @@ export type {
   SchemaAdminUserDto as AdminUserDto,
   SchemaFlaggedAttemptDto as FlaggedAttemptDto,
   SchemaSuspendedUserDto as SuspendedUserDto,
+  SchemaCursorPageResponseStoryDto as StoryCursorPage,
 } from './api-types';
 
 // PageResponse<T> is generic on the Java side. openapi-typescript emits
