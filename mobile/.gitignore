@@ -38,6 +38,6 @@ yarn-error.*
 
 app-example
 
-# generated native folders
-/ios
+# generated native folders (committed per spec §7 — ios/ ships with the repo
+# so widget extension (M6) + signing config stay reproducible)
 /android

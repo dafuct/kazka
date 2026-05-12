@@ -8,6 +8,7 @@ import { Button } from '@/src/components/Button';
 import { Input } from '@/src/components/Input';
 import { authApi } from '@/src/api/auth';
 import { AppleSignInButton } from '@/src/components/AppleSignInButton';
+import { GoogleSignInButton } from '@/src/components/GoogleSignInButton';
 
 export default function SignupScreen() {
   const { t } = useTranslation();
@@ -51,6 +52,7 @@ export default function SignupScreen() {
         <Button title={t('signup.submit')} onPress={onSubmit} loading={loading} />
         <Button title={t('signup.alreadyHave')} variant="secondary" onPress={() => router.replace('/(auth)/login')} />
         <AppleSignInButton />
+        <GoogleSignInButton />
       </View>
     </KeyboardAvoidingView>
   );
