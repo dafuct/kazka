@@ -1,5 +1,6 @@
 package com.kazka.illustration;
 
+import com.kazka.device.PushNotifier;
 import com.kazka.hf.HuggingFaceClient;
 import com.kazka.moderation.ModerationCategory;
 import com.kazka.moderation.ModerationPipeline;
@@ -34,7 +35,7 @@ public class IllustrationService {
     private final ModerationService moderationService;
     private final SuspensionService suspensionService;
     private final ModerationProperties modProps;
-    private final com.kazka.device.PushNotifier pushNotifier;
+    private final PushNotifier pushNotifier;
 
     public IllustrationService(HuggingFaceClient hfClient,
                                ImageStorageService imageStorageService,
@@ -43,7 +44,7 @@ public class IllustrationService {
                                ModerationService moderationService,
                                SuspensionService suspensionService,
                                ModerationProperties modProps,
-                               com.kazka.device.PushNotifier pushNotifier) {
+                               PushNotifier pushNotifier) {
         this.hfClient = hfClient;
         this.imageStorageService = imageStorageService;
         this.storyRepository = storyRepository;
