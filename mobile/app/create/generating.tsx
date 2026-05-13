@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { StyleSheet } from 'react-native-unistyles';
 import { openSseStream } from '@/src/api/sse';
 import { queryKeys } from '@/src/query/keys';
+import { maybeRequestPushPermission } from '@/src/push/permission';
 
 export default function GeneratingScreen() {
   const { t } = useTranslation();
@@ -85,6 +86,7 @@ export default function GeneratingScreen() {
       }
 
       if (storyId && !cancelled) {
+        void maybeRequestPushPermission();
         void qc.invalidateQueries({ queryKey: queryKeys.stories.list() });
         void qc.invalidateQueries({ queryKey: queryKeys.stories.featured() });
         router.replace(`/story/${storyId}`);
