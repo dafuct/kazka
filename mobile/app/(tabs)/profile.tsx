@@ -9,11 +9,7 @@ import { authApi } from '@/src/api/auth';
 import { clearTokens } from '@/src/secure/tokenStorage';
 import type { VisualStyle } from '@/src/theme/tokens';
 
-const STYLES: { value: VisualStyle; label: string }[] = [
-  { value: 'cozy', label: 'Затишний' },
-  { value: 'playful', label: 'Грайливий' },
-  { value: 'immersive', label: 'Казковий' },
-];
+const STYLE_VALUES: VisualStyle[] = ['cozy', 'playful', 'immersive'];
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -47,14 +43,14 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('profile.styleLabel')}</Text>
           <View style={styles.row}>
-            {STYLES.map((s) => (
+            {STYLE_VALUES.map((v) => (
               <TouchableOpacity
-                key={s.value}
-                onPress={() => setVisualStyle(s.value)}
-                style={[styles.chip, visualStyle === s.value && styles.chipActive]}
+                key={v}
+                onPress={() => setVisualStyle(v)}
+                style={[styles.chip, visualStyle === v && styles.chipActive]}
               >
-                <Text style={[styles.chipText, visualStyle === s.value && styles.chipTextActive]}>
-                  {s.label}
+                <Text style={[styles.chipText, visualStyle === v && styles.chipTextActive]}>
+                  {t(`profile.styleLabels.${v}`)}
                 </Text>
               </TouchableOpacity>
             ))}

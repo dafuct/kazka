@@ -92,6 +92,11 @@ export const en = {
     themeLabel: 'Theme',
     dayTheme: 'Day',
     nightTheme: 'Night',
+    styleLabels: {
+      cozy: 'Cozy',
+      playful: 'Playful',
+      immersive: 'Storybook',
+    },
   },
 };
 

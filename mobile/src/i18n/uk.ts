@@ -94,5 +94,10 @@ export const uk: Translations = {
     themeLabel: 'Тема',
     dayTheme: 'Денна',
     nightTheme: 'Нічна',
+    styleLabels: {
+      cozy: 'Затишний',
+      playful: 'Грайливий',
+      immersive: 'Казковий',
+    },
   },
 };
