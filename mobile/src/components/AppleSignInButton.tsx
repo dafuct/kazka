@@ -5,6 +5,7 @@ import { ApiError } from '@kazka/shared';
 import { authApi } from '@/src/api/auth';
 import { saveTokens } from '@/src/secure/tokenStorage';
 import { useAuthStore } from '@/src/stores/auth.store';
+import { bootstrapEntitlements } from '@/src/iap/bootstrap';
 
 interface Props { style?: any }
 
@@ -43,6 +44,7 @@ export function AppleSignInButton({ style }: Props) {
             accessToken: res.accessToken,
             refreshToken: res.refreshToken,
           });
+          void bootstrapEntitlements();
         } catch (e) {
           if ((e as any)?.code === 'ERR_REQUEST_CANCELED') return;
           const code = e instanceof ApiError ? (e.body.error as string) : 'NETWORK';

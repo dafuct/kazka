@@ -27,6 +27,11 @@ async function performRefresh(): Promise<void> {
     if (!res.ok) {
       await clearTokens();
       useAuthStore.getState().signOut();
+      // Entitlements are user-scoped; wipe on hard sign-out (refresh fail = different user next session).
+      try {
+        const { clearEntitlements } = await import('@/src/iap/bootstrap');
+        clearEntitlements();
+      } catch { /* best-effort */ }
       const body = (await res.json().catch(() => ({}))) as ApiErrorBody;
       throw new ApiError(res.status, body);
     }

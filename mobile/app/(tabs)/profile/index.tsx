@@ -7,6 +7,7 @@ import { useAuthStore } from '@/src/stores/auth.store';
 import { authApi } from '@/src/api/auth';
 import { clearTokens } from '@/src/secure/tokenStorage';
 import { unregisterPushToken } from '@/src/push/register';
+import { clearEntitlements } from '@/src/iap/bootstrap';
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -19,6 +20,7 @@ export default function ProfileScreen() {
     try { if (refreshToken) await authApi.tokenLogout(refreshToken); } catch { /* best-effort */ }
     await clearTokens();
     useAuthStore.getState().signOut();
+    clearEntitlements();
   }
 
   const links: { id: 'account' | 'settings' | 'subscription' | 'help'; label: string }[] = [

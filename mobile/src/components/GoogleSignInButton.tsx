@@ -5,6 +5,7 @@ import { ApiError } from '@kazka/shared';
 import { authApi } from '@/src/api/auth';
 import { saveTokens } from '@/src/secure/tokenStorage';
 import { useAuthStore } from '@/src/stores/auth.store';
+import { bootstrapEntitlements } from '@/src/iap/bootstrap';
 import { Button } from './Button';
 import { useTranslation } from 'react-i18next';
 
@@ -27,6 +28,7 @@ export function GoogleSignInButton() {
           accessToken: res.accessToken,
           refreshToken: res.refreshToken,
         });
+        void bootstrapEntitlements();
       } catch (e) {
         const code = e instanceof ApiError ? (e.body.error as string) : 'NETWORK';
         Alert.alert('Google sign-in', code);

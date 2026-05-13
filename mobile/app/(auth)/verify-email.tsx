@@ -7,6 +7,7 @@ import { ApiError } from '@kazka/shared';
 import { authApi } from '@/src/api/auth';
 import { saveTokens } from '@/src/secure/tokenStorage';
 import { useAuthStore } from '@/src/stores/auth.store';
+import { bootstrapEntitlements } from '@/src/iap/bootstrap';
 
 export default function VerifyEmailScreen() {
   const { t } = useTranslation();
@@ -30,6 +31,7 @@ export default function VerifyEmailScreen() {
         accessToken: res.accessToken,
         refreshToken: res.refreshToken,
       });
+      void bootstrapEntitlements();
     } catch (e) {
       const code = e instanceof ApiError ? (e.body.error as string) : 'NETWORK';
       Alert.alert(t('verifyEmail.title'), t(`errors.${code}`, { defaultValue: t('errors.ERROR') }));

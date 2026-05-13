@@ -11,6 +11,7 @@ import { saveTokens } from '@/src/secure/tokenStorage';
 import { useAuthStore } from '@/src/stores/auth.store';
 import { AppleSignInButton } from '@/src/components/AppleSignInButton';
 import { GoogleSignInButton } from '@/src/components/GoogleSignInButton';
+import { bootstrapEntitlements } from '@/src/iap/bootstrap';
 
 export default function LoginScreen() {
   const { t } = useTranslation();
@@ -30,6 +31,7 @@ export default function LoginScreen() {
         accessToken: res.accessToken,
         refreshToken: res.refreshToken,
       });
+      void bootstrapEntitlements();
     } catch (e) {
       const code = e instanceof ApiError ? (e.body.error as string) : 'NETWORK';
       Alert.alert(t('login.title'), t(`errors.${code}`, { defaultValue: t('errors.ERROR') }));
