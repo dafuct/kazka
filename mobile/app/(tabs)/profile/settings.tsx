@@ -35,6 +35,7 @@ export default function SettingsScreen() {
               style={[styles.chip, visualStyle === v && styles.chipActive]}
               accessibilityRole="button"
               accessibilityLabel={t(`profile.styleLabels.${v}`)}
+              accessibilityState={{ selected: visualStyle === v }}
             >
               <Text style={[styles.chipText, visualStyle === v && styles.chipTextActive]}>
                 {t(`profile.styleLabels.${v}`)}
@@ -69,6 +70,7 @@ export default function SettingsScreen() {
               style={[styles.chip, i18nInstance.language === l.code && styles.chipActive]}
               accessibilityRole="button"
               accessibilityLabel={l.label}
+              accessibilityState={{ selected: i18nInstance.language === l.code }}
             >
               <Text style={[styles.chipText, i18nInstance.language === l.code && styles.chipTextActive]}>
                 {l.label}
