@@ -5,7 +5,7 @@ import { createMMKV } from 'react-native-mmkv';
 import { en } from './en';
 import { uk } from './uk';
 
-const localeStorage = createMMKV({ id: 'kazka-locale' });
+const localeStorage = createMMKV({ id: 'kazka.locale.v1' });
 const STORAGE_KEY = 'language';
 
 const mmkvDetector: LanguageDetectorModule = {
