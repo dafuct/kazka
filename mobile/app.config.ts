@@ -17,7 +17,7 @@ const config: ExpoConfig = {
     bundleIdentifier: 'app.kazka.ios',
     associatedDomains: ['applinks:kazka.app'],
     usesAppleSignIn: true,
-    buildNumber: '2',
+    buildNumber: '3',
     entitlements: {
       'aps-environment': 'development',
     },
