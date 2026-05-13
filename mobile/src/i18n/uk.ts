@@ -108,4 +108,7 @@ export const uk: Translations = {
       immersive: 'Казковий',
     },
   },
+  offline: {
+    badge: 'Офлайн',
+  },
 };

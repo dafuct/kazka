@@ -106,6 +106,9 @@ export const en = {
       immersive: 'Storybook',
     },
   },
+  offline: {
+    badge: 'Offline',
+  },
 };
 
 export type Translations = typeof en;

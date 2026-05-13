@@ -5,6 +5,7 @@ import { StyleSheet } from 'react-native-unistyles';
 import { HeroCard } from '@/src/components/HeroCard';
 import { Particles } from '@/src/components/Particles';
 import { StoryCard } from '@/src/components/StoryCard';
+import { OfflineBadge } from '@/src/network/OfflineBadge';
 import { useFeatured, useStoriesInfinite } from '@/src/query/hooks';
 import { useAuthStore } from '@/src/stores/auth.store';
 
@@ -23,6 +24,7 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1 }}>
+      <OfflineBadge />
       <Particles />
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <Text style={styles.greeting}>{t('home.greeting', { name: user?.displayName ?? 'друже' })}</Text>

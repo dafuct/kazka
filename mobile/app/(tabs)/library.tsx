@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Particles } from '@/src/components/Particles';
 import { StoryCard } from '@/src/components/StoryCard';
+import { OfflineBadge } from '@/src/network/OfflineBadge';
 import { useStoriesInfinite } from '@/src/query/hooks';
 
 export default function LibraryScreen() {
@@ -15,6 +16,7 @@ export default function LibraryScreen() {
 
   return (
     <View style={styles.container}>
+      <OfflineBadge />
       <Particles />
       <Text style={styles.title}>{t('library.title')}</Text>
       <FlatList
