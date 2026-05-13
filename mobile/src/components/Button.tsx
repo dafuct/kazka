@@ -12,6 +12,9 @@ export function Button({ title, variant = 'primary', loading = false, style, ...
     <TouchableOpacity
       style={[variant === 'primary' ? styles.primary : styles.secondary, loading && styles.disabled, style]}
       disabled={loading || rest.disabled}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: loading || rest.disabled }}
       {...rest}
     >
       {loading ? (

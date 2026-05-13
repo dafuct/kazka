@@ -37,6 +37,7 @@ export default function ForgotScreen() {
         <Text style={styles.body}>{t('forgot.body')}</Text>
         <Input
           placeholder={t('forgot.email')}
+          accessibilityLabel={t('forgot.email')}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"

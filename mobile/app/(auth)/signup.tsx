@@ -40,15 +40,27 @@ export default function SignupScreen() {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.container}>
       <View style={styles.inner}>
         <Text style={styles.title}>{t('signup.title')}</Text>
-        <Input placeholder={t('signup.displayName')} value={displayName} onChangeText={setDisplayName} />
+        <Input
+          placeholder={t('signup.displayName')}
+          accessibilityLabel={t('signup.displayName')}
+          value={displayName}
+          onChangeText={setDisplayName}
+        />
         <Input
           placeholder={t('signup.email')}
+          accessibilityLabel={t('signup.email')}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
           keyboardType="email-address"
         />
-        <Input placeholder={t('signup.password')} value={password} onChangeText={setPassword} secureTextEntry />
+        <Input
+          placeholder={t('signup.password')}
+          accessibilityLabel={t('signup.password')}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
         <Button title={t('signup.submit')} onPress={onSubmit} loading={loading} />
         <Button title={t('signup.alreadyHave')} variant="secondary" onPress={() => router.replace('/(auth)/login')} />
         <AppleSignInButton />

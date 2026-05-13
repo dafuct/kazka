@@ -17,7 +17,12 @@ export function HeroCard({ story, onPress }: Props) {
   const uri = path ? `${API_BASE_URL}${path}` : undefined;
 
   return (
-    <TouchableOpacity onPress={onPress} style={styles.container}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={styles.container}
+      accessibilityRole="button"
+      accessibilityLabel={story.title}
+    >
       {uri ? (
         <Image source={{ uri }} style={styles.image} transition={200} contentFit="cover" cachePolicy="disk" />
       ) : (

@@ -44,6 +44,7 @@ export default function LoginScreen() {
         <Text style={styles.title}>{t('login.title')}</Text>
         <Input
           placeholder={t('login.email')}
+          accessibilityLabel={t('login.email')}
           value={email}
           onChangeText={setEmail}
           autoCapitalize="none"
@@ -52,6 +53,7 @@ export default function LoginScreen() {
         />
         <Input
           placeholder={t('login.password')}
+          accessibilityLabel={t('login.password')}
           value={password}
           onChangeText={setPassword}
           secureTextEntry

@@ -14,6 +14,7 @@ export function AppleSignInButton({ style }: Props) {
       buttonStyle={AppleAuth.AppleAuthenticationButtonStyle.BLACK}
       cornerRadius={20}
       style={[{ height: 50 }, style]}
+      accessibilityLabel="Sign in with Apple"
       onPress={async () => {
         try {
           const credential = await AppleAuth.signInAsync({

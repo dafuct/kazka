@@ -15,11 +15,21 @@ export default function WelcomeScreen() {
       </View>
 
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.primaryButton} onPress={() => router.push('/(auth)/signup')}>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => router.push('/(auth)/signup')}
+          accessibilityRole="button"
+          accessibilityLabel={t('welcome.signUp')}
+        >
           <Text style={styles.primaryButtonText}>{t('welcome.signUp')}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push('/(auth)/login')}>
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() => router.push('/(auth)/login')}
+          accessibilityRole="button"
+          accessibilityLabel={t('welcome.signIn')}
+        >
           <Text style={styles.secondaryButtonText}>{t('welcome.signIn')}</Text>
         </TouchableOpacity>
       </View>

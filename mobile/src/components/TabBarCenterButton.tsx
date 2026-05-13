@@ -11,6 +11,8 @@ export function TabBarCenterButton() {
       onPress={() => router.push('/create/step-age')}
       style={styles.outer}
       hitSlop={12}
+      accessibilityRole="button"
+      accessibilityLabel="Create"
     >
       <View style={[styles.inner, { backgroundColor: theme.colors.accent }]}>
         <View style={[styles.plusH, { backgroundColor: '#fff' }]} />

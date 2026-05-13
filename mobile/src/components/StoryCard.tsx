@@ -21,7 +21,12 @@ export function StoryCard({ story, onPress, variant = 'tile' }: Props) {
   const illustrationUri = illustrationPath ? `${API_BASE_URL}${illustrationPath}` : undefined;
 
   return (
-    <TouchableOpacity onPress={onPress} style={compact ? styles.compact : styles.tile}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={compact ? styles.compact : styles.tile}
+      accessibilityRole="button"
+      accessibilityLabel={story.title}
+    >
       {illustrationUri ? (
         <Image source={{ uri: illustrationUri }} style={compact ? styles.compactImage : styles.tileImage} transition={200} cachePolicy="disk" />
       ) : (
