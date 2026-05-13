@@ -98,6 +98,14 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "INVALID_ARGUMENT"));
     }
 
+    @ExceptionHandler(com.kazka.story.exception.PaywallRequiredException.class)
+    public ResponseEntity<Map<String, Object>> handlePaywall(com.kazka.story.exception.PaywallRequiredException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "PAYWALL_REQUIRED");
+        if (ex.getMessage() != null) body.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(body);
+    }
+
     private static String codeFor(ResponseStatusException ex) {
         int s = ex.getStatusCode().value();
         if (s == 404) return "NOT_FOUND";
