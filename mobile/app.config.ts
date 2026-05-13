@@ -18,6 +18,9 @@ const config: ExpoConfig = {
     associatedDomains: ['applinks:kazka.app'],
     usesAppleSignIn: true,
     buildNumber: '2',
+    entitlements: {
+      'aps-environment': 'development',
+    },
   },
   android: {
     package: 'app.kazka.android',
@@ -51,6 +54,7 @@ const config: ExpoConfig = {
     'expo-secure-store',
     'expo-localization',
     'expo-apple-authentication',
+    'expo-notifications',
   ],
   experiments: {
     typedRoutes: true,
