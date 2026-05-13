@@ -67,6 +67,38 @@ xcrun simctl openurl booted "kazka://story/<id>"
     ```
 23. Banner notification fires; tap → app opens on the story reader.
 
+## TestFlight #4 — build & upload
+
+After App Store Connect setup (subscriptions + ASN webhook URL) and the one-time Xcode widget-target add:
+
+1. Bump `buildNumber` in `mobile/app.config.ts` if you haven't already (M6 lands at `4`).
+2. Backend env vars must be set in production:
+   ```
+   BILLING_BUNDLE_ID=app.kazka.ios
+   BILLING_APPLE_ID=<numeric App Store Connect app id>
+   BILLING_ENVIRONMENT=Production    # or Sandbox for the first TestFlight cuts
+   BILLING_ENABLED=true
+   BILLING_FREE_LIMIT=3
+   APNS_TEAM_ID=...
+   APNS_KEY_ID=...
+   APNS_PRIVATE_KEY_PEM="-----BEGIN PRIVATE KEY-----\n..."
+   APNS_BUNDLE_ID=app.kazka.ios
+   APNS_HOST=api.push.apple.com       # api.sandbox.push.apple.com for sandbox
+   APNS_ENABLED=true
+   ```
+3. Build via EAS (recommended) or Xcode Organizer:
+   ```bash
+   cd mobile && eas build --platform ios --profile preview
+   ```
+   Or, archive locally:
+   ```bash
+   cd mobile && npx expo run:ios --configuration Release --no-bundler
+   # Then in Xcode: Product → Archive → Window → Organizer → Distribute App → App Store Connect
+   ```
+4. Upload to TestFlight via Organizer or `eas submit`.
+5. Add internal testers in App Store Connect.
+6. Walk this playbook end-to-end on the TestFlight build.
+
 ## Known limitations (v1)
 
 - The Xcode widget extension target must be added manually once per checkout (`File → New → Target → Widget Extension`, name `KazkarWidget`, attach the source files in `ios/KazkarWidget/`).
