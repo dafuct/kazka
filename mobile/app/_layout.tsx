@@ -10,6 +10,7 @@ import { authApi } from '@/src/api/auth';
 import { queryClient, queryPersister } from '@/src/query/client';
 import { registerPushToken } from '@/src/push/register';
 import { subscribeToTaps } from '@/src/push/handlers';
+import { subscribeToQueueFlush } from '@/src/network/queueFlusher';
 import '@/src/theme/unistyles.config';
 import { i18n } from '@/src/i18n';
 
@@ -55,6 +56,12 @@ export default function RootLayout() {
   useEffect(() => {
     void registerPushToken();
     const unsubscribe = subscribeToTaps();
+    return unsubscribe;
+  }, []);
+
+  // Offline write queue: flush on reconnect.
+  useEffect(() => {
+    const unsubscribe = subscribeToQueueFlush();
     return unsubscribe;
   }, []);
 
