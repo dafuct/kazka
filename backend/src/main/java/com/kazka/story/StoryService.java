@@ -2,7 +2,6 @@ package com.kazka.story;
 
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.auth.exception.EmailNotVerifiedException;
-import com.kazka.device.PushNotifier;
 import com.kazka.hf.HuggingFaceClient;
 import com.kazka.illustration.IllustrationService;
 import com.kazka.moderation.ModerationCategory;
@@ -14,8 +13,6 @@ import com.kazka.moderation.SuspensionService;
 import com.kazka.story.dto.*;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -30,8 +27,6 @@ import java.util.UUID;
 @Service
 public class StoryService {
 
-    private static final Logger log = LoggerFactory.getLogger(StoryService.class);
-
     private final StoryRepository repository;
     private final UserRepository users;
     private final HuggingFaceClient hfClient;
@@ -40,15 +35,13 @@ public class StoryService {
     private final ModerationService moderationService;
     private final SuspensionService suspensionService;
     private final ModerationProperties moderationProperties;
-    private final PushNotifier pushNotifier;
 
     public StoryService(StoryRepository repository, UserRepository users,
                         HuggingFaceClient hfClient, PromptBuilder promptBuilder,
                         IllustrationService illustrationService,
                         ModerationService moderationService,
                         SuspensionService suspensionService,
-                        ModerationProperties moderationProperties,
-                        PushNotifier pushNotifier) {
+                        ModerationProperties moderationProperties) {
         this.repository = repository;
         this.users = users;
         this.hfClient = hfClient;
@@ -57,7 +50,6 @@ public class StoryService {
         this.moderationService = moderationService;
         this.suspensionService = suspensionService;
         this.moderationProperties = moderationProperties;
-        this.pushNotifier = pushNotifier;
     }
 
     public Flux<SseEvent> generate(GenerationRequest req, CurrentUser currentUser) {
@@ -65,26 +57,7 @@ public class StoryService {
         return ensureVerified(currentUser)
                 .then(loadUser(currentUser))
                 .doOnNext(suspensionService::assertNotSuspended)
-                .thenMany(Flux.defer(() -> moderateThenGenerate(req, userId)))
-                .doOnNext(event -> {
-                    if ("done".equals(event.type())) {
-                        try {
-                            // SseEvent.done builds a Map of {id, title}; cast and pull both fields.
-                            if (event.data() instanceof java.util.Map<?, ?> m) {
-                                Object idObj = m.get("id");
-                                Object titleObj = m.get("title");
-                                if (idObj != null) {
-                                    pushNotifier.notifyStoryReady(
-                                            userId,
-                                            idObj.toString(),
-                                            titleObj == null ? "" : titleObj.toString());
-                                }
-                            }
-                        } catch (Exception e) {
-                            log.warn("Push hook failed for user={}: {}", userId, e.getMessage());
-                        }
-                    }
-                });
+                .thenMany(Flux.defer(() -> moderateThenGenerate(req, userId)));
     }
 
     private Mono<User> loadUser(CurrentUser currentUser) {

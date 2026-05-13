@@ -34,6 +34,7 @@ public class IllustrationService {
     private final ModerationService moderationService;
     private final SuspensionService suspensionService;
     private final ModerationProperties modProps;
+    private final com.kazka.device.PushNotifier pushNotifier;
 
     public IllustrationService(HuggingFaceClient hfClient,
                                ImageStorageService imageStorageService,
@@ -41,7 +42,8 @@ public class IllustrationService {
                                PromptBuilder promptBuilder,
                                ModerationService moderationService,
                                SuspensionService suspensionService,
-                               ModerationProperties modProps) {
+                               ModerationProperties modProps,
+                               com.kazka.device.PushNotifier pushNotifier) {
         this.hfClient = hfClient;
         this.imageStorageService = imageStorageService;
         this.storyRepository = storyRepository;
@@ -49,6 +51,7 @@ public class IllustrationService {
         this.moderationService = moderationService;
         this.suspensionService = suspensionService;
         this.modProps = modProps;
+        this.pushNotifier = pushNotifier;
     }
 
     public Mono<Void> generateAndStore(String storyId) {
@@ -69,7 +72,15 @@ public class IllustrationService {
                             .flatMap(scene -> Mono.zip(
                                     hfClient.generateImage(promptBuilder.buildImagePrompt(story, scene, Theme.LIGHT), IMAGE_W, IMAGE_H),
                                     hfClient.generateImage(promptBuilder.buildImagePrompt(story, scene, Theme.DARK), IMAGE_W, IMAGE_H)))
-                            .flatMap(tuple -> savePair(story, tuple.getT1(), tuple.getT2()))
+                            .flatMap(tuple -> savePair(story, tuple.getT1(), tuple.getT2())
+                                    .doOnSuccess(v -> {
+                                        try {
+                                            pushNotifier.notifyStoryReady(story.getUserId(), story.getId(),
+                                                    story.getTitle() == null ? "" : story.getTitle());
+                                        } catch (Exception e) {
+                                            log.warn("Push hook failed after illustration for story={}: {}", story.getId(), e.getMessage());
+                                        }
+                                    }))
                             .onErrorResume(e -> {
                                 log.warn("PNG illustration failed for {}: {}", storyId, e.getMessage());
                                 return markFailed(story);

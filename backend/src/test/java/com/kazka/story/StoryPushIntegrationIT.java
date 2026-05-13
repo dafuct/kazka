@@ -23,6 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @EnabledIfEnvironmentVariable(named = "HUGGINGFACE_API_TOKEN", matches = ".+")
+@org.junit.jupiter.api.Disabled("Replaced by IllustrationServicePushIT — spec O5")
 class StoryPushIntegrationIT extends AbstractIT {
 
     @Autowired UserRepository users;
