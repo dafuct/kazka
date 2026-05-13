@@ -8,5 +8,6 @@ export interface ListArgs {
 }
 
 export interface UpdateStoryArgs {
-  title?: string;
+  title: string;
+  content: string;
 }

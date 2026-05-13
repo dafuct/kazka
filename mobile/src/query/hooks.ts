@@ -29,8 +29,8 @@ export function useStoriesInfinite(limit: number = 20) {
 export function useUpdateStory() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, title }: { id: string; title: string }) =>
-      storiesApi.update(id, { title }),
+    mutationFn: ({ id, title, content }: { id: string; title: string; content: string }) =>
+      storiesApi.update(id, { title, content }),
     onSuccess: (story: Story) => {
       qc.setQueryData(queryKeys.stories.byId(story.id), story);
       void qc.invalidateQueries({ queryKey: queryKeys.stories.list() });
