@@ -113,6 +113,11 @@ export const uk: Translations = {
     deleteAccount: 'Видалити акаунт',
     deleteAccountConfirm: 'Це призведе до виходу з облікового запису на цьому пристрої. Видалення акаунту з сервера буде доступне в наступній версії.',
     languageLabel: 'Мова',
+    helpLinks: {
+      about: 'Про додаток',
+      terms: 'Умови використання',
+      privacy: 'Політика конфіденційності',
+    },
   },
   offline: {
     badge: 'Офлайн',

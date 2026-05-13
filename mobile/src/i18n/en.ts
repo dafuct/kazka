@@ -111,6 +111,11 @@ export const en = {
     deleteAccount: 'Delete account',
     deleteAccountConfirm: 'This signs you out on this device. Server-side account deletion will be available in a future release.',
     languageLabel: 'Language',
+    helpLinks: {
+      about: 'About',
+      terms: 'Terms of Service',
+      privacy: 'Privacy Policy',
+    },
   },
   offline: {
     badge: 'Offline',
