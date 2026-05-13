@@ -122,6 +122,27 @@ export const uk: Translations = {
   offline: {
     badge: 'Офлайн',
   },
+  paywall: {
+    title: 'Kazka Pro',
+    tagline: 'Без обмежень. Красиві ілюстрації. Без водяних знаків.',
+    monthly: 'Місячна',
+    yearly: 'Річна',
+    cta: 'Підписатися',
+    restore: 'Відновити покупки',
+    active: 'У вас активна підписка',
+    errorGeneric: 'Не вдалося оформити підписку. Спробуйте ще раз.',
+    perks: {
+      unlimited: 'Безліч казок',
+      illustrations: 'Красиві ілюстрації',
+      noWatermark: 'Без водяних знаків у PDF',
+      widget: 'Налаштування віджета',
+    },
+  },
+  entitlement: {
+    free: 'Безкоштовно',
+    pro: 'Pro',
+    proBadge: 'Функція Pro',
+  },
   a11y: {
     createButton: 'Створити казку',
     appleSignIn: 'Увійти через Apple',

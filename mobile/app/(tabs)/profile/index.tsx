@@ -21,9 +21,10 @@ export default function ProfileScreen() {
     useAuthStore.getState().signOut();
   }
 
-  const links: { id: 'account' | 'settings' | 'help'; label: string }[] = [
+  const links: { id: 'account' | 'settings' | 'subscription' | 'help'; label: string }[] = [
     { id: 'account', label: t('profile.account') },
     { id: 'settings', label: t('profile.settings') },
+    { id: 'subscription', label: t('paywall.title') },
     { id: 'help', label: t('profile.help') },
   ];
 

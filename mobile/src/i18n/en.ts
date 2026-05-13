@@ -120,6 +120,27 @@ export const en = {
   offline: {
     badge: 'Offline',
   },
+  paywall: {
+    title: 'Kazka Pro',
+    tagline: 'Unlimited stories. Beautiful illustrations. No watermark.',
+    monthly: 'Monthly',
+    yearly: 'Yearly',
+    cta: 'Subscribe',
+    restore: 'Restore purchases',
+    active: 'You are subscribed',
+    errorGeneric: 'Purchase failed. Please try again.',
+    perks: {
+      unlimited: 'Unlimited stories',
+      illustrations: 'Beautiful illustrations',
+      noWatermark: 'No watermark on shared PDFs',
+      widget: 'Customize the home widget',
+    },
+  },
+  entitlement: {
+    free: 'Free',
+    pro: 'Pro',
+    proBadge: 'Pro feature',
+  },
   a11y: {
     createButton: 'Create story',
     appleSignIn: 'Sign in with Apple',
