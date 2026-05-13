@@ -86,7 +86,8 @@ public class SecurityConfig {
                                                 "/api/auth/password-reset/**",
                                                 "/api/auth/token/**",
                                                 "/api/auth/oauth/**",
-                                                "/api/devices/**")))))
+                                                "/api/devices/**",
+                                                "/api/billing/**")))))
                 .authorizeExchange(auth -> auth
                         .pathMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                         .pathMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
@@ -101,6 +102,8 @@ public class SecurityConfig {
                                 "/api/auth/token/logout",
                                 "/api/auth/oauth/apple").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/auth/me", "/api/auth/verify-email").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/billing/products").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/billing/iap/webhook").permitAll()
                         .pathMatchers("/api/admin/**").hasRole("ADMIN")
                         .pathMatchers("/api/**").authenticated()
                         .anyExchange().permitAll())
