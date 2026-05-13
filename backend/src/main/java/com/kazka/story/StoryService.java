@@ -35,8 +35,7 @@ public class StoryService {
     private final ModerationService moderationService;
     private final SuspensionService suspensionService;
     private final ModerationProperties moderationProperties;
-    private final com.kazka.billing.EntitlementResolver entitlements;
-    private final com.kazka.billing.BillingProperties billingProps;
+    private final com.kazka.billing.FreeTierGate freeTier;
 
     public StoryService(StoryRepository repository, UserRepository users,
                         HuggingFaceClient hfClient, PromptBuilder promptBuilder,
@@ -44,8 +43,7 @@ public class StoryService {
                         ModerationService moderationService,
                         SuspensionService suspensionService,
                         ModerationProperties moderationProperties,
-                        com.kazka.billing.EntitlementResolver entitlements,
-                        com.kazka.billing.BillingProperties billingProps) {
+                        com.kazka.billing.FreeTierGate freeTier) {
         this.repository = repository;
         this.users = users;
         this.hfClient = hfClient;
@@ -54,8 +52,7 @@ public class StoryService {
         this.moderationService = moderationService;
         this.suspensionService = suspensionService;
         this.moderationProperties = moderationProperties;
-        this.entitlements = entitlements;
-        this.billingProps = billingProps;
+        this.freeTier = freeTier;
     }
 
     public Flux<SseEvent> generate(GenerationRequest req, CurrentUser currentUser) {
@@ -63,18 +60,8 @@ public class StoryService {
         return ensureVerified(currentUser)
                 .then(loadUser(currentUser))
                 .doOnNext(suspensionService::assertNotSuspended)
-                .doOnNext(this::assertWithinFreeTierOrPro)
+                .doOnNext(freeTier::assertAllowed)
                 .thenMany(Flux.defer(() -> moderateThenGenerate(req, userId)));
-    }
-
-    private void assertWithinFreeTierOrPro(com.kazka.user.User user) {
-        if (entitlements.isPro(user.getId())) return;
-        int limit = billingProps.freeMonthlyStoryLimit() == null
-                ? 3 : billingProps.freeMonthlyStoryLimit();
-        if (user.getStoriesThisMonth() >= limit) {
-            throw new com.kazka.story.exception.PaywallRequiredException(
-                    "Free tier limited to " + limit + " stories per month");
-        }
     }
 
     private Mono<User> loadUser(CurrentUser currentUser) {
@@ -126,7 +113,6 @@ public class StoryService {
 
         return Mono.fromCallable(() -> repository.save(story))
                 .subscribeOn(Schedulers.boundedElastic())
-                .doOnNext(saved -> incrementCounterIfFreeTier(userId))
                 .flatMapMany(saved -> {
                     Flux<SseEvent> meta = Flux.just(SseEvent.meta(id));
                     StringBuilder rawBuffer = new StringBuilder();
@@ -157,6 +143,7 @@ public class StoryService {
                                             saved.setTitle(title);
                                             saved.setContent(body);
                                             repository.save(saved);
+                                            freeTier.recordUsage(userId);
                                             return SseEvent.done(id, title);
                                         }).subscribeOn(Schedulers.boundedElastic()))
                             ))
@@ -251,13 +238,6 @@ public class StoryService {
                 ? repository.findById(id)
                 : repository.findByIdAndUserId(id, currentUser.userId());
         return opt.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    }
-
-    private void incrementCounterIfFreeTier(String userId) {
-        if (entitlements.isPro(userId)) return;
-        com.kazka.user.User u = users.findById(userId).orElseThrow();
-        u.setStoriesThisMonth(u.getStoriesThisMonth() + 1);
-        users.save(u);
     }
 
     private Mono<Void> ensureVerified(CurrentUser currentUser) {
