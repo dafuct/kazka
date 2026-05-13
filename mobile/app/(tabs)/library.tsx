@@ -1,11 +1,13 @@
+import { useCallback } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Particles } from '@/src/components/Particles';
 import { StoryCard } from '@/src/components/StoryCard';
 import { OfflineBadge } from '@/src/network/OfflineBadge';
 import { useStoriesInfinite } from '@/src/query/hooks';
+import { writeTodayJSON } from '@/src/widget/appGroup';
 
 export default function LibraryScreen() {
   const { t } = useTranslation();
@@ -13,6 +15,19 @@ export default function LibraryScreen() {
   const { theme } = useUnistyles();
   const query = useStoriesInfinite(20);
   const items = query.data?.pages.flatMap((p) => p.items) ?? [];
+  const latest = items[0] ?? null;
+
+  useFocusEffect(
+    useCallback(() => {
+      if (latest) {
+        void writeTodayJSON({
+          title: latest.title,
+          snippet: (latest.content ?? '').slice(0, 140),
+          storyId: latest.id,
+        });
+      }
+    }, [latest?.id, latest?.title, latest?.content])
+  );
 
   return (
     <View style={styles.container}>

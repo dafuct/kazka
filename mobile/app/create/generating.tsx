@@ -7,6 +7,7 @@ import { StyleSheet } from 'react-native-unistyles';
 import { openSseStream } from '@/src/api/sse';
 import { queryKeys } from '@/src/query/keys';
 import { maybeRequestPushPermission } from '@/src/push/permission';
+import { writeTodayJSON } from '@/src/widget/appGroup';
 
 export default function GeneratingScreen() {
   const { t } = useTranslation();
@@ -37,6 +38,8 @@ export default function GeneratingScreen() {
 
     (async () => {
       let storyId: string | null = null;
+      let storyTitle: string | null = null;
+      let storySnippet = '';
       try {
         for await (const ev of events) {
           if (cancelled) break;
@@ -46,12 +49,16 @@ export default function GeneratingScreen() {
           }
           if (ev.type === 'token') {
             setPhase('streaming');
+            if (storySnippet.length < 140 && typeof ev.data === 'string') {
+              storySnippet = (storySnippet + ev.data).slice(0, 140);
+            }
           } else if (ev.type === 'done') {
             // Backend emits done with JSON payload { id, title }
             try {
               const parsed = JSON.parse(ev.data);
               if (parsed && typeof parsed === 'object' && typeof parsed.id === 'string') {
                 storyId = parsed.id;
+                if (typeof parsed.title === 'string') storyTitle = parsed.title;
               } else if (typeof parsed === 'string') {
                 storyId = parsed;
               }
@@ -89,6 +96,11 @@ export default function GeneratingScreen() {
         void maybeRequestPushPermission();
         void qc.invalidateQueries({ queryKey: queryKeys.stories.list() });
         void qc.invalidateQueries({ queryKey: queryKeys.stories.featured() });
+        void writeTodayJSON({
+          title: storyTitle ?? '',
+          snippet: storySnippet,
+          storyId,
+        });
         router.replace(`/story/${storyId}`);
       }
     })();

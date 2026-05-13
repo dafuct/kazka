@@ -1,5 +1,6 @@
+import { useCallback } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native-unistyles';
 import { HeroCard } from '@/src/components/HeroCard';
@@ -8,6 +9,7 @@ import { StoryCard } from '@/src/components/StoryCard';
 import { OfflineBadge } from '@/src/network/OfflineBadge';
 import { useFeatured, useStoriesInfinite } from '@/src/query/hooks';
 import { useAuthStore } from '@/src/stores/auth.store';
+import { writeTodayJSON } from '@/src/widget/appGroup';
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -17,10 +19,23 @@ export default function HomeScreen() {
   const stories = useStoriesInfinite(6);  // first page = 6 recents
 
   const recents = stories.data?.pages.flatMap((p) => p.items) ?? [];
+  const latest = featured.data ?? recents[0] ?? null;
 
   function open(id: string) {
     router.push(`/story/${id}`);
   }
+
+  useFocusEffect(
+    useCallback(() => {
+      if (latest) {
+        void writeTodayJSON({
+          title: latest.title,
+          snippet: (latest.content ?? '').slice(0, 140),
+          storyId: latest.id,
+        });
+      }
+    }, [latest?.id, latest?.title, latest?.content])
+  );
 
   return (
     <View style={{ flex: 1 }}>

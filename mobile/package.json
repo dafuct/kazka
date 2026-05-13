@@ -73,5 +73,10 @@
     "jest-expo": "^55.0.17",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "autolinking": {
+      "search_paths": ["./modules"]
+    }
+  }
 }
