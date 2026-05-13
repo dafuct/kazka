@@ -48,6 +48,12 @@ public class User {
     @Column(name = "suspended_by", length = 36)
     private String suspendedBy;
 
+    @Column(name = "stories_this_month", nullable = false)
+    private int storiesThisMonth;
+
+    @Column(name = "counter_reset_at")
+    private Instant counterResetAt;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
@@ -80,6 +86,12 @@ public class User {
     public void setSuspendedReason(String suspendedReason) { this.suspendedReason = suspendedReason; }
     public String getSuspendedBy() { return suspendedBy; }
     public void setSuspendedBy(String suspendedBy) { this.suspendedBy = suspendedBy; }
+
+    public int getStoriesThisMonth() { return storiesThisMonth; }
+    public void setStoriesThisMonth(int v) { this.storiesThisMonth = v; }
+
+    public Instant getCounterResetAt() { return counterResetAt; }
+    public void setCounterResetAt(Instant t) { this.counterResetAt = t; }
 
     public boolean isSuspended() { return suspendedAt != null; }
 
