@@ -97,3 +97,13 @@ kazka:
       bundle-id: ${APNS_BUNDLE_ID:app.kazka.ios}
       apns-host: ${APNS_HOST:api.sandbox.push.apple.com}
       enabled: ${APNS_ENABLED:false}
+  billing:
+    bundle-id: ${BILLING_BUNDLE_ID:app.kazka.ios}
+    app-apple-id: ${BILLING_APP_APPLE_ID:not-configured}
+    apple-id: ${BILLING_APPLE_ID:0}
+    environment: ${BILLING_ENVIRONMENT:Sandbox}
+    issuer-id: ${BILLING_ISSUER_ID:}
+    key-id: ${BILLING_KEY_ID:}
+    private-key-pem: ${BILLING_PRIVATE_KEY_PEM:}
+    enabled: ${BILLING_ENABLED:false}
+    free-monthly-story-limit: ${BILLING_FREE_LIMIT:3}
