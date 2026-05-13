@@ -16,7 +16,7 @@ export function PageView({ text, illustrationPath }: Props) {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       {uri && (
-        <Image source={{ uri }} style={styles.illustration} transition={200} contentFit="cover" />
+        <Image source={{ uri }} style={styles.illustration} transition={200} contentFit="cover" cachePolicy="disk" />
       )}
       <Text style={styles.text}>{text}</Text>
     </ScrollView>

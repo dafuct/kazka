@@ -19,7 +19,7 @@ export function HeroCard({ story, onPress }: Props) {
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
       {uri ? (
-        <Image source={{ uri }} style={styles.image} transition={200} contentFit="cover" />
+        <Image source={{ uri }} style={styles.image} transition={200} contentFit="cover" cachePolicy="disk" />
       ) : (
         <View style={[styles.image, styles.placeholder]} />
       )}

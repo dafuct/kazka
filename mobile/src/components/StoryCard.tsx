@@ -23,7 +23,7 @@ export function StoryCard({ story, onPress, variant = 'tile' }: Props) {
   return (
     <TouchableOpacity onPress={onPress} style={compact ? styles.compact : styles.tile}>
       {illustrationUri ? (
-        <Image source={{ uri: illustrationUri }} style={compact ? styles.compactImage : styles.tileImage} transition={200} />
+        <Image source={{ uri: illustrationUri }} style={compact ? styles.compactImage : styles.tileImage} transition={200} cachePolicy="disk" />
       ) : (
         <View style={[compact ? styles.compactImage : styles.tileImage, styles.imagePlaceholder]} />
       )}
