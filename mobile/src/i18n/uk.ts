@@ -87,6 +87,14 @@ export const uk: Translations = {
     streaming: 'Пишемо текст...',
     illustrating: 'Малюємо ілюстрації...',
     done: 'Готово!',
+    worlds: {
+      forest: 'Зачарований ліс',
+      sea: 'Підводне царство',
+      space: 'Космос',
+      castle: 'Старий замок',
+      mountains: 'Високі гори',
+      village: 'Українське село',
+    },
   },
   profile: {
     signOut: 'Вийти',

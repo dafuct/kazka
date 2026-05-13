@@ -6,25 +6,21 @@ import { StyleSheet } from 'react-native-unistyles';
 import { Button } from '@/src/components/Button';
 import { Input } from '@/src/components/Input';
 
-const PRESETS = [
-  { id: 'forest', label: 'Зачарований ліс' },
-  { id: 'sea', label: 'Підводне царство' },
-  { id: 'space', label: 'Космос' },
-  { id: 'castle', label: 'Старий замок' },
-  { id: 'mountains', label: 'Високі гори' },
-  { id: 'village', label: 'Українське село' },
-];
+const PRESET_IDS = ['forest', 'sea', 'space', 'castle', 'mountains', 'village'] as const;
+type PresetId = typeof PRESET_IDS[number];
 
 export default function StepWorldScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { ageGroup } = useLocalSearchParams<{ ageGroup: '3-5' | '6-8' | '9-12' }>();
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<PresetId | null>(null);
   const [custom, setCustom] = useState('');
 
+  const presets = PRESET_IDS.map((id) => ({ id, label: t(`create.worlds.${id}`) }));
+
   const theme = selectedId
-    ? PRESETS.find((p) => p.id === selectedId)?.label ?? ''
+    ? presets.find((p) => p.id === selectedId)?.label ?? ''
     : custom.trim();
 
   const canSubmit = theme.length > 0;
@@ -52,7 +48,7 @@ export default function StepWorldScreen() {
       <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
         <Text style={styles.title}>{t('create.worldTitle')}</Text>
         <View style={styles.grid}>
-          {PRESETS.map((p) => (
+          {presets.map((p) => (
             <Pressable
               key={p.id}
               onPress={() => { setSelectedId(p.id); setCustom(''); }}

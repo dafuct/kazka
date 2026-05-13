@@ -85,6 +85,14 @@ export const en = {
     streaming: 'Writing text...',
     illustrating: 'Painting illustrations...',
     done: 'Done!',
+    worlds: {
+      forest: 'Enchanted forest',
+      sea: 'Underwater kingdom',
+      space: 'Outer space',
+      castle: 'Old castle',
+      mountains: 'High mountains',
+      village: 'Ukrainian village',
+    },
   },
   profile: {
     signOut: 'Sign out',
