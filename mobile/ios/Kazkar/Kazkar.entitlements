@@ -12,5 +12,9 @@
     <array>
       <string>applinks:kazka.app</string>
     </array>
+    <key>com.apple.security.application-groups</key>
+    <array>
+      <string>group.app.kazka</string>
+    </array>
   </dict>
 </plist>
