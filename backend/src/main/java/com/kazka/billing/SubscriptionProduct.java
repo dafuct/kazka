@@ -15,7 +15,7 @@ public class SubscriptionProduct {
     @Column(length = 36)
     private String id;
 
-    @Column(name = "apple_product_id", nullable = false, unique = true, length = 120)
+    @Column(name = "apple_product_id", nullable = false, length = 120)
     private String appleProductId;
 
     @Column(nullable = false, length = 120)
