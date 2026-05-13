@@ -38,7 +38,12 @@ export default function StepWorldScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={12}>
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel={t('create.back')}
+        >
           <Text style={styles.cancel}>{t('create.back')}</Text>
         </Pressable>
         <Text style={styles.stepLabel}>{t('create.stepN', { n: 2, total: 2 })}</Text>
@@ -53,6 +58,9 @@ export default function StepWorldScreen() {
               key={p.id}
               onPress={() => { setSelectedId(p.id); setCustom(''); }}
               style={[styles.tile, selectedId === p.id && styles.tileActive]}
+              accessibilityRole="button"
+              accessibilityLabel={p.label}
+              accessibilityState={{ selected: selectedId === p.id }}
             >
               <Text style={[styles.tileText, selectedId === p.id && styles.tileTextActive]}>{p.label}</Text>
             </Pressable>
@@ -62,6 +70,7 @@ export default function StepWorldScreen() {
           <Text style={styles.label}>{t('create.customLabel')}</Text>
           <Input
             placeholder={t('create.customPlaceholder')}
+            accessibilityLabel={t('create.customLabel')}
             value={custom}
             onChangeText={(v) => { setCustom(v); if (v) setSelectedId(null); }}
             multiline

@@ -100,7 +100,7 @@ export default function GeneratingScreen() {
   }, [ageGroup, theme]);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} accessible accessibilityLabel={t('create.starting')}>
       <ActivityIndicator size="large" />
       <Text style={styles.title}>
         {phase === 'starting' && t('create.starting')}

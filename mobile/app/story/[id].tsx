@@ -65,11 +65,21 @@ export default function ReaderScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={12}>
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel={t('reader.close')}
+        >
           <Text style={styles.headerText}>{t('reader.close')}</Text>
         </Pressable>
         <Text style={styles.title} numberOfLines={1}>{loadedStory.title}</Text>
-        <Pressable onPress={onShare} hitSlop={12}>
+        <Pressable
+          onPress={onShare}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel={t('reader.share')}
+        >
           <Text style={styles.headerText}>{t('reader.share')}</Text>
         </Pressable>
       </View>

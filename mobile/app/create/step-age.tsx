@@ -19,7 +19,12 @@ export default function StepAgeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={12}>
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel={t('create.cancel')}
+        >
           <Text style={styles.cancel}>{t('create.cancel')}</Text>
         </Pressable>
         <Text style={styles.stepLabel}>{t('create.stepN', { n: 1, total: 2 })}</Text>
@@ -34,6 +39,9 @@ export default function StepAgeScreen() {
               key={a.value}
               onPress={() => setAgeGroup(a.value)}
               style={[styles.chip, ageGroup === a.value && styles.chipActive]}
+              accessibilityRole="button"
+              accessibilityLabel={a.label}
+              accessibilityState={{ selected: ageGroup === a.value }}
             >
               <Text style={[styles.chipText, ageGroup === a.value && styles.chipTextActive]}>
                 {a.label}

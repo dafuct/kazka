@@ -14,7 +14,12 @@ export function PageView({ text, illustrationPath }: Props) {
   const uri = illustrationPath ? `${API_BASE_URL}${illustrationPath}` : undefined;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      accessible
+      accessibilityLabel={text}
+    >
       {uri && (
         <Image source={{ uri }} style={styles.illustration} transition={200} contentFit="cover" cachePolicy="disk" />
       )}
