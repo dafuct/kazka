@@ -17,6 +17,9 @@ import java.util.Map;
 @RequestMapping("/api/billing")
 public class BillingController {
 
+    private static final org.slf4j.Logger log =
+            org.slf4j.LoggerFactory.getLogger(BillingController.class);
+
     private final BillingService service;
     private final CurrentUserResolver currentUserResolver;
 
@@ -44,14 +47,20 @@ public class BillingController {
                         .then(entitlementsFor(cu.userId())));
     }
 
-    /** Apple ASN V2 webhook. Body is { "signedPayload": "<jws>" }. */
+    /** Apple ASN V2 webhook. Body is { "signedPayload": "<jws>" }.
+     *  We swallow VerificationException so Apple doesn't retry a permanently bad payload. */
     @PostMapping(path = "/iap/webhook", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Mono<Void> webhook(@RequestBody Map<String, String> body) {
         String signed = body.get("signedPayload");
         if (signed == null || signed.isBlank()) {
             return Mono.error(new IllegalArgumentException("missing signedPayload"));
         }
-        return service.ingestWebhook(signed);
+        return service.ingestWebhook(signed)
+                .onErrorResume(com.apple.itunes.storekit.verification.VerificationException.class, e -> {
+                    log.warn("ASN V2 webhook: invalid signature; returning 200 to suppress retries: {}",
+                            e.getMessage());
+                    return Mono.empty();
+                });
     }
 
     private Mono<List<EntitlementDto>> entitlementsFor(String userId) {

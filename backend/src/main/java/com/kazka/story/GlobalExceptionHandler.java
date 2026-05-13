@@ -106,6 +106,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(body);
     }
 
+    @ExceptionHandler(com.apple.itunes.storekit.verification.VerificationException.class)
+    public ResponseEntity<Map<String, Object>> handleAppleVerification(
+            com.apple.itunes.storekit.verification.VerificationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "INVALID_SIGNATURE"));
+    }
+
     private static String codeFor(ResponseStatusException ex) {
         int s = ex.getStatusCode().value();
         if (s == 404) return "NOT_FOUND";
