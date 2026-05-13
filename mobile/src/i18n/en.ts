@@ -110,6 +110,7 @@ export const en = {
     help: 'Help',
     deleteAccount: 'Delete account',
     deleteAccountConfirm: 'This signs you out on this device. Server-side account deletion will be available in a future release.',
+    languageLabel: 'Language',
   },
   offline: {
     badge: 'Offline',
