@@ -61,6 +61,7 @@ const config: ExpoConfig = {
         paymentProvider: 'AppStore',
       },
     ],
+    './plugins/with-kazkar-widget.js',
   ],
   experiments: {
     typedRoutes: true,
