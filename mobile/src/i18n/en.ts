@@ -105,6 +105,9 @@ export const en = {
       playful: 'Playful',
       immersive: 'Storybook',
     },
+    account: 'Account',
+    settings: 'Settings',
+    help: 'Help',
   },
   offline: {
     badge: 'Offline',

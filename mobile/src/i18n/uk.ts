@@ -107,6 +107,9 @@ export const uk: Translations = {
       playful: 'Грайливий',
       immersive: 'Казковий',
     },
+    account: 'Акаунт',
+    settings: 'Налаштування',
+    help: 'Допомога',
   },
   offline: {
     badge: 'Офлайн',
