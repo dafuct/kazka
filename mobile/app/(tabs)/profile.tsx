@@ -7,6 +7,7 @@ import { useAuthStore } from '@/src/stores/auth.store';
 import { useThemeStore } from '@/src/stores/theme.store';
 import { authApi } from '@/src/api/auth';
 import { clearTokens } from '@/src/secure/tokenStorage';
+import { unregisterPushToken } from '@/src/push/register';
 import type { VisualStyle } from '@/src/theme/tokens';
 
 const STYLE_VALUES: VisualStyle[] = ['cozy', 'playful', 'immersive'];
@@ -21,6 +22,7 @@ export default function ProfileScreen() {
   const toggleDarkMode = useThemeStore((s) => s.toggleDarkMode);
 
   async function signOut() {
+    try { await unregisterPushToken(); } catch { /* best-effort */ }
     try {
       if (refreshToken) {
         await authApi.tokenLogout(refreshToken);
