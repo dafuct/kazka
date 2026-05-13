@@ -36,13 +36,15 @@ public class IapVerifier {
         }
         try (InputStream is = new ClassPathResource("apple-root-ca-g3.cer").getInputStream()) {
             byte[] caBytes = is.readAllBytes();
-            this.verifier = new SignedDataVerifier(
-                    Set.of(new ByteArrayInputStream(caBytes)),
-                    props.bundleId(),
-                    props.appleId(),
-                    Environment.valueOf(props.environment().toUpperCase()),
-                    /* enableOnlineChecks */ false
-            );
+            try (ByteArrayInputStream caStream = new ByteArrayInputStream(caBytes)) {
+                this.verifier = new SignedDataVerifier(
+                        Set.of(caStream),
+                        props.bundleId(),
+                        props.appleId(),
+                        Environment.valueOf(props.environment().toUpperCase()),
+                        /* enableOnlineChecks */ false
+                );
+            }
         }
     }
 
