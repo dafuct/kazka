@@ -11,7 +11,8 @@ public record AuthProperties(
         TokenTtl tokenTtl,
         Admin admin,
         Jwt jwt,
-        Apple apple
+        Apple apple,
+        Apns apns
 ) {
     public record TokenTtl(Duration emailVerification, Duration passwordReset) {}
 
@@ -32,5 +33,14 @@ public record AuthProperties(
             String jwksUri,
             String issuer,
             Duration clientSecretTtl
+    ) {}
+
+    public record Apns(
+            String teamId,
+            String keyId,
+            String privateKeyPem,
+            String bundleId,
+            String apnsHost,
+            Boolean enabled
     ) {}
 }

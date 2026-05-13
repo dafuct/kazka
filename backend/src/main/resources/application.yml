@@ -90,3 +90,10 @@ kazka:
       jwks-uri: ${APPLE_JWKS_URI:https://appleid.apple.com/auth/keys}
       issuer: ${APPLE_ISSUER:https://appleid.apple.com}
       client-secret-ttl: 1h
+    apns:
+      team-id: ${APNS_TEAM_ID:not-configured}
+      key-id: ${APNS_KEY_ID:not-configured}
+      private-key-pem: ${APNS_PRIVATE_KEY_PEM:}
+      bundle-id: ${APNS_BUNDLE_ID:app.kazka.ios}
+      apns-host: ${APNS_HOST:api.sandbox.push.apple.com}
+      enabled: ${APNS_ENABLED:false}

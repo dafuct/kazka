@@ -33,6 +33,7 @@ dependencies {
     implementation 'com.mysql:mysql-connector-j'
     implementation 'org.springframework.boot:spring-boot-starter-liquibase'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.eatthepath:pushy:0.15.4'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

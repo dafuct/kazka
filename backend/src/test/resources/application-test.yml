@@ -66,3 +66,10 @@ kazka:
       jwks-uri: http://localhost:0
       issuer: https://appleid.apple.com
       client-secret-ttl: 1m
+    apns:
+      team-id: TEST-TEAM
+      key-id: TEST-KEY
+      private-key-pem: ""
+      bundle-id: app.kazka.ios.test
+      apns-host: http://localhost:0
+      enabled: false
