@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
 import * as AppleAuth from 'expo-apple-authentication';
+import { useTranslation } from 'react-i18next';
 import { ApiError } from '@kazka/shared';
 import { authApi } from '@/src/api/auth';
 import { saveTokens } from '@/src/secure/tokenStorage';
@@ -8,13 +9,14 @@ import { useAuthStore } from '@/src/stores/auth.store';
 interface Props { style?: any }
 
 export function AppleSignInButton({ style }: Props) {
+  const { t } = useTranslation();
   return (
     <AppleAuth.AppleAuthenticationButton
       buttonType={AppleAuth.AppleAuthenticationButtonType.SIGN_IN}
       buttonStyle={AppleAuth.AppleAuthenticationButtonStyle.BLACK}
       cornerRadius={20}
       style={[{ height: 50 }, style]}
-      accessibilityLabel="Sign in with Apple"
+      accessibilityLabel={t('a11y.appleSignIn')}
       onPress={async () => {
         try {
           const credential = await AppleAuth.signInAsync({

@@ -120,6 +120,10 @@ export const en = {
   offline: {
     badge: 'Offline',
   },
+  a11y: {
+    createButton: 'Create story',
+    appleSignIn: 'Sign in with Apple',
+  },
 };
 
 export type Translations = typeof en;

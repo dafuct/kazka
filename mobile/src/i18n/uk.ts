@@ -122,4 +122,8 @@ export const uk: Translations = {
   offline: {
     badge: 'Офлайн',
   },
+  a11y: {
+    createButton: 'Створити казку',
+    appleSignIn: 'Увійти через Apple',
+  },
 };
