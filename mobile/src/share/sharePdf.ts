@@ -10,8 +10,14 @@ function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
 
-export async function sharePdf(story: Story): Promise<void> {
+export async function sharePdf(story: Story, opts: { watermark: boolean }): Promise<void> {
   const pages = splitPages(story.content);
+  const watermarkCss = opts.watermark
+    ? `.kazka-watermark { position: fixed; bottom: 16px; right: 16px; font-size: 11px; color: #999; }`
+    : '';
+  const watermarkHtml = opts.watermark
+    ? `<div class="kazka-watermark">Made with Kazka — kazka.app</div>`
+    : '';
   const html = `
     <!DOCTYPE html>
     <html lang="${story.language}">
@@ -23,11 +29,13 @@ export async function sharePdf(story: Story): Promise<void> {
           h1 { font-size: 32px; margin-bottom: 24px; }
           .page { page-break-after: always; margin-bottom: 32px; }
           .page:last-child { page-break-after: auto; }
+          ${watermarkCss}
         </style>
       </head>
       <body>
         <h1>${escapeHtml(story.title)}</h1>
         ${pages.map((p) => `<div class="page">${escapeHtml(p)}</div>`).join('\n')}
+        ${watermarkHtml}
       </body>
     </html>
   `;

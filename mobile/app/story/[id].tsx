@@ -7,6 +7,8 @@ import { PageView } from '@/src/components/PageView';
 import { useStory } from '@/src/query/hooks';
 import { shareLink } from '@/src/share/shareLink';
 import { sharePdf } from '@/src/share/sharePdf';
+import { useEntitlementStore } from '@/src/stores/entitlement.store';
+import { isPro } from '@/src/iap/entitlement';
 
 interface Page {
   text: string;
@@ -29,6 +31,8 @@ export default function ReaderScreen() {
   const { data: story, isLoading } = useStory(id!);
   const [pageIndex, setPageIndex] = useState(0);
   const listRef = useRef<FlatList<Page>>(null);
+  const entitlements = useEntitlementStore((s) => s.entitlements);
+  const proUser = isPro(entitlements);
 
   if (isLoading) {
     return (
@@ -58,7 +62,7 @@ export default function ReaderScreen() {
     Alert.alert(t('reader.shareTitle'), '', [
       { text: t('reader.cancel'), style: 'cancel' },
       { text: t('reader.shareLink'), onPress: () => shareLink(loadedStory.id, loadedStory.title) },
-      { text: t('reader.sharePdf'), onPress: () => sharePdf(loadedStory) },
+      { text: t('reader.sharePdf'), onPress: () => sharePdf(loadedStory, { watermark: !proUser }) },
     ]);
   }
 

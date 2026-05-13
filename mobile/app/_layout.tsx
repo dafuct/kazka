@@ -5,8 +5,10 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { UnistylesRuntime } from 'react-native-unistyles';
 import { useAuthStore } from '@/src/stores/auth.store';
 import { useThemeStore } from '@/src/stores/theme.store';
+import { useEntitlementStore } from '@/src/stores/entitlement.store';
 import { readTokens } from '@/src/secure/tokenStorage';
 import { authApi } from '@/src/api/auth';
+import { billingApi } from '@/src/api/billing';
 import { queryClient, queryPersister } from '@/src/query/client';
 import { registerPushToken } from '@/src/push/register';
 import { subscribeToTaps } from '@/src/push/handlers';
@@ -46,8 +48,13 @@ export default function RootLayout() {
           accessToken: useAuthStore.getState().accessToken!,
           refreshToken: useAuthStore.getState().refreshToken!,
         });
+        // Best-effort: bootstrap entitlements; failure leaves the store empty (= free tier).
+        void billingApi.myEntitlements()
+          .then((e) => useEntitlementStore.getState().setEntitlements(e))
+          .catch(() => {});
       } catch {
         useAuthStore.getState().signOut();
+        useEntitlementStore.getState().clear();
       }
     })();
   }, []);
