@@ -17,7 +17,7 @@ const config: ExpoConfig = {
     bundleIdentifier: 'app.kazka.ios',
     associatedDomains: ['applinks:kazka.app'],
     usesAppleSignIn: true,
-    buildNumber: '3',
+    buildNumber: '4',
     entitlements: {
       'aps-environment': 'development',
     },
@@ -55,6 +55,12 @@ const config: ExpoConfig = {
     'expo-localization',
     'expo-apple-authentication',
     'expo-notifications',
+    [
+      'react-native-iap',
+      {
+        paymentProvider: 'AppStore',
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,
