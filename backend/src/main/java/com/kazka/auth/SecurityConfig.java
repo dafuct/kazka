@@ -85,7 +85,8 @@ public class SecurityConfig {
                                                 "/api/auth/signup", "/api/auth/login",
                                                 "/api/auth/password-reset/**",
                                                 "/api/auth/token/**",
-                                                "/api/auth/oauth/**")))))
+                                                "/api/auth/oauth/**",
+                                                "/api/devices/**")))))
                 .authorizeExchange(auth -> auth
                         .pathMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                         .pathMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
