@@ -8,6 +8,8 @@ import { useThemeStore } from '@/src/stores/theme.store';
 import { readTokens } from '@/src/secure/tokenStorage';
 import { authApi } from '@/src/api/auth';
 import { queryClient, queryPersister } from '@/src/query/client';
+import { registerPushToken } from '@/src/push/register';
+import { subscribeToTaps } from '@/src/push/handlers';
 import '@/src/theme/unistyles.config';
 import { i18n } from '@/src/i18n';
 
@@ -47,6 +49,13 @@ export default function RootLayout() {
         useAuthStore.getState().signOut();
       }
     })();
+  }, []);
+
+  // Push notifications: register token (best-effort) + subscribe to taps.
+  useEffect(() => {
+    void registerPushToken();
+    const unsubscribe = subscribeToTaps();
+    return unsubscribe;
   }, []);
 
   // Route gate
