@@ -82,7 +82,7 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create((theme) => ({
-  container: { flex: 1, backgroundColor: theme.colors.bg },
+  container: { flex: 1, backgroundColor: 'transparent' },
   content: { padding: 24, paddingTop: 64, paddingBottom: 48, gap: 24, minHeight: '100%' },
   header: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   close: { fontSize: 15, color: theme.colors.accent },

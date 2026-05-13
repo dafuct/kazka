@@ -62,7 +62,7 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create((theme) => ({
-  container: { flex: 1, backgroundColor: theme.colors.bg },
+  container: { flex: 1, backgroundColor: 'transparent' },
   content: { padding: 24, paddingTop: 96, gap: 16, minHeight: '100%' },
   title: { fontSize: theme.scalars.headlineSize, fontWeight: theme.scalars.titleWeight, color: theme.colors.text },
   body: { fontSize: theme.scalars.bodySize, color: theme.colors.textMuted, marginTop: 4 },
