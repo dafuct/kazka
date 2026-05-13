@@ -12,7 +12,7 @@ export default function GeneratingScreen() {
   const router = useRouter();
   const qc = useQueryClient();
   const { ageGroup, theme } = useLocalSearchParams<{ ageGroup: string; theme: string }>();
-  const [phase, setPhase] = useState<'starting' | 'streaming' | 'illustrating' | 'done' | 'error'>('starting');
+  const [phase, setPhase] = useState<'starting' | 'streaming' | 'done' | 'error'>('starting');
   const [error, setError] = useState<string | null>(null);
   const cancelRef = useRef<(() => void) | null>(null);
 
@@ -39,10 +39,12 @@ export default function GeneratingScreen() {
       try {
         for await (const ev of events) {
           if (cancelled) break;
+          if (ev.type === 'meta') {
+            // The story id is also surfaced by `done`; we don't act on meta yet.
+            continue;
+          }
           if (ev.type === 'token') {
             setPhase('streaming');
-          } else if (ev.type === 'image_ready') {
-            setPhase('illustrating');
           } else if (ev.type === 'done') {
             // Backend emits done with JSON payload { id, title }
             try {
@@ -101,7 +103,6 @@ export default function GeneratingScreen() {
       <Text style={styles.title}>
         {phase === 'starting' && t('create.starting')}
         {phase === 'streaming' && t('create.streaming')}
-        {phase === 'illustrating' && t('create.illustrating')}
         {phase === 'done' && t('create.done')}
         {phase === 'error' && (error ?? t('errors.ERROR'))}
       </Text>

@@ -7,7 +7,7 @@ export interface SseEvent {
   data: string;
 }
 
-type StoryEvent = 'token' | 'image_ready' | 'done';
+type StoryEvent = 'meta' | 'token' | 'done';
 
 /**
  * Opens an SSE connection to a POST endpoint that streams text/event-stream.
@@ -56,28 +56,23 @@ export function openSseStream(path: string, body: unknown): {
     }
   }
 
-  // The backend emits named events: "token", "image_ready", "done", "error".
-  // Plus the default 'message' channel as a fallback.
+  // The backend emits named events: "meta", "token", "done", "error".
+  // Plus the default 'message' channel as a fallback, and 'open' for stream open.
   // react-native-sse types data as `string | null` for message/custom events;
   // we coerce to '' for the SseEvent interface.
-  eventSource.addEventListener('message', (e) => {
-    push({ type: 'message', data: e.data ?? '' });
-  });
-  eventSource.addEventListener('token', (e) => {
-    push({ type: 'token', data: e.data ?? '' });
-  });
-  eventSource.addEventListener('image_ready', (e) => {
-    push({ type: 'image_ready', data: e.data ?? '' });
-  });
-  eventSource.addEventListener('done', (e) => {
-    push({ type: 'done', data: e.data ?? '' });
-    close();
-  });
-  eventSource.addEventListener('error', (e) => {
-    // Error union: TimeoutEvent / ExceptionEvent / ErrorEvent — all have `message`.
-    const message = 'message' in e ? e.message : 'unknown';
-    push({ type: 'error', data: message });
-    close();
+  ['message', 'meta', 'token', 'done', 'error', 'open'].forEach((type) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    eventSource.addEventListener(type as any, (e: any) => {
+      if (type === 'error') {
+        // Error union: TimeoutEvent / ExceptionEvent / ErrorEvent — all have `message`.
+        const message = e && 'message' in e ? e.message : 'unknown';
+        push({ type: 'error', data: message ?? 'unknown' });
+        close();
+        return;
+      }
+      push({ type, data: e?.data ?? '' });
+      if (type === 'done') close();
+    });
   });
 
   const events: AsyncIterable<SseEvent> = {
