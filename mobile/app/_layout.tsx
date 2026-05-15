@@ -1,3 +1,8 @@
+// MUST be the very first import: registers Unistyles themes before any
+// downstream module (transitively loaded by expo-router) calls
+// StyleSheet.create((theme) => ...).
+import '@/src/theme/unistyles.config';
+
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
@@ -13,7 +18,6 @@ import { queryClient, queryPersister } from '@/src/query/client';
 import { registerPushToken } from '@/src/push/register';
 import { subscribeToTaps } from '@/src/push/handlers';
 import { subscribeToQueueFlush } from '@/src/network/queueFlusher';
-import '@/src/theme/unistyles.config';
 import { i18n } from '@/src/i18n';
 
 void i18n;  // ensure i18n is initialised

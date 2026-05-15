@@ -10,10 +10,14 @@ import { Button } from './Button';
 import { useTranslation } from 'react-i18next';
 
 export function GoogleSignInButton() {
+  const iosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
+  // Hooks must be called unconditionally; pass undefined and bail out below.
   const { t } = useTranslation();
-  const [_, response, promptAsync] = Google.useIdTokenAuthRequest({
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-  });
+  const auth = Google.useIdTokenAuthRequest(
+    iosClientId ? { iosClientId } : { iosClientId: 'unset.apps.googleusercontent.com' },
+  );
+  const response = auth[1];
+  const promptAsync = auth[2];
 
   useEffect(() => {
     if (response?.type !== 'success') return;
@@ -35,6 +39,9 @@ export function GoogleSignInButton() {
       }
     })();
   }, [response]);
+
+  // No client id configured for this build → hide the button entirely.
+  if (!iosClientId) return null;
 
   return <Button title={t('login.withGoogle')} variant="secondary" onPress={() => promptAsync()} />;
 }
