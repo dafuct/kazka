@@ -22,7 +22,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Component
@@ -65,13 +67,13 @@ public class AppleIdentityTokenVerifier {
                     .parseSignedClaims(identityToken)
                     .getPayload();
 
-            java.util.Set<String> allowedAudiences = new java.util.LinkedHashSet<>();
+            Set<String> allowedAudiences = new LinkedHashSet<>();
             allowedAudiences.add(apple.clientId());
             if (apple.webClientId() != null && !apple.webClientId().isBlank()) {
                 allowedAudiences.add(apple.webClientId());
             }
-            java.util.Set<String> tokenAudiences = claims.getAudience() == null
-                    ? java.util.Set.of()
+            Set<String> tokenAudiences = claims.getAudience() == null
+                    ? Set.of()
                     : claims.getAudience();
             boolean audMatched = tokenAudiences.stream().anyMatch(allowedAudiences::contains);
             if (!audMatched) {

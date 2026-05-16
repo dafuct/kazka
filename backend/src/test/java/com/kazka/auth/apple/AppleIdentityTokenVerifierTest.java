@@ -97,7 +97,7 @@ class AppleIdentityTokenVerifierTest {
     }
 
     @Test
-    void should_acceptToken_when_audienceIsWebClientId() throws Exception {
+    void should_acceptToken_when_audienceIsWebClientId() {
         var appleWithWeb = new AuthProperties.Apple(
                 "TEAM", "app.kazka.ios", "app.kazka.web", "k", "",
                 wiremock.baseUrl() + "/auth/keys",
@@ -120,7 +120,7 @@ class AppleIdentityTokenVerifierTest {
     }
 
     @Test
-    void should_acceptToken_when_audienceIsIosClientIdAndWebClientIdConfigured() throws Exception {
+    void should_acceptToken_when_audienceIsIosClientIdAndWebClientIdConfigured() {
         var appleWithWeb = new AuthProperties.Apple(
                 "TEAM", "app.kazka.ios", "app.kazka.web", "k", "",
                 wiremock.baseUrl() + "/auth/keys",
@@ -142,7 +142,7 @@ class AppleIdentityTokenVerifierTest {
     }
 
     @Test
-    void should_throw_when_audIsNeither() throws Exception {
+    void should_throw_when_audIsNeither() {
         var appleWithWeb = new AuthProperties.Apple(
                 "TEAM", "app.kazka.ios", "app.kazka.web", "k", "",
                 wiremock.baseUrl() + "/auth/keys",
@@ -160,7 +160,8 @@ class AppleIdentityTokenVerifierTest {
                 .compact();
 
         assertThatThrownBy(() -> verifier2.verify(token))
-                .isInstanceOf(AppleIdentityTokenVerifier.InvalidAppleTokenException.class);
+                .isInstanceOf(AppleIdentityTokenVerifier.InvalidAppleTokenException.class)
+                .hasMessageContaining("Audience not allowed");
     }
 
     @Test
