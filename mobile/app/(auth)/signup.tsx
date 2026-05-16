@@ -7,6 +7,9 @@ import { ApiError } from '@kazka/shared';
 import { Button } from '@/src/components/Button';
 import { Input } from '@/src/components/Input';
 import { authApi } from '@/src/api/auth';
+import { saveTokens } from '@/src/secure/tokenStorage';
+import { useAuthStore } from '@/src/stores/auth.store';
+import { bootstrapEntitlements } from '@/src/iap/bootstrap';
 import { AppleSignInButton } from '@/src/components/AppleSignInButton';
 import { GoogleSignInButton } from '@/src/components/GoogleSignInButton';
 
@@ -26,8 +29,15 @@ export default function SignupScreen() {
     }
     setLoading(true);
     try {
-      await authApi.signup(email.trim(), password, displayName.trim());
-      router.replace({ pathname: '/(auth)/verify-email', params: { email: email.trim() } });
+      const res = await authApi.signup(email.trim(), password, displayName.trim());
+      await saveTokens({ accessToken: res.accessToken, refreshToken: res.refreshToken });
+      useAuthStore.getState().signIn({
+        user: res.user,
+        accessToken: res.accessToken,
+        refreshToken: res.refreshToken,
+      });
+      void bootstrapEntitlements();
+      // Root layout will redirect authenticated users to (tabs) automatically.
     } catch (e) {
       const code = e instanceof ApiError ? (e.body.error as string) : 'NETWORK';
       Alert.alert(t('signup.title'), t(`errors.${code}`, { defaultValue: t('errors.ERROR') }));

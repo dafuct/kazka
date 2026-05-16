@@ -9,7 +9,7 @@ interface TokenResponse {
 }
 
 export const authApi = {
-  signup: (email: string, password: string, displayName: string): Promise<AuthResponse> =>
+  signup: (email: string, password: string, displayName: string): Promise<TokenResponse> =>
     apiClient.post('/api/auth/signup', { email, password, displayName }),
 
   verifyEmail: (token: string): Promise<TokenResponse> =>
