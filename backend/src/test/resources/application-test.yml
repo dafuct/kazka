@@ -66,6 +66,11 @@ kazka:
       jwks-uri: http://localhost:0
       issuer: https://appleid.apple.com
       client-secret-ttl: 1m
+    google:
+      ios-client-id: ios.test.googleusercontent.com
+      android-client-id: ""
+      jwks-uri: http://localhost:0
+      issuer: https://accounts.google.com
     apns:
       team-id: TEST-TEAM
       key-id: TEST-KEY

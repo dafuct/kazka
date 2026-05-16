@@ -79,6 +79,25 @@ class GoogleIdTokenVerifierTest {
         assertThat(v.subject()).isEqualTo("google-user-123");
         assertThat(v.email()).isEqualTo("user@example.com");
         assertThat(v.name()).isEqualTo("User Name");
+        assertThat(v.emailVerified()).isTrue();
+    }
+
+    @Test
+    void should_returnEmailVerifiedFalse_when_claimAbsent() {
+        String token = Jwts.builder()
+                .header().keyId(kid).and()
+                .issuer("https://accounts.google.com")
+                .audience().add(clientId).and()
+                .subject("u-no-claim")
+                .claim("email", "noclaim@example.com")
+                .claim("name", "No Claim")
+                .expiration(Date.from(Instant.now().plusSeconds(60)))
+                .signWith(privateKey, Jwts.SIG.RS256)
+                .compact();
+
+        GoogleIdTokenVerifier.Verified v = verifier.verify(token);
+
+        assertThat(v.emailVerified()).isFalse();
     }
 
     @Test
@@ -157,6 +176,7 @@ class GoogleIdTokenVerifierTest {
                 .audience().add(clientId).and()
                 .subject(sub)
                 .claim("email", email)
+                .claim("email_verified", true)
                 .claim("name", name)
                 .expiration(Date.from(exp))
                 .signWith(privateKey, Jwts.SIG.RS256)

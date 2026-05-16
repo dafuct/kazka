@@ -30,7 +30,7 @@ class GoogleOAuthServiceTest {
         existing.setGoogleSubject("g-sub-1");
         when(users.findByGoogleSubject("g-sub-1")).thenReturn(Optional.of(existing));
 
-        User result = service.linkOrCreate("g-sub-1", "a@b.com", "Name");
+        User result = service.linkOrCreate("g-sub-1", "a@b.com", true, "Name");
 
         assertThat(result).isSameAs(existing);
     }
@@ -44,7 +44,7 @@ class GoogleOAuthServiceTest {
         when(users.findByEmail("a@b.com")).thenReturn(Optional.of(existing));
         when(users.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User result = service.linkOrCreate("g-sub-2", "a@b.com", "Name");
+        User result = service.linkOrCreate("g-sub-2", "a@b.com", true, "Name");
 
         assertThat(result.getGoogleSubject()).isEqualTo("g-sub-2");
         assertThat(result.isEmailVerified()).isTrue();
@@ -56,7 +56,7 @@ class GoogleOAuthServiceTest {
         when(users.findByEmail("new@x.com")).thenReturn(Optional.empty());
         when(users.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User result = service.linkOrCreate("g-sub-3", "new@x.com", "New Name");
+        User result = service.linkOrCreate("g-sub-3", "new@x.com", true, "New Name");
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         org.mockito.Mockito.verify(users).save(captor.capture());
@@ -67,5 +67,20 @@ class GoogleOAuthServiceTest {
         assertThat(saved.getRole()).isEqualTo(UserRole.USER);
         assertThat(saved.isEmailVerified()).isTrue();
         assertThat(saved.getPasswordHash()).isNull();
+    }
+
+    @Test
+    void should_createUserWithUnverifiedEmail_when_emailVerifiedFalse() {
+        when(users.findByGoogleSubject("g-sub-4")).thenReturn(Optional.empty());
+        when(users.findByEmail("unverified@x.com")).thenReturn(Optional.empty());
+        when(users.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        User result = service.linkOrCreate("g-sub-4", "unverified@x.com", false, "Unverified");
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        org.mockito.Mockito.verify(users).save(captor.capture());
+        User saved = captor.getValue();
+        assertThat(saved.getGoogleSubject()).isEqualTo("g-sub-4");
+        assertThat(saved.isEmailVerified()).isFalse();
     }
 }

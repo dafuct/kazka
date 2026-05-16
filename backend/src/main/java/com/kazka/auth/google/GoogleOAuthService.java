@@ -15,7 +15,7 @@ public class GoogleOAuthService {
     }
 
     @Transactional
-    public User linkOrCreate(String googleSubject, String email, String displayName) {
+    public User linkOrCreate(String googleSubject, String email, boolean emailVerified, String displayName) {
         var bySubject = users.findByGoogleSubject(googleSubject);
         if (bySubject.isPresent()) return bySubject.get();
 
@@ -25,7 +25,7 @@ public class GoogleOAuthService {
             if (byEmail.isPresent()) {
                 User u = byEmail.get();
                 u.setGoogleSubject(googleSubject);
-                u.setEmailVerified(true);
+                u.setEmailVerified(emailVerified || u.isEmailVerified());
                 return users.save(u);
             }
         }
@@ -42,7 +42,7 @@ public class GoogleOAuthService {
                 ? "Google user"
                 : displayName.trim());
         u.setRole(com.kazka.user.UserRole.USER);
-        u.setEmailVerified(true);
+        u.setEmailVerified(emailVerified);
         return users.save(u);
     }
 }

@@ -141,6 +141,7 @@ class GoogleOAuthControllerIT extends AbstractIT {
                 .audience().add(iosClientId).and()
                 .subject(sub)
                 .claim("email", email)
+                .claim("email_verified", true)
                 .claim("name", name)
                 .expiration(Date.from(Instant.now().plusSeconds(300)))
                 .signWith(googleKey, Jwts.SIG.RS256)

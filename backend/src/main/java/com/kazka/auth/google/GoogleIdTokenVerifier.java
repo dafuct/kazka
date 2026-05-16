@@ -78,9 +78,11 @@ public class GoogleIdTokenVerifier {
                 throw new InvalidGoogleTokenException("Token expired");
             }
 
+            Boolean emailVerifiedClaim = claims.get("email_verified", Boolean.class);
             return new Verified(
                     claims.getSubject(),
                     claims.get("email", String.class),
+                    emailVerifiedClaim != null && emailVerifiedClaim,
                     claims.get("name", String.class));
         } catch (InvalidGoogleTokenException e) {
             throw e;
@@ -118,7 +120,7 @@ public class GoogleIdTokenVerifier {
         return parsed;
     }
 
-    public record Verified(String subject, String email, String name) {}
+    public record Verified(String subject, String email, boolean emailVerified, String name) {}
 
     private record JwksCache(Map<String, PublicKey> keys, Instant fetchedAt) {}
 

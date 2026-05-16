@@ -53,6 +53,7 @@ public class GoogleOAuthController {
                                 oauthService.linkOrCreate(
                                         verified.subject(),
                                         verified.email(),
+                                        verified.emailVerified(),
                                         verified.name()))
                         .subscribeOn(Schedulers.boundedElastic()))
                 .flatMap(user -> establishSession(exchange, user).thenReturn(user))
