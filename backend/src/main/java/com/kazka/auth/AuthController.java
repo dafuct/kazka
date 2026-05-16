@@ -4,6 +4,7 @@ import com.kazka.auth.dto.AuthResponse;
 import com.kazka.auth.dto.PasswordResetConfirmRequest;
 import com.kazka.auth.dto.PasswordResetRequestRequest;
 import com.kazka.auth.dto.SignupRequest;
+import com.kazka.auth.token.dto.TokenResponse;
 import com.kazka.user.UserDto;
 import com.kazka.user.UserRepository;
 import jakarta.validation.Valid;
@@ -42,12 +43,12 @@ public class AuthController {
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<AuthResponse> signup(@Valid @RequestBody SignupRequest req,
-                                     ServerWebExchange exchange) {
-        return Mono.fromCallable(() -> authService.signup(req.email(), req.password(), req.displayName()).user())
+    public Mono<TokenResponse> signup(@Valid @RequestBody SignupRequest req,
+                                      ServerWebExchange exchange) {
+        return Mono.fromCallable(() -> authService.signup(req.email(), req.password(), req.displayName()))
                 .subscribeOn(Schedulers.boundedElastic())
-                .flatMap(dto -> establishSession(exchange, dto)
-                        .thenReturn(new AuthResponse(dto)));
+                .flatMap(result -> establishSession(exchange, result.user())
+                        .thenReturn(result.tokens()));
     }
 
     @GetMapping("/me")

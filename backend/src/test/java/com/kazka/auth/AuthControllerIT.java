@@ -41,6 +41,23 @@ class AuthControllerIT extends AbstractIT {
     }
 
     @Test
+    void should_returnTokensAndUser_when_signup() {
+        client().post().uri("/api/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of(
+                        "email", "newsignup@example.com",
+                        "password", "password123",
+                        "displayName", "New Signup"))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .jsonPath("$.user.email").isEqualTo("newsignup@example.com")
+                .jsonPath("$.accessToken").isNotEmpty()
+                .jsonPath("$.refreshToken").isNotEmpty()
+                .jsonPath("$.accessExpiresInSeconds").isNumber();
+    }
+
+    @Test
     void should_returnUser_when_callMeWithValidSession() {
         var sessionCookie = signupAndGetSessionCookie("bob@example.com", "Bob");
 
