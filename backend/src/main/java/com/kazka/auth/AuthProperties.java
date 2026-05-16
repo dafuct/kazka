@@ -28,6 +28,7 @@ public record AuthProperties(
     public record Apple(
             String teamId,
             String clientId,
+            String webClientId,
             String keyId,
             String privateKeyPem,
             String jwksUri,

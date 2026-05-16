@@ -32,7 +32,7 @@ class AppleClientSecretProviderTest {
                 + "\n-----END PRIVATE KEY-----";
 
         var apple = new AuthProperties.Apple(
-                "TEAM123", "app.kazka.ios", "KEY123", pem,
+                "TEAM123", "app.kazka.ios", null, "KEY123", pem,
                 "https://example.com/jwks", "https://appleid.apple.com",
                 Duration.ofMinutes(60));
         provider = new AppleClientSecretProvider(apple);

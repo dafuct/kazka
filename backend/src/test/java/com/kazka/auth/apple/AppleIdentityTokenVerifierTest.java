@@ -59,7 +59,7 @@ class AppleIdentityTokenVerifierTest {
                         .withBody(new ObjectMapper().writeValueAsString(jwks))));
 
         var apple = new AuthProperties.Apple(
-                "TEAM", "app.kazka.ios", "k", "",
+                "TEAM", "app.kazka.ios", null, "k", "",
                 wiremock.baseUrl() + "/auth/keys",
                 "https://appleid.apple.com",
                 Duration.ofMinutes(60));
