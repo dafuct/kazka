@@ -6,6 +6,7 @@ import { SignInForm } from './SignInForm'
 import { SignUpForm } from './SignUpForm'
 import { ForgotPasswordForm } from './ForgotPasswordForm'
 import { GoogleButton } from './GoogleButton'
+import { AppleButton } from './AppleButton'
 import storyStyles from '../modal/StoryModal.module.css'
 import styles from './AuthModal.module.css'
 
@@ -51,6 +52,7 @@ export function AuthModal() {
           <>
             <div className={styles.divider}>or</div>
             <GoogleButton />
+            <AppleButton />
           </>
         )}
       </div>
