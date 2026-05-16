@@ -52,6 +52,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/devices/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/billing/iap/webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["webhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/billing/iap/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/verify-email/resend": {
         parameters: {
             query?: never;
@@ -164,6 +212,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/oauth/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["google"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/oauth/apple": {
         parameters: {
             query?: never;
@@ -236,6 +300,38 @@ export interface paths {
             cookie?: never;
         };
         get: operations["listByCursor"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/billing/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/billing/entitlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["entitlements"];
         put?: never;
         post?: never;
         delete?: never;
@@ -324,6 +420,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/devices/{deviceToken}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["unregister"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -361,6 +473,22 @@ export interface components {
             language: "uk" | "en";
         };
         ServerSentEventObject: Record<string, never>;
+        DeviceRegisterRequest: {
+            deviceToken: string;
+            /** @enum {string} */
+            platform: "ios";
+            locale?: string | null;
+        };
+        IapVerifyRequest: {
+            signedTransaction: string;
+        };
+        EntitlementDto: {
+            productAppleId?: string;
+            /** @enum {string} */
+            state?: "ACTIVE" | "EXPIRED" | "GRACE" | "REFUNDED" | "REVOKED";
+            /** Format: date-time */
+            expiresAt?: string;
+        };
         TokenRefreshRequest: {
             refreshToken: string;
         };
@@ -393,15 +521,15 @@ export interface components {
             password: string;
             displayName: string;
         };
-        AuthResponse: {
-            user: components["schemas"]["UserDto"];
-        };
         PasswordResetRequestRequest: {
             email: string;
         };
         PasswordResetConfirmRequest: {
             token: string;
             newPassword: string;
+        };
+        GoogleLoginRequest: {
+            idToken: string;
         };
         AppleLoginRequest: {
             identityToken: string;
@@ -421,6 +549,19 @@ export interface components {
         CursorPageResponseStoryDto: {
             items: components["schemas"]["StoryDto"][];
             nextCursor?: string | null;
+        };
+        ProductDto: {
+            id?: string;
+            appleProductId?: string;
+            name?: string;
+            /** Format: int64 */
+            priceMicro?: number;
+            currency?: string;
+            period?: string;
+            tier?: string;
+        };
+        AuthResponse: {
+            user: components["schemas"]["UserDto"];
         };
         AdminUserDto: {
             id?: string;
@@ -479,18 +620,23 @@ export type SchemaUpdateStoryRequest = components['schemas']['UpdateStoryRequest
 export type SchemaStoryDto = components['schemas']['StoryDto'];
 export type SchemaGenerationRequest = components['schemas']['GenerationRequest'];
 export type SchemaServerSentEventObject = components['schemas']['ServerSentEventObject'];
+export type SchemaDeviceRegisterRequest = components['schemas']['DeviceRegisterRequest'];
+export type SchemaIapVerifyRequest = components['schemas']['IapVerifyRequest'];
+export type SchemaEntitlementDto = components['schemas']['EntitlementDto'];
 export type SchemaTokenRefreshRequest = components['schemas']['TokenRefreshRequest'];
 export type SchemaTokenResponse = components['schemas']['TokenResponse'];
 export type SchemaUserDto = components['schemas']['UserDto'];
 export type SchemaTokenLogoutRequest = components['schemas']['TokenLogoutRequest'];
 export type SchemaTokenLoginRequest = components['schemas']['TokenLoginRequest'];
 export type SchemaSignupRequest = components['schemas']['SignupRequest'];
-export type SchemaAuthResponse = components['schemas']['AuthResponse'];
 export type SchemaPasswordResetRequestRequest = components['schemas']['PasswordResetRequestRequest'];
 export type SchemaPasswordResetConfirmRequest = components['schemas']['PasswordResetConfirmRequest'];
+export type SchemaGoogleLoginRequest = components['schemas']['GoogleLoginRequest'];
 export type SchemaAppleLoginRequest = components['schemas']['AppleLoginRequest'];
 export type SchemaPageResponseStoryDto = components['schemas']['PageResponseStoryDto'];
 export type SchemaCursorPageResponseStoryDto = components['schemas']['CursorPageResponseStoryDto'];
+export type SchemaProductDto = components['schemas']['ProductDto'];
+export type SchemaAuthResponse = components['schemas']['AuthResponse'];
 export type SchemaAdminUserDto = components['schemas']['AdminUserDto'];
 export type SchemaSuspendedUserDto = components['schemas']['SuspendedUserDto'];
 export type SchemaFlaggedAttemptDto = components['schemas']['FlaggedAttemptDto'];
@@ -609,6 +755,76 @@ export interface operations {
             };
         };
     };
+    register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeviceRegisterRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    webhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    verify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IapVerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EntitlementDto"][];
+                };
+            };
+        };
+    };
     resendVerification: {
         parameters: {
             query?: never;
@@ -716,7 +932,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AuthResponse"];
+                    "*/*": components["schemas"]["TokenResponse"];
                 };
             };
         };
@@ -762,6 +978,30 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    google: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoogleLoginRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TokenResponse"];
+                };
             };
         };
     };
@@ -875,6 +1115,46 @@ export interface operations {
             };
         };
     };
+    products: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProductDto"][];
+                };
+            };
+        };
+    };
+    entitlements: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EntitlementDto"][];
+                };
+            };
+        };
+    };
     verifyEmail: {
         parameters: {
             query: {
@@ -975,6 +1255,26 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["PageResponseFlaggedAttemptDto"];
                 };
+            };
+        };
+    };
+    unregister: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                deviceToken: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
