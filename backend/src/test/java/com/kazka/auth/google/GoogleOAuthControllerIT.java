@@ -83,6 +83,7 @@ class GoogleOAuthControllerIT extends AbstractIT {
                 .bodyValue(Map.of("idToken", idToken))
                 .exchange()
                 .expectStatus().isOk()
+                .expectHeader().exists("Set-Cookie")
                 .expectBody()
                 .jsonPath("$.accessToken").isNotEmpty()
                 .jsonPath("$.refreshToken").isNotEmpty()

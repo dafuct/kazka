@@ -1,6 +1,7 @@
 package com.kazka.auth.google;
 
 import com.kazka.auth.AuthProperties;
+import com.kazka.auth.KazkaUserDetails;
 import com.kazka.auth.google.dto.GoogleLoginRequest;
 import com.kazka.auth.token.RefreshTokenService;
 import com.kazka.auth.token.TokenIssuer;
@@ -8,10 +9,14 @@ import com.kazka.auth.token.dto.TokenResponse;
 import com.kazka.user.User;
 import com.kazka.user.UserDto;
 import jakarta.validation.Valid;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -24,6 +29,8 @@ public class GoogleOAuthController {
     private final TokenIssuer tokenIssuer;
     private final RefreshTokenService refreshTokens;
     private final AuthProperties props;
+    private final WebSessionServerSecurityContextRepository contextRepo =
+            new WebSessionServerSecurityContextRepository();
 
     public GoogleOAuthController(GoogleIdTokenVerifier verifier,
                                  GoogleOAuthService oauthService,
@@ -38,7 +45,8 @@ public class GoogleOAuthController {
     }
 
     @PostMapping("/google")
-    public Mono<TokenResponse> google(@RequestBody @Valid GoogleLoginRequest req) {
+    public Mono<TokenResponse> google(@RequestBody @Valid GoogleLoginRequest req,
+                                      ServerWebExchange exchange) {
         return Mono.fromCallable(() -> verifier.verify(req.idToken()))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(verified -> Mono.fromCallable(() ->
@@ -47,7 +55,15 @@ public class GoogleOAuthController {
                                         verified.email(),
                                         verified.name()))
                         .subscribeOn(Schedulers.boundedElastic()))
+                .flatMap(user -> establishSession(exchange, user).thenReturn(user))
                 .flatMap(this::issueTokens);
+    }
+
+    private Mono<Void> establishSession(ServerWebExchange exchange, User user) {
+        var principal = new KazkaUserDetails(user);
+        var token = new UsernamePasswordAuthenticationToken(
+                principal, null, principal.getAuthorities());
+        return contextRepo.save(exchange, new SecurityContextImpl(token));
     }
 
     private Mono<TokenResponse> issueTokens(User u) {

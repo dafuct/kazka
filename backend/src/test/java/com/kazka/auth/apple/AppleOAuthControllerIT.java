@@ -83,6 +83,7 @@ class AppleOAuthControllerIT extends AbstractIT {
                         "email", "new@privaterelay.appleid.com"))
                 .exchange()
                 .expectStatus().isOk()
+                .expectHeader().exists("Set-Cookie")
                 .expectBody()
                 .jsonPath("$.accessToken").isNotEmpty()
                 .jsonPath("$.refreshToken").isNotEmpty()
