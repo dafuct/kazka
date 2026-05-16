@@ -100,7 +100,8 @@ public class SecurityConfig {
                                 "/api/auth/token/login",
                                 "/api/auth/token/refresh",
                                 "/api/auth/token/logout",
-                                "/api/auth/oauth/apple").permitAll()
+                                "/api/auth/oauth/apple",
+                                "/api/auth/oauth/google").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/auth/me", "/api/auth/verify-email").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/billing/products").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/billing/iap/webhook").permitAll()

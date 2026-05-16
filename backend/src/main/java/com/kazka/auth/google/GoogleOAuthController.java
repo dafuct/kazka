@@ -1,0 +1,61 @@
+package com.kazka.auth.google;
+
+import com.kazka.auth.AuthProperties;
+import com.kazka.auth.google.dto.GoogleLoginRequest;
+import com.kazka.auth.token.RefreshTokenService;
+import com.kazka.auth.token.TokenIssuer;
+import com.kazka.auth.token.dto.TokenResponse;
+import com.kazka.user.User;
+import com.kazka.user.UserDto;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
+@RestController
+@RequestMapping("/api/auth/oauth")
+public class GoogleOAuthController {
+
+    private final GoogleIdTokenVerifier verifier;
+    private final GoogleOAuthService oauthService;
+    private final TokenIssuer tokenIssuer;
+    private final RefreshTokenService refreshTokens;
+    private final AuthProperties props;
+
+    public GoogleOAuthController(GoogleIdTokenVerifier verifier,
+                                 GoogleOAuthService oauthService,
+                                 TokenIssuer tokenIssuer,
+                                 RefreshTokenService refreshTokens,
+                                 AuthProperties props) {
+        this.verifier = verifier;
+        this.oauthService = oauthService;
+        this.tokenIssuer = tokenIssuer;
+        this.refreshTokens = refreshTokens;
+        this.props = props;
+    }
+
+    @PostMapping("/google")
+    public Mono<TokenResponse> google(@RequestBody @Valid GoogleLoginRequest req) {
+        return Mono.fromCallable(() -> verifier.verify(req.idToken()))
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(verified -> Mono.fromCallable(() ->
+                                oauthService.linkOrCreate(
+                                        verified.subject(),
+                                        verified.email(),
+                                        verified.name()))
+                        .subscribeOn(Schedulers.boundedElastic()))
+                .flatMap(this::issueTokens);
+    }
+
+    private Mono<TokenResponse> issueTokens(User u) {
+        String access = tokenIssuer.issueAccessToken(u.getId(), u.getRole());
+        return refreshTokens.issue(u.getId())
+                .map(refresh -> new TokenResponse(
+                        access, refresh,
+                        props.jwt().accessTtl().toSeconds(),
+                        UserDto.from(u)));
+    }
+}

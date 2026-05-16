@@ -71,6 +71,13 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "INVALID_APPLE_TOKEN"));
     }
 
+    @ExceptionHandler(com.kazka.auth.google.GoogleIdTokenVerifier.InvalidGoogleTokenException.class)
+    public ResponseEntity<Map<String, String>> invalidGoogle(
+            com.kazka.auth.google.GoogleIdTokenVerifier.InvalidGoogleTokenException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "INVALID_GOOGLE_TOKEN"));
+    }
+
     @ExceptionHandler(MailDeliveryException.class)
     public ResponseEntity<Map<String, Object>> handleMailFailure(MailDeliveryException ex) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
