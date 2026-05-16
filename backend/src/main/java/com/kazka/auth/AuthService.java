@@ -1,6 +1,9 @@
 package com.kazka.auth;
 
 import com.kazka.auth.exception.EmailAlreadyExistsException;
+import com.kazka.auth.token.RefreshTokenService;
+import com.kazka.auth.token.TokenIssuer;
+import com.kazka.auth.token.dto.TokenResponse;
 import com.kazka.user.EmailVerificationToken;
 import com.kazka.user.EmailVerificationTokenRepository;
 import com.kazka.user.PasswordResetToken;
@@ -23,6 +26,8 @@ public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
+    public record SignupResult(UserDto user, TokenResponse tokens) {}
+
     private final UserRepository users;
     private final EmailVerificationTokenRepository emailTokens;
     private final PasswordResetTokenRepository resetTokens;
@@ -31,6 +36,8 @@ public class AuthService {
     private final MailService mailService;
     private final SessionInvalidator sessionInvalidator;
     private final AuthProperties props;
+    private final TokenIssuer tokenIssuer;
+    private final RefreshTokenService refreshTokens;
 
     public AuthService(UserRepository users,
                        EmailVerificationTokenRepository emailTokens,
@@ -39,7 +46,9 @@ public class AuthService {
                        TokenService tokenService,
                        MailService mailService,
                        SessionInvalidator sessionInvalidator,
-                       AuthProperties props) {
+                       AuthProperties props,
+                       TokenIssuer tokenIssuer,
+                       RefreshTokenService refreshTokens) {
         this.users = users;
         this.emailTokens = emailTokens;
         this.resetTokens = resetTokens;
@@ -48,10 +57,12 @@ public class AuthService {
         this.mailService = mailService;
         this.sessionInvalidator = sessionInvalidator;
         this.props = props;
+        this.tokenIssuer = tokenIssuer;
+        this.refreshTokens = refreshTokens;
     }
 
     @Transactional
-    public UserDto signup(String email, String password, String displayName) {
+    public SignupResult signup(String email, String password, String displayName) {
         String normalized = email.trim().toLowerCase();
         if (users.existsByEmail(normalized)) {
             throw new EmailAlreadyExistsException();
@@ -67,7 +78,14 @@ public class AuthService {
         users.save(user);
 
         sendVerification(user);
-        return UserDto.from(user);
+
+        String access = tokenIssuer.issueAccessToken(user.getId(), user.getRole());
+        String refresh = refreshTokens.issue(user.getId()).block();
+        TokenResponse tokens = new TokenResponse(
+                access, refresh,
+                props.jwt().accessTtl().toSeconds(),
+                UserDto.from(user));
+        return new SignupResult(UserDto.from(user), tokens);
     }
 
     private void sendVerification(User user) {

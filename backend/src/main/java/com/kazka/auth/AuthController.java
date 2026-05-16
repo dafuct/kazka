@@ -44,7 +44,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<AuthResponse> signup(@Valid @RequestBody SignupRequest req,
                                      ServerWebExchange exchange) {
-        return Mono.fromCallable(() -> authService.signup(req.email(), req.password(), req.displayName()))
+        return Mono.fromCallable(() -> authService.signup(req.email(), req.password(), req.displayName()).user())
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(dto -> establishSession(exchange, dto)
                         .thenReturn(new AuthResponse(dto)));
