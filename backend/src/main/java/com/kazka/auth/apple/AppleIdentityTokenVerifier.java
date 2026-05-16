@@ -61,10 +61,22 @@ public class AppleIdentityTokenVerifier {
             Claims claims = Jwts.parser()
                     .verifyWith(key)
                     .requireIssuer(apple.issuer())
-                    .requireAudience(apple.clientId())
                     .build()
                     .parseSignedClaims(identityToken)
                     .getPayload();
+
+            java.util.Set<String> allowedAudiences = new java.util.LinkedHashSet<>();
+            allowedAudiences.add(apple.clientId());
+            if (apple.webClientId() != null && !apple.webClientId().isBlank()) {
+                allowedAudiences.add(apple.webClientId());
+            }
+            java.util.Set<String> tokenAudiences = claims.getAudience() == null
+                    ? java.util.Set.of()
+                    : claims.getAudience();
+            boolean audMatched = tokenAudiences.stream().anyMatch(allowedAudiences::contains);
+            if (!audMatched) {
+                throw new InvalidAppleTokenException("Audience not allowed: " + tokenAudiences);
+            }
 
             if (claims.getExpiration() == null
                     || claims.getExpiration().toInstant().isBefore(Instant.now())) {

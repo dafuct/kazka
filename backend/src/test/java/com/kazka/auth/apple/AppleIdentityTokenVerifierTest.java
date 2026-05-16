@@ -97,6 +97,73 @@ class AppleIdentityTokenVerifierTest {
     }
 
     @Test
+    void should_acceptToken_when_audienceIsWebClientId() throws Exception {
+        var appleWithWeb = new AuthProperties.Apple(
+                "TEAM", "app.kazka.ios", "app.kazka.web", "k", "",
+                wiremock.baseUrl() + "/auth/keys",
+                "https://appleid.apple.com",
+                Duration.ofMinutes(60));
+        var verifier2 = new AppleIdentityTokenVerifier(appleWithWeb);
+
+        String token = Jwts.builder()
+                .header().keyId(kid).and()
+                .issuer("https://appleid.apple.com")
+                .audience().add("app.kazka.web").and()
+                .subject("u")
+                .claim("email", "u@example.com")
+                .expiration(Date.from(Instant.now().plusSeconds(60)))
+                .signWith(privateKey, Jwts.SIG.ES256)
+                .compact();
+
+        AppleIdentityTokenVerifier.Verified verified = verifier2.verify(token);
+        assertThat(verified.subject()).isEqualTo("u");
+    }
+
+    @Test
+    void should_acceptToken_when_audienceIsIosClientIdAndWebClientIdConfigured() throws Exception {
+        var appleWithWeb = new AuthProperties.Apple(
+                "TEAM", "app.kazka.ios", "app.kazka.web", "k", "",
+                wiremock.baseUrl() + "/auth/keys",
+                "https://appleid.apple.com",
+                Duration.ofMinutes(60));
+        var verifier2 = new AppleIdentityTokenVerifier(appleWithWeb);
+
+        String token = Jwts.builder()
+                .header().keyId(kid).and()
+                .issuer("https://appleid.apple.com")
+                .audience().add("app.kazka.ios").and()
+                .subject("u")
+                .expiration(Date.from(Instant.now().plusSeconds(60)))
+                .signWith(privateKey, Jwts.SIG.ES256)
+                .compact();
+
+        AppleIdentityTokenVerifier.Verified verified = verifier2.verify(token);
+        assertThat(verified.subject()).isEqualTo("u");
+    }
+
+    @Test
+    void should_throw_when_audIsNeither() throws Exception {
+        var appleWithWeb = new AuthProperties.Apple(
+                "TEAM", "app.kazka.ios", "app.kazka.web", "k", "",
+                wiremock.baseUrl() + "/auth/keys",
+                "https://appleid.apple.com",
+                Duration.ofMinutes(60));
+        var verifier2 = new AppleIdentityTokenVerifier(appleWithWeb);
+
+        String token = Jwts.builder()
+                .header().keyId(kid).and()
+                .issuer("https://appleid.apple.com")
+                .audience().add("some-other-app").and()
+                .subject("u")
+                .expiration(Date.from(Instant.now().plusSeconds(60)))
+                .signWith(privateKey, Jwts.SIG.ES256)
+                .compact();
+
+        assertThatThrownBy(() -> verifier2.verify(token))
+                .isInstanceOf(AppleIdentityTokenVerifier.InvalidAppleTokenException.class);
+    }
+
+    @Test
     void should_throw_when_tokenExpired() {
         String token = signToken("u", "e@e.com", Instant.now().minusSeconds(60));
 
