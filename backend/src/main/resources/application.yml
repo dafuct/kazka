@@ -91,6 +91,11 @@ kazka:
       jwks-uri: ${APPLE_JWKS_URI:https://appleid.apple.com/auth/keys}
       issuer: ${APPLE_ISSUER:https://appleid.apple.com}
       client-secret-ttl: 1h
+    google:
+      ios-client-id: ${GOOGLE_IOS_CLIENT_ID:}
+      android-client-id: ${GOOGLE_ANDROID_CLIENT_ID:}
+      jwks-uri: ${GOOGLE_JWKS_URI:https://www.googleapis.com/oauth2/v3/certs}
+      issuer: ${GOOGLE_ISSUER:https://accounts.google.com}
     apns:
       team-id: ${APNS_TEAM_ID:not-configured}
       key-id: ${APNS_KEY_ID:not-configured}

@@ -12,6 +12,7 @@ public record AuthProperties(
         Admin admin,
         Jwt jwt,
         Apple apple,
+        Google google,
         Apns apns
 ) {
     public record TokenTtl(Duration emailVerification, Duration passwordReset) {}
@@ -43,5 +44,12 @@ public record AuthProperties(
             String bundleId,
             String apnsHost,
             Boolean enabled
+    ) {}
+
+    public record Google(
+            String iosClientId,
+            String androidClientId,
+            String jwksUri,
+            String issuer
     ) {}
 }
