@@ -27,6 +27,11 @@ export const en = {
     body: 'We sent a verification link to {{email}}. Open it on this device to finish setting up your account.',
     resend: 'Resend verification email',
   },
+  verifyBanner: {
+    message: 'Verify your email to keep your account.',
+    resend: 'Resend',
+    sent: 'Sent! Check your inbox.',
+  },
   forgot: {
     title: 'Reset password',
     body: 'Enter your email — we will send a link to reset it.',
@@ -40,6 +45,7 @@ export const en = {
     EMAIL_NOT_VERIFIED: 'Please verify your email first.',
     INVALID_REFRESH_TOKEN: 'Your session has expired. Please sign in again.',
     INVALID_APPLE_TOKEN: 'Apple sign-in failed. Please try again.',
+    INVALID_GOOGLE_TOKEN: 'Google sign-in failed. Please try again.',
     ACCOUNT_SUSPENDED: 'Your account is suspended.',
     VALIDATION: 'Please check the form for errors.',
     UNAUTHENTICATED: 'Please sign in.',
