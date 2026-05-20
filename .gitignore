@@ -27,6 +27,7 @@
 
 # Runtime
 backend/uploads/
+scripts/.pids/
 
 # Git worktrees
 .worktrees/
