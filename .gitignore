@@ -12,6 +12,9 @@
 **/.vite/
 *.log
 
+# Expo
+.expo/
+
 # IDE
 .idea/
 *.iml
@@ -37,3 +40,7 @@ backend/uploads/
 .serena/
 docs/
 CLAUDE.md
+
+# LLM Wiki (local-only)
+raw/
+wiki/
