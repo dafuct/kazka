@@ -13,7 +13,8 @@ class IapVerifierTest {
     @Test
     void should_throw_when_billing_disabled_and_verify_called() {
         BillingProperties disabled = new BillingProperties(
-                "app.kazka.ios", "n/a", 0L, "Sandbox", "i", "k", "", false, 3);
+                "app.kazka.ios", "n/a", 0L, "Sandbox", "i", "k", "", false, 3,
+                null, null, null, null, null);
         IapVerifier v = new IapVerifier(disabled);
         assertThatThrownBy(() -> v.verifyTransaction("any"))
                 .isInstanceOf(IllegalStateException.class)
@@ -23,7 +24,8 @@ class IapVerifierTest {
     @Test
     void should_throw_VerificationException_when_signed_data_is_garbage() throws Exception {
         BillingProperties enabled = new BillingProperties(
-                "app.kazka.ios", "n/a", 1234567890L, "Sandbox", "i", "k", "", true, 3);
+                "app.kazka.ios", "n/a", 1234567890L, "Sandbox", "i", "k", "", true, 3,
+                null, null, null, null, null);
         IapVerifier v = new IapVerifier(enabled);
         v.init();
         assertThatThrownBy(() -> v.verifyTransaction("not.a.real.jws"))
