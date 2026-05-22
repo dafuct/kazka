@@ -32,6 +32,10 @@ public class UserEntitlement {
     @Column(name = "original_transaction_id", length = 64)
     private String originalTransactionId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source", nullable = false, length = 16)
+    private EntitlementSource source = EntitlementSource.APPLE;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
@@ -56,4 +60,6 @@ public class UserEntitlement {
     public void setOriginalTransactionId(String v) { this.originalTransactionId = v; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
+    public EntitlementSource getSource() { return source; }
+    public void setSource(EntitlementSource v) { this.source = v; }
 }

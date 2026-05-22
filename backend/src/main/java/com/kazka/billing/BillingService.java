@@ -53,6 +53,7 @@ public class BillingService {
                         e.setUserId(userId);
                         e.setProductId(product.getId());
                         e.setOriginalTransactionId(origTxn);
+                        e.setSource(EntitlementSource.APPLE);
                         return e;
                     });
             entitlement.setState(EntitlementState.ACTIVE);
