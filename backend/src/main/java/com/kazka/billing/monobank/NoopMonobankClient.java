@@ -6,12 +6,11 @@ import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
 @Configuration
-public class StubMonobankClient {
-
+public class NoopMonobankClient {
     @Bean
     @ConditionalOnMissingBean(MonobankClient.class)
-    MonobankClient monobankClient() {
+    MonobankClient noopMonobankClient() {
         return (planId, userId, priceMicro, currency) -> Mono.error(
-                new IllegalStateException("MonobankClient not yet implemented."));
+                new IllegalStateException("Monobank not configured"));
     }
 }
