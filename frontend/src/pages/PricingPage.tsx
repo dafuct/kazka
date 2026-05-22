@@ -6,6 +6,7 @@ import { PlanCard } from '../components/billing/PlanCard'
 import { ProviderSelector } from '../components/billing/ProviderSelector'
 import { useLocale } from '../lib/LocaleContext'
 import { useAuth } from '../lib/AuthContext'
+import { useAuthModal } from '../lib/AuthModalContext'
 import { useBilling } from '../lib/BillingContext'
 import { billing } from '../lib/apiClient'
 import type { Product, ProviderName, GeoResponse } from '../lib/types'
@@ -19,6 +20,7 @@ function formatPrice(p: Product): string {
 export function PricingPage() {
   const { t } = useLocale()
   const { user } = useAuth()
+  const { openAuth } = useAuthModal()
   const { isPro } = useBilling()
   const [params] = useSearchParams()
   const [period, setPeriod] = useState<Period>('yearly')
@@ -40,7 +42,7 @@ export function PricingPage() {
 
   async function handleSubscribe(provider: ProviderName) {
     if (!user) {
-      window.location.href = `/?auth=signin&redirect=${encodeURIComponent('/pricing')}`
+      openAuth('signIn')
       return
     }
     if (!proProduct) return
