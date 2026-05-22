@@ -21,12 +21,14 @@ public class PaddleClientImpl implements PaddleClient {
     private final WebClient http;
 
     public PaddleClientImpl(BillingProperties props) {
-        String base = "sandbox".equalsIgnoreCase(props.paddle().environment())
+        BillingProperties.Paddle paddle = props.paddle();
+        String base = paddle != null && "sandbox".equalsIgnoreCase(paddle.environment())
                 ? "https://sandbox-api.paddle.com"
                 : "https://api.paddle.com";
+        String apiKey = paddle != null ? paddle.apiKey() : "";
         this.http = WebClient.builder()
                 .baseUrl(base)
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + props.paddle().apiKey())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
                 .build();
     }

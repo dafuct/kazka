@@ -104,7 +104,9 @@ public class SecurityConfig {
                                 "/api/auth/oauth/google").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/auth/me", "/api/auth/verify-email").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/billing/products").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/billing/iap/webhook").permitAll()
+                        .pathMatchers(HttpMethod.POST,
+                                "/api/billing/iap/webhook",
+                                "/api/billing/webhook/**").permitAll()
                         .pathMatchers("/api/admin/**").hasRole("ADMIN")
                         .pathMatchers("/api/**").authenticated()
                         .anyExchange().permitAll())
