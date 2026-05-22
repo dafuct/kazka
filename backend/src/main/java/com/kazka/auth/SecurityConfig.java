@@ -87,7 +87,14 @@ public class SecurityConfig {
                                                 "/api/auth/token/**",
                                                 "/api/auth/oauth/**",
                                                 "/api/devices/**",
-                                                "/api/billing/**")))))
+                                                // Webhook endpoints use signed payloads from payment
+                                                // providers (no browser session / no CSRF token).
+                                                // IAP endpoints are called by iOS native clients
+                                                // (Bearer-token only, no cookie session).
+                                                // /api/billing/checkout-session is deliberately
+                                                // excluded here so it keeps CSRF protection.
+                                                "/api/billing/webhook/**",
+                                                "/api/billing/iap/**")))))
                 .authorizeExchange(auth -> auth
                         .pathMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                         .pathMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
