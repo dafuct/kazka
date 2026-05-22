@@ -4,6 +4,7 @@ import { ThemeProvider } from './lib/ThemeContext'
 import { LocaleProvider } from './lib/LocaleContext'
 import { StoryModalProvider } from './lib/StoryModalContext'
 import { AuthProvider, useAuth } from './lib/AuthContext'
+import { BillingProvider } from './lib/BillingContext'
 import { AuthModalProvider } from './lib/AuthModalContext'
 import { StoryModal } from './components/modal/StoryModal'
 import { AuthModal } from './components/auth/AuthModal'
@@ -112,11 +113,13 @@ export default function App() {
       <LocaleProvider>
         <BrowserRouter>
           <AuthProvider>
-            <AuthModalProvider>
-              <StoryModalProvider>
-                <AppShell />
-              </StoryModalProvider>
-            </AuthModalProvider>
+            <BillingProvider>
+              <AuthModalProvider>
+                <StoryModalProvider>
+                  <AppShell />
+                </StoryModalProvider>
+              </AuthModalProvider>
+            </BillingProvider>
           </AuthProvider>
         </BrowserRouter>
       </LocaleProvider>
