@@ -6,12 +6,11 @@ import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
 @Configuration
-public class StubPaddleClient {
-
+public class NoopPaddleClient {
     @Bean
     @ConditionalOnMissingBean(PaddleClient.class)
-    PaddleClient paddleClient() {
+    PaddleClient noopPaddleClient() {
         return (productId, userId, email) -> Mono.error(
-                new IllegalStateException("PaddleClient not yet implemented; configure PADDLE_API_KEY and replace with real bean."));
+                new IllegalStateException("Paddle not configured (set PADDLE_API_KEY)"));
     }
 }
