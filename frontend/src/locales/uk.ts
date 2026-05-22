@@ -207,6 +207,45 @@ export const uk = {
     contactSupport: 'Написати в підтримку',
     tryAnotherTheme: 'Спробувати іншу тему',
   },
+  pricing: {
+    title: 'Перейти на Pro',
+    subtitle: 'Необмежено казок щомісяця',
+    monthly: 'Щомісячно',
+    yearly: 'Щорічно',
+    saveYearly: 'Економія 20%',
+    perMonth: '/міс',
+    perYear: '/рік',
+    free: {
+      name: 'Безкоштовно',
+      price: 'Безкоштовно',
+      bullets: ['3 казки на місяць', 'Базові ілюстрації'],
+    },
+    pro: {
+      name: 'Pro',
+      bullets: [
+        'Необмежено казок',
+        'Пріоритетна черга',
+        'Усі стилі ілюстрацій',
+        'Ранній доступ до нових функцій',
+      ],
+    },
+    payWith: 'Оплата',
+    liqpay: 'LiqPay',
+    monobank: 'Монобанк',
+    paddle: 'Картка (міжнародна)',
+    changeCountry: 'Змінити країну',
+    detectedCountry: 'Виявлено: {country}',
+    alreadyPro: 'Ви вже на Pro',
+    manageOnApple: 'Керувати в App Store',
+    cancelled: 'Без проблем — підпишіться, коли будете готові.',
+    subscribe: 'Підписатися',
+    success: {
+      title: 'Вітаємо у Pro!',
+      activating: 'Активуємо вашу підписку…',
+      delayed: 'Платіж отримано — обліковий запис оновиться найближчим часом.',
+      continue: 'Продовжити',
+    },
+  },
 }
 
 export type Locale = typeof uk
