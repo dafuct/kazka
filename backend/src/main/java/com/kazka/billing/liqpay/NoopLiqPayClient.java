@@ -6,12 +6,11 @@ import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
 
 @Configuration
-public class StubLiqPayClient {
-
+public class NoopLiqPayClient {
     @Bean
     @ConditionalOnMissingBean(LiqPayClient.class)
-    LiqPayClient liqPayClient() {
+    LiqPayClient noopLiqPayClient() {
         return (planId, userId, priceMicro, currency) -> Mono.error(
-                new IllegalStateException("LiqPayClient not yet implemented."));
+                new IllegalStateException("LiqPay not configured"));
     }
 }
