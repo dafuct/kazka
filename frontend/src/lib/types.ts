@@ -16,3 +16,33 @@ export type {
 } from '@kazka/shared';
 
 export { ApiError } from '@kazka/shared';
+
+export interface Product {
+  id: string
+  appleProductId: string
+  name: string
+  priceMicro: number
+  currency: string
+  period: 'P1M' | 'P1Y'
+  tier: string
+}
+
+export interface Entitlement {
+  productAppleId: string
+  state: 'ACTIVE' | 'GRACE' | 'EXPIRED' | 'REFUNDED'
+  expiresAt: string | null
+  source: 'APPLE' | 'PADDLE' | 'LIQPAY' | 'MONOBANK'
+}
+
+export interface GeoResponse {
+  country: string
+  isUkraine: boolean
+}
+
+export type ProviderName = 'paddle' | 'liqpay' | 'monobank'
+
+export interface CheckoutSessionResponse {
+  provider: ProviderName
+  checkoutUrl: string | null
+  paddleTransactionId: string | null
+}

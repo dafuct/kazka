@@ -2,6 +2,7 @@ import { withCsrf } from './csrf'
 import { ApiError } from './types'
 import type {
   Story, PageResponse, UpdateStoryRequest, User, ApiErrorBody,
+  Product, Entitlement, GeoResponse, CheckoutSessionResponse, ProviderName,
 } from './types'
 
 const STORIES = '/api/stories'
@@ -12,6 +13,13 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
     ...init,
   }))
+  if (res.status === 402) {
+    const currentPath = window.location.pathname + window.location.search
+    if (!currentPath.startsWith('/pricing')) {
+      window.location.href = `/pricing?redirect=${encodeURIComponent(currentPath)}`
+    }
+    throw new ApiError(402, { error: 'PAYWALL_REQUIRED' })
+  }
   if (!res.ok) {
     let body: ApiErrorBody
     try { body = await res.json() } catch { body = { error: 'ERROR' } }
@@ -116,5 +124,26 @@ export const adminModeration = {
   },
   unsuspend(userId: string): Promise<void> {
     return request(`/api/admin/users/${userId}/unsuspend`, { method: 'POST' })
+  },
+}
+
+const BILLING = '/api/billing'
+
+export const billing = {
+  listProducts(): Promise<Product[]> {
+    return request(`${BILLING}/products`)
+  },
+  entitlements(): Promise<Entitlement[]> {
+    return request(`${BILLING}/entitlements`)
+  },
+  geo(countryHint?: string): Promise<GeoResponse> {
+    const q = countryHint ? `?country=${encodeURIComponent(countryHint)}` : ''
+    return request(`${BILLING}/geo${q}`)
+  },
+  createCheckoutSession(planId: string, provider: ProviderName, countryHint?: string): Promise<CheckoutSessionResponse> {
+    return request(`${BILLING}/checkout-session`, {
+      method: 'POST',
+      body: JSON.stringify({ planId, provider, countryHint }),
+    })
   },
 }
