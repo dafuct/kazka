@@ -15,7 +15,7 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   }))
   if (res.status === 402) {
     const currentPath = window.location.pathname + window.location.search
-    if (!currentPath.startsWith('/pricing')) {
+    if (!currentPath.startsWith('/pricing') && !url.startsWith('/api/billing/')) {
       window.location.href = `/pricing?redirect=${encodeURIComponent(currentPath)}`
     }
     throw new ApiError(402, { error: 'PAYWALL_REQUIRED' })
