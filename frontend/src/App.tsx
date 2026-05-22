@@ -4,6 +4,7 @@ import { ThemeProvider } from './lib/ThemeContext'
 import { LocaleProvider } from './lib/LocaleContext'
 import { StoryModalProvider } from './lib/StoryModalContext'
 import { AuthProvider, useAuth } from './lib/AuthContext'
+import { BillingProvider } from './lib/BillingContext'
 import { AuthModalProvider } from './lib/AuthModalContext'
 import { StoryModal } from './components/modal/StoryModal'
 import { AuthModal } from './components/auth/AuthModal'
@@ -19,6 +20,8 @@ import { EmailVerifiedPage } from './pages/EmailVerifiedPage'
 import { PasswordResetPage } from './pages/PasswordResetPage'
 import { AdminUsersPage } from './pages/AdminUsersPage'
 import { AdminModerationPage } from './pages/AdminModerationPage'
+import { PricingPage } from './pages/PricingPage'
+import { SubscriptionSuccessPage } from './pages/SubscriptionSuccessPage'
 
 function ScrollProgress() {
   const barRef = useRef<HTMLDivElement>(null)
@@ -97,6 +100,8 @@ function AppShell() {
           <Route path="/reset-password" element={<PasswordResetPage />} />
           <Route path="/admin/users" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
           <Route path="/admin/moderation" element={<RequireAdmin><AdminModerationPage /></RequireAdmin>} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/subscription/success" element={<RequireAuth><SubscriptionSuccessPage /></RequireAuth>} />
         </Routes>
       </main>
       <Footer />
@@ -112,11 +117,13 @@ export default function App() {
       <LocaleProvider>
         <BrowserRouter>
           <AuthProvider>
-            <AuthModalProvider>
-              <StoryModalProvider>
-                <AppShell />
-              </StoryModalProvider>
-            </AuthModalProvider>
+            <BillingProvider>
+              <AuthModalProvider>
+                <StoryModalProvider>
+                  <AppShell />
+                </StoryModalProvider>
+              </AuthModalProvider>
+            </BillingProvider>
           </AuthProvider>
         </BrowserRouter>
       </LocaleProvider>

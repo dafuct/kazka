@@ -33,6 +33,15 @@ public class SubscriptionProduct {
     @Column(nullable = false, length = 32)
     private String tier;
 
+    @Column(name = "paddle_product_id", length = 120)
+    private String paddleProductId;
+
+    @Column(name = "liqpay_plan_id", length = 120)
+    private String liqpayPlanId;
+
+    @Column(name = "monobank_plan_id", length = 120)
+    private String monobankPlanId;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
@@ -52,4 +61,10 @@ public class SubscriptionProduct {
     public String getTier() { return tier; }
     public void setTier(String v) { this.tier = v; }
     public Instant getCreatedAt() { return createdAt; }
+    public String getPaddleProductId() { return paddleProductId; }
+    public void setPaddleProductId(String v) { this.paddleProductId = v; }
+    public String getLiqpayPlanId() { return liqpayPlanId; }
+    public void setLiqpayPlanId(String v) { this.liqpayPlanId = v; }
+    public String getMonobankPlanId() { return monobankPlanId; }
+    public void setMonobankPlanId(String v) { this.monobankPlanId = v; }
 }

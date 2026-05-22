@@ -1,0 +1,33 @@
+.wrap { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.label { font-size: 12px; opacity: 0.6; letter-spacing: 0.6px; text-transform: uppercase; }
+.buttons { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.btn {
+  background: #7C3AED;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn:disabled { opacity: 0.5; cursor: progress; }
+.geoRow { display: flex; gap: 12px; align-items: center; font-size: 12px; opacity: 0.7; }
+.linkBtn {
+  background: none;
+  border: none;
+  color: #A78BFA;
+  cursor: pointer;
+  font-size: 12px;
+  text-decoration: underline;
+}
+.picker { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 360px; }
+.pickBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: inherit;
+  cursor: pointer;
+}

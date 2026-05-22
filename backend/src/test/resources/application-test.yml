@@ -78,3 +78,25 @@ kazka:
       bundle-id: app.kazka.ios.test
       apns-host: http://localhost:0
       enabled: false
+  billing:
+    bundle-id: app.kazka.ios.test
+    app-apple-id: ""
+    apple-id: 0
+    environment: Sandbox
+    issuer-id: ""
+    key-id: ""
+    private-key-pem: ""
+    enabled: false
+    free-monthly-story-limit: 3
+    paddle:
+      api-key: ""
+      webhook-secret: ""
+      environment: sandbox
+    liqpay:
+      public-key: ""
+      private-key: ""
+    monobank:
+      token: ""
+      webhook-public-key: ""
+    success-url: http://localhost:5173/subscription/success
+    cancel-url: http://localhost:5173/pricing?cancelled=1

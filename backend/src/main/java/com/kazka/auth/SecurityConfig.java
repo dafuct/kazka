@@ -87,7 +87,14 @@ public class SecurityConfig {
                                                 "/api/auth/token/**",
                                                 "/api/auth/oauth/**",
                                                 "/api/devices/**",
-                                                "/api/billing/**")))))
+                                                // Webhook endpoints use signed payloads from payment
+                                                // providers (no browser session / no CSRF token).
+                                                // IAP endpoints are called by iOS native clients
+                                                // (Bearer-token only, no cookie session).
+                                                // /api/billing/checkout-session is deliberately
+                                                // excluded here so it keeps CSRF protection.
+                                                "/api/billing/webhook/**",
+                                                "/api/billing/iap/**")))))
                 .authorizeExchange(auth -> auth
                         .pathMatchers(HttpMethod.GET, "/uploads/**").permitAll()
                         .pathMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
@@ -104,7 +111,9 @@ public class SecurityConfig {
                                 "/api/auth/oauth/google").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/auth/me", "/api/auth/verify-email").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/billing/products").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/billing/iap/webhook").permitAll()
+                        .pathMatchers(HttpMethod.POST,
+                                "/api/billing/iap/webhook",
+                                "/api/billing/webhook/**").permitAll()
                         .pathMatchers("/api/admin/**").hasRole("ADMIN")
                         .pathMatchers("/api/**").authenticated()
                         .anyExchange().permitAll())

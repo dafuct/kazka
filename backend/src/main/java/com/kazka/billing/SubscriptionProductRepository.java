@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface SubscriptionProductRepository extends JpaRepository<SubscriptionProduct, String> {
     Optional<SubscriptionProduct> findByAppleProductId(String appleProductId);
+    Optional<SubscriptionProduct> findByPaddleProductId(String paddleProductId);
 }
