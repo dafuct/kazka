@@ -95,7 +95,7 @@ public class StoryService {
 
     private Flux<SseEvent> generateInternal(GenerationRequest req, String userId) {
         String id = UUID.randomUUID().toString();
-        String storySystem = promptBuilder.buildStorySystem();
+        String storySystem = promptBuilder.buildStorySystem(req.language());
         String storyUser = promptBuilder.buildStoryUserMessage(req);
         String editorSystem = promptBuilder.buildEditorSystem(req.language());
 

@@ -19,6 +19,8 @@ public class PromptBuilder {
     );
 
     private final String storySystem;
+    private final String storyFewshotUk;
+    private final String storyFewshotEn;
     private final String editorUk;
     private final String editorEn;
     private final String sceneExtractionSystem;
@@ -26,6 +28,8 @@ public class PromptBuilder {
 
     public PromptBuilder() {
         this.storySystem = readResource("prompts/story-system.txt");
+        this.storyFewshotUk = readResource("prompts/story-fewshot-uk.txt");
+        this.storyFewshotEn = readResource("prompts/story-fewshot-en.txt");
         this.editorUk = readResource("prompts/editor-uk.txt");
         this.editorEn = readResource("prompts/editor-en.txt");
         this.sceneExtractionSystem = readResource("prompts/scene-extraction-system.txt");
@@ -42,8 +46,9 @@ public class PromptBuilder {
         );
     }
 
-    public String buildStorySystem() {
-        return storySystem.strip();
+    public String buildStorySystem(String language) {
+        String fewshot = "uk".equals(language) ? storyFewshotUk : storyFewshotEn;
+        return storySystem.strip() + "\n\n---\n\n" + fewshot.strip();
     }
 
     public String buildStoryUserMessage(GenerationRequest req) {

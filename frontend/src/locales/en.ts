@@ -1,6 +1,7 @@
 import type { Locale } from './uk'
 
 export const en: Locale = {
+  brand: 'Storybook World',
   nav: {
     home: 'Home',
     archive: 'Story Archive',
@@ -13,7 +14,7 @@ export const en: Locale = {
     tryCta: 'Try it',
   },
   home: {
-    hero: 'Kazkar',
+    hero: 'Storybook World',
     label: '✦ Personalized fairy tales for your child',
     headline: 'The story waiting just for your child',
     tagline: 'Magical fairy tales for your child — created by AI',
@@ -94,7 +95,7 @@ export const en: Locale = {
   },
   features: {
     label: 'Features',
-    title: 'What makes Kazkar special',
+    title: 'What makes Storybook World special',
     dropInitial: 'D',
     cards: [
       {
@@ -149,7 +150,7 @@ export const en: Locale = {
     terms: 'Terms of Use',
     privacy: 'Privacy',
     support: 'Support',
-    copyright: 'Made with ❤️ for little dreamers · Kazkar 2026',
+    copyright: 'Made with ❤️ for little dreamers · Storybook World 2026',
   },
   errors: {
     generateFailed: 'Failed to generate story. Please try again.',

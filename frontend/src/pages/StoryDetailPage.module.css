@@ -98,10 +98,6 @@
   margin: 0;
 }
 
-.content p:first-child {
-  text-indent: 0;
-}
-
 .contentInput {
   width: 100%;
   padding: var(--spacing-4);

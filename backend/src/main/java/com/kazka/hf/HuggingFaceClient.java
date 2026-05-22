@@ -36,11 +36,15 @@ public class HuggingFaceClient {
     }
 
     public Flux<String> streamText(String system, String user) {
-        return streamRequest(props.getTextModel(), system, user);
+        return streamRequest(props.getTextModel(), system, user,
+                props.getTextTemperature(), props.getTextTopP(),
+                props.getTextRepetitionPenalty(), props.getTextMaxTokens());
     }
 
     public Flux<String> streamEdit(String system, String user) {
-        return streamRequest(props.getEditorModel(), system, user);
+        return streamRequest(props.getEditorModel(), system, user,
+                props.getEditorTemperature(), props.getEditorTopP(),
+                props.getEditorRepetitionPenalty(), props.getEditorMaxTokens());
     }
 
     public Mono<String> generateText(String system, String user) {
@@ -64,19 +68,24 @@ public class HuggingFaceClient {
                         .path("message").path("content").asText(""));
     }
 
-    private Flux<String> streamRequest(String model, String system, String user) {
+    private Flux<String> streamRequest(String model, String system, String user,
+                                        double temperature, double topP,
+                                        double repetitionPenalty, int maxTokens) {
+        Map<String, Object> body = new java.util.LinkedHashMap<>();
+        body.put("model", model);
+        body.put("messages", List.of(
+                Map.of("role", "system", "content", system),
+                Map.of("role", "user", "content", user)
+        ));
+        body.put("stream", true);
+        body.put("max_tokens", maxTokens);
+        body.put("temperature", temperature);
+        body.put("top_p", topP);
+        body.put("repetition_penalty", repetitionPenalty);
         return textClient.post()
                 .uri("/v1/chat/completions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of(
-                        "model", model,
-                        "messages", List.of(
-                                Map.of("role", "system", "content", system),
-                                Map.of("role", "user", "content", user)
-                        ),
-                        "stream", true,
-                        "max_tokens", 4096
-                ))
+                .bodyValue(body)
                 .retrieve()
                 .bodyToFlux(String.class)
                 .flatMap(line -> {

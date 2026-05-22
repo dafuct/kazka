@@ -14,12 +14,24 @@ class PromptBuilderTest {
     private final PromptBuilder builder = new PromptBuilder();
 
     @Test
-    void buildStorySystem_containsStructureGuidance() {
-        String system = builder.buildStorySystem();
+    void buildStorySystem_uk_containsStructureAndUkrainianFewshot() {
+        String system = builder.buildStorySystem("uk");
 
         assertThat(system).contains("Opening");
         assertThat(system).contains("Challenge");
         assertThat(system).contains("Resolution");
+        assertThat(system).contains("STYLE EXAMPLES (Ukrainian)");
+        assertThat(system).contains("Тимко");
+    }
+
+    @Test
+    void buildStorySystem_en_containsStructureAndEnglishFewshot() {
+        String system = builder.buildStorySystem("en");
+
+        assertThat(system).contains("Opening");
+        assertThat(system).contains("Resolution");
+        assertThat(system).contains("STYLE EXAMPLES (English)");
+        assertThat(system).contains("Pippin");
     }
 
     @Test

@@ -33,6 +33,23 @@ done
 
 mkdir -p "$LOG_DIR" "$PID_DIR"
 
+# Load root .env so backend (Spring Boot) and Metro inherit ADMIN_*, OAuth,
+# mail, and other shared secrets. Frontend reads it directly via Vite envDir.
+# .env uses docker service names (e.g. DB_URL points at host `mysql`); when
+# running on the host we remap those to localhost.
+if [ -f "$ROOT/.env" ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source "$ROOT/.env"
+  set +a
+  if [ -n "${DB_URL:-}" ]; then
+    _from='//mysql:'; _to='//localhost:'
+    DB_URL="${DB_URL/${_from}/${_to}}"
+    export DB_URL
+    unset _from _to
+  fi
+fi
+
 bold()  { printf "\033[1m%s\033[0m\n" "$*"; }
 green() { printf "\033[32m%s\033[0m\n" "$*"; }
 warn()  { printf "\033[33m%s\033[0m\n" "$*"; }

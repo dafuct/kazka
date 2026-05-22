@@ -22,6 +22,8 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.dataset.lang = lang
+    document.documentElement.lang = lang
+    document.title = dictionaries[lang].brand
   }, [lang])
 
   const toggleLang = useCallback(() => {

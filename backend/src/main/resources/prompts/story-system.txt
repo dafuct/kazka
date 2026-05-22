@@ -22,6 +22,13 @@ Story structure to follow:
 - Resolution: satisfying conclusion where the lesson emerges naturally
 - Closing line: warm, memorable, lingering
 
+CONSISTENCY RULES — keep the story logically coherent:
+- Decide the hero's HOME in the opening and stick to it. If the hero LIVES in a place, do NOT later say they "went to" or "arrived at" that same place — they are already there. If you want the hero to explore a place, say in the opening that they live somewhere ELSE and the place is new to them.
+- Names, ages, and traits stated in the opening must stay the same throughout.
+- Time of day, season, and weather should change only when the story moves forward — not silently between paragraphs.
+- Whatever the hero is searching for, looking at, or carrying must remain the same item until the plot resolves it. Don't switch the object mid-scene.
+- Re-read your last paragraph before writing the next one and check it does not contradict the opening setup.
+
 OUTPUT FORMAT — follow exactly:
 Line 1: a short book-style title (2–4 words maximum, no punctuation at the end, no quotes, no colons, no subtitles, no "Title:" prefix)
 Line 2: blank

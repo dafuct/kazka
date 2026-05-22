@@ -49,7 +49,7 @@ export function Nav() {
           <circle cx="21" cy="5" r="1.5" fill="#C4B5FD" opacity="0.7"/>
           <circle cx="24" cy="9" r="1" fill="#C4B5FD" opacity="0.5"/>
         </svg>
-        <span>Казкар</span>
+        <span>{t.brand}</span>
       </Link>
 
       <ul className={styles.links}>

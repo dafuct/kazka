@@ -10,3 +10,11 @@ Operations:
 - `shard` — an index was sharded.
 
 ---
+
+## [2026-05-21] lesson | filed bland-tale-output-needs-sampling-and-fewshot — story gen output flatness traced to missing sampling params + no in-language few-shot examples; both fixed
+
+## [2026-05-22] lesson | filed tale-setup-contradicts-itself — tale opened with "Matviy lived in the house" then "Matviy went to the house"; added CONSISTENCY RULES block to storyteller prompt
+
+## [2026-05-22] lesson | filed first-paragraph-indent-ukrainian-typography — CSS removed indent from first paragraph (English convention); Ukrainian typography indents every paragraph including the first
+
+## [2026-05-22] lesson | filed editor-must-fix-invented-words-including-in-titles — editor left "Привидиний" in title; added invented-words rule + relaxed title carve-out to permit morphology fixes

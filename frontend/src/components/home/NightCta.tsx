@@ -37,7 +37,6 @@ export function NightCta() {
   const { ref: r1, visible: v1 } = useReveal()
   const { ref: r2, visible: v2 } = useReveal()
   const { ref: r3, visible: v3 } = useReveal()
-  const { ref: r4, visible: v4 } = useReveal()
 
   return (
     <section className={styles.section}>
@@ -57,9 +56,6 @@ export function NightCta() {
         >
           {t.nightCta.button}
         </a>
-        <p ref={r4} className={`reveal ${v4 ? 'visible' : ''} ${styles.fine}`}>
-          {t.nightCta.fine}
-        </p>
       </div>
     </section>
   )

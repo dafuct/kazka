@@ -10,7 +10,10 @@ When this file exceeds ~300 lines or the wiki passes ~150 pages, shard into `wik
 
 ## Lessons
 
-(populated as postmortems and pattern-to-avoid notes are filed — consult before feature work)
+- [[bland-tale-output-needs-sampling-and-fewshot]] — flat MamayLM output was sampling/few-shot, not the model; tune both before fine-tuning
+- [[tale-setup-contradicts-itself]] — tale openings contradicted their own setup; fixed with explicit CONSISTENCY RULES block in the storyteller prompt
+- [[first-paragraph-indent-ukrainian-typography]] — first paragraph of every tale rendered flush-left (English convention); Ukrainian typography indents every paragraph
+- [[editor-must-fix-invented-words-including-in-titles]] — editor left invented Ukrainian words ("Привидиний") in titles; carve-out was too broad and rule list missed neologisms
 
 ## Sources
 
