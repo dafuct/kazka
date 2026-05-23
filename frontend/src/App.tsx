@@ -22,6 +22,8 @@ import { AdminUsersPage } from './pages/AdminUsersPage'
 import { AdminModerationPage } from './pages/AdminModerationPage'
 import { PricingPage } from './pages/PricingPage'
 import { SubscriptionSuccessPage } from './pages/SubscriptionSuccessPage'
+import { CheckoutPage } from './pages/CheckoutPage'
+import { SettingsPage } from './pages/SettingsPage'
 
 function ScrollProgress() {
   const barRef = useRef<HTMLDivElement>(null)
@@ -101,7 +103,9 @@ function AppShell() {
           <Route path="/admin/users" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
           <Route path="/admin/moderation" element={<RequireAdmin><AdminModerationPage /></RequireAdmin>} />
           <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/subscription/success" element={<RequireAuth><SubscriptionSuccessPage /></RequireAuth>} />
+          <Route path="/settings" element={<RequireAuth><SettingsPage /></RequireAuth>} />
         </Routes>
       </main>
       <Footer />

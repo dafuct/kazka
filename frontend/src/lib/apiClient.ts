@@ -74,6 +74,9 @@ export const auth = {
   passwordResetConfirm(token: string, newPassword: string): Promise<void> {
     return request(`${AUTH}/password-reset/confirm`, { method: 'POST', body: JSON.stringify({ token, newPassword }) })
   },
+  updateProfile(displayName: string): Promise<AuthEnvelope> {
+    return request(`${AUTH}/me`, { method: 'PATCH', body: JSON.stringify({ displayName }) })
+  },
 }
 
 export interface AdminUser {
@@ -145,5 +148,8 @@ export const billing = {
       method: 'POST',
       body: JSON.stringify({ planId, provider, countryHint }),
     })
+  },
+  cancelSubscription(): Promise<Entitlement[]> {
+    return request(`${BILLING}/subscription/cancel`, { method: 'POST' })
   },
 }

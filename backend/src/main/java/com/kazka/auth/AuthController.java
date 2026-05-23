@@ -4,6 +4,7 @@ import com.kazka.auth.dto.AuthResponse;
 import com.kazka.auth.dto.PasswordResetConfirmRequest;
 import com.kazka.auth.dto.PasswordResetRequestRequest;
 import com.kazka.auth.dto.SignupRequest;
+import com.kazka.auth.dto.UpdateProfileRequest;
 import com.kazka.auth.token.dto.TokenResponse;
 import com.kazka.user.UserDto;
 import com.kazka.user.UserRepository;
@@ -58,6 +59,15 @@ public class AuthController {
                         .subscribeOn(Schedulers.boundedElastic()))
                 .map(dto -> ResponseEntity.ok(new AuthResponse(dto)))
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
+    @PatchMapping("/me")
+    public Mono<AuthResponse> updateMe(@Valid @RequestBody UpdateProfileRequest req) {
+        return currentUserResolver.requireUser()
+                .flatMap(cu -> Mono.fromCallable(() ->
+                                authService.updateDisplayName(cu.userId(), req.displayName()))
+                        .subscribeOn(Schedulers.boundedElastic()))
+                .map(AuthResponse::new);
     }
 
     @GetMapping("/verify-email")

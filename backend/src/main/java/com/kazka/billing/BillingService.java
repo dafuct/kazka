@@ -117,6 +117,30 @@ public class BillingService {
         };
     }
 
+    @Transactional
+    public Mono<List<UserEntitlement>> revokeActiveForUser(String userId) {
+        return Mono.fromCallable(() -> {
+            List<UserEntitlement> active = entitlements.findByUserId(userId).stream()
+                    .filter(e -> e.getState() == EntitlementState.ACTIVE
+                            || e.getState() == EntitlementState.GRACE)
+                    .toList();
+            if (active.isEmpty()) {
+                return active;
+            }
+            boolean appleManaged = active.stream()
+                    .anyMatch(e -> e.getSource() == EntitlementSource.APPLE);
+            if (appleManaged) {
+                throw new AppleManagedSubscriptionException();
+            }
+            for (UserEntitlement e : active) {
+                e.setState(EntitlementState.REVOKED);
+                e.setExpiresAt(Instant.now());
+                entitlements.save(e);
+            }
+            return active;
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
     public Mono<List<UserEntitlement>> findActive(String userId) {
         return Mono.fromCallable(() -> entitlements.findByUserId(userId).stream()
                         .filter(e -> e.getState() == EntitlementState.ACTIVE || e.getState() == EntitlementState.GRACE)

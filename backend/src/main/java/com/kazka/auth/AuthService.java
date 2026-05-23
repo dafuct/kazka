@@ -173,4 +173,11 @@ public class AuthService {
     public UserDto findCurrent(String userId) {
         return users.findById(userId).map(UserDto::from).orElseThrow();
     }
+
+    @Transactional
+    public UserDto updateDisplayName(String userId, String displayName) {
+        User user = users.findById(userId).orElseThrow();
+        user.setDisplayName(displayName.trim());
+        return UserDto.from(users.save(user));
+    }
 }

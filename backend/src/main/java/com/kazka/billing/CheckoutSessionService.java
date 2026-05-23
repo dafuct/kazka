@@ -44,7 +44,7 @@ public class CheckoutSessionService {
               case "paddle" -> paddle.createTransaction(
                       requireNotBlank(ctx.product().getPaddleProductId(), "paddleProductId"),
                       ctx.user().getId(), ctx.user().getEmail())
-                  .map(txn -> new CheckoutSessionResponse("paddle", null, txn));
+                  .map(pt -> new CheckoutSessionResponse("paddle", pt.checkoutUrl(), pt.id()));
               case "liqpay" -> liqpay.createCheckoutUrl(
                       requireNotBlank(ctx.product().getLiqpayPlanId(), "liqpayPlanId"),
                       ctx.user().getId(), ctx.product().getPriceMicro(), ctx.product().getCurrency())

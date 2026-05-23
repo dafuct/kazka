@@ -4,6 +4,7 @@ import com.kazka.billing.dto.CheckoutSessionRequest;
 import com.kazka.billing.liqpay.LiqPayClient;
 import com.kazka.billing.monobank.MonobankClient;
 import com.kazka.billing.paddle.PaddleClient;
+import com.kazka.billing.paddle.PaddleTransaction;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,16 +56,19 @@ class CheckoutSessionServiceTest {
     }
 
     @Test
-    void should_returnPaddleTransactionId_when_providerIsPaddle() {
+    void should_returnPaddleCheckoutUrlAndTransactionId_when_providerIsPaddle() {
         when(paddle.createTransaction(anyString(), anyString(), anyString()))
-                .thenReturn(Mono.just("txn_abc123"));
+                .thenReturn(Mono.just(new PaddleTransaction(
+                        "txn_abc123",
+                        "https://sandbox-checkout.paddle.com/checkout/txn_abc123")));
 
         StepVerifier.create(service.create("user-1",
                         new CheckoutSessionRequest("prod-1", "paddle", "DE")))
                 .assertNext(resp -> {
                     org.assertj.core.api.Assertions.assertThat(resp.provider()).isEqualTo("paddle");
                     org.assertj.core.api.Assertions.assertThat(resp.paddleTransactionId()).isEqualTo("txn_abc123");
-                    org.assertj.core.api.Assertions.assertThat(resp.checkoutUrl()).isNull();
+                    org.assertj.core.api.Assertions.assertThat(resp.checkoutUrl())
+                            .isEqualTo("https://sandbox-checkout.paddle.com/checkout/txn_abc123");
                 })
                 .verifyComplete();
     }

@@ -63,6 +63,13 @@ public class BillingController {
                 });
     }
 
+    @PostMapping("/subscription/cancel")
+    public Mono<List<EntitlementDto>> cancelSubscription() {
+        return currentUserResolver.requireUser()
+                .flatMap(cu -> service.revokeActiveForUser(cu.userId())
+                        .then(entitlementsFor(cu.userId())));
+    }
+
     private Mono<List<EntitlementDto>> entitlementsFor(String userId) {
         return service.findActive(userId)
                 .flatMap(active -> Flux.fromIterable(active)

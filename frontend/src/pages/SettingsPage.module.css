@@ -1,0 +1,242 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 96px 24px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+}
+
+.section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-surface-deep);
+  border-radius: 16px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.input {
+  font-family: inherit;
+  font-size: 15px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color-surface-deep);
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: border-color 0.2s;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--color-magic);
+}
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.primaryBtn {
+  align-self: flex-start;
+  background: var(--color-ember);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+.primaryBtn:hover:not(:disabled) {
+  background: #A93A0A;
+}
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dangerBtn {
+  align-self: flex-start;
+  background: transparent;
+  color: #DC2626;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 9px 18px;
+  border: 1px solid rgba(220, 38, 38, 0.45);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.dangerBtn:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: #DC2626;
+}
+.dangerBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ghostBtn {
+  background: transparent;
+  color: var(--color-text);
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 9px 18px;
+  border: 1px solid var(--color-surface-deep);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.ghostBtn:hover {
+  background: var(--color-surface-deep);
+}
+
+.successMsg {
+  margin: 0;
+  font-size: 14px;
+  color: #16A34A;
+}
+.errorMsg {
+  margin: 0;
+  font-size: 14px;
+  color: #DC2626;
+}
+.muted {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.subBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detailList {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-surface-deep);
+}
+.detailRow:last-child {
+  border-bottom: none;
+}
+.detailRow dt {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.detailRow dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(22, 163, 74, 0.12);
+  color: #16A34A;
+}
+
+.backLink {
+  margin: 0;
+  font-size: 14px;
+}
+.backLink a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+.backLink a:hover {
+  color: var(--color-text);
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 16px;
+}
+.modal {
+  background: var(--color-bg);
+  border: 1px solid var(--color-surface-deep);
+  border-radius: 14px;
+  padding: 28px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+.modalTitle {
+  margin: 0 0 12px 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+.modal p {
+  margin: 0 0 24px 0;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+.modalActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}

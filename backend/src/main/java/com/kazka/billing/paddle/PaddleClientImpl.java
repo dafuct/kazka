@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class PaddleClientImpl implements PaddleClient {
     }
 
     @Override
-    public Mono<String> createTransaction(String paddleProductId, String userId, String userEmail) {
+    public Mono<PaddleTransaction> createTransaction(String paddleProductId, String userId, String userEmail) {
         Map<String, Object> body = Map.of(
                 "items", List.of(Map.of("price_id", paddleProductId, "quantity", 1)),
                 "customer_email", userEmail,
@@ -44,14 +45,37 @@ public class PaddleClientImpl implements PaddleClient {
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(Map.class)
-                .map(resp -> {
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> data = (Map<String, Object>) resp.get("data");
-                    if (data == null || data.get("id") == null) {
-                        throw new IllegalStateException("Paddle returned no transaction id: " + resp);
-                    }
-                    return data.get("id").toString();
-                })
-                .doOnError(e -> log.warn("Paddle createTransaction failed: {}", e.getMessage()));
+                .map(this::parseTransaction)
+                .onErrorMap(WebClientResponseException.class, this::translatePaddleError);
+    }
+
+    @SuppressWarnings("unchecked")
+    private PaddleTransaction parseTransaction(Map<?, ?> resp) {
+        Map<String, Object> data = (Map<String, Object>) resp.get("data");
+        if (data == null || data.get("id") == null) {
+            throw new IllegalStateException("Paddle returned no transaction id: " + resp);
+        }
+        String id = data.get("id").toString();
+        String checkoutUrl = null;
+        Object checkoutObj = data.get("checkout");
+        if (checkoutObj instanceof Map<?, ?> checkout) {
+            Object url = checkout.get("url");
+            if (url != null) checkoutUrl = url.toString();
+        }
+        if (checkoutUrl == null || checkoutUrl.isBlank()) {
+            throw new IllegalStateException(
+                    "Paddle returned transaction without checkout URL. " +
+                    "Set a Default Payment Link in Paddle dashboard → Checkout settings. " +
+                    "Response: " + resp);
+        }
+        return new PaddleTransaction(id, checkoutUrl);
+    }
+
+    private RuntimeException translatePaddleError(WebClientResponseException ex) {
+        String responseBody = ex.getResponseBodyAsString();
+        log.warn("Paddle createTransaction failed: {} — response body: {}",
+                ex.getMessage(), responseBody);
+        return new IllegalStateException(
+                "Paddle API rejected the request (" + ex.getStatusCode() + "): " + responseBody, ex);
     }
 }

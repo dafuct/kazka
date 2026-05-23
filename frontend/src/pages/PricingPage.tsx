@@ -54,11 +54,6 @@ export function PricingPage() {
       )
       if (session.checkoutUrl) {
         window.location.href = session.checkoutUrl
-      } else if (session.paddleTransactionId) {
-        // Paddle.js overlay: assumes the script has been loaded.
-        // For now we fall back to a hosted-checkout URL constructed by Paddle.
-        const txn = session.paddleTransactionId
-        window.location.href = `https://checkout.paddle.com/checkout/custom/${txn}`
       } else {
         setError('No checkout URL returned')
       }

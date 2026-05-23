@@ -113,6 +113,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(body);
     }
 
+    @ExceptionHandler(com.kazka.billing.AppleManagedSubscriptionException.class)
+    public ResponseEntity<Map<String, Object>> handleAppleManaged(
+            com.kazka.billing.AppleManagedSubscriptionException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", "APPLE_MANAGED"));
+    }
+
     @ExceptionHandler(com.apple.itunes.storekit.verification.VerificationException.class)
     public ResponseEntity<Map<String, Object>> handleAppleVerification(
             com.apple.itunes.storekit.verification.VerificationException ex) {

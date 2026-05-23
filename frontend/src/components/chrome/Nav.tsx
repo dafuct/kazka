@@ -5,6 +5,7 @@ import { useTheme } from '../../lib/ThemeContext'
 import { useStoryModal } from '../../lib/StoryModalContext'
 import { useAuth } from '../../lib/AuthContext'
 import { useAuthModal } from '../../lib/AuthModalContext'
+import { useBilling } from '../../lib/BillingContext'
 import styles from './Nav.module.css'
 
 export function Nav() {
@@ -13,6 +14,7 @@ export function Nav() {
   const { openModal } = useStoryModal()
   const { user, signOut } = useAuth()
   const { openAuth } = useAuthModal()
+  const { isPro } = useBilling()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [scrolled, setScrolled] = useState(false)
@@ -55,12 +57,14 @@ export function Nav() {
       <ul className={styles.links}>
         <li><a href="/#how" className={styles.link}>{t.nav.howItWorks}</a></li>
         <li><a href="/#features" className={styles.link}>{t.nav.features}</a></li>
-        <li>
-          <Link to="/pricing"
-                className={pathname.startsWith('/pricing') ? `${styles.link} ${styles.active}` : styles.link}>
-            {t.nav.pricing}
-          </Link>
-        </li>
+        {!isPro && (
+          <li>
+            <Link to="/pricing"
+                  className={pathname.startsWith('/pricing') ? `${styles.link} ${styles.active}` : styles.link}>
+              {t.nav.pricing}
+            </Link>
+          </li>
+        )}
         {user && (
           <li>
             <Link to="/stories"
@@ -97,10 +101,15 @@ export function Nav() {
               </li>
             )}
             <li className={styles.userWrap} ref={menuRef}>
-              <button className={styles.userBtn} onClick={() => setMenuOpen(o => !o)}>{user.displayName} ▾</button>
+              <button className={styles.userBtn} onClick={() => setMenuOpen(o => !o)}>
+                <span>{user.displayName}</span>
+                {isPro && <span className={styles.proBadge}>Pro</span>}
+                <span aria-hidden="true">▾</span>
+              </button>
               {menuOpen && (
                 <div className={styles.userMenu}>
                   <button onClick={() => { setMenuOpen(false); navigate('/stories') }}>{t.auth.actions.myArchive}</button>
+                  <button onClick={() => { setMenuOpen(false); navigate('/settings') }}>{t.auth.actions.settings}</button>
                   {user.role === 'ADMIN' && (
                     <button onClick={() => { setMenuOpen(false); navigate('/admin/users') }}>{t.auth.actions.adminUsers}</button>
                   )}
