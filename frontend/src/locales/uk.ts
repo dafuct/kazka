@@ -5,6 +5,7 @@ export const uk = {
     archive: 'Архів казок',
     howItWorks: 'Як це працює',
     features: 'Можливості',
+    pricing: 'Ціни',
     toggleTheme: 'Змінити тему',
     toggleLang: 'EN',
     themeLight: 'Нічний режим 🌙',

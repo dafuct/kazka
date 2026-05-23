@@ -7,6 +7,7 @@ export const en: Locale = {
     archive: 'Story Archive',
     howItWorks: 'How it works',
     features: 'Features',
+    pricing: 'Pricing',
     toggleTheme: 'Toggle theme',
     toggleLang: 'UA',
     themeLight: 'Dark mode 🌙',

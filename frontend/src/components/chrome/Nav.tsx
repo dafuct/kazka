@@ -55,6 +55,12 @@ export function Nav() {
       <ul className={styles.links}>
         <li><a href="/#how" className={styles.link}>{t.nav.howItWorks}</a></li>
         <li><a href="/#features" className={styles.link}>{t.nav.features}</a></li>
+        <li>
+          <Link to="/pricing"
+                className={pathname.startsWith('/pricing') ? `${styles.link} ${styles.active}` : styles.link}>
+            {t.nav.pricing}
+          </Link>
+        </li>
         {user && (
           <li>
             <Link to="/stories"
