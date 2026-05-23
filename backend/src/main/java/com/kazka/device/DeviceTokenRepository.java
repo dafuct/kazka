@@ -12,4 +12,7 @@ public interface DeviceTokenRepository extends JpaRepository<DeviceToken, String
 
     @Transactional
     void deleteByDeviceToken(String deviceToken);
+
+    @Transactional
+    void deleteByDeviceTokenAndUserId(String deviceToken, String userId);
 }

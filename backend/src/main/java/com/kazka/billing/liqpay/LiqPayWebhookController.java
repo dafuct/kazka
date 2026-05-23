@@ -8,6 +8,7 @@ import com.kazka.billing.EntitlementState;
 import com.kazka.billing.SubscriptionProductRepository;
 import com.kazka.billing.UserEntitlement;
 import com.kazka.billing.UserEntitlementRepository;
+import com.kazka.billing.webhook.WebhookIdempotencyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -35,16 +36,19 @@ public class LiqPayWebhookController {
     private final BillingProperties props;
     private final SubscriptionProductRepository products;
     private final UserEntitlementRepository entitlements;
+    private final WebhookIdempotencyService idempotency;
     private final ObjectMapper json = new ObjectMapper();
 
     public LiqPayWebhookController(LiqPaySignatureVerifier verifier,
                                    BillingProperties props,
                                    SubscriptionProductRepository products,
-                                   UserEntitlementRepository entitlements) {
+                                   UserEntitlementRepository entitlements,
+                                   WebhookIdempotencyService idempotency) {
         this.verifier = verifier;
         this.props = props;
         this.products = products;
         this.entitlements = entitlements;
+        this.idempotency = idempotency;
     }
 
     /** LiqPay POSTs application/x-www-form-urlencoded with data + signature. */
@@ -72,6 +76,25 @@ public class LiqPayWebhookController {
             JsonNode root = json.readTree(body);
             String status = root.path("status").asText("");
             String orderId = root.path("order_id").asText("");
+            // Replay window: LiqPay puts create_date as milliseconds since epoch.
+            long createDateMs = root.path("create_date").asLong(0);
+            if (createDateMs > 0) {
+                Instant ts = Instant.ofEpochMilli(createDateMs);
+                Instant now = Instant.now();
+                if (ts.isBefore(now.minusSeconds(600)) || ts.isAfter(now.plusSeconds(600))) {
+                    log.warn("LiqPay webhook stale/future create_date={} (now={}); ignoring", ts, now);
+                    return;
+                }
+            }
+            // LiqPay does not assign a per-event id; the closest stable identifier is the
+            // (payment_id|transaction_id) — same combo only ever delivered once.
+            String eventId = root.path("payment_id").asText(null);
+            if (eventId == null || eventId.isBlank()) {
+                eventId = root.path("transaction_id").asText(null);
+            }
+            if (eventId != null && !idempotency.markProcessed("liqpay", eventId + ":" + status)) {
+                return;
+            }
             String[] parts = orderId.split(":");
             if (parts.length < 2) {
                 log.warn("LiqPay webhook: order_id has wrong shape: {}", orderId);

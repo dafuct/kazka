@@ -98,7 +98,7 @@ public class AuthService {
         try {
             mailService.sendVerificationEmail(user.getEmail(), user.getDisplayName(), token.getToken());
         } catch (Exception e) {
-            log.warn("Verification email failed for {}; user can resend later", user.getEmail());
+            log.warn("Verification email failed for user={}; user can resend later", user.getId());
         }
     }
 
@@ -146,7 +146,7 @@ public class AuthService {
         try {
             mailService.sendPasswordResetEmail(user.getEmail(), user.getDisplayName(), token.getToken());
         } catch (Exception e) {
-            log.warn("Password reset email failed for {}", user.getEmail());
+            log.warn("Password reset email failed for user={}", user.getId());
         }
     }
 

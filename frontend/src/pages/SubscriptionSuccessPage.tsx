@@ -12,7 +12,10 @@ export function SubscriptionSuccessPage() {
   const { isPro, refresh } = useBilling()
   const [params] = useSearchParams()
   const [attempts, setAttempts] = useState(0)
-  const redirect = params.get('redirect') ?? '/stories'
+  const requested = params.get('redirect')
+  const redirect = requested && requested.startsWith('/') && !requested.startsWith('//')
+    ? requested
+    : '/stories'
 
   useEffect(() => {
     if (isPro) {

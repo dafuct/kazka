@@ -41,6 +41,15 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID:not-configured}
             client-secret: ${GOOGLE_CLIENT_SECRET:not-configured}
             scope: openid,email,profile
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never
 server:
   port: 8080
   reactive:
@@ -78,7 +87,7 @@ kazka:
     cache-ttl: 1h
     safe-fallback-scene: "two friends in a sunlit forest at sunset"
   auth:
-    app-base-url: ${APP_BASE_URL:http://localhost}
+    app-base-url: ${APP_BASE_URL}
     mail-from: ${MAIL_FROM:no-reply@kazka.local}
     token-ttl:
       email-verification: 24h
@@ -87,7 +96,7 @@ kazka:
       email: ${ADMIN_EMAIL:}
       password: ${ADMIN_PASSWORD:}
     jwt:
-      secret: ${KAZKA_JWT_SECRET:dev-only-secret-please-rotate-in-production-min-32-chars}
+      secret: ${KAZKA_JWT_SECRET}
       access-ttl: 1h
       refresh-ttl: 30d
       issuer: ${KAZKA_JWT_ISSUER:kazka}

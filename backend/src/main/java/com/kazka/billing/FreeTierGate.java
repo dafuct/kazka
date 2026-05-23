@@ -3,6 +3,7 @@ package com.kazka.billing;
 import com.kazka.story.exception.PaywallRequiredException;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,12 +29,11 @@ public class FreeTierGate {
         }
     }
 
-    /** Records a successful story creation against the free tier counter. No-op for Pro. */
+    /** Records a successful story creation against the free tier counter. No-op for Pro.
+     *  Uses an atomic UPDATE to avoid lost-update races between concurrent generations. */
     public void recordUsage(String userId) {
         if (entitlements.isPro(userId)) return;
-        User u = users.findById(userId).orElseThrow();
-        u.setStoriesThisMonth(u.getStoriesThisMonth() + 1);
-        users.save(u);
+        users.incrementStoriesThisMonth(userId);
     }
 
     private int limit() {

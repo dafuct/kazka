@@ -11,8 +11,14 @@ export function AdminModerationPage() {
   const [page, setPage] = useState(0)
 
   const load = useCallback(() => {
-    adminModeration.listFlagged(page, 50).then(setFlagged).catch(e => setError(String(e)))
-    adminModeration.listSuspended().then(setSuspended).catch(e => setError(String(e)))
+    adminModeration.listFlagged(page, 50).then(setFlagged).catch(e => {
+      console.error('adminModeration.listFlagged failed', e)
+      setError('Failed to load moderation data.')
+    })
+    adminModeration.listSuspended().then(setSuspended).catch(e => {
+      console.error('adminModeration.listSuspended failed', e)
+      setError('Failed to load moderation data.')
+    })
   }, [page])
 
   useEffect(() => { load() }, [load])

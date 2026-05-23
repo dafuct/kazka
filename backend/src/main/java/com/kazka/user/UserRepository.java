@@ -28,4 +28,9 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("UPDATE User u SET u.storiesThisMonth = 0, u.counterResetAt = CURRENT_TIMESTAMP " +
             "WHERE u.counterResetAt IS NULL OR u.counterResetAt < :cutoff")
     int resetCountersUpdatedBefore(@Param("cutoff") Instant cutoff);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE User u SET u.storiesThisMonth = u.storiesThisMonth + 1 WHERE u.id = :id")
+    int incrementStoriesThisMonth(@Param("id") String id);
 }

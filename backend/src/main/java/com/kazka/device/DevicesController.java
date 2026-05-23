@@ -34,7 +34,8 @@ public class DevicesController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> unregister(@PathVariable String deviceToken) {
         return currentUserResolver.requireUser()
-                .flatMap(cu -> Mono.<Void>fromRunnable(() -> repository.deleteByDeviceToken(deviceToken))
+                .flatMap(cu -> Mono.<Void>fromRunnable(
+                                () -> repository.deleteByDeviceTokenAndUserId(deviceToken, cu.userId()))
                         .subscribeOn(Schedulers.boundedElastic())).then();
     }
 

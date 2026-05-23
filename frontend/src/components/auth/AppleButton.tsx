@@ -50,6 +50,10 @@ export function AppleButton() {
     const script = document.createElement('script')
     script.src = APPLE_SCRIPT_SRC
     script.async = true
+    // Apple rotates the appleauth bundle; SRI pinning isn't viable. Defense in depth
+    // is provided by CSP `script-src` (nginx.conf) restricting loads to appleid.cdn-apple.com.
+    script.crossOrigin = 'anonymous'
+    script.referrerPolicy = 'no-referrer'
     script.onload = initSDK
     document.head.appendChild(script)
   }, [clientId, redirectURI])

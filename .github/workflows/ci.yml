@@ -14,14 +14,14 @@ jobs:
     name: Backend tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Set up JDK 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
         with:
           distribution: temurin
           java-version: '25'
       - name: Cache Gradle
-        uses: actions/cache@v4
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           path: |
             ~/.gradle/caches
@@ -37,13 +37,18 @@ jobs:
     name: Frontend build + lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: '20'
           cache: 'npm'
       - name: Install
         run: npm ci
+      - name: Audit dependencies
+        # Fail the build on a high-severity advisory in any production dep tree.
+        # Use `npm audit --audit-level=high --omit=dev` if you want to ignore devDeps.
+        run: npm audit --audit-level=high
+        continue-on-error: false
       - name: Build
         run: npm run frontend:build
       - name: Lint
@@ -75,18 +80,18 @@ jobs:
           --health-timeout 3s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Set up JDK 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
         with:
           distribution: temurin
           java-version: '25'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: '20'
           cache: 'npm'
       - name: Cache Gradle
-        uses: actions/cache@v4
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           path: |
             ~/.gradle/caches
@@ -104,6 +109,7 @@ jobs:
           SPRING_DATA_REDIS_PORT: '6379'
           HUGGINGFACE_API_TOKEN: ci-dummy
           KAZKA_JWT_SECRET: ci-dummy-secret-32-characters-minimum-for-hs256-ok
+          APP_BASE_URL: http://localhost:5173
         run: |
           ./gradlew bootRun --no-daemon > /tmp/boot.log 2>&1 &
           echo $! > /tmp/boot.pid

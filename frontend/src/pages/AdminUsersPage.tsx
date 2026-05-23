@@ -8,7 +8,10 @@ export function AdminUsersPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    admin.listUsers().then(setUsers).catch(e => setError(String(e)))
+    admin.listUsers().then(setUsers).catch(e => {
+      console.error('admin.listUsers failed', e)
+      setError('Failed to load users.')
+    })
   }, [])
 
   if (error) return <p className={styles.msg}>{error}</p>

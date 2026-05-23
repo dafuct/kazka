@@ -5,6 +5,7 @@ import com.apple.itunes.storekit.model.JWSTransactionDecodedPayload;
 import com.apple.itunes.storekit.model.NotificationTypeV2;
 import com.apple.itunes.storekit.model.ResponseBodyV2DecodedPayload;
 import com.apple.itunes.storekit.model.Subtype;
+import com.kazka.billing.webhook.WebhookIdempotencyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -26,13 +27,16 @@ public class BillingService {
     private final IapVerifier verifier;
     private final SubscriptionProductRepository products;
     private final UserEntitlementRepository entitlements;
+    private final WebhookIdempotencyService idempotency;
 
     public BillingService(IapVerifier verifier,
                           SubscriptionProductRepository products,
-                          UserEntitlementRepository entitlements) {
+                          UserEntitlementRepository entitlements,
+                          WebhookIdempotencyService idempotency) {
         this.verifier = verifier;
         this.products = products;
         this.entitlements = entitlements;
+        this.idempotency = idempotency;
     }
 
     @Transactional
@@ -72,6 +76,24 @@ public class BillingService {
             NotificationTypeV2 type = payload.getNotificationType();
             Subtype subtype = payload.getSubtype();
             log.info("ASN V2 ingest: type={} subtype={}", type, subtype);
+
+            // Replay window: Apple's signedDate is included in every notification.
+            // Reject anything outside ±10 minutes of "now" to block replay of captured events.
+            Long signedDate = payload.getSignedDate();
+            if (signedDate != null) {
+                Instant ts = Instant.ofEpochMilli(signedDate);
+                Instant now = Instant.now();
+                if (ts.isBefore(now.minusSeconds(600)) || ts.isAfter(now.plusSeconds(600))) {
+                    log.warn("ASN V2 stale/future signedDate={} (now={}); ignoring", ts, now);
+                    return null;
+                }
+            }
+
+            // notificationUUID is the per-event id Apple guarantees stable across retries.
+            String notificationUuid = payload.getNotificationUUID();
+            if (!idempotency.markProcessed("apple", notificationUuid)) {
+                return null;
+            }
 
             String signedTxn = Optional.ofNullable(payload.getData())
                     .map(Data::getSignedTransactionInfo)

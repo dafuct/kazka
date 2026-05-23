@@ -79,14 +79,14 @@ public class SuspensionService {
         try {
             mailService.sendAccountSuspendedEmail(locked.getEmail(), locked.getDisplayName());
         } catch (Exception e) {
-            log.warn("Failed to email suspended user {}: {}", locked.getEmail(), e.getMessage());
+            log.warn("Failed to email suspended user={}: {}", locked.getId(), e.getMessage());
         }
         String adminEmail = authProps.admin() == null ? null : authProps.admin().email();
         if (adminEmail != null && !adminEmail.isBlank()) {
             try {
                 mailService.sendAdminSuspensionNotice(adminEmail, locked.getEmail());
             } catch (Exception e) {
-                log.warn("Failed to send admin notice for {}: {}", locked.getEmail(), e.getMessage());
+                log.warn("Failed to send admin notice for user={}: {}", locked.getId(), e.getMessage());
             }
         }
     }

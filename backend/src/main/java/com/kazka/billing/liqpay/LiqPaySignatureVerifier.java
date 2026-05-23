@@ -16,7 +16,9 @@ public class LiqPaySignatureVerifier {
             byte[] digest = MessageDigest.getInstance("SHA-1")
                     .digest(concat.getBytes(StandardCharsets.UTF_8));
             String expected = Base64.getEncoder().encodeToString(digest);
-            return constantTimeEquals(expected, signature);
+            return MessageDigest.isEqual(
+                    expected.getBytes(StandardCharsets.UTF_8),
+                    signature.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             return false;
         }
@@ -27,12 +29,5 @@ public class LiqPaySignatureVerifier {
         byte[] digest = MessageDigest.getInstance("SHA-1")
                 .digest(concat.getBytes(StandardCharsets.UTF_8));
         return Base64.getEncoder().encodeToString(digest);
-    }
-
-    private static boolean constantTimeEquals(String a, String b) {
-        if (a.length() != b.length()) return false;
-        int r = 0;
-        for (int i = 0; i < a.length(); i++) r |= a.charAt(i) ^ b.charAt(i);
-        return r == 0;
     }
 }

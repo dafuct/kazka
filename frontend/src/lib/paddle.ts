@@ -28,6 +28,12 @@ function loadScript(): Promise<void> {
     const s = document.createElement('script')
     s.src = PADDLE_JS_URL
     s.async = true
+    // Paddle does not publish stable SRI hashes — they rotate the v2 bundle frequently,
+    // so pinning would cause production outages. Defense in depth is provided by:
+    //   1) CSP `script-src` in nginx.conf restricts loads to https://cdn.paddle.com
+    //   2) `crossOrigin=anonymous` enforces a CORS-validated load (no credentials)
+    s.crossOrigin = 'anonymous'
+    s.referrerPolicy = 'no-referrer'
     s.onload = () => resolve()
     s.onerror = () => {
       loadPromise = null

@@ -8,6 +8,7 @@ import com.kazka.billing.EntitlementState;
 import com.kazka.billing.SubscriptionProductRepository;
 import com.kazka.billing.UserEntitlement;
 import com.kazka.billing.UserEntitlementRepository;
+import com.kazka.billing.webhook.WebhookIdempotencyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -36,16 +37,19 @@ public class PaddleWebhookController {
     private final BillingProperties props;
     private final SubscriptionProductRepository products;
     private final UserEntitlementRepository entitlements;
+    private final WebhookIdempotencyService idempotency;
     private final ObjectMapper json = new ObjectMapper();
 
     public PaddleWebhookController(PaddleSignatureVerifier verifier,
                                    BillingProperties props,
                                    SubscriptionProductRepository products,
-                                   UserEntitlementRepository entitlements) {
+                                   UserEntitlementRepository entitlements,
+                                   WebhookIdempotencyService idempotency) {
         this.verifier = verifier;
         this.props = props;
         this.products = products;
         this.entitlements = entitlements;
+        this.idempotency = idempotency;
     }
 
     @PostMapping(path = "/paddle", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -67,6 +71,25 @@ public class PaddleWebhookController {
         try {
             JsonNode root = json.readTree(body);
             String eventType = root.path("event_type").asText("");
+            // Replay window: reject events whose occurred_at is more than ±10 minutes
+            // from now. Stale captured webhooks (or future-dated forgeries) get dropped.
+            String occurredAt = root.path("occurred_at").asText(null);
+            if (occurredAt != null && !occurredAt.isBlank()) {
+                try {
+                    Instant ts = Instant.parse(occurredAt);
+                    Instant now = Instant.now();
+                    if (ts.isBefore(now.minusSeconds(600)) || ts.isAfter(now.plusSeconds(600))) {
+                        log.warn("Paddle webhook stale/future occurred_at={} (now={}); ignoring", ts, now);
+                        return;
+                    }
+                } catch (DateTimeParseException e) {
+                    log.warn("Paddle webhook unparseable occurred_at={}; processing anyway", occurredAt);
+                }
+            }
+            String eventId = root.path("event_id").asText(null);
+            if (!idempotency.markProcessed("paddle", eventId)) {
+                return; // duplicate delivery — already processed
+            }
             JsonNode data = root.path("data");
             String userId = data.path("custom_data").path("kazka_user_id").asText(null);
             String paddleProductId = data.path("items").path(0).path("price").path("id").asText(null);

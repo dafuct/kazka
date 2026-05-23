@@ -96,7 +96,11 @@ public class SecurityConfig {
                                                 "/api/billing/webhook/**",
                                                 "/api/billing/iap/**")))))
                 .authorizeExchange(auth -> auth
-                        .pathMatchers(HttpMethod.GET, "/uploads/**").permitAll()
+                        // Illustrations are linked to specific stories. We gate uploads behind
+                        // auth so unauth users can't enumerate `/uploads/{storyId}-{theme}.png`.
+                        // (Residual gap: any authenticated user can still fetch any storyId they
+                        // know; full IDOR closure requires a proxy endpoint that checks ownership.)
+                        .pathMatchers(HttpMethod.GET, "/uploads/**").authenticated()
                         .pathMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .pathMatchers(HttpMethod.POST,
                                 "/api/auth/signup",

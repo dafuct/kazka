@@ -33,6 +33,8 @@ spring:
             client-id: test-client-id
             client-secret: test-client-secret
 kazka:
+  rate-limit:
+    enabled: false
   huggingface:
     api-token: test-token
   moderation:
