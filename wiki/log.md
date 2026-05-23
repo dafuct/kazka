@@ -18,3 +18,5 @@ Operations:
 ## [2026-05-22] lesson | filed first-paragraph-indent-ukrainian-typography — CSS removed indent from first paragraph (English convention); Ukrainian typography indents every paragraph including the first
 
 ## [2026-05-22] lesson | filed editor-must-fix-invented-words-including-in-titles — editor left "Привидиний" in title; added invented-words rule + relaxed title carve-out to permit morphology fixes
+
+## [2026-05-23] lesson | filed subscription-cancel-rules-differ-by-provider — captured per-provider cancel policy decided while building /settings page (Apple → App Store-only via 409 APPLE_MANAGED, Paddle/LiqPay/Monobank → local revoke; known gap: Paddle subscription-id not stored)

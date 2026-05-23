@@ -14,6 +14,7 @@ When this file exceeds ~300 lines or the wiki passes ~150 pages, shard into `wik
 - [[tale-setup-contradicts-itself]] — tale openings contradicted their own setup; fixed with explicit CONSISTENCY RULES block in the storyteller prompt
 - [[first-paragraph-indent-ukrainian-typography]] — first paragraph of every tale rendered flush-left (English convention); Ukrainian typography indents every paragraph
 - [[editor-must-fix-invented-words-including-in-titles]] — editor left invented Ukrainian words ("Привидиний") in titles; carve-out was too broad and rule list missed neologisms
+- [[subscription-cancel-rules-differ-by-provider]] — generic "Cancel subscription" is wrong; Apple is App Store-managed, Paddle needs subscription-id+API call, LiqPay/Monobank are one-off today
 
 ## Sources
 
