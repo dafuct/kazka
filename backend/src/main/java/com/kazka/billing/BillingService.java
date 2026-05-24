@@ -8,6 +8,7 @@ import com.apple.itunes.storekit.model.Subtype;
 import com.kazka.billing.webhook.WebhookIdempotencyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -28,15 +29,18 @@ public class BillingService {
     private final SubscriptionProductRepository products;
     private final UserEntitlementRepository entitlements;
     private final WebhookIdempotencyService idempotency;
+    private final ApplicationEventPublisher events;
 
     public BillingService(IapVerifier verifier,
                           SubscriptionProductRepository products,
                           UserEntitlementRepository entitlements,
-                          WebhookIdempotencyService idempotency) {
+                          WebhookIdempotencyService idempotency,
+                          ApplicationEventPublisher events) {
         this.verifier = verifier;
         this.products = products;
         this.entitlements = entitlements;
         this.idempotency = idempotency;
+        this.events = events;
     }
 
     @Transactional
@@ -117,12 +121,16 @@ public class BillingService {
                         type, subtype, e.getId());
                 return null;
             }
-            e.setState(nextState.get());
+            EntitlementState newState = nextState.get();
+            e.setState(newState);
             if (txn.getExpiresDate() != null) {
                 e.setExpiresAt(Instant.ofEpochMilli(txn.getExpiresDate()));
             }
             e.setLatestJws(signedTxn);
             entitlements.save(e);
+            if (newState != EntitlementState.ACTIVE && newState != EntitlementState.GRACE) {
+                events.publishEvent(new EntitlementDowngradedEvent(e.getUserId()));
+            }
             return null;
         }).subscribeOn(Schedulers.boundedElastic());
     }
@@ -159,6 +167,7 @@ public class BillingService {
                 e.setExpiresAt(Instant.now());
                 entitlements.save(e);
             }
+            events.publishEvent(new EntitlementDowngradedEvent(userId));
             return active;
         }).subscribeOn(Schedulers.boundedElastic());
     }

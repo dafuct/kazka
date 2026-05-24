@@ -16,6 +16,8 @@ public interface StoryRepository extends JpaRepository<Story, String> {
     Optional<Story> findByIdAndUserId(String id, String userId);
     long countByUserId(String userId);
 
+    java.util.Optional<Story> findFirstByChildProfileIdOrderByCreatedAtDesc(String childProfileId);
+
     @Query("SELECT s FROM Story s WHERE s.userId = :userId " +
            "AND (:createdAt IS NULL OR (s.createdAt < :createdAt OR (s.createdAt = :createdAt AND s.id < :id))) " +
            "ORDER BY s.createdAt DESC, s.id DESC")
