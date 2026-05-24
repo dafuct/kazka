@@ -50,6 +50,13 @@ public class Story {
     @Column(name = "illustration_status", length = 20)
     private IllustrationStatus illustrationStatus = IllustrationStatus.PENDING;
 
+    @Column(name = "child_profile_id", length = 36)
+    private String childProfileId;
+
+    @Convert(converter = com.kazka.child.ExtractionStatusConverter.class)
+    @Column(name = "extraction_status", length = 20, nullable = false)
+    private com.kazka.child.ExtractionStatus extractionStatus = com.kazka.child.ExtractionStatus.PENDING;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
@@ -96,4 +103,10 @@ public class Story {
 
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
+
+    public String getChildProfileId() { return childProfileId; }
+    public void setChildProfileId(String childProfileId) { this.childProfileId = childProfileId; }
+
+    public com.kazka.child.ExtractionStatus getExtractionStatus() { return extractionStatus; }
+    public void setExtractionStatus(com.kazka.child.ExtractionStatus extractionStatus) { this.extractionStatus = extractionStatus; }
 }
