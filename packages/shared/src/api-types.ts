@@ -36,6 +36,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/stories/{id}/extract-characters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["reextract"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/stories/generate": {
         parameters: {
             query?: never;
@@ -68,6 +84,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/children": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list"];
+        put?: never;
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/characters/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/billing/webhook/paddle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["handle"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/billing/webhook/monobank": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["handle_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/billing/webhook/liqpay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["handle_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/billing/subscription/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancelSubscription"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/billing/iap/webhook": {
         parameters: {
             query?: never;
@@ -94,6 +206,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["verify"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/billing/checkout-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["create_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -260,6 +388,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/children/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["findById_1"];
+        put?: never;
+        post?: never;
+        delete: operations["archive"];
+        options?: never;
+        head?: never;
+        patch: operations["update_1"];
+        trace?: never;
+    };
+    "/api/characters/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["archive_1"];
+        options?: never;
+        head?: never;
+        patch: operations["update_2"];
+        trace?: never;
+    };
+    "/api/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateMe"];
+        trace?: never;
+    };
     "/api/stories": {
         parameters: {
             query?: never;
@@ -267,7 +443,23 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list"];
+        get: operations["list_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/stories/{id}/extraction-candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["candidates"];
         put?: never;
         post?: never;
         delete?: never;
@@ -308,6 +500,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/children/{childId}/characters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/billing/products": {
         parameters: {
             query?: never;
@@ -316,6 +524,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/billing/geo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["geo"];
         put?: never;
         post?: never;
         delete?: never;
@@ -348,22 +572,6 @@ export interface paths {
             cookie?: never;
         };
         get: operations["verifyEmail"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/auth/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["me"];
         put?: never;
         post?: never;
         delete?: never;
@@ -443,6 +651,7 @@ export interface components {
         UpdateStoryRequest: {
             title: string;
             content: string;
+            childProfileId?: string;
         };
         StoryDto: {
             id: string;
@@ -457,6 +666,9 @@ export interface components {
             illustrationPathDark?: string | null;
             /** @enum {string} */
             illustrationStatus: "PENDING" | "READY" | "FAILED";
+            childProfileId?: string | null;
+            /** @enum {string} */
+            extractionStatus: "PENDING" | "RUNNING" | "DONE" | "FAILED" | "SKIPPED";
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -471,6 +683,8 @@ export interface components {
             length: "short" | "medium" | "long";
             /** @enum {string} */
             language: "uk" | "en";
+            childProfileId: string;
+            includeCharacterIds?: (string | null)[] | null;
         };
         ServerSentEventObject: Record<string, never>;
         DeviceRegisterRequest: {
@@ -479,15 +693,76 @@ export interface components {
             platform: "ios";
             locale?: string | null;
         };
-        IapVerifyRequest: {
-            signedTransaction: string;
+        CreateChildProfileRequest: {
+            name: string;
+            /** Format: int32 */
+            birthYear?: number;
+            gender?: string;
+            /** @enum {string} */
+            preferredLanguage?: "uk" | "en" | "bilingual";
+            interests?: string[];
+        };
+        ChildProfileDto: {
+            id: string;
+            name: string;
+            /** Format: int32 */
+            birthYear?: number | null;
+            gender?: string | null;
+            /** @enum {string} */
+            preferredLanguage: "uk" | "en" | "bilingual";
+            interests: string[];
+            avatarSeed: string;
+            /** Format: int64 */
+            characterCount: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ConfirmCharactersRequest: {
+            storyId: string;
+            candidates: components["schemas"]["ExtractedCandidateDto"][];
+        };
+        ExtractedCandidateDto: {
+            name?: string;
+            kind?: string;
+            description?: string;
+            traits?: string[];
+            role?: string;
+        };
+        CharacterDto: {
+            id: string;
+            childProfileId: string;
+            name: string;
+            /** @enum {string} */
+            kind: "boy" | "girl" | "animal" | "creature" | "object";
+            description: string;
+            traits: string[];
+            firstStoryId?: string | null;
+            /** Format: date-time */
+            lastUsedAt?: string | null;
+            /** Format: int32 */
+            usageCount: number;
+            /** Format: date-time */
+            createdAt: string;
         };
         EntitlementDto: {
             productAppleId?: string;
-            /** @enum {string} */
-            state?: "ACTIVE" | "EXPIRED" | "GRACE" | "REFUNDED" | "REVOKED";
+            state?: string;
             /** Format: date-time */
             expiresAt?: string;
+            source?: string;
+        };
+        IapVerifyRequest: {
+            signedTransaction: string;
+        };
+        CheckoutSessionRequest: {
+            planId: string;
+            provider: string;
+            countryHint?: string;
+        };
+        CheckoutSessionResponse: {
+            provider?: string;
+            checkoutUrl?: string;
+            paddleTransactionId?: string;
         };
         TokenRefreshRequest: {
             refreshToken: string;
@@ -537,6 +812,27 @@ export interface components {
             fullName?: string;
             email?: string;
         };
+        UpdateChildProfileRequest: {
+            name: string;
+            /** Format: int32 */
+            birthYear?: number;
+            gender?: string;
+            /** @enum {string} */
+            preferredLanguage?: "uk" | "en" | "bilingual";
+            interests?: string[];
+        };
+        UpdateCharacterRequest: {
+            name: string;
+            kind?: string;
+            description: string;
+            traits?: string[];
+        };
+        UpdateProfileRequest: {
+            displayName: string;
+        };
+        AuthResponse: {
+            user: components["schemas"]["UserDto"];
+        };
         PageResponseStoryDto: {
             items?: components["schemas"]["StoryDto"][];
             /** Format: int32 */
@@ -560,8 +856,9 @@ export interface components {
             period?: string;
             tier?: string;
         };
-        AuthResponse: {
-            user: components["schemas"]["UserDto"];
+        GeoResponse: {
+            country?: string;
+            isUkraine?: boolean;
         };
         AdminUserDto: {
             id?: string;
@@ -621,8 +918,15 @@ export type SchemaStoryDto = components['schemas']['StoryDto'];
 export type SchemaGenerationRequest = components['schemas']['GenerationRequest'];
 export type SchemaServerSentEventObject = components['schemas']['ServerSentEventObject'];
 export type SchemaDeviceRegisterRequest = components['schemas']['DeviceRegisterRequest'];
-export type SchemaIapVerifyRequest = components['schemas']['IapVerifyRequest'];
+export type SchemaCreateChildProfileRequest = components['schemas']['CreateChildProfileRequest'];
+export type SchemaChildProfileDto = components['schemas']['ChildProfileDto'];
+export type SchemaConfirmCharactersRequest = components['schemas']['ConfirmCharactersRequest'];
+export type SchemaExtractedCandidateDto = components['schemas']['ExtractedCandidateDto'];
+export type SchemaCharacterDto = components['schemas']['CharacterDto'];
 export type SchemaEntitlementDto = components['schemas']['EntitlementDto'];
+export type SchemaIapVerifyRequest = components['schemas']['IapVerifyRequest'];
+export type SchemaCheckoutSessionRequest = components['schemas']['CheckoutSessionRequest'];
+export type SchemaCheckoutSessionResponse = components['schemas']['CheckoutSessionResponse'];
 export type SchemaTokenRefreshRequest = components['schemas']['TokenRefreshRequest'];
 export type SchemaTokenResponse = components['schemas']['TokenResponse'];
 export type SchemaUserDto = components['schemas']['UserDto'];
@@ -633,10 +937,14 @@ export type SchemaPasswordResetRequestRequest = components['schemas']['PasswordR
 export type SchemaPasswordResetConfirmRequest = components['schemas']['PasswordResetConfirmRequest'];
 export type SchemaGoogleLoginRequest = components['schemas']['GoogleLoginRequest'];
 export type SchemaAppleLoginRequest = components['schemas']['AppleLoginRequest'];
+export type SchemaUpdateChildProfileRequest = components['schemas']['UpdateChildProfileRequest'];
+export type SchemaUpdateCharacterRequest = components['schemas']['UpdateCharacterRequest'];
+export type SchemaUpdateProfileRequest = components['schemas']['UpdateProfileRequest'];
+export type SchemaAuthResponse = components['schemas']['AuthResponse'];
 export type SchemaPageResponseStoryDto = components['schemas']['PageResponseStoryDto'];
 export type SchemaCursorPageResponseStoryDto = components['schemas']['CursorPageResponseStoryDto'];
 export type SchemaProductDto = components['schemas']['ProductDto'];
-export type SchemaAuthResponse = components['schemas']['AuthResponse'];
+export type SchemaGeoResponse = components['schemas']['GeoResponse'];
 export type SchemaAdminUserDto = components['schemas']['AdminUserDto'];
 export type SchemaSuspendedUserDto = components['schemas']['SuspendedUserDto'];
 export type SchemaFlaggedAttemptDto = components['schemas']['FlaggedAttemptDto'];
@@ -731,6 +1039,26 @@ export interface operations {
             };
         };
     };
+    reextract: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     generate: {
         parameters: {
             query?: never;
@@ -774,6 +1102,162 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ChildProfileDto"][];
+                };
+            };
+        };
+    };
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateChildProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ChildProfileDto"];
+                };
+            };
+        };
+    };
+    confirm: {
+        parameters: {
+            query: {
+                childProfileId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmCharactersRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CharacterDto"][];
+                };
+            };
+        };
+    };
+    handle: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Paddle-Signature"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": string;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    handle_1: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Sign"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": string;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    handle_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    cancelSubscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EntitlementDto"][];
+                };
             };
         };
     };
@@ -821,6 +1305,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["EntitlementDto"][];
+                };
+            };
+        };
+    };
+    create_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutSessionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CheckoutSessionResponse"];
                 };
             };
         };
@@ -1049,11 +1557,170 @@ export interface operations {
             };
         };
     };
-    list: {
+    findById_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ChildProfileDto"];
+                };
+            };
+        };
+    };
+    archive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateChildProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ChildProfileDto"];
+                };
+            };
+        };
+    };
+    archive_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCharacterRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CharacterDto"];
+                };
+            };
+        };
+    };
+    me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AuthResponse"];
+                };
+            };
+        };
+    };
+    updateMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AuthResponse"];
+                };
+            };
+        };
+    };
+    list_1: {
         parameters: {
             query?: {
                 page?: number;
                 size?: number;
+                childProfileId?: string;
             };
             header?: never;
             path?: never;
@@ -1068,6 +1735,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PageResponseStoryDto"];
+                };
+            };
+        };
+    };
+    candidates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ExtractedCandidateDto"][];
                 };
             };
         };
@@ -1115,6 +1804,28 @@ export interface operations {
             };
         };
     };
+    list_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CharacterDto"][];
+                };
+            };
+        };
+    };
     products: {
         parameters: {
             query?: never;
@@ -1131,6 +1842,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ProductDto"][];
+                };
+            };
+        };
+    };
+    geo: {
+        parameters: {
+            query?: {
+                country?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GeoResponse"];
                 };
             };
         };
@@ -1172,26 +1905,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-        };
-    };
-    me: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["AuthResponse"];
-                };
             };
         };
     };

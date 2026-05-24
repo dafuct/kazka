@@ -18,6 +18,13 @@ export type {
   SchemaFlaggedAttemptDto as FlaggedAttemptDto,
   SchemaSuspendedUserDto as SuspendedUserDto,
   SchemaCursorPageResponseStoryDto as StoryCursorPage,
+  SchemaChildProfileDto as ChildProfileDto,
+  SchemaCharacterDto as CharacterDto,
+  SchemaCreateChildProfileRequest as CreateChildProfileRequest,
+  SchemaUpdateChildProfileRequest as UpdateChildProfileRequest,
+  SchemaExtractedCandidateDto as ExtractedCandidateDto,
+  SchemaConfirmCharactersRequest as ConfirmCharactersRequest,
+  SchemaUpdateCharacterRequest as UpdateCharacterRequest,
 } from './api-types';
 
 // PageResponse<T> is generic on the Java side. openapi-typescript emits

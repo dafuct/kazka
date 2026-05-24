@@ -13,6 +13,13 @@ export type {
   AuthErrorCode,
   ModerationErrorCode,
   ApiErrorBody,
+  ChildProfileDto,
+  CharacterDto,
+  CreateChildProfileRequest,
+  UpdateChildProfileRequest,
+  ExtractedCandidateDto,
+  ConfirmCharactersRequest,
+  UpdateCharacterRequest,
 } from '@kazka/shared';
 
 export { ApiError } from '@kazka/shared';
