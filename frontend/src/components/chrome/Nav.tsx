@@ -6,6 +6,7 @@ import { useStoryModal } from '../../lib/StoryModalContext'
 import { useAuth } from '../../lib/AuthContext'
 import { useAuthModal } from '../../lib/AuthModalContext'
 import { useBilling } from '../../lib/BillingContext'
+import { ActiveChildPicker } from '../children/ActiveChildPicker'
 import styles from './Nav.module.css'
 
 export function Nav() {
@@ -71,6 +72,11 @@ export function Nav() {
                   className={pathname.startsWith('/stories') ? `${styles.link} ${styles.active}` : styles.link}>
               {t.nav.archive}
             </Link>
+          </li>
+        )}
+        {user && (
+          <li className={styles.childPickerItem}>
+            <ActiveChildPicker />
           </li>
         )}
         <li>
