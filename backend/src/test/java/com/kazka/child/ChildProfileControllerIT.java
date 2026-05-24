@@ -1,0 +1,146 @@
+package com.kazka.child;
+
+import com.kazka.AbstractIT;
+import com.kazka.billing.EntitlementResolver;
+import com.kazka.child.dto.ChildProfileDto;
+import com.kazka.child.dto.CreateChildProfileRequest;
+import com.kazka.child.dto.UpdateChildProfileRequest;
+import com.kazka.user.User;
+import com.kazka.user.UserRepository;
+import com.kazka.user.UserRole;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.util.MultiValueMap;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@Tag("integration")
+class ChildProfileControllerIT extends AbstractIT {
+
+    @Autowired UserRepository users;
+    @Autowired PasswordEncoder passwordEncoder;
+    @MockitoBean EntitlementResolver entitlements;
+
+    @BeforeEach
+    void setup() {
+        when(entitlements.isPro(any())).thenReturn(true);
+    }
+
+    @Test
+    void should_create_then_list_profile() {
+        String userA = seedUser();
+        WebTestClient c = authedClient(userA);
+        c.post().uri("/api/children")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new CreateChildProfileRequest("Лія", (short) 2020, "girl", "uk", List.of("dragons")))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.name").isEqualTo("Лія")
+                .jsonPath("$.characterCount").isEqualTo(0);
+
+        c.get().uri("/api/children").exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(1);
+    }
+
+    @Test
+    void should_return402_when_freeTier_atProfileLimit() {
+        String userA = seedUser();
+        when(entitlements.isPro(userA)).thenReturn(false);
+        WebTestClient c = authedClient(userA);
+        c.post().uri("/api/children")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new CreateChildProfileRequest("First", null, null, "uk", List.of()))
+                .exchange().expectStatus().isOk();
+        c.post().uri("/api/children")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new CreateChildProfileRequest("Second", null, null, "uk", List.of()))
+                .exchange().expectStatus().isEqualTo(402);
+    }
+
+    @Test
+    void should_return404_when_accessing_another_users_profile() {
+        String userA = seedUser();
+        String userB = seedUser();
+
+        WebTestClient cA = authedClient(userA);
+        String createdId = cA.post().uri("/api/children")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new CreateChildProfileRequest("Owned", null, null, "uk", List.of()))
+                .exchange().expectStatus().isOk()
+                .returnResult(ChildProfileDto.class).getResponseBody().blockFirst().id();
+
+        WebTestClient cB = authedClient(userB);
+        cB.get().uri("/api/children/" + createdId).exchange().expectStatus().isNotFound();
+        cB.patch().uri("/api/children/" + createdId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UpdateChildProfileRequest("X", null, null, "uk", List.of()))
+                .exchange().expectStatus().isNotFound();
+        cB.delete().uri("/api/children/" + createdId).exchange().expectStatus().isNotFound();
+    }
+
+    private String seedUser() {
+        String id = UUID.randomUUID().toString();
+        User u = new User();
+        u.setId(id);
+        u.setEmail(id + "@test.example");
+        u.setDisplayName("Tester");
+        u.setPasswordHash(passwordEncoder.encode("password123"));
+        u.setRole(UserRole.USER);
+        u.setEmailVerified(true);
+        users.save(u);
+        return id;
+    }
+
+    /**
+     * Obtains a Bearer access token via /api/auth/token/login and a CSRF token from
+     * a safe GET, then returns a WebTestClient pre-configured with both.
+     * The CSRF cookie+header pair is required for mutating requests (POST/PATCH/DELETE)
+     * that are not in the CSRF exclusion list.
+     */
+    private WebTestClient authedClient(String userId) {
+        String email = users.findById(userId).orElseThrow().getEmail();
+        @SuppressWarnings("rawtypes")
+        Map body = client().post().uri("/api/auth/token/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(Map.of("email", email, "password", "password123"))
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(Map.class).getResponseBody().blockFirst();
+        String bearer = body.get("accessToken").toString();
+
+        // Fetch CSRF token from any safe GET endpoint
+        EntityExchangeResult<byte[]> csrf = client()
+                .get().uri("/api/billing/products")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().returnResult();
+        MultiValueMap<String, ResponseCookie> csrfCookies = csrf.getResponseCookies();
+        ResponseCookie xsrfCookie = csrfCookies.getFirst("XSRF-TOKEN");
+        if (xsrfCookie == null) {
+            throw new IllegalStateException("No XSRF-TOKEN cookie issued by server");
+        }
+        String csrfToken = xsrfCookie.getValue();
+
+        return client().mutate()
+                .defaultHeader("Authorization", "Bearer " + bearer)
+                .defaultHeader("X-XSRF-TOKEN", csrfToken)
+                .defaultCookie("XSRF-TOKEN", csrfToken)
+                .build();
+    }
+}
