@@ -79,6 +79,21 @@ public class CharacterService {
         return c;
     }
 
+    @Transactional
+    public com.kazka.child.Character updateOwned(String characterId, String userId,
+                                                  String name, String kind,
+                                                  String description, List<String> traits) {
+        com.kazka.child.Character c = repo.findById(characterId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        profiles.requireOwned(c.getChildProfileId(), userId);
+        c.setName(name.trim());
+        if (kind != null) c.setKind(kind);
+        c.setDescription(description);
+        if (traits != null) c.setTraits(traits);
+        c.setLastUsedAt(Instant.now());
+        return repo.save(c);
+    }
+
     private long countNew(String childProfileId, List<ExtractedCandidateDto> candidates) {
         return candidates.stream()
                 .filter(c -> repo.findByChildProfileIdAndName(childProfileId, c.name()).isEmpty())
