@@ -20,12 +20,14 @@ class DevicesControllerIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired DeviceTokenRepository devices;
     @Autowired PasswordEncoder encoder;
+    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     String bearer;
 
     @BeforeEach
     void clean() {
         devices.deleteAll();
+        entitlementRepo.deleteAll();
         users.deleteAll();
         seedUser("dev-user@example.com");
         bearer = loginBearer("dev-user@example.com");

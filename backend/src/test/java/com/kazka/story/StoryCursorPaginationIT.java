@@ -20,6 +20,7 @@ class StoryCursorPaginationIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder encoder;
+    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     User me;
     String bearer;
@@ -27,6 +28,7 @@ class StoryCursorPaginationIT extends AbstractIT {
     @BeforeEach
     void clean() {
         stories.deleteAll();
+        entitlementRepo.deleteAll();
         users.deleteAll();
         me = seedUser("paginator@example.com");
         bearer = loginBearer("paginator@example.com");

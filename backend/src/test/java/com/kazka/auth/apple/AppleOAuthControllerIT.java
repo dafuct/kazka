@@ -36,6 +36,7 @@ class AppleOAuthControllerIT extends AbstractIT {
     static String kid = "test-kid-1";
 
     @Autowired UserRepository users;
+    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeAll
     static void startWiremock() throws Exception {
@@ -69,7 +70,10 @@ class AppleOAuthControllerIT extends AbstractIT {
     }
 
     @BeforeEach
-    void clean() { users.deleteAll(); }
+    void clean() {
+        entitlementRepo.deleteAll();
+        users.deleteAll();
+    }
 
     @Test
     void should_returnTokensAndCreateUser_when_validAppleIdentityToken() {

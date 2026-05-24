@@ -22,9 +22,11 @@ class StoryGenerateEntitlementGateIT extends AbstractIT {
 
     @Autowired UserRepository users;
     @Autowired PasswordEncoder encoder;
+    @Autowired UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
     void clean() {
+        entitlementRepo.deleteAll();
         users.deleteAll();
     }
 

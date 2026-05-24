@@ -36,6 +36,11 @@ public class StoryService {
     private final SuspensionService suspensionService;
     private final ModerationProperties moderationProperties;
     private final com.kazka.billing.FreeTierGate freeTier;
+    private final com.kazka.child.ChildProfileService childProfiles;
+    private final com.kazka.child.CharacterRepository characters;
+    private final com.kazka.child.StoryCharacterRepository storyCharacters;
+    private final com.kazka.child.ChildEntitlementResolver childTier;
+    private final com.kazka.child.CharacterExtractionWorker extractionWorker;
 
     public StoryService(StoryRepository repository, UserRepository users,
                         HuggingFaceClient hfClient, PromptBuilder promptBuilder,
@@ -43,7 +48,12 @@ public class StoryService {
                         ModerationService moderationService,
                         SuspensionService suspensionService,
                         ModerationProperties moderationProperties,
-                        com.kazka.billing.FreeTierGate freeTier) {
+                        com.kazka.billing.FreeTierGate freeTier,
+                        com.kazka.child.ChildProfileService childProfiles,
+                        com.kazka.child.CharacterRepository characters,
+                        com.kazka.child.StoryCharacterRepository storyCharacters,
+                        com.kazka.child.ChildEntitlementResolver childTier,
+                        com.kazka.child.CharacterExtractionWorker extractionWorker) {
         this.repository = repository;
         this.users = users;
         this.hfClient = hfClient;
@@ -53,6 +63,11 @@ public class StoryService {
         this.suspensionService = suspensionService;
         this.moderationProperties = moderationProperties;
         this.freeTier = freeTier;
+        this.childProfiles = childProfiles;
+        this.characters = characters;
+        this.storyCharacters = storyCharacters;
+        this.childTier = childTier;
+        this.extractionWorker = extractionWorker;
     }
 
     public Flux<SseEvent> generate(GenerationRequest req, CurrentUser currentUser) {
@@ -94,10 +109,27 @@ public class StoryService {
     }
 
     private Flux<SseEvent> generateInternal(GenerationRequest req, String userId) {
+        com.kazka.child.ChildProfile child = childProfiles.requireOwned(req.childProfileId(), userId);
+        String effectiveLang = promptBuilder.resolveLanguage(child, req.language());
+
+        java.util.List<com.kazka.child.Character> recurringCast;
+        if (!childTier.canIncludeCharacters(userId)) {
+            recurringCast = java.util.List.of();   // silently strip for free tier
+        } else if (req.includeCharacterIds() == null || req.includeCharacterIds().isEmpty()) {
+            recurringCast = java.util.List.of();
+        } else {
+            recurringCast = req.includeCharacterIds().stream()
+                    .limit(3)
+                    .map(characters::findById)
+                    .filter(java.util.Optional::isPresent).map(java.util.Optional::get)
+                    .filter(c -> c.getChildProfileId().equals(child.getId()))
+                    .toList();
+        }
+
         String id = UUID.randomUUID().toString();
-        String storySystem = promptBuilder.buildStorySystem(req.language());
-        String storyUser = promptBuilder.buildStoryUserMessage(req);
-        String editorSystem = promptBuilder.buildEditorSystem(req.language());
+        String storySystem = promptBuilder.buildStorySystem(effectiveLang);
+        String storyUser = promptBuilder.buildStoryUserMessage(req, child, recurringCast);
+        String editorSystem = promptBuilder.buildEditorSystem(effectiveLang);
 
         Story story = new Story();
         story.setId(id);
@@ -107,9 +139,11 @@ public class StoryService {
         story.setCharacters(req.characters());
         story.setAgeGroup(req.ageGroup());
         story.setLength(req.length());
-        story.setLanguage(req.language());
+        story.setLanguage(effectiveLang);
         story.setContent("");
         story.setIllustrationStatus(IllustrationStatus.PENDING);
+        story.setChildProfileId(child.getId());
+        story.setExtractionStatus(com.kazka.child.ExtractionStatus.PENDING);
 
         return Mono.fromCallable(() -> repository.save(story))
                 .subscribeOn(Schedulers.boundedElastic())
@@ -143,6 +177,14 @@ public class StoryService {
                                             saved.setTitle(title);
                                             saved.setContent(body);
                                             repository.save(saved);
+                                            for (com.kazka.child.Character cc : recurringCast) {
+                                                storyCharacters.save(new com.kazka.child.StoryCharacter(
+                                                        saved.getId(), cc.getId(), "companion"));
+                                                cc.setUsageCount(cc.getUsageCount() + 1);
+                                                cc.setLastUsedAt(java.time.Instant.now());
+                                                characters.save(cc);
+                                            }
+                                            extractionWorker.enqueue(saved.getId(), child.getId(), userId);
                                             freeTier.recordUsage(userId);
                                             return SseEvent.done(id, title);
                                         }).subscribeOn(Schedulers.boundedElastic()))

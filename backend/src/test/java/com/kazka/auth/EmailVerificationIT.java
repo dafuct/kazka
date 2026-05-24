@@ -23,9 +23,13 @@ class EmailVerificationIT extends AbstractIT {
 
     @Autowired UserRepository users;
     @Autowired EmailVerificationTokenRepository tokens;
+    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
-    void clean() { users.deleteAll(); }
+    void clean() {
+        entitlementRepo.deleteAll();
+        users.deleteAll();
+    }
 
     @Test
     void should_verifyUser_when_clickValidLink() throws Exception {

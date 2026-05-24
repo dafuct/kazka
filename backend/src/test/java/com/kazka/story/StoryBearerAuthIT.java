@@ -18,10 +18,12 @@ class StoryBearerAuthIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder encoder;
+    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
     void clean() {
         stories.deleteAll();
+        entitlementRepo.deleteAll();
         users.deleteAll();
     }
 
