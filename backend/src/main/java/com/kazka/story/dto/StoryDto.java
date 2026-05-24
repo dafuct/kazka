@@ -1,5 +1,6 @@
 package com.kazka.story.dto;
 
+import com.kazka.child.ExtractionStatus;
 import com.kazka.story.IllustrationStatus;
 import com.kazka.story.Story;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,6 +20,8 @@ public record StoryDto(
         @Schema(nullable = true) String illustrationPathLight,
         @Schema(nullable = true) String illustrationPathDark,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) IllustrationStatus illustrationStatus,
+        @Schema(nullable = true) String childProfileId,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) ExtractionStatus extractionStatus,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant createdAt,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant updatedAt
 ) {
@@ -28,6 +31,7 @@ public record StoryDto(
                 s.getAgeGroup(), s.getLength(), s.getLanguage(), s.getContent(),
                 s.getIllustrationPathLight(), s.getIllustrationPathDark(),
                 s.getIllustrationStatus(),
+                s.getChildProfileId(), s.getExtractionStatus(),
                 s.getCreatedAt(), s.getUpdatedAt()
         );
     }

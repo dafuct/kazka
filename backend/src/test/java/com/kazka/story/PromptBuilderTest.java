@@ -37,7 +37,7 @@ class PromptBuilderTest {
     @Test
     void buildStoryUserMessage_uk_containsThemeAndCharacters() {
         GenerationRequest req = new GenerationRequest(
-                "пригоди в лісі", List.of("Мія", "лисичка"), "6-8", "medium", "uk");
+                "пригоди в лісі", List.of("Мія", "лисичка"), "6-8", "medium", "uk", "child-123", null);
 
         String user = builder.buildStoryUserMessage(req);
 
@@ -52,7 +52,7 @@ class PromptBuilderTest {
     @Test
     void buildStoryUserMessage_en_containsLengthWords() {
         GenerationRequest req = new GenerationRequest(
-                "forest adventure", List.of("Mia"), "3-5", "short", "en");
+                "forest adventure", List.of("Mia"), "3-5", "short", "en", "child-456", null);
 
         String user = builder.buildStoryUserMessage(req);
 

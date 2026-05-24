@@ -16,6 +16,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.util.MultiValueMap;
 
 import java.time.Duration;
+import java.util.*;
 import java.util.List;
 import java.util.Map;
 
@@ -58,12 +59,15 @@ class ModerationFlowIT extends AbstractIT {
                 .cookie("SESSION", session.sessionId())
                 .header("X-XSRF-TOKEN", session.csrfToken())
                 .cookie("XSRF-TOKEN", session.csrfToken())
-                .bodyValue(Map.of(
-                        "theme", "naked princess",
-                        "characters", List.of("Sofia"),
-                        "ageGroup", "6-8",
-                        "length", "short",
-                        "language", "uk"))
+                .bodyValue(new HashMap<String, Object>() {{
+                    put("theme", "naked princess");
+                    put("characters", List.of("Sofia"));
+                    put("ageGroup", "6-8");
+                    put("length", "short");
+                    put("language", "uk");
+                    put("childProfileId", "profile-123");
+                    put("includeCharacterIds", null);
+                }})
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
@@ -81,15 +85,22 @@ class ModerationFlowIT extends AbstractIT {
 
         Session session = login("repeat@example.com");
         for (int i = 0; i < 3; i++) {
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("theme", "bad");
+            requestBody.put("characters", List.of("x"));
+            requestBody.put("ageGroup", "6-8");
+            requestBody.put("length", "short");
+            requestBody.put("language", "uk");
+            requestBody.put("childProfileId", "profile-test");
+            requestBody.put("includeCharacterIds", null);
+
             client().post().uri("/api/stories/generate")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.TEXT_EVENT_STREAM)
                     .cookie("SESSION", session.sessionId())
                     .header("X-XSRF-TOKEN", session.csrfToken())
                     .cookie("XSRF-TOKEN", session.csrfToken())
-                    .bodyValue(Map.of(
-                            "theme", "bad", "characters", List.of("x"),
-                            "ageGroup", "6-8", "length", "short", "language", "uk"))
+                    .bodyValue(requestBody)
                     .exchange()
                     .expectStatus().isOk();
         }
@@ -117,9 +128,15 @@ class ModerationFlowIT extends AbstractIT {
                 .cookie("SESSION", session.sessionId())
                 .header("X-XSRF-TOKEN", session.csrfToken())
                 .cookie("XSRF-TOKEN", session.csrfToken())
-                .bodyValue(Map.of(
-                        "theme", "anything", "characters", List.of("x"),
-                        "ageGroup", "6-8", "length", "short", "language", "uk"))
+                .bodyValue(new HashMap<String, Object>() {{
+                    put("theme", "anything");
+                    put("characters", List.of("x"));
+                    put("ageGroup", "6-8");
+                    put("length", "short");
+                    put("language", "uk");
+                    put("childProfileId", "profile-123");
+                    put("includeCharacterIds", null);
+                }})
                 .exchange()
                 .expectStatus().isForbidden()
                 .expectBody(String.class)

@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.util.MultiValueMap;
 
+import java.util.*;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -33,13 +34,14 @@ class StoryGenerateEntitlementGateIT extends AbstractIT {
         String bearer = loginBearer("gated-it@example.com");
         Csrf csrf = fetchCsrf();
 
-        Map<String, Object> body = Map.of(
-                "theme", "forest",
-                "characters", List.of("fox", "owl"),
-                "ageGroup", "3-5",
-                "length", "short",
-                "language", "uk"
-        );
+        Map<String, Object> body = new HashMap<>();
+        body.put("theme", "forest");
+        body.put("characters", List.of("fox", "owl"));
+        body.put("ageGroup", "3-5");
+        body.put("length", "short");
+        body.put("language", "uk");
+        body.put("childProfileId", "profile-123");
+        body.put("includeCharacterIds", null);
 
         client().post().uri("/api/stories/generate")
                 .header("Authorization", "Bearer " + bearer)
