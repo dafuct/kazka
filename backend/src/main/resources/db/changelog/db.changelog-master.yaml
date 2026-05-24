@@ -35,3 +35,6 @@ databaseChangeLog:
   - include:
       file: changes/012-add-stories-child-profile.sql
       relativeToChangelogFile: true
+  - include:
+      file: changes/013-create-story-characters.sql
+      relativeToChangelogFile: true
