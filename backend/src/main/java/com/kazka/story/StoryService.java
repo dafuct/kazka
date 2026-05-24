@@ -209,11 +209,21 @@ public class StoryService {
                         .subscribeOn(Schedulers.boundedElastic()));
     }
 
-    public Mono<PageResponse<StoryDto>> list(int page, int size, CurrentUser currentUser) {
+    public Mono<PageResponse<StoryDto>> list(int page, int size, String childProfileIdFilter, CurrentUser currentUser) {
         return Mono.fromCallable(() -> {
-            Page<Story> p = currentUser.isAdmin()
-                    ? repository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size))
-                    : repository.findAllByUserIdOrderByCreatedAtDesc(currentUser.userId(), PageRequest.of(page, size));
+            org.springframework.data.domain.Page<Story> p;
+            if (childProfileIdFilter == null) {
+                p = currentUser.isAdmin()
+                        ? repository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size))
+                        : repository.findAllByUserIdOrderByCreatedAtDesc(currentUser.userId(), PageRequest.of(page, size));
+            } else if ("none".equalsIgnoreCase(childProfileIdFilter)) {
+                // "none" is a sentinel that returns stories with no child profile attached (legacy tales)
+                p = repository.findAllByUserIdAndChildProfileIdIsNullOrderByCreatedAtDesc(
+                        currentUser.userId(), PageRequest.of(page, size));
+            } else {
+                p = repository.findAllByUserIdAndChildProfileIdOrderByCreatedAtDesc(
+                        currentUser.userId(), childProfileIdFilter, PageRequest.of(page, size));
+            }
             return new PageResponse<>(
                     p.getContent().stream().map(StoryDto::from).toList(),
                     p.getNumber(), p.getSize(), p.getTotalElements());
@@ -259,6 +269,11 @@ public class StoryService {
             Story story = findOwned(id, currentUser);
             story.setTitle(req.title());
             story.setContent(req.content());
+            if (req.childProfileId() != null && !req.childProfileId().isBlank()) {
+                // verify new profile is owned by this user before rebinding
+                childProfiles.requireOwned(req.childProfileId(), currentUser.userId());
+                story.setChildProfileId(req.childProfileId());
+            }
             return repository.save(story);
         }).subscribeOn(Schedulers.boundedElastic()).map(StoryDto::from);
     }

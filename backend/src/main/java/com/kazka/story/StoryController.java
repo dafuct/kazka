@@ -46,8 +46,11 @@ public class StoryController {
     @GetMapping
     public Mono<PageResponse<StoryDto>> list(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return currentUserResolver.requireUser().flatMap(cu -> storyService.list(page, size, cu));
+            @RequestParam(defaultValue = "20") int size,
+            // Optional filter: pass a childProfileId to scope results, or "none" for unattributed legacy tales
+            @RequestParam(required = false) String childProfileId) {
+        return currentUserResolver.requireUser()
+                .flatMap(cu -> storyService.list(page, size, childProfileId, cu));
     }
 
     @GetMapping("/cursor")
