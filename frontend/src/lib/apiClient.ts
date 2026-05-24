@@ -3,6 +3,8 @@ import { ApiError } from './types'
 import type {
   Story, PageResponse, UpdateStoryRequest, User, ApiErrorBody,
   Product, Entitlement, GeoResponse, CheckoutSessionResponse, ProviderName,
+  ChildProfileDto, CharacterDto, CreateChildProfileRequest, UpdateChildProfileRequest,
+  ConfirmCharactersRequest, UpdateCharacterRequest, ExtractedCandidateDto,
 } from './types'
 
 const STORIES = '/api/stories'
@@ -151,5 +153,51 @@ export const billing = {
   },
   cancelSubscription(): Promise<Entitlement[]> {
     return request(`${BILLING}/subscription/cancel`, { method: 'POST' })
+  },
+}
+
+const CHILDREN = '/api/children'
+const CHARACTERS = '/api/characters'
+
+export const children = {
+  list(): Promise<ChildProfileDto[]> {
+    return request(`${CHILDREN}`)
+  },
+  get(id: string): Promise<ChildProfileDto> {
+    return request(`${CHILDREN}/${id}`)
+  },
+  create(body: CreateChildProfileRequest): Promise<ChildProfileDto> {
+    return request(`${CHILDREN}`, { method: 'POST', body: JSON.stringify(body) })
+  },
+  update(id: string, body: UpdateChildProfileRequest): Promise<ChildProfileDto> {
+    return request(`${CHILDREN}/${id}`, { method: 'PATCH', body: JSON.stringify(body) })
+  },
+  archive(id: string): Promise<void> {
+    return request(`${CHILDREN}/${id}`, { method: 'DELETE' })
+  },
+  listCharacters(id: string): Promise<CharacterDto[]> {
+    return request(`${CHILDREN}/${id}/characters`)
+  },
+}
+
+export const charactersApi = {
+  update(id: string, body: UpdateCharacterRequest): Promise<CharacterDto> {
+    return request(`${CHARACTERS}/${id}`, { method: 'PATCH', body: JSON.stringify(body) })
+  },
+  archive(id: string): Promise<void> {
+    return request(`${CHARACTERS}/${id}`, { method: 'DELETE' })
+  },
+  confirm(childProfileId: string, body: ConfirmCharactersRequest): Promise<CharacterDto[]> {
+    return request(`${CHARACTERS}/confirm?childProfileId=${encodeURIComponent(childProfileId)}`,
+      { method: 'POST', body: JSON.stringify(body) })
+  },
+}
+
+export const extraction = {
+  candidates(storyId: string): Promise<ExtractedCandidateDto[]> {
+    return request(`/api/stories/${storyId}/extraction-candidates`)
+  },
+  retrigger(storyId: string): Promise<void> {
+    return request(`/api/stories/${storyId}/extract-characters`, { method: 'POST' })
   },
 }
