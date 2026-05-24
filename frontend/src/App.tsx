@@ -14,6 +14,7 @@ import { SuspensionBanner } from './components/chrome/SuspensionBanner'
 import { Footer } from './components/chrome/Footer'
 import { RequireAuth } from './components/auth/RequireAuth'
 import { RequireAdmin } from './components/auth/RequireAdmin'
+import { RequireChild } from './components/children/RequireChild'
 import { HomePage } from './pages/HomePage'
 import { ArchivePage } from './pages/ArchivePage'
 import { StoryDetailPage } from './pages/StoryDetailPage'
@@ -96,9 +97,9 @@ function AppShell() {
       <SuspensionBanner />
       <main>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/stories" element={<RequireAuth><ArchivePage /></RequireAuth>} />
-          <Route path="/stories/:id" element={<RequireAuth><StoryDetailPage /></RequireAuth>} />
+          <Route path="/" element={<RequireChild><HomePage /></RequireChild>} />
+          <Route path="/stories" element={<RequireAuth><RequireChild><ArchivePage /></RequireChild></RequireAuth>} />
+          <Route path="/stories/:id" element={<RequireAuth><RequireChild><StoryDetailPage /></RequireChild></RequireAuth>} />
           <Route path="/verify-email" element={<EmailVerifiedPage />} />
           <Route path="/reset-password" element={<PasswordResetPage />} />
           <Route path="/admin/users" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
