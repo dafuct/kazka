@@ -67,6 +67,58 @@ public class PromptBuilder {
                 "  9–12 → richer plot, character growth, subtle lesson";
     }
 
+    public String buildStoryUserMessage(GenerationRequest req,
+                                        com.kazka.child.ChildProfile child,
+                                        java.util.List<com.kazka.child.Character> recurringCast) {
+        int words = LENGTH_WORDS.getOrDefault(req.length(), 600);
+        String characters = String.join(", ", req.characters());
+        int currentYear = java.time.Year.now().getValue();
+        Integer approxAge = (child != null && child.getBirthYear() != null)
+                ? (currentYear - child.getBirthYear())
+                : null;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Write a fairy tale with the following parameters:\n\n")
+          .append("Language: ").append(req.language()).append('\n')
+          .append("Theme: ").append(req.theme()).append('\n')
+          .append("Characters: ").append(characters).append('\n')
+          .append("Age: ").append(req.ageGroup()).append('\n')
+          .append("Length: ").append(req.length()).append(" (~").append(words).append(" words)\n");
+
+        if (child != null && child.getName() != null && !child.getName().isBlank()) {
+            sb.append('\n').append("Child name: ").append(child.getName()).append('\n');
+            if (approxAge != null) sb.append("Approximate age: ").append(approxAge).append('\n');
+        }
+        if (recurringCast != null && !recurringCast.isEmpty()) {
+            sb.append('\n').append("RECURRING CAST (these characters return from previous tales — keep them consistent):\n");
+            for (var c : recurringCast) {
+                sb.append("- ").append(c.getName())
+                  .append(" (").append(c.getKind()).append("): ")
+                  .append(c.getDescription());
+                if (c.getTraits() != null && !c.getTraits().isEmpty()) {
+                    sb.append(" — traits: ").append(String.join(", ", c.getTraits()));
+                }
+                sb.append('\n');
+            }
+        }
+        sb.append('\n').append("Age guidelines:\n")
+          .append("  3–5 → very short sentences, gentle repetition, familiar home/forest world\n")
+          .append("  6–8 → light adventure, clear moral, lively dialogue\n")
+          .append("  9–12 → richer plot, character growth, subtle lesson");
+        return sb.toString();
+    }
+
+    /** Resolves the language for generation. 'bilingual' is accepted for storage but treated as 'uk' until Spec H. */
+    public String resolveLanguage(com.kazka.child.ChildProfile child, String requestedLanguage) {
+        if (requestedLanguage != null && !requestedLanguage.isBlank() && !"bilingual".equals(requestedLanguage)) {
+            return requestedLanguage;
+        }
+        if (child == null) return "uk";
+        String pref = child.getPreferredLanguage();
+        if ("bilingual".equals(pref)) return "uk";
+        return pref == null ? "uk" : pref;
+    }
+
     public String buildEditorSystem(String language) {
         return "uk".equals(language) ? editorUk.strip() : editorEn.strip();
     }
