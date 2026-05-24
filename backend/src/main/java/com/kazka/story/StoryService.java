@@ -275,6 +275,18 @@ public class StoryService {
                 .then();
     }
 
+    public Mono<Void> triggerExtraction(String storyId, CurrentUser currentUser) {
+        return Mono.fromCallable(() -> {
+            Story story = findOwned(storyId, currentUser);
+            if (story.getExtractionStatus() == com.kazka.child.ExtractionStatus.RUNNING) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT);
+            }
+            return story;
+        }).subscribeOn(Schedulers.boundedElastic())
+                .flatMap(story -> Mono.fromRunnable(() ->
+                        extractionWorker.enqueueAsync(story.getId())).then());
+    }
+
     private Story findOwned(String id, CurrentUser currentUser) {
         var opt = currentUser.isAdmin()
                 ? repository.findById(id)

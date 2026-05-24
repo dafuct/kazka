@@ -85,4 +85,11 @@ public class StoryController {
     public Mono<Void> delete(@PathVariable String id) {
         return currentUserResolver.requireUser().flatMap(cu -> storyService.delete(id, cu));
     }
+
+    @PostMapping("/{id}/extract-characters")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Mono<Void> reextract(@PathVariable String id) {
+        return currentUserResolver.requireUser()
+                .flatMap(cu -> storyService.triggerExtraction(id, cu));
+    }
 }
