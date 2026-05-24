@@ -127,6 +127,13 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "INVALID_SIGNATURE"));
     }
 
+    @ExceptionHandler(com.kazka.child.ChildRateLimiter.TooManyChildCreatesException.class)
+    public ResponseEntity<Map<String, Object>> handleChildRateLimit(
+            com.kazka.child.ChildRateLimiter.TooManyChildCreatesException ex) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(Map.of("error", "RATE_LIMITED", "message", ex.getMessage()));
+    }
+
     private static String codeFor(ResponseStatusException ex) {
         int s = ex.getStatusCode().value();
         if (s == 404) return "NOT_FOUND";
