@@ -26,4 +26,21 @@ class HolidayDateRuleTest {
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> feb29.computeFor(2025))
                 .isInstanceOf(java.time.DateTimeException.class);
     }
+
+    @Test
+    void nthWeekdayOfMonth_computes_third_thursday_of_may() {
+        NthWeekdayOfMonth vyshyvanka = new NthWeekdayOfMonth(Month.MAY, java.time.DayOfWeek.THURSDAY, 3);
+        // Vyshyvanka Day — verified against the Ukrainian Wikipedia article:
+        assertThat(vyshyvanka.computeFor(2024)).isEqualTo(LocalDate.of(2024, 5, 16));
+        assertThat(vyshyvanka.computeFor(2025)).isEqualTo(LocalDate.of(2025, 5, 15));
+        assertThat(vyshyvanka.computeFor(2026)).isEqualTo(LocalDate.of(2026, 5, 21));
+        assertThat(vyshyvanka.computeFor(2027)).isEqualTo(LocalDate.of(2027, 5, 20));
+    }
+
+    @Test
+    void nthWeekdayOfMonth_handles_first_weekday_after_month_start() {
+        // 1st Monday of June 2026 — June 1 is a Monday, so the 1st Monday is June 1
+        NthWeekdayOfMonth firstMonJune = new NthWeekdayOfMonth(Month.JUNE, java.time.DayOfWeek.MONDAY, 1);
+        assertThat(firstMonJune.computeFor(2026)).isEqualTo(LocalDate.of(2026, 6, 1));
+    }
 }
