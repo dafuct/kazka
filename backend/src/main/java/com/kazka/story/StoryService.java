@@ -318,4 +318,88 @@ public class StoryService {
                         ? Mono.empty()
                         : Mono.error(new EmailNotVerifiedException()));
     }
+
+    /**
+     * Generates a story for the bedtime worker. Same persistence flow as the SSE path,
+     * but returns the final Story (no token streaming, no SSE events).
+     *
+     * Theme fallback chain:
+     *   1. schedule.themes (explicit per-bedtime preference)
+     *   2. child.interests (general profile-level preference)
+     *   3. language-aware default ("магічна казка" / "a magical bedtime tale")
+     *
+     * Does NOT call freeTier.recordUsage — bedtime is paid-only and doesn't count
+     * against the free-tier monthly limit.
+     */
+    public Mono<Story> generateForBedtime(com.kazka.child.ChildProfile child,
+                                          com.kazka.child.bedtime.BedtimeSchedule schedule,
+                                          User user) {
+        java.util.List<String> themes = !schedule.getThemes().isEmpty()
+                ? schedule.getThemes()
+                : (child.getInterests() == null || child.getInterests().isEmpty()
+                        ? java.util.List.of()
+                        : child.getInterests());
+        String themeText = themes.isEmpty()
+                ? ("uk".equals(child.getPreferredLanguage()) ? "магічна казка" : "a magical bedtime tale")
+                : String.join(", ", themes);
+
+        String effectiveLang = promptBuilder.resolveLanguage(child, "uk");
+
+        com.kazka.story.dto.GenerationRequest req = new com.kazka.story.dto.GenerationRequest(
+                themeText,
+                java.util.List.of(child.getName()),
+                "6-8",
+                "short",
+                effectiveLang,
+                child.getId(),
+                java.util.List.of()
+        );
+
+        String storySystem = promptBuilder.buildStorySystem(effectiveLang);
+        String storyUser = promptBuilder.buildStoryUserMessage(req, child, java.util.List.of());
+        String editorSystem = promptBuilder.buildEditorSystem(effectiveLang);
+
+        Story story = new Story();
+        story.setId(java.util.UUID.randomUUID().toString());
+        story.setUserId(user.getId());
+        story.setTitle("");
+        story.setTheme(req.theme());
+        story.setCharacters(req.characters());
+        story.setAgeGroup(req.ageGroup());
+        story.setLength(req.length());
+        story.setLanguage(req.language());
+        story.setContent("");
+        story.setIllustrationStatus(IllustrationStatus.PENDING);
+        story.setChildProfileId(child.getId());
+        story.setExtractionStatus(com.kazka.child.ExtractionStatus.PENDING);
+
+        return Mono.fromCallable(() -> repository.save(story))
+                .subscribeOn(Schedulers.boundedElastic())
+                .flatMap(saved -> hfClient.streamText(storySystem, storyUser)
+                        .reduce("", String::concat)
+                        .flatMap(raw -> hfClient.streamEdit(editorSystem, raw)
+                                .reduce("", String::concat))
+                        .flatMap(corrected -> Mono.fromCallable(() -> {
+                            String[] lines = corrected.split("\n");
+                            int firstNonEmpty = 0;
+                            while (firstNonEmpty < lines.length && lines[firstNonEmpty].strip().isEmpty()) firstNonEmpty++;
+                            String title;
+                            int storyStart;
+                            if (firstNonEmpty < lines.length && looksLikeTitle(lines[firstNonEmpty].strip())) {
+                                title = lines[firstNonEmpty].strip();
+                                storyStart = firstNonEmpty + 1;
+                            } else {
+                                title = req.theme();
+                                storyStart = firstNonEmpty;
+                            }
+                            while (storyStart < lines.length && lines[storyStart].strip().isEmpty()) storyStart++;
+                            String body = String.join("\n",
+                                    java.util.Arrays.copyOfRange(lines, storyStart, lines.length));
+                            saved.setTitle(title);
+                            saved.setContent(body);
+                            repository.save(saved);
+                            extractionWorker.enqueue(saved.getId(), child.getId(), user.getId());
+                            return saved;
+                        }).subscribeOn(Schedulers.boundedElastic())));
+    }
 }
