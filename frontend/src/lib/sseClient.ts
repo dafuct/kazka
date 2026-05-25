@@ -40,6 +40,13 @@ export async function streamStory(
   }))
 
   if (!res.ok) {
+    if (res.status === 402) {
+      const currentPath = window.location.pathname + window.location.search
+      if (!currentPath.startsWith('/pricing')) {
+        window.location.href = `/pricing?redirect=${encodeURIComponent(currentPath)}`
+      }
+      return
+    }
     const text = await res.text().catch(() => '')
     handlers.onError?.({ message: `HTTP ${res.status}: ${text}` })
     return
