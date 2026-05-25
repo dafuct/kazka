@@ -1,0 +1,14 @@
+.form { display: flex; flex-direction: column; gap: 16px; max-width: 480px; }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.field > span { font-weight: 600; }
+.field input, .field select { padding: 8px 10px; border: 1px solid var(--border, #e5e7eb); border-radius: 6px; font: inherit; }
+.field small { color: var(--muted, #6b7280); font-size: 12px; }
+.chipRow { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; background: var(--surface-hover, #f3f4f6); border-radius: 999px; padding: 4px 10px; font-size: 13px; }
+.chip button { background: transparent; border: 0; cursor: pointer; padding: 0 2px; color: var(--muted, #6b7280); }
+.chipInput { display: flex; gap: 6px; margin-top: 4px; }
+.chipInput input { flex: 1; }
+.chipInput button { padding: 6px 12px; border: 1px solid var(--border, #e5e7eb); background: transparent; border-radius: 6px; cursor: pointer; }
+.error { color: #dc2626; font-size: 14px; }
+.submit { padding: 10px 16px; background: var(--accent, #4f46e5); color: white; border: 0; border-radius: 6px; cursor: pointer; font-weight: 600; align-self: flex-start; }
+.submit:disabled { opacity: 0.5; cursor: not-allowed; }
