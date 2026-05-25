@@ -38,3 +38,6 @@ databaseChangeLog:
   - include:
       file: changes/013-create-story-characters.sql
       relativeToChangelogFile: true
+  - include:
+      file: changes/014-create-bedtime-schedules.sql
+      relativeToChangelogFile: true
