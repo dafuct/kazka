@@ -43,4 +43,26 @@ class HolidayDateRuleTest {
         NthWeekdayOfMonth firstMonJune = new NthWeekdayOfMonth(Month.JUNE, java.time.DayOfWeek.MONDAY, 1);
         assertThat(firstMonJune.computeFor(2026)).isEqualTo(LocalDate.of(2026, 6, 1));
     }
+
+    @Test
+    void easterGregorian_known_dates_2024_to_2030() {
+        // Gregorian Easter dates (Ukrainian Orthodox Church of Ukraine switched to
+        // the Gregorian computus in 2023). Verified against multiple calendrical sources.
+        EasterGregorian easter = new EasterGregorian();
+        assertThat(easter.computeFor(2024)).isEqualTo(LocalDate.of(2024, 3, 31));
+        assertThat(easter.computeFor(2025)).isEqualTo(LocalDate.of(2025, 4, 20));
+        assertThat(easter.computeFor(2026)).isEqualTo(LocalDate.of(2026, 4,  5));
+        assertThat(easter.computeFor(2027)).isEqualTo(LocalDate.of(2027, 3, 28));
+        assertThat(easter.computeFor(2028)).isEqualTo(LocalDate.of(2028, 4, 16));
+        assertThat(easter.computeFor(2029)).isEqualTo(LocalDate.of(2029, 4,  1));
+        assertThat(easter.computeFor(2030)).isEqualTo(LocalDate.of(2030, 4, 21));
+    }
+
+    @Test
+    void easterGregorian_century_boundary_year() {
+        // Meeus is documented to work correctly across century boundaries; 2100 is the
+        // canonical sanity check (NOT a leap year in Gregorian, so the calendar adjusts).
+        EasterGregorian easter = new EasterGregorian();
+        assertThat(easter.computeFor(2100)).isEqualTo(LocalDate.of(2100, 3, 28));
+    }
 }
