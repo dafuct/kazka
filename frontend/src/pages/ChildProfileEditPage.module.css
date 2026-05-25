@@ -1,3 +1,6 @@
 .page { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
 .page h1 { margin: 0 0 24px 0; font-size: 22px; }
 .loading { padding: 24px; color: var(--muted, #6b7280); }
+.bedtimeSection { margin-top: 32px; }
+.divider { border: none; border-top: 1px solid var(--border, #e5e7eb); margin: 0 0 24px 0; }
+.bedtimeSection h2 { font-size: 18px; margin: 0 0 16px 0; }

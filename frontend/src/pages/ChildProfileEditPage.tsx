@@ -4,6 +4,9 @@ import { ChildProfileForm } from '../components/children/ChildProfileForm'
 import { children as childrenApi } from '../lib/apiClient'
 import { useChildren } from '../lib/ChildrenContext'
 import { useLocale } from '../lib/LocaleContext'
+import { useBilling } from '../lib/BillingContext'
+import { BedtimeSettingsForm } from '../components/children/BedtimeSettingsForm'
+import { BedtimeUpgradeTeaser } from '../components/children/BedtimeUpgradeTeaser'
 import type { ChildProfileDto } from '@kazka/shared'
 import styles from './ChildProfileEditPage.module.css'
 
@@ -14,6 +17,7 @@ export function ChildProfileEditPage() {
   const { t } = useLocale()
   const tc = (t as any).children ?? {}
   const { refetch, setActive } = useChildren()
+  const { isPro } = useBilling()
   const [initial, setInitial] = useState<ChildProfileDto | null>(null)
   const [loading, setLoading] = useState(!isNew)
 
@@ -51,6 +55,15 @@ export function ChildProfileEditPage() {
           }
         }}
       />
+      {!isNew && (
+        <section className={styles.bedtimeSection}>
+          <hr className={styles.divider} />
+          <h2>{(t as any).children?.bedtime?.sectionTitle ?? 'Bedtime ritual'}</h2>
+          {isPro
+            ? <BedtimeSettingsForm childId={id!} />
+            : <BedtimeUpgradeTeaser />}
+        </section>
+      )}
     </div>
   )
 }
