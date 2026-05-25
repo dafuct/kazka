@@ -34,6 +34,7 @@ public class BedtimeWorker {
     private final StoryService storyService;
     private final BedtimeMailer mailer;
     private final NextRunCalculator nextRunCalc;
+    private final com.kazka.holidays.HolidayCalendar holidayCalendar;
 
     public BedtimeWorker(BedtimeScheduleRepository scheduleRepo,
                          ChildProfileRepository profiles,
@@ -41,7 +42,8 @@ public class BedtimeWorker {
                          EntitlementResolver entitlements,
                          StoryService storyService,
                          BedtimeMailer mailer,
-                         NextRunCalculator nextRunCalc) {
+                         NextRunCalculator nextRunCalc,
+                         com.kazka.holidays.HolidayCalendar holidayCalendar) {
         this.scheduleRepo = scheduleRepo;
         this.profiles = profiles;
         this.users = users;
@@ -49,6 +51,7 @@ public class BedtimeWorker {
         this.storyService = storyService;
         this.mailer = mailer;
         this.nextRunCalc = nextRunCalc;
+        this.holidayCalendar = holidayCalendar;
     }
 
     @Async
@@ -86,7 +89,18 @@ public class BedtimeWorker {
         }
 
         try {
-            Story story = storyService.generateForBedtime(child, s, user, null).block();
+            java.util.Optional<com.kazka.holidays.Holiday> holiday =
+                    holidayCalendar.activeFor(java.time.Instant.now(), java.time.ZoneId.of(s.getTimezone()));
+
+            String themeOverride = null;
+            if (holiday.isPresent() && s.isHolidayThemesEnabled()) {
+                com.kazka.holidays.Holiday h = holiday.get();
+                String lang = child.getPreferredLanguage();
+                themeOverride = h.label(lang) + "\n\n" + h.culturalContext(lang);
+                log.info("Bedtime holiday active: {} for child {}", h.id(), child.getId());
+            }
+
+            Story story = storyService.generateForBedtime(child, s, user, themeOverride).block();
             mailer.send(story, child, user);
             s.setLastSentAt(Instant.now());
             s.setRetryCount(0);
