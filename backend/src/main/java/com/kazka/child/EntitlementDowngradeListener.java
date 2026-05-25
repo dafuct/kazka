@@ -20,35 +20,47 @@ public class EntitlementDowngradeListener {
     private final ChildProfileRepository profiles;
     private final EntitlementResolver entitlements;
     private final com.kazka.story.StoryRepository stories;
+    private final com.kazka.child.bedtime.BedtimeScheduleRepository bedtimeRepo;
 
     public EntitlementDowngradeListener(ChildProfileRepository profiles,
                                         EntitlementResolver entitlements,
-                                        com.kazka.story.StoryRepository stories) {
+                                        com.kazka.story.StoryRepository stories,
+                                        com.kazka.child.bedtime.BedtimeScheduleRepository bedtimeRepo) {
         this.profiles = profiles;
         this.entitlements = entitlements;
         this.stories = stories;
+        this.bedtimeRepo = bedtimeRepo;
     }
 
     @EventListener
     @Transactional
     public void on(EntitlementDowngradedEvent ev) {
         if (entitlements.isPro(ev.userId())) return; // race-safe re-check
+
+        // Archive over-quota child profiles
         List<ChildProfile> active = profiles.findByUserIdAndArchivedAtIsNullOrderByCreatedAtAsc(ev.userId());
-        if (active.size() <= 1) return;
+        if (active.size() > 1) {
+            ChildProfile keep = active.stream()
+                    .max(Comparator.comparing(p -> mostRecentStoryAt(p.getId())))
+                    .orElse(active.get(0));
 
-        ChildProfile keep = active.stream()
-                .max(Comparator.comparing(p -> mostRecentStoryAt(p.getId())))
-                .orElse(active.get(0));
-
-        Instant now = Instant.now();
-        for (ChildProfile p : active) {
-            if (!p.getId().equals(keep.getId())) {
-                p.setArchivedAt(now);
-                profiles.save(p);
+            Instant now = Instant.now();
+            for (ChildProfile p : active) {
+                if (!p.getId().equals(keep.getId())) {
+                    p.setArchivedAt(now);
+                    profiles.save(p);
+                }
             }
+            log.info("Entitlement downgrade: kept profile {} for user {}, archived {} others",
+                    keep.getId(), ev.userId(), active.size() - 1);
         }
-        log.info("Entitlement downgrade: kept profile {} for user {}, archived {} others",
-                keep.getId(), ev.userId(), active.size() - 1);
+
+        // Disable all bedtime schedules
+        int disabled = bedtimeRepo.disableAllForUser(ev.userId());
+        if (disabled > 0) {
+            log.info("Entitlement downgrade: disabled {} bedtime schedule(s) for user {}",
+                    disabled, ev.userId());
+        }
     }
 
     private Instant mostRecentStoryAt(String childProfileId) {
