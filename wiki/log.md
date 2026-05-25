@@ -20,3 +20,7 @@ Operations:
 ## [2026-05-22] lesson | filed editor-must-fix-invented-words-including-in-titles — editor left "Привидиний" in title; added invented-words rule + relaxed title carve-out to permit morphology fixes
 
 ## [2026-05-23] lesson | filed subscription-cancel-rules-differ-by-provider — captured per-provider cancel policy decided while building /settings page (Apple → App Store-only via 409 APPLE_MANAGED, Paddle/LiqPay/Monobank → local revoke; known gap: Paddle subscription-id not stored)
+
+## [2026-05-25] feature | shipped Spec C — child profiles + recurring characters (keystone for D/E/F/G/H/I); migrations 010-013, new entities ChildProfile + Character + StoryCharacter, /api/children + /api/characters controllers, generation flow now requires childProfileId, async LLM-based character extraction with PENDING/RUNNING/DONE/FAILED/SKIPPED states, tier limits (free=1 profile/0 saved chars, paid=unlimited), entitlement-downgrade auto-archive listener, full frontend (ActiveChildPicker, settings pages, CharacterPicker on Home, ExtractedCharactersPanel on StoryDetailPage, archive filter chips, full UK+EN locales)
+
+## [2026-05-25] lesson | candidate filed user-entitlements-fk-needs-cascade-on-user-delete — adding new ITs in Spec C exposed latent FK constraint failures in 15 test classes that called users.deleteAll() before entitlementRepo.deleteAll() (user_entitlements.user_id FK lacks ON DELETE CASCADE — masked until test ordering changed)

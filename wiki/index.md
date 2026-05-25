@@ -15,6 +15,7 @@ When this file exceeds ~300 lines or the wiki passes ~150 pages, shard into `wik
 - [[first-paragraph-indent-ukrainian-typography]] — first paragraph of every tale rendered flush-left (English convention); Ukrainian typography indents every paragraph
 - [[editor-must-fix-invented-words-including-in-titles]] — editor left invented Ukrainian words ("Привидиний") in titles; carve-out was too broad and rule list missed neologisms
 - [[subscription-cancel-rules-differ-by-provider]] — generic "Cancel subscription" is wrong; Apple is App Store-managed, Paddle needs subscription-id+API call, LiqPay/Monobank are one-off today
+- [[user-entitlements-fk-needs-cascade-on-user-delete]] — user_entitlements.user_id FK lacks ON DELETE CASCADE; test ordering hid this until Spec C ITs reshuffled execution and broke 15 tests at once
 
 ## Sources
 
