@@ -19,7 +19,8 @@ class BedtimeMigrationIT extends AbstractIT {
                 "SELECT COUNT(*) FROM information_schema.columns " +
                 "WHERE table_schema = DATABASE() AND table_name = 'bedtime_schedules'",
                 Integer.class);
-        assertThat(count).isEqualTo(11);
+        // Migration 014 created 11 columns; migration 015 added holiday_themes_enabled
+        assertThat(count).isEqualTo(12);
     }
 
     @Test
