@@ -62,7 +62,7 @@ class BedtimeScheduleControllerIT extends AbstractIT {
     void should_upsert_and_then_return_persisted_values() {
         var c = authedClient(userA);
         c.put().uri("/api/children/" + profileA + "/bedtime")
-                .bodyValue(new BedtimeUpdateRequest(true, "21:00", "Europe/Warsaw", List.of("dragons")))
+                .bodyValue(new BedtimeUpdateRequest(true, "21:00", "Europe/Warsaw", List.of("dragons"), true))
                 .exchange().expectStatus().isOk();
 
         c.get().uri("/api/children/" + profileA + "/bedtime").exchange()
@@ -80,7 +80,7 @@ class BedtimeScheduleControllerIT extends AbstractIT {
         when(entitlements.isPro(userA)).thenReturn(false);
         var c = authedClient(userA);
         c.put().uri("/api/children/" + profileA + "/bedtime")
-                .bodyValue(new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of()))
+                .bodyValue(new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of(), true))
                 .exchange().expectStatus().isEqualTo(402);
     }
 
@@ -88,7 +88,7 @@ class BedtimeScheduleControllerIT extends AbstractIT {
     void should_return400_on_bad_timezone() {
         var c = authedClient(userA);
         c.put().uri("/api/children/" + profileA + "/bedtime")
-                .bodyValue(new BedtimeUpdateRequest(true, "20:30", "Mars/Olympus", List.of()))
+                .bodyValue(new BedtimeUpdateRequest(true, "20:30", "Mars/Olympus", List.of(), true))
                 .exchange().expectStatus().isBadRequest();
     }
 
@@ -98,7 +98,7 @@ class BedtimeScheduleControllerIT extends AbstractIT {
         cB.get().uri("/api/children/" + profileA + "/bedtime")
                 .exchange().expectStatus().isNotFound();
         cB.put().uri("/api/children/" + profileA + "/bedtime")
-                .bodyValue(new BedtimeUpdateRequest(false, "20:30", "Europe/Kyiv", List.of()))
+                .bodyValue(new BedtimeUpdateRequest(false, "20:30", "Europe/Kyiv", List.of(), true))
                 .exchange().expectStatus().isNotFound();
     }
 

@@ -69,6 +69,7 @@ public class BedtimeScheduleService {
         s.setLocalTime(req.localTime());
         s.setTimezone(req.timezone());
         s.setThemes(req.themes() == null ? List.of() : req.themes());
+        s.setHolidayThemesEnabled(req.holidayThemesEnabled());
         s.setFailedAt(null);
         s.setRetryCount(0);
 

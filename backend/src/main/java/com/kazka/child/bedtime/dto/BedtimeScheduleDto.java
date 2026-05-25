@@ -12,6 +12,7 @@ public record BedtimeScheduleDto(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String localTime,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String timezone,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) List<String> themes,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) boolean holidayThemesEnabled,
         @Schema(nullable = true) Instant nextRunAt,
         @Schema(nullable = true) Instant lastSentAt,
         @Schema(nullable = true) Instant failedAt
@@ -19,6 +20,7 @@ public record BedtimeScheduleDto(
     public static BedtimeScheduleDto from(BedtimeSchedule s) {
         return new BedtimeScheduleDto(
                 s.getChildProfileId(), s.isEnabled(), s.getLocalTime(), s.getTimezone(),
-                s.getThemes(), s.getNextRunAt(), s.getLastSentAt(), s.getFailedAt());
+                s.getThemes(), s.isHolidayThemesEnabled(),
+                s.getNextRunAt(), s.getLastSentAt(), s.getFailedAt());
     }
 }

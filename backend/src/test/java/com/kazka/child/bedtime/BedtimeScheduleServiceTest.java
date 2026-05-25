@@ -45,7 +45,7 @@ class BedtimeScheduleServiceTest {
         when(nextRun.nextRun(any(), any(), any())).thenReturn(java.time.Instant.parse("2026-06-15T17:30:00Z"));
 
         BedtimeSchedule saved = svc.upsert("p1", "u",
-                new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of("dragons")));
+                new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of("dragons"), true));
 
         assertThat(saved.isEnabled()).isTrue();
         assertThat(saved.getLocalTime()).isEqualTo("20:30");
@@ -60,7 +60,7 @@ class BedtimeScheduleServiceTest {
         when(entitlements.isPro("u")).thenReturn(false);
 
         assertThatThrownBy(() -> svc.upsert("p1", "u",
-                new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of())))
+                new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of(), true)))
                 .isInstanceOf(PaywallRequiredException.class);
         verify(repo, never()).save(any());
     }
@@ -73,7 +73,7 @@ class BedtimeScheduleServiceTest {
         when(repo.save(any(BedtimeSchedule.class))).thenAnswer(i -> i.getArgument(0));
 
         BedtimeSchedule saved = svc.upsert("p1", "u",
-                new BedtimeUpdateRequest(false, "20:30", "Europe/Kyiv", List.of()));
+                new BedtimeUpdateRequest(false, "20:30", "Europe/Kyiv", List.of(), true));
 
         assertThat(saved.isEnabled()).isFalse();
         assertThat(saved.getNextRunAt()).isNull();
@@ -85,7 +85,7 @@ class BedtimeScheduleServiceTest {
         when(entitlements.isPro("u")).thenReturn(true);
 
         assertThatThrownBy(() -> svc.upsert("p1", "u",
-                new BedtimeUpdateRequest(true, "20:30", "Mars/Olympus", List.of())))
+                new BedtimeUpdateRequest(true, "20:30", "Mars/Olympus", List.of(), true)))
                 .isInstanceOf(ResponseStatusException.class)
                 .satisfies(e -> assertThat(((ResponseStatusException) e).getStatusCode())
                         .isEqualTo(HttpStatus.BAD_REQUEST));
@@ -107,7 +107,7 @@ class BedtimeScheduleServiceTest {
         when(nextRun.nextRun(any(), any(), any())).thenReturn(java.time.Instant.parse("2026-06-15T18:00:00Z"));
 
         BedtimeSchedule saved = svc.upsert("p1", "u",
-                new BedtimeUpdateRequest(true, "21:00", "Europe/Kyiv", List.of()));
+                new BedtimeUpdateRequest(true, "21:00", "Europe/Kyiv", List.of(), true));
 
         ArgumentCaptor<BedtimeSchedule> captor = ArgumentCaptor.forClass(BedtimeSchedule.class);
         verify(repo).save(captor.capture());
@@ -130,9 +130,23 @@ class BedtimeScheduleServiceTest {
         when(repo.save(any(BedtimeSchedule.class))).thenAnswer(i -> i.getArgument(0));
 
         BedtimeSchedule saved = svc.upsert("p1", "u",
-                new BedtimeUpdateRequest(false, "20:30", "Europe/Kyiv", List.of()));
+                new BedtimeUpdateRequest(false, "20:30", "Europe/Kyiv", List.of(), true));
 
         assertThat(saved.isEnabled()).isFalse();
         assertThat(saved.getNextRunAt()).isNull();
+    }
+
+    @Test
+    void should_persist_holidayThemesEnabled_false_when_user_opts_out() {
+        when(profiles.requireOwned("p1", "u")).thenReturn(owned());
+        when(entitlements.isPro("u")).thenReturn(true);
+        when(repo.findByChildProfileId("p1")).thenReturn(Optional.empty());
+        when(repo.save(any(BedtimeSchedule.class))).thenAnswer(i -> i.getArgument(0));
+        when(nextRun.nextRun(any(), any(), any())).thenReturn(java.time.Instant.now().plusSeconds(3600));
+
+        BedtimeSchedule saved = svc.upsert("p1", "u",
+                new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of(), false));
+
+        assertThat(saved.isHolidayThemesEnabled()).isFalse();
     }
 }
