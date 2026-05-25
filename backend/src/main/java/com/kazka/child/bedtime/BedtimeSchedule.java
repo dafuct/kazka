@@ -40,6 +40,9 @@ public class BedtimeSchedule {
     @Column(name = "failed_at")
     private Instant failedAt;
 
+    @Column(name = "holiday_themes_enabled", nullable = false)
+    private boolean holidayThemesEnabled = true;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
@@ -66,6 +69,8 @@ public class BedtimeSchedule {
     public void setRetryCount(int retryCount) { this.retryCount = retryCount; }
     public Instant getFailedAt() { return failedAt; }
     public void setFailedAt(Instant failedAt) { this.failedAt = failedAt; }
+    public boolean isHolidayThemesEnabled() { return holidayThemesEnabled; }
+    public void setHolidayThemesEnabled(boolean holidayThemesEnabled) { this.holidayThemesEnabled = holidayThemesEnabled; }
     public Instant getCreatedAt() { return createdAt; }
     public Instant getUpdatedAt() { return updatedAt; }
 }
