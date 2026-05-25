@@ -46,3 +46,8 @@
 @media (max-width: 860px) {
   .page { padding: calc(64px + 40px) 20px 60px; }
 }
+
+.chipStrip { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.chip, .chipOn { padding: 4px 12px; border: 1px solid var(--border, #e5e7eb); border-radius: 999px; background: transparent; cursor: pointer; font-size: 13px; font: inherit; }
+.chip:hover { background: var(--surface-hover, #f3f4f6); }
+.chipOn { background: var(--accent, #4f46e5); color: white; border-color: var(--accent, #4f46e5); }

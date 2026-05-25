@@ -110,6 +110,14 @@ export function SettingsPage() {
       </section>
 
       <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>{(t as any).settings?.childrenSection ?? (t as any).children?.listTitle ?? 'Children'}</h2>
+        <p className={styles.muted}>{(t as any).settings?.childrenDescription ?? 'Manage child profiles and their character libraries.'}</p>
+        <Link to="/settings/children" className={styles.primaryBtn}>
+          {(t as any).settings?.manageChildren ?? (t as any).children?.manageLink ?? 'Manage children'}
+        </Link>
+      </section>
+
+      <section className={styles.section}>
         <h2 className={styles.sectionTitle}>{t.settings.subscriptionSection}</h2>
         {!isPro && (
           <div className={styles.subBlock}>

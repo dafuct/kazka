@@ -32,8 +32,9 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  listStories(page = 0, size = 20): Promise<PageResponse<Story>> {
-    return request(`${STORIES}?page=${page}&size=${size}`)
+  listStories(page = 0, size = 20, childProfileId?: string): Promise<PageResponse<Story>> {
+    const q = childProfileId ? `&childProfileId=${encodeURIComponent(childProfileId)}` : ''
+    return request(`${STORIES}?page=${page}&size=${size}${q}`)
   },
   getStory(id: string): Promise<Story> {
     return request(`${STORIES}/${id}`)

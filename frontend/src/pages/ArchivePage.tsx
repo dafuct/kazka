@@ -2,23 +2,30 @@ import { useState, useEffect, useCallback } from 'react'
 import { StoryCard } from '../components/story/StoryCard'
 import { ConfirmModal } from '../components/modal/ConfirmModal'
 import { useLocale } from '../lib/LocaleContext'
+import { useChildren } from '../lib/ChildrenContext'
 import { api } from '../lib/apiClient'
 import type { Story } from '../lib/types'
 import styles from './ArchivePage.module.css'
 
 export function ArchivePage() {
   const { t } = useLocale()
+  const tc = (t as any).children ?? {}
+  const { children: profiles } = useChildren()
+  const [filterId, setFilterId] = useState<string>('all')
   const [stories, setStories] = useState<Story[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
   useEffect(() => {
-    api.listStories()
+    setLoading(true)
+    setError(null)
+    const param = filterId === 'all' ? undefined : filterId
+    api.listStories(0, 20, param)
       .then(page => setStories(page.items))
       .catch(() => setError(t.errors.loadFailed))
       .finally(() => setLoading(false))
-  }, [])
+  }, [filterId])
 
   const handleDelete = useCallback(async () => {
     if (!deleteId) return
@@ -33,6 +40,23 @@ export function ArchivePage() {
         <div className={styles.pageHeader}>
           <div className={styles.label}>{t.archive.label}</div>
           <h1 className={styles.heading}>{t.archive.title}</h1>
+        </div>
+
+        <div className={styles.chipStrip}>
+          <button onClick={() => setFilterId('all')} aria-pressed={filterId === 'all'}
+                  className={filterId === 'all' ? styles.chipOn : styles.chip}>
+            {tc.filterAll ?? 'All'}
+          </button>
+          {profiles.map(p => (
+            <button key={p.id} onClick={() => setFilterId(p.id)} aria-pressed={filterId === p.id}
+                    className={filterId === p.id ? styles.chipOn : styles.chip}>
+              {p.name}
+            </button>
+          ))}
+          <button onClick={() => setFilterId('none')} aria-pressed={filterId === 'none'}
+                  className={filterId === 'none' ? styles.chipOn : styles.chip}>
+            {tc.filterNoChild ?? 'No child'}
+          </button>
         </div>
 
         {loading && <p className={styles.msg}>...</p>}
