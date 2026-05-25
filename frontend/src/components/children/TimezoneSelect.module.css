@@ -1,0 +1,4 @@
+.select, .input { padding: 8px 10px; border: 1px solid var(--border, #e5e7eb); border-radius: 6px; font: inherit; }
+.row { display: flex; gap: 8px; align-items: center; }
+.input { flex: 1; }
+.linkBtn { background: transparent; border: 0; color: var(--accent, #4f46e5); cursor: pointer; font-size: 13px; }
