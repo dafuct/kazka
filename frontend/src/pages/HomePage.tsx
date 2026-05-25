@@ -4,10 +4,12 @@ import { HowItWorks } from '../components/home/HowItWorks'
 import { Features } from '../components/home/Features'
 import { StoryPreview } from '../components/home/StoryPreview'
 import { NightCta } from '../components/home/NightCta'
+import { AvatarInitials } from '../components/children/AvatarInitials'
 import { useLocale } from '../lib/LocaleContext'
 import { useStoryModal } from '../lib/StoryModalContext'
 import { useAuth } from '../lib/AuthContext'
 import { useAuthModal } from '../lib/AuthModalContext'
+import { useChildren } from '../lib/ChildrenContext'
 import { handleRipple } from '../lib/ripple'
 import styles from './HomePage.module.css'
 
@@ -58,6 +60,8 @@ export function HomePage() {
   const { openModal } = useStoryModal()
   const { user } = useAuth()
   const { openAuth } = useAuthModal()
+  const { active } = useChildren()
+  const tc = (t as any).children ?? {}
   const tryClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault()
     if (!user) openAuth('signIn'); else openModal()
@@ -114,6 +118,12 @@ export function HomePage() {
               </a>
             </div>
             <div className={styles.heroProof}>{t.home.proof}</div>
+            {user && active && (
+              <div className={styles.activeChildPill}>
+                <AvatarInitials name={active.name} seed={active.avatarSeed} size={20} />
+                <span>{tc.generatingFor ? tc.generatingFor(active.name) : `For ${active.name}`}</span>
+              </div>
+            )}
           </div>
 
           <div ref={heroImgRef} className={styles.heroImageWrap}>

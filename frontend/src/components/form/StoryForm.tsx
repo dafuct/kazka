@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { FormEvent } from 'react'
 import { TagInput } from './TagInput'
+import { CharacterPicker } from '../children/CharacterPicker'
 import { useLocale } from '../../lib/LocaleContext'
 import { useAuth } from '../../lib/AuthContext'
+import { useChildren } from '../../lib/ChildrenContext'
 import type { GenerationRequest } from '../../lib/types'
 import styles from './StoryForm.module.css'
 
@@ -15,17 +17,34 @@ interface StoryFormProps {
 export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
   const { t, lang } = useLocale()
   const { user } = useAuth()
+  const { active } = useChildren()
   const isSuspended = !!user?.suspended
   const [theme, setTheme] = useState('')
   const [characters, setCharacters] = useState<string[]>([])
   const [ageGroup, setAgeGroup] = useState<GenerationRequest['ageGroup']>('6-8')
   const [length, setLength] = useState<GenerationRequest['length']>('medium')
   const [language, setLanguage] = useState<'uk' | 'en'>(lang)
+  const [includeCharacterIds, setIncludeCharacterIds] = useState<string[]>([])
+
+  // Prefill language from the active child's preference; bilingual → 'uk'
+  useEffect(() => {
+    if (!active) return
+    const pref = active.preferredLanguage
+    setLanguage(pref === 'en' ? 'en' : 'uk')
+  }, [active])
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!theme.trim() || characters.length === 0) return
-    onSubmit({ theme: theme.trim(), characters, ageGroup, length, language })
+    if (!theme.trim() || characters.length === 0 || !active) return
+    onSubmit({
+      theme: theme.trim(),
+      characters,
+      ageGroup,
+      length,
+      language,
+      childProfileId: active.id,
+      includeCharacterIds: includeCharacterIds.length > 0 ? includeCharacterIds : undefined,
+    })
   }
 
   return (
@@ -53,6 +72,10 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
           onChange={setCharacters}
           placeholder={t.form.charactersPlaceholder}
         />
+      </div>
+
+      <div className={styles.field}>
+        <CharacterPicker selected={includeCharacterIds} onChange={setIncludeCharacterIds} />
       </div>
 
       <div className={styles.row}>
@@ -102,7 +125,7 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
       <button
         type="submit"
         className={styles.submit}
-        disabled={loading || isSuspended || !theme.trim() || characters.length === 0}
+        disabled={loading || isSuspended || !theme.trim() || characters.length === 0 || !active}
         title={isSuspended ? t.moderation.formDisabledSuspended : undefined}
       >
         {loading ? t.form.generating : t.form.submit}
