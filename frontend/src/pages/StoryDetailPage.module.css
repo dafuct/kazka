@@ -69,6 +69,15 @@
   margin-bottom: var(--spacing-4);
 }
 
+.forChild {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: -8px 0 12px 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
 .meta {
   display: flex;
   gap: var(--spacing-2);

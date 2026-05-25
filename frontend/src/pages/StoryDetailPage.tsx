@@ -2,7 +2,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { IllustrationFrame } from '../components/story/IllustrationFrame'
 import { ConfirmModal } from '../components/modal/ConfirmModal'
+import { AvatarInitials } from '../components/children/AvatarInitials'
+import { ExtractedCharactersPanel } from '../components/children/ExtractedCharactersPanel'
 import { useLocale } from '../lib/LocaleContext'
+import { useChildren } from '../lib/ChildrenContext'
 import { api } from '../lib/apiClient'
 import type { Story } from '../lib/types'
 import styles from './StoryDetailPage.module.css'
@@ -11,6 +14,7 @@ export function StoryDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t } = useLocale()
+  const { children: childProfiles } = useChildren()
 
   const [story, setStory] = useState<Story | null>(null)
   const [loading, setLoading] = useState(true)
@@ -21,6 +25,11 @@ export function StoryDetailPage() {
   const [saving, setSaving] = useState(false)
   const [illustrating, setIllustrating] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
+
+  const refresh = useCallback(() => {
+    if (!id) return
+    api.getStory(id).then(s => setStory(s)).catch(() => null)
+  }, [id])
 
   useEffect(() => {
     if (!id) return
@@ -33,6 +42,20 @@ export function StoryDetailPage() {
       .catch(() => setError(t.errors.loadFailed))
       .finally(() => setLoading(false))
   }, [id])
+
+  // Poll while extraction is in progress (max 10 polls × 3s = 30s)
+  useEffect(() => {
+    if (!story) return
+    const s = story.extractionStatus
+    if (s !== 'PENDING' && s !== 'RUNNING') return
+    let count = 0
+    const interval = setInterval(() => {
+      count++
+      if (count >= 10) { clearInterval(interval); return }
+      refresh()
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [story?.extractionStatus, story?.id])
 
   const handleIllustrate = useCallback(async () => {
     if (!story) return
@@ -65,6 +88,10 @@ export function StoryDetailPage() {
   if (loading) return <div className={styles.state}>...</div>
   if (error || !story) return <div className={styles.state}>{error ?? t.errors.loadFailed}</div>
 
+  const childProfile = story.childProfileId
+    ? childProfiles.find(p => p.id === story.childProfileId) ?? null
+    : null
+
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
@@ -80,6 +107,13 @@ export function StoryDetailPage() {
               />
             ) : (
               <h1 className={styles.title}>{story.title}</h1>
+            )}
+
+            {childProfile && (
+              <p className={styles.forChild}>
+                <AvatarInitials name={childProfile.name} seed={childProfile.avatarSeed} size={18} />
+                <span>{(t as any).children?.forChild ? (t as any).children.forChild(childProfile.name) : `for ${childProfile.name}`}</span>
+              </p>
             )}
 
             <div className={styles.meta}>
@@ -105,6 +139,15 @@ export function StoryDetailPage() {
                     <p key={i}>{para}</p>
                   ))}
               </div>
+            )}
+
+            {story.childProfileId && story.extractionStatus !== 'SKIPPED' && (
+              <ExtractedCharactersPanel
+                storyId={story.id}
+                childProfileId={story.childProfileId}
+                extractionStatus={story.extractionStatus as any}
+                onConfirmed={() => refresh()}
+              />
             )}
 
             <div className={styles.actions}>
