@@ -59,6 +59,7 @@ server:
         secure: ${COOKIE_SECURE:false}
         http-only: true
 kazka:
+  public-base-url: ${PUBLIC_BASE_URL:http://localhost:5173}
   huggingface:
     api-token: ${HUGGINGFACE_API_TOKEN:}
     text-model: ${HF_TEXT_MODEL:INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v1.0:featherless-ai}

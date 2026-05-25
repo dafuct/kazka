@@ -1,11 +1,13 @@
 package com.kazka.auth;
 
 import com.kazka.auth.exception.MailDeliveryException;
+import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
@@ -43,6 +45,23 @@ public class MailService {
              Map.of("displayName", displayName,
                     "supportEmail", props.mailFrom(),
                     "baseUrl", props.appBaseUrl()));
+    }
+
+    public void sendHtml(String to, String subject, String htmlBody) {
+        try {
+            MimeMessage msg = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(msg, false, "UTF-8");
+            helper.setFrom(props.mailFrom());
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(htmlBody, true);
+            mailSender.send(msg);
+        } catch (jakarta.mail.MessagingException e) {
+            throw new IllegalStateException("Failed to build HTML mail to " + to, e);
+        } catch (org.springframework.mail.MailException e) {
+            log.warn("Failed to send HTML mail to {}: {}", to, e.getMessage());
+            throw new MailDeliveryException(e);
+        }
     }
 
     public void sendAdminSuspensionNotice(String adminTo, String userEmail) {
