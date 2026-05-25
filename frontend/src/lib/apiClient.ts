@@ -5,6 +5,7 @@ import type {
   Product, Entitlement, GeoResponse, CheckoutSessionResponse, ProviderName,
   ChildProfileDto, CharacterDto, CreateChildProfileRequest, UpdateChildProfileRequest,
   ConfirmCharactersRequest, UpdateCharacterRequest, ExtractedCandidateDto,
+  BedtimeScheduleDto, BedtimeUpdateRequest,
 } from './types'
 
 const STORIES = '/api/stories'
@@ -178,6 +179,12 @@ export const children = {
   },
   listCharacters(id: string): Promise<CharacterDto[]> {
     return request(`${CHILDREN}/${id}/characters`)
+  },
+  getBedtime(id: string): Promise<BedtimeScheduleDto> {
+    return request(`${CHILDREN}/${id}/bedtime`)
+  },
+  updateBedtime(id: string, body: BedtimeUpdateRequest): Promise<BedtimeScheduleDto> {
+    return request(`${CHILDREN}/${id}/bedtime`, { method: 'PUT', body: JSON.stringify(body) })
   },
 }
 

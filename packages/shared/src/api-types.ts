@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/children/{childId}/bedtime": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get"];
+        put: operations["upsert"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/stories/{id}/illustrate": {
         parameters: {
             query?: never;
@@ -674,6 +690,25 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
+        BedtimeUpdateRequest: {
+            enabled: boolean;
+            localTime: string;
+            timezone: string;
+            themes?: string[];
+        };
+        BedtimeScheduleDto: {
+            childProfileId: string;
+            enabled: boolean;
+            localTime: string;
+            timezone: string;
+            themes: string[];
+            /** Format: date-time */
+            nextRunAt?: string | null;
+            /** Format: date-time */
+            lastSentAt?: string | null;
+            /** Format: date-time */
+            failedAt?: string | null;
+        };
         GenerationRequest: {
             theme: string;
             characters: string[];
@@ -915,6 +950,8 @@ export interface components {
 }
 export type SchemaUpdateStoryRequest = components['schemas']['UpdateStoryRequest'];
 export type SchemaStoryDto = components['schemas']['StoryDto'];
+export type SchemaBedtimeUpdateRequest = components['schemas']['BedtimeUpdateRequest'];
+export type SchemaBedtimeScheduleDto = components['schemas']['BedtimeScheduleDto'];
 export type SchemaGenerationRequest = components['schemas']['GenerationRequest'];
 export type SchemaServerSentEventObject = components['schemas']['ServerSentEventObject'];
 export type SchemaDeviceRegisterRequest = components['schemas']['DeviceRegisterRequest'];
@@ -1016,6 +1053,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BedtimeScheduleDto"];
+                };
+            };
+        };
+    };
+    upsert: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BedtimeUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BedtimeScheduleDto"];
+                };
             };
         };
     };

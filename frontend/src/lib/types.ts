@@ -20,6 +20,8 @@ export type {
   ExtractedCandidateDto,
   ConfirmCharactersRequest,
   UpdateCharacterRequest,
+  BedtimeScheduleDto,
+  BedtimeUpdateRequest,
 } from '@kazka/shared';
 
 export { ApiError } from '@kazka/shared';
