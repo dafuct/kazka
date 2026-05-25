@@ -86,7 +86,7 @@ public class BedtimeWorker {
         }
 
         try {
-            Story story = storyService.generateForBedtime(child, s, user).block();
+            Story story = storyService.generateForBedtime(child, s, user, null).block();
             mailer.send(story, child, user);
             s.setLastSentAt(Instant.now());
             s.setRetryCount(0);

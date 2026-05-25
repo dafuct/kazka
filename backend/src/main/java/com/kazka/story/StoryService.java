@@ -333,15 +333,21 @@ public class StoryService {
      */
     public Mono<Story> generateForBedtime(com.kazka.child.ChildProfile child,
                                           com.kazka.child.bedtime.BedtimeSchedule schedule,
-                                          User user) {
-        java.util.List<String> themes = !schedule.getThemes().isEmpty()
-                ? schedule.getThemes()
-                : (child.getInterests() == null || child.getInterests().isEmpty()
-                        ? java.util.List.of()
-                        : child.getInterests());
-        String themeText = themes.isEmpty()
-                ? ("uk".equals(child.getPreferredLanguage()) ? "магічна казка" : "a magical bedtime tale")
-                : String.join(", ", themes);
+                                          User user,
+                                          String themeOverride) {
+        String themeText;
+        if (themeOverride != null && !themeOverride.isBlank()) {
+            themeText = themeOverride;
+        } else {
+            java.util.List<String> themes = !schedule.getThemes().isEmpty()
+                    ? schedule.getThemes()
+                    : (child.getInterests() == null || child.getInterests().isEmpty()
+                            ? java.util.List.of()
+                            : child.getInterests());
+            themeText = themes.isEmpty()
+                    ? ("uk".equals(child.getPreferredLanguage()) ? "магічна казка" : "a magical bedtime tale")
+                    : String.join(", ", themes);
+        }
 
         String effectiveLang = promptBuilder.resolveLanguage(child, "uk");
 
