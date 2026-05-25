@@ -1,0 +1,7 @@
+.page { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.header h1 { margin: 0; font-size: 22px; }
+.addBtn { padding: 8px 14px; background: var(--accent, #4f46e5); color: white; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; }
+.addBtn:hover { opacity: 0.9; }
+.list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.empty { padding: 24px; text-align: center; color: var(--muted, #6b7280); border: 1px dashed var(--border, #e5e7eb); border-radius: 8px; }

@@ -1,0 +1,9 @@
+.card { display: flex; align-items: center; gap: 16px; padding: 16px; border: 1px solid var(--border, #e5e7eb); border-radius: 8px; background: var(--surface, #fff); }
+.body { flex: 1; }
+.body h3 { margin: 0 0 4px 0; font-size: 18px; }
+.meta { margin: 0; font-size: 13px; color: var(--muted, #6b7280); }
+.actions { display: flex; gap: 12px; align-items: center; }
+.actions a { color: var(--accent, #4f46e5); text-decoration: none; font-size: 14px; }
+.actions a:hover { text-decoration: underline; }
+.danger { background: transparent; border: 0; color: #dc2626; cursor: pointer; font-size: 14px; padding: 0; }
+.danger:hover { text-decoration: underline; }
