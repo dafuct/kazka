@@ -19,6 +19,7 @@ export function BedtimeSettingsForm({ childId }: { childId: string }) {
   const [busy, setBusy] = useState(false)
   const [savedMsg, setSavedMsg] = useState<string | null>(null)
   const [err, setErr] = useState<string | null>(null)
+  const [holidayThemesEnabled, setHolidayThemesEnabled] = useState(false)
   const [failedAt, setFailedAt] = useState<string | null>(null)
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export function BedtimeSettingsForm({ childId }: { childId: string }) {
         setLocalTime(s.localTime)
         setTimezone(s.timezone)
         setThemes(s.themes ?? [])
+        setHolidayThemesEnabled(s.holidayThemesEnabled)
         setFailedAt(s.failedAt ?? null)
       })
       .catch(() => {})
@@ -46,7 +48,7 @@ export function BedtimeSettingsForm({ childId }: { childId: string }) {
     e.preventDefault()
     setBusy(true); setSavedMsg(null); setErr(null)
     try {
-      await childrenApi.updateBedtime(childId, { enabled, localTime, timezone, themes })
+      await childrenApi.updateBedtime(childId, { enabled, localTime, timezone, themes, holidayThemesEnabled })
       setSavedMsg(tb.savedToast ?? 'Saved')
     } catch (e: any) {
       setErr(e?.message ?? tb.saveError ?? 'Could not save')

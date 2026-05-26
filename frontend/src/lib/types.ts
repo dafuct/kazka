@@ -22,6 +22,7 @@ export type {
   UpdateCharacterRequest,
   BedtimeScheduleDto,
   BedtimeUpdateRequest,
+  HolidayDto,
 } from '@kazka/shared';
 
 export { ApiError } from '@kazka/shared';

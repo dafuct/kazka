@@ -6,6 +6,7 @@ import type {
   ChildProfileDto, CharacterDto, CreateChildProfileRequest, UpdateChildProfileRequest,
   ConfirmCharactersRequest, UpdateCharacterRequest, ExtractedCandidateDto,
   BedtimeScheduleDto, BedtimeUpdateRequest,
+  HolidayDto,
 } from './types'
 
 const STORIES = '/api/stories'
@@ -207,5 +208,23 @@ export const extraction = {
   },
   retrigger(storyId: string): Promise<void> {
     return request(`/api/stories/${storyId}/extract-characters`, { method: 'POST' })
+  },
+}
+
+const HOLIDAYS = '/api/holidays'
+
+export const holidays = {
+  async today(tz: string, lang?: string): Promise<HolidayDto | null> {
+    const params = new URLSearchParams({ tz })
+    if (lang) params.set('lang', lang)
+    try {
+      const result = await request<HolidayDto>(`${HOLIDAYS}/today?${params.toString()}`)
+      // 204 No Content → request<T> returns undefined per the existing helper
+      return result ?? null
+    } catch (e) {
+      // If 204 manifests as a different error type, surface as null
+      if (e instanceof ApiError && (e.status === 204 || e.status === 404)) return null
+      throw e
+    }
   },
 }

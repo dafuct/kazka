@@ -27,6 +27,7 @@ export type {
   SchemaUpdateCharacterRequest as UpdateCharacterRequest,
   SchemaBedtimeScheduleDto as BedtimeScheduleDto,
   SchemaBedtimeUpdateRequest as BedtimeUpdateRequest,
+  SchemaHolidayDto as HolidayDto,
 } from './api-types';
 
 // PageResponse<T> is generic on the Java side. openapi-typescript emits

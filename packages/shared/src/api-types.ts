@@ -516,6 +516,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/holidays/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["today"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/children/{childId}/characters": {
         parameters: {
             query?: never;
@@ -695,6 +711,7 @@ export interface components {
             localTime: string;
             timezone: string;
             themes?: string[];
+            holidayThemesEnabled: boolean;
         };
         BedtimeScheduleDto: {
             childProfileId: string;
@@ -702,6 +719,7 @@ export interface components {
             localTime: string;
             timezone: string;
             themes: string[];
+            holidayThemesEnabled: boolean;
             /** Format: date-time */
             nextRunAt?: string | null;
             /** Format: date-time */
@@ -881,6 +899,13 @@ export interface components {
             items: components["schemas"]["StoryDto"][];
             nextCursor?: string | null;
         };
+        HolidayDto: {
+            id: string;
+            name: string;
+            suggestedTheme: string;
+            /** Format: date-time */
+            date: string;
+        };
         ProductDto: {
             id?: string;
             appleProductId?: string;
@@ -980,6 +1005,7 @@ export type SchemaUpdateProfileRequest = components['schemas']['UpdateProfileReq
 export type SchemaAuthResponse = components['schemas']['AuthResponse'];
 export type SchemaPageResponseStoryDto = components['schemas']['PageResponseStoryDto'];
 export type SchemaCursorPageResponseStoryDto = components['schemas']['CursorPageResponseStoryDto'];
+export type SchemaHolidayDto = components['schemas']['HolidayDto'];
 export type SchemaProductDto = components['schemas']['ProductDto'];
 export type SchemaGeoResponse = components['schemas']['GeoResponse'];
 export type SchemaAdminUserDto = components['schemas']['AdminUserDto'];
@@ -1885,6 +1911,29 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CursorPageResponseStoryDto"];
+                };
+            };
+        };
+    };
+    today: {
+        parameters: {
+            query: {
+                tz: string;
+                lang?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HolidayDto"];
                 };
             };
         };
