@@ -5,6 +5,7 @@ import { Features } from '../components/home/Features'
 import { StoryPreview } from '../components/home/StoryPreview'
 import { NightCta } from '../components/home/NightCta'
 import { AvatarInitials } from '../components/children/AvatarInitials'
+import { HolidayChip } from '../components/holidays/HolidayChip'
 import { useLocale } from '../lib/LocaleContext'
 import { useStoryModal } from '../lib/StoryModalContext'
 import { useAuth } from '../lib/AuthContext'
@@ -105,6 +106,9 @@ export function HomePage() {
               ))}
             </h1>
             <p className={styles.heroSub}>{t.home.sub}</p>
+            {user && active && (
+              <HolidayChip onApply={(theme) => localStorage.setItem('kazka.suggestedTheme', theme)} />
+            )}
             <div className={styles.heroButtons}>
               <a
                 href="#"

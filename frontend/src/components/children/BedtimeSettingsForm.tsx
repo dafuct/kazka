@@ -95,6 +95,11 @@ export function BedtimeSettingsForm({ childId }: { childId: string }) {
           <button type="button" onClick={addTheme} disabled={!themesDraft.trim() || themes.length >= 10}>+</button>
         </div>
       </div>
+      <label className={styles.field}>
+        <input type="checkbox" checked={holidayThemesEnabled}
+               onChange={e => setHolidayThemesEnabled(e.target.checked)} />
+        <span>{tb.holidayThemesLabel ?? 'Use holiday themes when relevant'}</span>
+      </label>
       <p className={styles.helper}>
         {tb.helperWeWillEmail
           ? tb.helperWeWillEmail({ email: user?.email ?? '', time: localTime, tz: timezone })

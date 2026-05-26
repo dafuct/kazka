@@ -19,7 +19,11 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
   const { user } = useAuth()
   const { active } = useChildren()
   const isSuspended = !!user?.suspended
-  const [theme, setTheme] = useState('')
+  const [theme, setTheme] = useState(() => {
+    const suggested = localStorage.getItem('kazka.suggestedTheme')
+    if (suggested) localStorage.removeItem('kazka.suggestedTheme')
+    return suggested ?? ''
+  })
   const [characters, setCharacters] = useState<string[]>([])
   const [ageGroup, setAgeGroup] = useState<GenerationRequest['ageGroup']>('6-8')
   const [length, setLength] = useState<GenerationRequest['length']>('medium')
