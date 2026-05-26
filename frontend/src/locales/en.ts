@@ -317,6 +317,7 @@ export const en: Locale = {
       localTimeLabel: 'Local bedtime',
       timezoneLabel: 'Timezone',
       themesLabel: 'Themes (optional)',
+      holidayThemesLabel: 'Use holiday themes when relevant',
       themesInheritOption: 'Empty = use the profile interests',
       saveCta: 'Save',
       savedToast: 'Saved 🌙',
@@ -363,5 +364,10 @@ export const en: Locale = {
     childrenSection: 'Children',
     childrenDescription: 'Manage child profiles and their character libraries.',
     manageChildren: 'Manage children',
+  },
+  holidayChip: {
+    prompt: 'Today is',
+    apply: 'Try it',
+    dismiss: 'Dismiss',
   },
 }

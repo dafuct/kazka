@@ -315,6 +315,7 @@ export const uk = {
       localTimeLabel: 'Час перед сном',
       timezoneLabel: 'Часовий пояс',
       themesLabel: "Теми (необов'язково)",
+      holidayThemesLabel: 'Використовувати святкові теми, коли вони актуальні',
       themesInheritOption: 'Порожньо = використати інтереси з профілю',
       saveCta: 'Зберегти',
       savedToast: 'Збережено 🌙',
@@ -361,6 +362,11 @@ export const uk = {
     childrenSection: 'Діти',
     childrenDescription: 'Керуйте профілями дітей і їхньою бібліотекою персонажів.',
     manageChildren: 'Керувати дітьми',
+  },
+  holidayChip: {
+    prompt: 'Сьогодні —',
+    apply: 'Спробувати',
+    dismiss: 'Закрити',
   },
 }
 
