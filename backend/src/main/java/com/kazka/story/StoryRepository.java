@@ -16,6 +16,12 @@ public interface StoryRepository extends JpaRepository<Story, String> {
     Optional<Story> findByIdAndUserId(String id, String userId);
     long countByUserId(String userId);
 
+    long countByUserIdAndCreatedAtAfter(String userId, Instant since);
+
+    long countByChildProfileId(String childProfileId);
+
+    List<Story> findTop5ByUserIdOrderByCreatedAtDesc(String userId);
+
     Page<Story> findAllByUserIdAndChildProfileIdOrderByCreatedAtDesc(
             String userId, String childProfileId, Pageable pageable);
 
