@@ -3,6 +3,10 @@ import { dashboard as dashboardApi } from '../lib/apiClient'
 import { useLocale } from '../lib/LocaleContext'
 import type { Dashboard } from '@kazka/shared'
 import styles from './DashboardPage.module.css'
+import { StatCard } from '../components/dashboard/StatCard'
+import { ChildSummaryCard } from '../components/dashboard/ChildSummaryCard'
+import { RecentTalesRow } from '../components/dashboard/RecentTalesRow'
+import { QuickLinks } from '../components/dashboard/QuickLinks'
 
 export function DashboardPage() {
   const { t } = useLocale()
@@ -27,7 +31,32 @@ export function DashboardPage() {
           {data.isPro ? (td.pillPro ?? '⭐ Pro') : (td.pillFree ?? 'Free')}
         </span>
       </header>
-      <pre className={styles.debug}>{JSON.stringify(data, null, 2)}</pre>
+      <section className={styles.statsRow}>
+        <StatCard label={td.thisWeek ?? 'This week'} value={data.aggregates.talesThisWeek} />
+        <StatCard label={td.thisMonth ?? 'This month'} value={data.aggregates.talesThisMonth} />
+        <StatCard label={td.total ?? 'Total'} value={data.aggregates.talesTotal} />
+      </section>
+
+      {data.children.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>{td.childrenSection ?? 'Children'}</h2>
+          <div className={styles.childrenGrid}>
+            {data.children.map(c => <ChildSummaryCard key={c.childProfileId} child={c} />)}
+          </div>
+        </section>
+      )}
+
+      {data.recentTales.length > 0 && (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>{td.recent ?? 'Recent tales'}</h2>
+          <RecentTalesRow tales={data.recentTales} />
+        </section>
+      )}
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>{td.quickLinks ?? 'Quick links'}</h2>
+        <QuickLinks />
+      </section>
     </div>
   )
 }

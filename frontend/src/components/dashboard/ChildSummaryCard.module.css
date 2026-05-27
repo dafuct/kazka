@@ -1,0 +1,9 @@
+.card { padding: 16px; background: var(--surface, #fff); border-radius: 12px; border: 1px solid var(--border, #e5e7eb); }
+.head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+.name { margin: 0; font-size: 18px; color: var(--text, #1f2937); }
+.count { font-size: 13px; color: var(--muted, #6b7280); }
+.latest, .empty, .bedtime { display: block; font-size: 14px; margin: 4px 0; color: var(--text, #1f2937); text-decoration: none; }
+.latest:hover { text-decoration: underline; }
+.latestLabel { color: var(--muted, #6b7280); }
+.bedtime { color: var(--muted, #6b7280); font-size: 12px; }
+.empty { color: var(--muted, #6b7280); font-style: italic; }
