@@ -1,0 +1,9 @@
+.page { max-width: 1080px; margin: 0 auto; padding: 24px 16px; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.title { margin: 0; font-size: 28px; color: var(--text, #1f2937); }
+.pillPro, .pillFree { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.pillPro { background: var(--accent, #4f46e5); color: white; }
+.pillFree { background: var(--surface-hover, #f3f4f6); color: var(--muted, #6b7280); }
+.loading, .error { padding: 24px; text-align: center; color: var(--muted, #6b7280); }
+.error { color: #991b1b; }
+.debug { background: var(--surface-hover, #f3f4f6); padding: 16px; border-radius: 8px; overflow: auto; font-size: 12px; }
