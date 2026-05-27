@@ -5,6 +5,7 @@ import { ConfirmModal } from '../components/modal/ConfirmModal'
 import { AvatarInitials } from '../components/children/AvatarInitials'
 import { ExtractedCharactersPanel } from '../components/children/ExtractedCharactersPanel'
 import { BranchingReader } from '../components/branching/BranchingReader'
+import { LanguageToggle } from '../components/translation/LanguageToggle'
 import { useLocale } from '../lib/LocaleContext'
 import { useChildren } from '../lib/ChildrenContext'
 import { api } from '../lib/apiClient'
@@ -26,6 +27,7 @@ export function StoryDetailPage() {
   const [saving, setSaving] = useState(false)
   const [illustrating, setIllustrating] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
+  const [viewLanguage, setViewLanguage] = useState<'original' | 'translated'>('original')
 
   const refresh = useCallback(() => {
     if (!id) return
@@ -101,10 +103,25 @@ export function StoryDetailPage() {
     ? childProfiles.find(p => p.id === story.childProfileId) ?? null
     : null
 
+  const displayedContent = viewLanguage === 'translated' && story.translatedContent
+    ? story.translatedContent
+    : story.content
+
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
         <Link to="/stories" className={styles.back}>← {t.story.back}</Link>
+
+        {!(story.isBranching && story.branchingState !== 'complete') && (
+          <LanguageToggle
+            story={story}
+            active={viewLanguage}
+            onSwitch={(active, updated) => {
+              setViewLanguage(active)
+              if (updated) setStory(updated)
+            }}
+          />
+        )}
 
         <div className={styles.layout}>
           <div className={styles.main}>
@@ -140,7 +157,7 @@ export function StoryDetailPage() {
               />
             ) : (
               <div className={styles.content}>
-                {story.content
+                {displayedContent
                   .split(/\n\s*\n+/)
                   .map(p => p.trim())
                   .filter(Boolean)
