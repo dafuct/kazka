@@ -580,6 +580,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/children/{childId}/characters": {
         parameters: {
             query?: never;
@@ -987,6 +1003,29 @@ export interface components {
             /** Format: date-time */
             date: string;
         };
+        Aggregates: {
+            /** Format: int64 */
+            talesTotal: number;
+            /** Format: int64 */
+            talesThisWeek: number;
+            /** Format: int64 */
+            talesThisMonth: number;
+        };
+        ChildSummary: {
+            childProfileId: string;
+            name: string;
+            /** Format: int64 */
+            taleCount: number;
+            latestTale?: components["schemas"]["StoryDto"];
+            /** Format: date-time */
+            lastBedtimeAt?: string | null;
+        };
+        DashboardDto: {
+            aggregates: components["schemas"]["Aggregates"];
+            children: components["schemas"]["ChildSummary"][];
+            recentTales: components["schemas"]["StoryDto"][];
+            isPro: boolean;
+        };
         ProductDto: {
             id?: string;
             appleProductId?: string;
@@ -1092,6 +1131,9 @@ export type SchemaAuthResponse = components['schemas']['AuthResponse'];
 export type SchemaPageResponseStoryDto = components['schemas']['PageResponseStoryDto'];
 export type SchemaCursorPageResponseStoryDto = components['schemas']['CursorPageResponseStoryDto'];
 export type SchemaHolidayDto = components['schemas']['HolidayDto'];
+export type SchemaAggregates = components['schemas']['Aggregates'];
+export type SchemaChildSummary = components['schemas']['ChildSummary'];
+export type SchemaDashboardDto = components['schemas']['DashboardDto'];
 export type SchemaProductDto = components['schemas']['ProductDto'];
 export type SchemaGeoResponse = components['schemas']['GeoResponse'];
 export type SchemaAdminUserDto = components['schemas']['AdminUserDto'];
@@ -2096,6 +2138,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["HolidayDto"];
+                };
+            };
+        };
+    };
+    get_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["DashboardDto"];
                 };
             };
         };

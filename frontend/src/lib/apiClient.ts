@@ -9,6 +9,7 @@ import type {
   HolidayDto,
   BranchingStartRequest, BranchingChoiceRequest, BranchingResponse,
   TranslateRequest,
+  Dashboard,
 } from './types'
 
 const STORIES = '/api/stories'
@@ -252,5 +253,11 @@ export const translation = {
       method: 'POST',
       body: JSON.stringify({ targetLanguage } satisfies TranslateRequest),
     })
+  },
+}
+
+export const dashboard = {
+  get(): Promise<Dashboard> {
+    return request<Dashboard>('/api/dashboard', { method: 'GET' })
   },
 }

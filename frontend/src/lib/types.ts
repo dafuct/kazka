@@ -28,6 +28,9 @@ export type {
   BranchingResponse,
   BranchingChoice,
   TranslateRequest,
+  Dashboard,
+  DashboardAggregates,
+  ChildSummary,
 } from '@kazka/shared';
 
 export { ApiError } from '@kazka/shared';
