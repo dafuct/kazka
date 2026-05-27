@@ -384,6 +384,15 @@ export const en: Locale = {
     proRequired: 'Translation is available on Pro.',
   },
   redeem: {
+    title: 'Redeem gift code',
+    codeLabel: 'Your code',
+    submit: 'Redeem',
+    submitting: 'Redeeming…',
+    success: 'Code redeemed! Your Pro expires:',
+    redirecting: 'Redirecting to dashboard…',
+    notFound: 'Code not found',
+    alreadyUsed: 'This code is no longer valid',
+    genericError: 'Could not redeem the code. Please try again.',
     haveCode: 'Have a code?',
   },
   dashboard: {

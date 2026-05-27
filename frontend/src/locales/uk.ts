@@ -382,6 +382,15 @@ export const uk = {
     proRequired: 'Переклад доступний у Pro-підписці.',
   },
   redeem: {
+    title: 'Активувати подарунковий код',
+    codeLabel: 'Ваш код',
+    submit: 'Активувати',
+    submitting: 'Активуємо…',
+    success: 'Код активовано! Pro-доступ діє до:',
+    redirecting: 'Перенаправляємо до огляду…',
+    notFound: 'Код не знайдено',
+    alreadyUsed: 'Цей код більше недійсний',
+    genericError: 'Не вдалося активувати код. Спробуйте ще раз.',
     haveCode: 'Є код?',
   },
   dashboard: {
