@@ -29,8 +29,15 @@
   padding: var(--spacing-4) var(--spacing-5);
 }
 
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+}
+
 .titleLink {
   text-decoration: none;
+  flex: 1;
 }
 
 .title {

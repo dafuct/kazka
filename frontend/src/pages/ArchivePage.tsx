@@ -68,7 +68,15 @@ export function ArchivePage() {
         <ul className={styles.grid}>
           {stories.map(story => (
             <li key={story.id}>
-              <StoryCard story={story} onDelete={setDeleteId} />
+              <StoryCard
+                story={story}
+                onDelete={setDeleteId}
+                badge={
+                  story.isBranching && story.branchingState !== 'complete' ? (
+                    <span className={styles.continueBadge}>▸ {(t as any).branching?.continueAffordance ?? 'Continue tale'}</span>
+                  ) : undefined
+                }
+              />
             </li>
           ))}
         </ul>

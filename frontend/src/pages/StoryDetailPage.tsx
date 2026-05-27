@@ -4,6 +4,7 @@ import { IllustrationFrame } from '../components/story/IllustrationFrame'
 import { ConfirmModal } from '../components/modal/ConfirmModal'
 import { AvatarInitials } from '../components/children/AvatarInitials'
 import { ExtractedCharactersPanel } from '../components/children/ExtractedCharactersPanel'
+import { BranchingReader } from '../components/branching/BranchingReader'
 import { useLocale } from '../lib/LocaleContext'
 import { useChildren } from '../lib/ChildrenContext'
 import { api } from '../lib/apiClient'
@@ -87,6 +88,14 @@ export function StoryDetailPage() {
 
   if (loading) return <div className={styles.state}>...</div>
   if (error || !story) return <div className={styles.state}>{error ?? t.errors.loadFailed}</div>
+
+  if (story.isBranching === true && story.branchingState !== 'complete') {
+    return (
+      <div className={styles.page}>
+        <BranchingReader story={story} onComplete={refresh} />
+      </div>
+    )
+  }
 
   const childProfile = story.childProfileId
     ? childProfiles.find(p => p.id === story.childProfileId) ?? null
