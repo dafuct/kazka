@@ -29,18 +29,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
+  min-width: 44px;
   padding: 0 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-magic);
   background: var(--color-surface-2);
-  color: var(--color-text);
+  color: var(--color-magic);
   border-radius: 6px;
   cursor: pointer;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   line-height: 1;
+  transition: background var(--transition), color var(--transition);
 }
-.chipInput button:hover:not(:disabled) { background: var(--color-surface-deep); border-color: var(--color-magic); color: var(--color-magic); }
+.chipInput button:hover:not(:disabled) { background: var(--color-magic); color: #fff; }
 .chipInput button:disabled { opacity: 0.4; cursor: not-allowed; }
 .error { color: #ef4444; font-size: 14px; }
 .submit { padding: 10px 16px; background: var(--color-magic); color: #fff; border: 0; border-radius: 6px; cursor: pointer; font-weight: 600; align-self: flex-start; }

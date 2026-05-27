@@ -11,6 +11,7 @@ export const uk = {
     themeLight: 'Нічний режим 🌙',
     themeDark: 'Денний режим ☀️',
     tryCta: 'Спробувати',
+    dashboard: 'Огляд',
   },
   home: {
     hero: 'Казкар',

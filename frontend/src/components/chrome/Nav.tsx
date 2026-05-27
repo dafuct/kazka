@@ -79,6 +79,14 @@ export function Nav() {
           </li>
         )}
         {user && (
+          <li>
+            <Link to="/dashboard"
+                  className={pathname.startsWith('/dashboard') ? `${styles.link} ${styles.active}` : styles.link}>
+              {t.nav.dashboard}
+            </Link>
+          </li>
+        )}
+        {user && (
           <li className={styles.childPickerItem}>
             <ActiveChildPicker />
           </li>

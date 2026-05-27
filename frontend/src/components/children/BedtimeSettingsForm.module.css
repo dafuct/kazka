@@ -1,21 +1,63 @@
 .form { display: flex; flex-direction: column; gap: 14px; max-width: 480px; }
-.field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
-.field > span { font-weight: 600; }
-.field input[type="time"] { padding: 8px 10px; border: 1px solid var(--border, #e5e7eb); border-radius: 6px; font: inherit; max-width: 160px; }
-.field input[type="checkbox"] { width: 18px; height: 18px; }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--color-text); }
+.field > span { font-weight: 600; color: var(--color-text); }
+.field input[type="time"] {
+  padding: 8px 10px;
+  border: 1px solid var(--color-surface-deep);
+  border-radius: 6px;
+  font: inherit;
+  max-width: 160px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.field input[type="time"]:focus { outline: 2px solid var(--color-magic); outline-offset: 1px; border-color: var(--color-magic); }
+.field input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--color-magic); }
 .field:has(input[type="checkbox"]) { flex-direction: row; align-items: center; gap: 8px; }
 .field:has(input[type="checkbox"]) > span { font-weight: 500; }
 .chipRow { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { display: inline-flex; align-items: center; gap: 4px; background: var(--surface-hover, #f3f4f6); border-radius: 999px; padding: 4px 10px; font-size: 13px; }
-.chip button { background: transparent; border: 0; cursor: pointer; padding: 0 2px; color: var(--muted, #6b7280); }
-.chipInput { display: flex; gap: 6px; margin-top: 4px; }
-.chipInput input { flex: 1; padding: 8px 10px; border: 1px solid var(--border, #e5e7eb); border-radius: 6px; font: inherit; }
-.chipInput button { padding: 6px 12px; border: 1px solid var(--border, #e5e7eb); background: transparent; border-radius: 6px; cursor: pointer; }
-.helper { font-size: 12px; color: var(--muted, #6b7280); margin: 0; }
-.error { color: #dc2626; font-size: 13px; margin: 0; }
-.success { color: #047857; font-size: 13px; margin: 0; }
-.submit { padding: 10px 16px; background: var(--accent, #4f46e5); color: white; border: 0; border-radius: 6px; cursor: pointer; font-weight: 600; align-self: flex-start; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 13px;
+}
+.chip button { background: transparent; border: 0; cursor: pointer; padding: 0 2px; color: var(--color-text-muted); font-size: 14px; }
+.chipInput { display: flex; gap: 6px; margin-top: 4px; align-items: stretch; }
+.chipInput input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--color-surface-deep);
+  border-radius: 6px;
+  font: inherit;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.chipInput button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--color-magic);
+  background: var(--color-surface-2);
+  color: var(--color-magic);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+}
+.chipInput button:hover:not(:disabled) { background: var(--color-magic); color: #fff; }
+.chipInput button:disabled { opacity: 0.4; cursor: not-allowed; }
+.helper { font-size: 12px; color: var(--color-text-muted); margin: 0; }
+.error { color: #f87171; font-size: 13px; margin: 0; }
+.success { color: #34d399; font-size: 13px; margin: 0; }
+.submit { padding: 10px 16px; background: var(--color-magic); color: #fff; border: 0; border-radius: 6px; cursor: pointer; font-weight: 600; align-self: flex-start; }
+.submit:hover:not(:disabled) { background: #6D28D9; }
 .submit:disabled { opacity: 0.5; cursor: not-allowed; }
 .failNotice { padding: 12px; background: rgba(220, 38, 38, 0.08); border-radius: 6px; font-size: 13px; }
-.failNotice strong { display: block; margin-bottom: 4px; color: #991b1b; }
-.failNotice p { margin: 0; color: var(--text, #1f2937); }
+.failNotice strong { display: block; margin-bottom: 4px; color: #f87171; }
+.failNotice p { margin: 0; color: var(--color-text); }

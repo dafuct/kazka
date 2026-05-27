@@ -13,6 +13,7 @@ export const en: Locale = {
     themeLight: 'Dark mode 🌙',
     themeDark: 'Light mode ☀️',
     tryCta: 'Try it',
+    dashboard: 'Dashboard',
   },
   home: {
     hero: 'Storybook World',
