@@ -56,8 +56,12 @@ export function Nav() {
       </Link>
 
       <ul className={styles.links}>
-        <li><a href="/#how" className={styles.link}>{t.nav.howItWorks}</a></li>
-        <li><a href="/#features" className={styles.link}>{t.nav.features}</a></li>
+        {!user && (
+          <>
+            <li><a href="/#how" className={styles.link}>{t.nav.howItWorks}</a></li>
+            <li><a href="/#features" className={styles.link}>{t.nav.features}</a></li>
+          </>
+        )}
         {!isPro && (
           <li>
             <Link to="/pricing"

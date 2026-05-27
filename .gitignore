@@ -45,3 +45,4 @@ CLAUDE.md
 # LLM Wiki (local-only)
 raw/
 wiki/
+.tmp/
