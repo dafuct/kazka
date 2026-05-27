@@ -57,6 +57,16 @@ public class Story {
     @Column(name = "extraction_status", length = 20, nullable = false)
     private com.kazka.child.ExtractionStatus extractionStatus = com.kazka.child.ExtractionStatus.PENDING;
 
+    @Column(name = "is_branching", nullable = false)
+    private boolean isBranching = false;
+
+    @Column(name = "branching_state", nullable = false, length = 20)
+    private String branchingState = "complete";
+
+    @Convert(converter = com.kazka.story.branching.BranchingChoicesConverter.class)
+    @Column(name = "pending_choices", columnDefinition = "JSON")
+    private java.util.List<com.kazka.story.branching.dto.BranchingChoice> pendingChoices;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
@@ -109,4 +119,13 @@ public class Story {
 
     public com.kazka.child.ExtractionStatus getExtractionStatus() { return extractionStatus; }
     public void setExtractionStatus(com.kazka.child.ExtractionStatus extractionStatus) { this.extractionStatus = extractionStatus; }
+
+    public boolean isBranching() { return isBranching; }
+    public void setBranching(boolean branching) { this.isBranching = branching; }
+
+    public String getBranchingState() { return branchingState; }
+    public void setBranchingState(String branchingState) { this.branchingState = branchingState; }
+
+    public java.util.List<com.kazka.story.branching.dto.BranchingChoice> getPendingChoices() { return pendingChoices; }
+    public void setPendingChoices(java.util.List<com.kazka.story.branching.dto.BranchingChoice> pendingChoices) { this.pendingChoices = pendingChoices; }
 }
