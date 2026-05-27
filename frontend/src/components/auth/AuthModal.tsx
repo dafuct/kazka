@@ -1,7 +1,9 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuthModal } from '../../lib/AuthModalContext'
 import { useLocale } from '../../lib/LocaleContext'
+import { dashboard as dashboardApi } from '../../lib/apiClient'
 import { SignInForm } from './SignInForm'
 import { SignUpForm } from './SignUpForm'
 import { ForgotPasswordForm } from './ForgotPasswordForm'
@@ -13,6 +15,17 @@ import styles from './AuthModal.module.css'
 export function AuthModal() {
   const { open, tab, closeAuth, setTab } = useAuthModal()
   const { t } = useLocale()
+  const navigate = useNavigate()
+
+  const handleSuccess = useCallback(async () => {
+    closeAuth()
+    try {
+      const d = await dashboardApi.get()
+      if (d.isPro) navigate('/dashboard')
+    } catch {
+      // non-Pro or network error — stay on current page
+    }
+  }, [closeAuth, navigate])
 
   useEffect(() => {
     if (!open) return
@@ -44,8 +57,8 @@ export function AuthModal() {
           </button>
         </div>
         <div className={storyStyles.body}>
-          {tab === 'signIn' && <SignInForm onSuccess={closeAuth} />}
-          {tab === 'signUp' && <SignUpForm onSuccess={closeAuth} />}
+          {tab === 'signIn' && <SignInForm onSuccess={handleSuccess} />}
+          {tab === 'signUp' && <SignUpForm onSuccess={handleSuccess} />}
           {tab === 'forgot' && <ForgotPasswordForm />}
         </div>
         {tab !== 'forgot' && (
