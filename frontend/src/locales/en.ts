@@ -398,7 +398,8 @@ export const en: Locale = {
     notFound: 'Code not found',
     alreadyUsed: 'This code is no longer valid',
     genericError: 'Could not redeem the code. Please try again.',
-    haveCode: 'Have a code?',
+    haveCode: 'Redeem gift code',
+    haveCodePrompt: 'Got a gift code?',
   },
   dashboard: {
     title: 'Dashboard',

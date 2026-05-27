@@ -27,8 +27,9 @@
 .toggleRow { margin-top: 16px; }
 .plans { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
 .providerRow { margin-top: 24px; }
-.haveCode { text-align: center; margin-top: 16px; font-size: 14px; }
-.haveCode a { color: var(--color-magic); text-decoration: none; }
+.haveCode { text-align: center; margin-top: 16px; font-size: 14px; color: var(--color-text-muted); }
+.haveCodeLead { color: var(--color-text-muted); }
+.haveCode a { color: var(--color-magic); text-decoration: none; font-weight: 600; }
 .haveCode a:hover { text-decoration: underline; }
 
 /* Subscription management panel (Pro users) */

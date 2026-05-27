@@ -195,7 +195,10 @@ export function PricingPage() {
 
       {!isPro && (
         <p className={styles.haveCode}>
-          <Link to="/redeem">{(t as any).redeem?.haveCode ?? 'Have a code?'}</Link>
+          <span className={styles.haveCodeLead}>
+            {(t as any).redeem?.haveCodePrompt ?? 'Got a gift code?'}
+          </span>{' '}
+          <Link to="/redeem">{(t as any).redeem?.haveCode ?? 'Redeem gift code'}</Link>
         </p>
       )}
 

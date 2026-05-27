@@ -396,7 +396,8 @@ export const uk = {
     notFound: 'Код не знайдено',
     alreadyUsed: 'Цей код більше недійсний',
     genericError: 'Не вдалося активувати код. Спробуйте ще раз.',
-    haveCode: 'Є код?',
+    haveCode: 'Активувати подарунковий код',
+    haveCodePrompt: 'Маєте подарунковий код?',
   },
   dashboard: {
     title: 'Огляд',
