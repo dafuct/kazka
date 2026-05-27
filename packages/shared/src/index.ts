@@ -32,6 +32,7 @@ export type {
   SchemaBranchingChoiceRequest as BranchingChoiceRequest,
   SchemaBranchingResponse as BranchingResponse,
   SchemaBranchingChoice as BranchingChoice,
+  SchemaTranslateRequest as TranslateRequest,
 } from './api-types';
 
 // PageResponse<T> is generic on the Java side. openapi-typescript emits

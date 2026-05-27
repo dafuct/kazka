@@ -8,6 +8,7 @@ import type {
   BedtimeScheduleDto, BedtimeUpdateRequest,
   HolidayDto,
   BranchingStartRequest, BranchingChoiceRequest, BranchingResponse,
+  TranslateRequest,
 } from './types'
 
 const STORIES = '/api/stories'
@@ -241,6 +242,15 @@ export const branching = {
     return request<BranchingResponse>(`/api/stories/${storyId}/branching/choose`, {
       method: 'POST',
       body: JSON.stringify({ choiceId } satisfies BranchingChoiceRequest),
+    })
+  },
+}
+
+export const translation = {
+  translate(storyId: string, targetLanguage: 'uk' | 'en'): Promise<Story> {
+    return request<Story>(`/api/stories/${storyId}/translate`, {
+      method: 'POST',
+      body: JSON.stringify({ targetLanguage } satisfies TranslateRequest),
     })
   },
 }

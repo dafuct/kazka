@@ -27,6 +27,7 @@ export type {
   BranchingChoiceRequest,
   BranchingResponse,
   BranchingChoice,
+  TranslateRequest,
 } from '@kazka/shared';
 
 export { ApiError } from '@kazka/shared';

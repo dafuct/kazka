@@ -36,6 +36,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/stories/{id}/translate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["translate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/stories/{id}/illustrate": {
         parameters: {
             query?: never;
@@ -740,6 +756,8 @@ export interface components {
             isBranching: boolean;
             branchingState: string;
             pendingChoices?: components["schemas"]["BranchingChoice"][] | null;
+            translatedContent?: string | null;
+            translatedLanguage?: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -765,6 +783,9 @@ export interface components {
             lastSentAt?: string | null;
             /** Format: date-time */
             failedAt?: string | null;
+        };
+        TranslateRequest: {
+            targetLanguage: string;
         };
         BranchingChoiceRequest: {
             choiceId: string;
@@ -1038,6 +1059,7 @@ export type SchemaBranchingChoice = components['schemas']['BranchingChoice'];
 export type SchemaStoryDto = components['schemas']['StoryDto'];
 export type SchemaBedtimeUpdateRequest = components['schemas']['BedtimeUpdateRequest'];
 export type SchemaBedtimeScheduleDto = components['schemas']['BedtimeScheduleDto'];
+export type SchemaTranslateRequest = components['schemas']['TranslateRequest'];
 export type SchemaBranchingChoiceRequest = components['schemas']['BranchingChoiceRequest'];
 export type SchemaBranchingResponse = components['schemas']['BranchingResponse'];
 export type SchemaGenerationRequest = components['schemas']['GenerationRequest'];
@@ -1190,6 +1212,32 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["BedtimeScheduleDto"];
+                };
+            };
+        };
+    };
+    translate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TranslateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["StoryDto"];
                 };
             };
         };
