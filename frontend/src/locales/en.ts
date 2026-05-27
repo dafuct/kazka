@@ -370,4 +370,12 @@ export const en: Locale = {
     apply: 'Try it',
     dismiss: 'Dismiss',
   },
+  branching: {
+    formToggle: 'Branching tale (Pro)',
+    choicePrompt: 'What happens next?',
+    loading: 'Generating the next part…',
+    errorRetry: 'Something went wrong. Please refresh.',
+    continueAffordance: 'Continue tale',
+    completionToast: 'Tale complete! 🌟',
+  },
 }

@@ -368,6 +368,14 @@ export const uk = {
     apply: 'Спробувати',
     dismiss: 'Закрити',
   },
+  branching: {
+    formToggle: 'Інтерактивна казка (Pro)',
+    choicePrompt: 'Що відбувається далі?',
+    loading: 'Створюємо наступну частину…',
+    errorRetry: 'Щось пішло не так. Спробуйте оновити сторінку.',
+    continueAffordance: 'Продовжити казку',
+    completionToast: 'Казку завершено! 🌟',
+  },
 }
 
 export type Locale = typeof uk
