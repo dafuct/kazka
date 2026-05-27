@@ -1,5 +1,5 @@
 package com.kazka.billing;
 
 public enum EntitlementSource {
-    APPLE, PADDLE, LIQPAY, MONOBANK
+    APPLE, PADDLE, LIQPAY, MONOBANK, GIFT
 }
