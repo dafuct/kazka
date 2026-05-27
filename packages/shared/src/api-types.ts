@@ -276,6 +276,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/billing/gift/redeem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["redeem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/billing/checkout-session": {
         parameters: {
             query?: never;
@@ -904,6 +920,15 @@ export interface components {
         IapVerifyRequest: {
             signedTransaction: string;
         };
+        RedeemGiftRequest: {
+            code: string;
+        };
+        RedemptionResultDto: {
+            /** Format: date-time */
+            expiresAt: string;
+            /** Format: int32 */
+            durationDays: number;
+        };
         CheckoutSessionRequest: {
             planId: string;
             provider: string;
@@ -1112,6 +1137,8 @@ export type SchemaExtractedCandidateDto = components['schemas']['ExtractedCandid
 export type SchemaCharacterDto = components['schemas']['CharacterDto'];
 export type SchemaEntitlementDto = components['schemas']['EntitlementDto'];
 export type SchemaIapVerifyRequest = components['schemas']['IapVerifyRequest'];
+export type SchemaRedeemGiftRequest = components['schemas']['RedeemGiftRequest'];
+export type SchemaRedemptionResultDto = components['schemas']['RedemptionResultDto'];
 export type SchemaCheckoutSessionRequest = components['schemas']['CheckoutSessionRequest'];
 export type SchemaCheckoutSessionResponse = components['schemas']['CheckoutSessionResponse'];
 export type SchemaTokenRefreshRequest = components['schemas']['TokenRefreshRequest'];
@@ -1620,6 +1647,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["EntitlementDto"][];
+                };
+            };
+        };
+    };
+    redeem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RedeemGiftRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RedemptionResultDto"];
                 };
             };
         };

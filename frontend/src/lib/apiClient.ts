@@ -10,6 +10,7 @@ import type {
   BranchingStartRequest, BranchingChoiceRequest, BranchingResponse,
   TranslateRequest,
   Dashboard,
+  RedeemGiftRequest, RedemptionResult,
 } from './types'
 
 const STORIES = '/api/stories'
@@ -259,5 +260,14 @@ export const translation = {
 export const dashboard = {
   get(): Promise<Dashboard> {
     return request<Dashboard>('/api/dashboard', { method: 'GET' })
+  },
+}
+
+export const gift = {
+  redeem(code: string): Promise<RedemptionResult> {
+    return request<RedemptionResult>('/api/billing/gift/redeem', {
+      method: 'POST',
+      body: JSON.stringify({ code } satisfies RedeemGiftRequest),
+    })
   },
 }

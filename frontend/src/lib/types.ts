@@ -31,6 +31,8 @@ export type {
   Dashboard,
   DashboardAggregates,
   ChildSummary,
+  RedeemGiftRequest,
+  RedemptionResult,
 } from '@kazka/shared';
 
 export { ApiError } from '@kazka/shared';
