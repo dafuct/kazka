@@ -1,0 +1,4 @@
+.reader { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+.content p { margin: 0 0 16px 0; line-height: 1.65; font-size: 16px; color: var(--text, #1f2937); }
+.error { padding: 12px; background: rgba(220, 38, 38, 0.08); color: #991b1b; border-radius: 6px; font-size: 14px; }
+.loading { padding: 12px; font-style: italic; color: var(--muted, #6b7280); }
