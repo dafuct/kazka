@@ -242,6 +242,9 @@ export const uk = {
     manageOnApple: 'Керувати в App Store',
     cancelled: 'Без проблем — підпишіться, коли будете готові.',
     subscribe: 'Підписатися',
+    manageTitle: 'Керування підпискою',
+    currentPlanBadge: 'Поточний план',
+    switchToCancel: 'Спершу скасуйте поточну підписку',
     success: {
       title: 'Вітаємо у Pro!',
       activating: 'Активуємо вашу підписку…',
@@ -350,6 +353,7 @@ export const uk = {
       PADDLE: 'Картка (Paddle)',
       LIQPAY: 'LiqPay',
       MONOBANK: 'Монобанк',
+      GIFT: 'Подарунковий код',
     },
     cancel: 'Скасувати підписку',
     cancelConfirmTitle: 'Скасувати підписку?',

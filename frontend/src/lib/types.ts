@@ -51,7 +51,7 @@ export interface Entitlement {
   productAppleId: string
   state: 'ACTIVE' | 'GRACE' | 'EXPIRED' | 'REFUNDED'
   expiresAt: string | null
-  source: 'APPLE' | 'PADDLE' | 'LIQPAY' | 'MONOBANK'
+  source: 'APPLE' | 'PADDLE' | 'LIQPAY' | 'MONOBANK' | 'GIFT'
 }
 
 export interface GeoResponse {

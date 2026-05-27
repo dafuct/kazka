@@ -244,6 +244,9 @@ export const en: Locale = {
     manageOnApple: 'Manage on the App Store',
     cancelled: "No worries — you can subscribe whenever you're ready.",
     subscribe: 'Subscribe',
+    manageTitle: 'Manage subscription',
+    currentPlanBadge: 'Current plan',
+    switchToCancel: 'Cancel your current subscription first',
     success: {
       title: 'Welcome to Pro!',
       activating: 'Activating your subscription…',
@@ -352,6 +355,7 @@ export const en: Locale = {
       PADDLE: 'Card (Paddle)',
       LIQPAY: 'LiqPay',
       MONOBANK: 'Monobank',
+      GIFT: 'Gift code',
     },
     cancel: 'Cancel subscription',
     cancelConfirmTitle: 'Cancel subscription?',
