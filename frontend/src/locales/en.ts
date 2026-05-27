@@ -378,4 +378,9 @@ export const en: Locale = {
     continueAffordance: 'Continue tale',
     completionToast: 'Tale complete! 🌟',
   },
+  translate: {
+    translating: 'Translating…',
+    error: 'Could not translate. Please try again.',
+    proRequired: 'Translation is available on Pro.',
+  },
 }

@@ -376,6 +376,11 @@ export const uk = {
     continueAffordance: 'Продовжити казку',
     completionToast: 'Казку завершено! 🌟',
   },
+  translate: {
+    translating: 'Перекладаємо…',
+    error: 'Не вдалося перекласти. Спробуйте ще раз.',
+    proRequired: 'Переклад доступний у Pro-підписці.',
+  },
 }
 
 export type Locale = typeof uk
