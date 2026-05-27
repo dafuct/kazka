@@ -1,0 +1,10 @@
+.wrap { display: inline-flex; align-items: center; gap: 4px; padding: 4px; background: var(--surface-hover, #f3f4f6); border-radius: 999px; }
+.pill, .pillActive {
+  padding: 4px 12px; border-radius: 999px; border: none; cursor: pointer;
+  font: inherit; font-size: 13px; font-weight: 500;
+  background: transparent; color: var(--muted, #6b7280);
+}
+.pill:hover:not(:disabled) { color: var(--text, #1f2937); }
+.pill:disabled, .pillActive:disabled { cursor: not-allowed; opacity: 0.7; }
+.pillActive { background: var(--surface, #fff); color: var(--text, #1f2937); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+.error { margin-left: 8px; color: #991b1b; font-size: 12px; }
