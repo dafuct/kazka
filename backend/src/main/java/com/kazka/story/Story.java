@@ -67,6 +67,12 @@ public class Story {
     @Column(name = "pending_choices", columnDefinition = "JSON")
     private java.util.List<com.kazka.story.branching.dto.BranchingChoice> pendingChoices;
 
+    @Column(name = "translated_content", columnDefinition = "TEXT")
+    private String translatedContent;
+
+    @Column(name = "translated_language", length = 2)
+    private String translatedLanguage;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
@@ -128,4 +134,10 @@ public class Story {
 
     public java.util.List<com.kazka.story.branching.dto.BranchingChoice> getPendingChoices() { return pendingChoices; }
     public void setPendingChoices(java.util.List<com.kazka.story.branching.dto.BranchingChoice> pendingChoices) { this.pendingChoices = pendingChoices; }
+
+    public String getTranslatedContent() { return translatedContent; }
+    public void setTranslatedContent(String translatedContent) { this.translatedContent = translatedContent; }
+
+    public String getTranslatedLanguage() { return translatedLanguage; }
+    public void setTranslatedLanguage(String translatedLanguage) { this.translatedLanguage = translatedLanguage; }
 }

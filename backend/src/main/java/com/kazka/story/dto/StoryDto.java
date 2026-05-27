@@ -25,6 +25,8 @@ public record StoryDto(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) boolean isBranching,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String branchingState,
         @Schema(nullable = true) List<com.kazka.story.branching.dto.BranchingChoice> pendingChoices,
+        @Schema(nullable = true) String translatedContent,
+        @Schema(nullable = true) String translatedLanguage,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant createdAt,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant updatedAt
 ) {
@@ -36,6 +38,7 @@ public record StoryDto(
                 s.getIllustrationStatus(),
                 s.getChildProfileId(), s.getExtractionStatus(),
                 s.isBranching(), s.getBranchingState(), s.getPendingChoices(),
+                s.getTranslatedContent(), s.getTranslatedLanguage(),
                 s.getCreatedAt(), s.getUpdatedAt()
         );
     }
