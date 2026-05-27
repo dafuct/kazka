@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import styles from './PricingPage.module.css'
 import { PlanToggle, type Period } from '../components/billing/PlanToggle'
 import { PlanCard } from '../components/billing/PlanCard'
@@ -115,6 +115,10 @@ export function PricingPage() {
           onCountryChange={handleCountryOverride}
         />
       </div>
+
+      <p className={styles.haveCode}>
+        <Link to="/redeem">{(t as any).redeem?.haveCode ?? 'Have a code?'}</Link>
+      </p>
     </div>
   )
 }

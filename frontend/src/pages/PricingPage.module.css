@@ -27,3 +27,6 @@
 .toggleRow { margin-top: 16px; }
 .plans { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
 .providerRow { margin-top: 24px; }
+.haveCode { text-align: center; margin-top: 16px; font-size: 14px; }
+.haveCode a { color: var(--accent, #4f46e5); text-decoration: none; }
+.haveCode a:hover { text-decoration: underline; }

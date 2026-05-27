@@ -381,6 +381,9 @@ export const uk = {
     error: 'Не вдалося перекласти. Спробуйте ще раз.',
     proRequired: 'Переклад доступний у Pro-підписці.',
   },
+  redeem: {
+    haveCode: 'Є код?',
+  },
   dashboard: {
     title: 'Огляд',
     pillPro: '⭐ Pro',

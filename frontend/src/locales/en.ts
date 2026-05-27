@@ -383,6 +383,9 @@ export const en: Locale = {
     error: 'Could not translate. Please try again.',
     proRequired: 'Translation is available on Pro.',
   },
+  redeem: {
+    haveCode: 'Have a code?',
+  },
   dashboard: {
     title: 'Dashboard',
     pillPro: '⭐ Pro',
