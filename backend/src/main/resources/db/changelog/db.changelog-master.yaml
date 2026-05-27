@@ -50,3 +50,6 @@ databaseChangeLog:
   - include:
       file: changes/017-add-stories-translation.sql
       relativeToChangelogFile: true
+  - include:
+      file: changes/018-add-gift-codes.sql
+      relativeToChangelogFile: true
