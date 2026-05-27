@@ -96,3 +96,90 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Branching tale magic toggle — styled pill with sparkle + Pro badge */
+.magicToggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1.5px solid var(--color-surface-deep);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition), box-shadow var(--transition), transform 80ms ease;
+  user-select: none;
+  position: relative;
+}
+
+.magicToggle:hover {
+  border-color: var(--color-magic-glow, #C4B5FD);
+  background: var(--color-surface-2);
+}
+
+.magicToggle:active { transform: scale(0.99); }
+
+.magicToggleOn {
+  border-color: var(--color-magic);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--color-magic) 8%, var(--color-surface)),
+    color-mix(in srgb, var(--color-magic) 14%, var(--color-surface))
+  );
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-magic) 14%, transparent),
+              0 4px 16px color-mix(in srgb, var(--color-magic) 22%, transparent);
+}
+
+.magicToggleInput {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.magicToggleInput:focus-visible + .magicToggleIcon {
+  outline: 2px solid var(--color-magic);
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+
+.magicToggleIcon {
+  font-size: 1.25rem;
+  line-height: 1;
+  filter: grayscale(0.6) opacity(0.55);
+  transition: filter var(--transition), transform var(--transition);
+}
+
+.magicToggleOn .magicToggleIcon {
+  filter: none;
+  transform: rotate(-8deg) scale(1.1);
+  animation: magicSparkle 2.4s ease-in-out infinite;
+}
+
+.magicToggleLabel {
+  flex: 1;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.magicToggleBadge {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--color-gold), var(--color-ember));
+  color: #fff;
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--color-ember) 30%, transparent);
+}
+
+@keyframes magicSparkle {
+  0%, 100% { transform: rotate(-8deg) scale(1.1); opacity: 1; }
+  50%      { transform: rotate(4deg) scale(1.18); opacity: 0.85; }
+}

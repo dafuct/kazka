@@ -1,4 +1,4 @@
-.page { max-width: 1080px; margin: 0 auto; padding: 24px 16px; }
+.page { max-width: 1080px; margin: 0 auto; padding: 96px 16px 48px; }
 .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .title { margin: 0; font-size: 28px; color: var(--text, #1f2937); }
 .pillPro, .pillFree { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; }

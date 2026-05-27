@@ -1,4 +1,4 @@
-.page { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+.page { max-width: 720px; margin: 0 auto; padding: 96px 16px 48px; }
 .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .header h1 { margin: 0; font-size: 22px; }
 .addBtn { padding: 8px 14px; background: var(--accent, #4f46e5); color: white; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; }

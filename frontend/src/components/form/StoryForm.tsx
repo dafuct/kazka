@@ -150,9 +150,18 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
         </div>
       </div>
 
-      <label className={styles.field}>
-        <input type="checkbox" checked={isBranching} onChange={e => setIsBranching(e.target.checked)} />
-        <span>{(t as any).branching?.formToggle ?? 'Branching tale (Pro)'}</span>
+      <label className={`${styles.magicToggle} ${isBranching ? styles.magicToggleOn : ''}`}>
+        <input
+          type="checkbox"
+          className={styles.magicToggleInput}
+          checked={isBranching}
+          onChange={e => setIsBranching(e.target.checked)}
+        />
+        <span className={styles.magicToggleIcon} aria-hidden="true">✨</span>
+        <span className={styles.magicToggleLabel}>
+          {(t as any).branching?.formToggle ?? 'Branching tale'}
+        </span>
+        <span className={styles.magicToggleBadge}>Pro</span>
       </label>
 
       <button
