@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/stories/{id}/branching/choose": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["choose"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/stories/generate": {
         parameters: {
             query?: never;
@@ -78,6 +94,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["generate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/stories/branching": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["start"];
         delete?: never;
         options?: never;
         head?: never;
@@ -685,6 +717,10 @@ export interface components {
             content: string;
             childProfileId?: string;
         };
+        BranchingChoice: {
+            id: string;
+            text: string;
+        } | null;
         StoryDto: {
             id: string;
             title: string;
@@ -701,6 +737,9 @@ export interface components {
             childProfileId?: string | null;
             /** @enum {string} */
             extractionStatus: "PENDING" | "RUNNING" | "DONE" | "FAILED" | "SKIPPED";
+            isBranching: boolean;
+            branchingState: string;
+            pendingChoices?: components["schemas"]["BranchingChoice"][] | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -727,6 +766,18 @@ export interface components {
             /** Format: date-time */
             failedAt?: string | null;
         };
+        BranchingChoiceRequest: {
+            choiceId: string;
+        };
+        BranchingResponse: {
+            storyId: string;
+            /** Format: int32 */
+            segmentNumber: number;
+            content: string;
+            choices?: components["schemas"]["BranchingChoice"][] | null;
+            branchingState: string;
+            isFinal: boolean;
+        };
         GenerationRequest: {
             theme: string;
             characters: string[];
@@ -740,6 +791,15 @@ export interface components {
             includeCharacterIds?: (string | null)[] | null;
         };
         ServerSentEventObject: Record<string, never>;
+        BranchingStartRequest: {
+            theme: string;
+            characters: string[];
+            ageGroup: string;
+            length: string;
+            language: string;
+            childProfileId: string;
+            includeCharacterIds?: (string | null)[] | null;
+        };
         DeviceRegisterRequest: {
             deviceToken: string;
             /** @enum {string} */
@@ -974,11 +1034,15 @@ export interface components {
     pathItems: never;
 }
 export type SchemaUpdateStoryRequest = components['schemas']['UpdateStoryRequest'];
+export type SchemaBranchingChoice = components['schemas']['BranchingChoice'];
 export type SchemaStoryDto = components['schemas']['StoryDto'];
 export type SchemaBedtimeUpdateRequest = components['schemas']['BedtimeUpdateRequest'];
 export type SchemaBedtimeScheduleDto = components['schemas']['BedtimeScheduleDto'];
+export type SchemaBranchingChoiceRequest = components['schemas']['BranchingChoiceRequest'];
+export type SchemaBranchingResponse = components['schemas']['BranchingResponse'];
 export type SchemaGenerationRequest = components['schemas']['GenerationRequest'];
 export type SchemaServerSentEventObject = components['schemas']['ServerSentEventObject'];
+export type SchemaBranchingStartRequest = components['schemas']['BranchingStartRequest'];
 export type SchemaDeviceRegisterRequest = components['schemas']['DeviceRegisterRequest'];
 export type SchemaCreateChildProfileRequest = components['schemas']['CreateChildProfileRequest'];
 export type SchemaChildProfileDto = components['schemas']['ChildProfileDto'];
@@ -1170,6 +1234,32 @@ export interface operations {
             };
         };
     };
+    choose: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BranchingChoiceRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BranchingResponse"];
+                };
+            };
+        };
+    };
     generate: {
         parameters: {
             query?: never;
@@ -1190,6 +1280,30 @@ export interface operations {
                 };
                 content: {
                     "text/event-stream": components["schemas"]["ServerSentEventObject"][];
+                };
+            };
+        };
+    };
+    start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BranchingStartRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BranchingResponse"];
                 };
             };
         };

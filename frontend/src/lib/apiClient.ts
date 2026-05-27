@@ -7,6 +7,7 @@ import type {
   ConfirmCharactersRequest, UpdateCharacterRequest, ExtractedCandidateDto,
   BedtimeScheduleDto, BedtimeUpdateRequest,
   HolidayDto,
+  BranchingStartRequest, BranchingChoiceRequest, BranchingResponse,
 } from './types'
 
 const STORIES = '/api/stories'
@@ -226,5 +227,20 @@ export const holidays = {
       if (e instanceof ApiError && (e.status === 204 || e.status === 404)) return null
       throw e
     }
+  },
+}
+
+export const branching = {
+  start(body: BranchingStartRequest): Promise<BranchingResponse> {
+    return request<BranchingResponse>('/api/stories/branching', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    })
+  },
+  choose(storyId: string, choiceId: string): Promise<BranchingResponse> {
+    return request<BranchingResponse>(`/api/stories/${storyId}/branching/choose`, {
+      method: 'POST',
+      body: JSON.stringify({ choiceId } satisfies BranchingChoiceRequest),
+    })
   },
 }

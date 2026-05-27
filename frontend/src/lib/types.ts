@@ -23,6 +23,10 @@ export type {
   BedtimeScheduleDto,
   BedtimeUpdateRequest,
   HolidayDto,
+  BranchingStartRequest,
+  BranchingChoiceRequest,
+  BranchingResponse,
+  BranchingChoice,
 } from '@kazka/shared';
 
 export { ApiError } from '@kazka/shared';
