@@ -267,6 +267,9 @@ public class StoryService {
     public Mono<StoryDto> update(String id, UpdateStoryRequest req, CurrentUser currentUser) {
         return Mono.fromCallable(() -> {
             Story story = findOwned(id, currentUser);
+            if (story.isBranching() && !"complete".equals(story.getBranchingState())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "story_in_progress");
+            }
             story.setTitle(req.title());
             story.setContent(req.content());
             if (req.childProfileId() != null && !req.childProfileId().isBlank()) {
