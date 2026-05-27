@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import type { FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { TagInput } from './TagInput'
 import { CharacterPicker } from '../children/CharacterPicker'
 import { useLocale } from '../../lib/LocaleContext'
 import { useAuth } from '../../lib/AuthContext'
 import { useChildren } from '../../lib/ChildrenContext'
 import type { GenerationRequest } from '../../lib/types'
+import { branching } from '../../lib/apiClient'
 import styles from './StoryForm.module.css'
 
 interface StoryFormProps {
@@ -15,6 +17,7 @@ interface StoryFormProps {
 }
 
 export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
+  const navigate = useNavigate()
   const { t, lang } = useLocale()
   const { user } = useAuth()
   const { active } = useChildren()
@@ -29,6 +32,7 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
   const [length, setLength] = useState<GenerationRequest['length']>('medium')
   const [language, setLanguage] = useState<'uk' | 'en'>(lang)
   const [includeCharacterIds, setIncludeCharacterIds] = useState<string[]>([])
+  const [isBranching, setIsBranching] = useState(false)
 
   // Prefill language from the active child's preference; bilingual → 'uk'
   useEffect(() => {
@@ -37,9 +41,29 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
     setLanguage(pref === 'en' ? 'en' : 'uk')
   }, [active])
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!theme.trim() || characters.length === 0 || !active) return
+
+    if (isBranching) {
+      try {
+        const resp = await branching.start({
+          theme: theme.trim(),
+          characters,
+          ageGroup,
+          length,
+          language,
+          childProfileId: active.id,
+          includeCharacterIds: includeCharacterIds.length > 0 ? includeCharacterIds : undefined,
+        })
+        navigate(`/stories/${resp.storyId}`)
+      } catch (err: any) {
+        // 402 → /pricing redirect is handled automatically by apiClient
+        console.error('Could not start branching tale', err)
+      }
+      return
+    }
+
     onSubmit({
       theme: theme.trim(),
       characters,
@@ -125,6 +149,11 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
           </select>
         </div>
       </div>
+
+      <label className={styles.field}>
+        <input type="checkbox" checked={isBranching} onChange={e => setIsBranching(e.target.checked)} />
+        <span>{(t as any).branching?.formToggle ?? 'Branching tale (Pro)'}</span>
+      </label>
 
       <button
         type="submit"
