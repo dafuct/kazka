@@ -16,7 +16,7 @@ public class UserEntitlement {
     @Column(name = "user_id", nullable = false, length = 36)
     private String userId;
 
-    @Column(name = "product_id", nullable = false, length = 36)
+    @Column(name = "product_id", nullable = true, length = 36)
     private String productId;
 
     @Enumerated(EnumType.STRING)

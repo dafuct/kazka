@@ -53,3 +53,6 @@ databaseChangeLog:
   - include:
       file: changes/018-add-gift-codes.sql
       relativeToChangelogFile: true
+  - include:
+      file: changes/019-user-entitlements-nullable-product.sql
+      relativeToChangelogFile: true

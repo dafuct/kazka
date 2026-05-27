@@ -73,7 +73,6 @@ public class GiftCodeService {
         UserEntitlement e = new UserEntitlement();
         e.setId(UUID.randomUUID().toString());
         e.setUserId(userId);
-        e.setProductId("gift");
         e.setState(EntitlementState.ACTIVE);
         e.setSource(EntitlementSource.GIFT);
         e.setExpiresAt(expiresAt);
