@@ -381,6 +381,27 @@ export const uk = {
     error: 'Не вдалося перекласти. Спробуйте ще раз.',
     proRequired: 'Переклад доступний у Pro-підписці.',
   },
+  dashboard: {
+    title: 'Огляд',
+    pillPro: '⭐ Pro',
+    pillFree: 'Free',
+    loading: 'Завантаження…',
+    error: 'Не вдалося завантажити дані',
+    thisWeek: 'Цього тижня',
+    thisMonth: 'Цього місяця',
+    total: 'Усього',
+    childrenSection: 'Діти',
+    recent: 'Останні казки',
+    quickLinks: 'Швидкі дії',
+    manageChildren: 'Керувати дітьми',
+    bedtime: 'Бедтайм',
+    billing: 'Підписка',
+    tales: 'казок',
+    latest: 'Остання',
+    untitled: 'Без назви',
+    noTales: 'Ще немає казок',
+    lastBedtime: 'Останній бедтайм',
+  },
 }
 
 export type Locale = typeof uk
