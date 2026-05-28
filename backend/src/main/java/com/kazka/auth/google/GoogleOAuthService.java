@@ -2,17 +2,15 @@ package com.kazka.auth.google;
 
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class GoogleOAuthService {
 
     private final UserRepository users;
-
-    public GoogleOAuthService(UserRepository users) {
-        this.users = users;
-    }
 
     @Transactional
     public User linkOrCreate(String googleSubject, String email, boolean emailVerified, String displayName) {
@@ -34,15 +32,15 @@ public class GoogleOAuthService {
             throw new IllegalArgumentException("Google id_token had no email claim");
         }
 
-        User u = new User();
-        u.setId(java.util.UUID.randomUUID().toString());
-        u.setEmail(normalizedEmail);
-        u.setGoogleSubject(googleSubject);
-        u.setDisplayName(displayName == null || displayName.isBlank()
+        User user = new User();
+        user.setId(java.util.UUID.randomUUID().toString());
+        user.setEmail(normalizedEmail);
+        user.setGoogleSubject(googleSubject);
+        user.setDisplayName(displayName == null || displayName.isBlank()
                 ? "Google user"
                 : displayName.trim());
-        u.setRole(com.kazka.user.UserRole.USER);
-        u.setEmailVerified(emailVerified);
-        return users.save(u);
+        user.setRole(com.kazka.user.UserRole.USER);
+        user.setEmailVerified(emailVerified);
+        return users.save(user);
     }
 }

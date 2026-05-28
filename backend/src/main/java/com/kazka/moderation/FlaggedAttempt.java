@@ -1,12 +1,16 @@
 package com.kazka.moderation;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
 @Table(name = "flagged_attempts")
+@Getter
+@Setter
 public class FlaggedAttempt {
 
     @Id
@@ -47,23 +51,4 @@ public class FlaggedAttempt {
             createdAt = Instant.now();
         }
     }
-
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
-    public ModerationPipeline getPipeline() { return pipeline; }
-    public void setPipeline(ModerationPipeline pipeline) { this.pipeline = pipeline; }
-    public ModerationCategory getCategory() { return category; }
-    public void setCategory(ModerationCategory category) { this.category = category; }
-    public String getLanguage() { return language; }
-    public void setLanguage(String language) { this.language = language; }
-    public String getPromptText() { return promptText; }
-    public void setPromptText(String promptText) { this.promptText = promptText; }
-    public BigDecimal getConfidence() { return confidence; }
-    public void setConfidence(BigDecimal confidence) { this.confidence = confidence; }
-    public String getJudgeModel() { return judgeModel; }
-    public void setJudgeModel(String judgeModel) { this.judgeModel = judgeModel; }
-    public Instant getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 }

@@ -6,8 +6,8 @@ import com.apple.itunes.storekit.model.ResponseBodyV2DecodedPayload;
 import com.apple.itunes.storekit.verification.SignedDataVerifier;
 import com.apple.itunes.storekit.verification.VerificationException;
 import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -16,17 +16,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
 
+@Slf4j
+@RequiredArgsConstructor
 @Component
 public class IapVerifier {
 
-    private static final Logger log = LoggerFactory.getLogger(IapVerifier.class);
-
     private final BillingProperties props;
     private SignedDataVerifier verifier;
-
-    public IapVerifier(BillingProperties props) {
-        this.props = props;
-    }
 
     @PostConstruct
     void init() throws IOException {

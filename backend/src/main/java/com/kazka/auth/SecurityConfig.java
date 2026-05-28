@@ -1,6 +1,9 @@
 package com.kazka.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kazka.auth.token.BearerTokenAuthenticationWebFilter;
+import com.kazka.user.UserRepository;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -31,6 +34,7 @@ import org.springframework.web.server.WebFilter;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -55,9 +59,9 @@ public class SecurityConfig {
             UserDetailsRepositoryReactiveAuthenticationManager authManager,
             OAuth2SuccessHandler oauthSuccess,
             ObjectMapper objectMapper,
-            com.kazka.user.UserRepository userRepository,
-            com.kazka.auth.token.BearerTokenAuthenticationWebFilter bearerFilter,
-            org.springframework.beans.factory.ObjectProvider<CorsConfigurationSource> corsProvider) {
+            UserRepository userRepository,
+            BearerTokenAuthenticationWebFilter bearerFilter,
+            ObjectProvider<CorsConfigurationSource> corsProvider) {
 
         var loginFilter = new AuthenticationWebFilter(authManager);
         loginFilter.setRequiresAuthenticationMatcher(
@@ -136,7 +140,7 @@ public class SecurityConfig {
                         .accessDeniedHandler((swe, ex) ->
                                 writeError(swe, HttpStatus.FORBIDDEN, "FORBIDDEN", objectMapper)))
                 .formLogin(Customizer.withDefaults())
-                .httpBasic(b -> b.disable())
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .build();
     }
 
@@ -167,7 +171,7 @@ public class SecurityConfig {
         exchange.getResponse().setStatusCode(status);
         exchange.getResponse().getHeaders().add("Content-Type", "application/json");
         try {
-            byte[] body = mapper.writeValueAsBytes(java.util.Map.of("error", code));
+            byte[] body = mapper.writeValueAsBytes(Map.of("error", code));
             return exchange.getResponse().writeWith(Mono.just(
                     exchange.getResponse().bufferFactory().wrap(body)));
         } catch (Exception e) {

@@ -5,6 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
@@ -14,6 +17,8 @@ import java.time.Instant;
         uniqueConstraints = @UniqueConstraint(
                 name = "uq_pwe_provider_event",
                 columnNames = {"provider", "event_id"}))
+@Getter
+@Setter
 public class ProcessedWebhookEvent {
 
     @Id
@@ -28,13 +33,6 @@ public class ProcessedWebhookEvent {
 
     @CreationTimestamp
     @Column(name = "processed_at", nullable = false, updatable = false)
+    @Setter(AccessLevel.NONE)
     private Instant processedAt;
-
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getProvider() { return provider; }
-    public void setProvider(String provider) { this.provider = provider; }
-    public String getEventId() { return eventId; }
-    public void setEventId(String eventId) { this.eventId = eventId; }
-    public Instant getProcessedAt() { return processedAt; }
 }

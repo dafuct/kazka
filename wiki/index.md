@@ -16,6 +16,9 @@ When this file exceeds ~300 lines or the wiki passes ~150 pages, shard into `wik
 - [[editor-must-fix-invented-words-including-in-titles]] — editor left invented Ukrainian words ("Привидиний") in titles; carve-out was too broad and rule list missed neologisms
 - [[subscription-cancel-rules-differ-by-provider]] — generic "Cancel subscription" is wrong; Apple is App Store-managed, Paddle needs subscription-id+API call, LiqPay/Monobank are one-off today
 - [[user-entitlements-fk-needs-cascade-on-user-delete]] — user_entitlements.user_id FK lacks ON DELETE CASCADE; test ordering hid this until Spec C ITs reshuffled execution and broke 15 tests at once
+- [[undefined-css-var-fallback-masks-dark-mode-failure]] — components used undefined `var(--surface, #fff)`-style vars; light-hex fallbacks hid the break until dark mode; alias tokens centrally in tokens.css
+- [[native-form-pickers-need-color-scheme-for-dark-theme]] — native time/select pickers stayed white in dark mode; they follow CSS `color-scheme`, not your theme variables
+- [[it-global-count-assertion-fragile-to-shared-db]] — ITs asserting a global sweep/count (e.g. `runOnce()==0`) break on leftover rows in the shared DB; clear the table in `@BeforeEach`
 
 ## Sources
 

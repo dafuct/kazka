@@ -1,18 +1,16 @@
 package com.kazka.billing;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
+@RequiredArgsConstructor
 @Component
 public class EntitlementResolver {
 
     private final UserEntitlementRepository entitlements;
-
-    public EntitlementResolver(UserEntitlementRepository entitlements) {
-        this.entitlements = entitlements;
-    }
 
     @Transactional(readOnly = true)
     public boolean isPro(String userId) {

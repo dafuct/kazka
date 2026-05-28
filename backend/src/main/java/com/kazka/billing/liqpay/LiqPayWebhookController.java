@@ -9,8 +9,8 @@ import com.kazka.billing.SubscriptionProductRepository;
 import com.kazka.billing.UserEntitlement;
 import com.kazka.billing.UserEntitlementRepository;
 import com.kazka.billing.webhook.WebhookIdempotencyService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,11 +26,11 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.UUID;
 
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/billing/webhook")
 public class LiqPayWebhookController {
-
-    private static final Logger log = LoggerFactory.getLogger(LiqPayWebhookController.class);
 
     private final LiqPaySignatureVerifier verifier;
     private final BillingProperties props;
@@ -38,18 +38,6 @@ public class LiqPayWebhookController {
     private final UserEntitlementRepository entitlements;
     private final WebhookIdempotencyService idempotency;
     private final ObjectMapper json = new ObjectMapper();
-
-    public LiqPayWebhookController(LiqPaySignatureVerifier verifier,
-                                   BillingProperties props,
-                                   SubscriptionProductRepository products,
-                                   UserEntitlementRepository entitlements,
-                                   WebhookIdempotencyService idempotency) {
-        this.verifier = verifier;
-        this.props = props;
-        this.products = products;
-        this.entitlements = entitlements;
-        this.idempotency = idempotency;
-    }
 
     /** LiqPay POSTs application/x-www-form-urlencoded with data + signature. */
     @PostMapping(path = "/liqpay", consumes = "application/x-www-form-urlencoded")
@@ -134,8 +122,7 @@ public class LiqPayWebhookController {
     private static EntitlementState mapState(String status) {
         return switch (status) {
             case "success", "subscribed", "wait_compensation" -> EntitlementState.ACTIVE;
-            case "subscription_canceled", "subscription_expired" -> EntitlementState.EXPIRED;
-            case "failure", "error" -> EntitlementState.EXPIRED;
+            case "subscription_canceled", "subscription_expired", "failure", "error" -> EntitlementState.EXPIRED;
             default -> null;
         };
     }

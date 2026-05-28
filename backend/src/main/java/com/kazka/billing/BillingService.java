@@ -6,8 +6,8 @@ import com.apple.itunes.storekit.model.NotificationTypeV2;
 import com.apple.itunes.storekit.model.ResponseBodyV2DecodedPayload;
 import com.apple.itunes.storekit.model.Subtype;
 import com.kazka.billing.webhook.WebhookIdempotencyService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,28 +20,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class BillingService {
-
-    private static final Logger log = LoggerFactory.getLogger(BillingService.class);
 
     private final IapVerifier verifier;
     private final SubscriptionProductRepository products;
     private final UserEntitlementRepository entitlements;
     private final WebhookIdempotencyService idempotency;
     private final ApplicationEventPublisher events;
-
-    public BillingService(IapVerifier verifier,
-                          SubscriptionProductRepository products,
-                          UserEntitlementRepository entitlements,
-                          WebhookIdempotencyService idempotency,
-                          ApplicationEventPublisher events) {
-        this.verifier = verifier;
-        this.products = products;
-        this.entitlements = entitlements;
-        this.idempotency = idempotency;
-        this.events = events;
-    }
 
     @Transactional
     public Mono<UserEntitlement> verifyAndPersist(String userId, String signedTransaction) {
@@ -53,7 +41,7 @@ public class BillingService {
 
             String origTxn = Objects.requireNonNull(
                     payload.getOriginalTransactionId(),
-                    "originalTransactionId must not be null").toString();
+                    "originalTransactionId must not be null");
             UserEntitlement entitlement = entitlements.findByOriginalTransactionId(origTxn)
                     .orElseGet(() -> {
                         UserEntitlement e = new UserEntitlement();

@@ -1,6 +1,7 @@
 package com.kazka.billing.geo;
 
 import com.kazka.billing.dto.GeoResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,15 +9,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/billing")
 public class GeoController {
 
     private final GeoLocator locator;
-
-    public GeoController(GeoLocator locator) {
-        this.locator = locator;
-    }
 
     @GetMapping("/geo")
     public Mono<GeoResponse> geo(ServerHttpRequest req,

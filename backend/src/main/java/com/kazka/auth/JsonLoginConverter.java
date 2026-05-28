@@ -1,6 +1,7 @@
 package com.kazka.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ class JsonLoginConverter implements ServerAuthenticationConverter {
     JsonLoginConverter(ObjectMapper mapper) { this.mapper = mapper; }
 
     @Override
+    @NullMarked
     public Mono<Authentication> convert(ServerWebExchange exchange) {
         return DataBufferUtils.join(exchange.getRequest().getBody())
                 .map(buf -> {

@@ -9,8 +9,8 @@ import com.kazka.billing.SubscriptionProductRepository;
 import com.kazka.billing.UserEntitlement;
 import com.kazka.billing.UserEntitlementRepository;
 import com.kazka.billing.webhook.WebhookIdempotencyService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,11 +27,11 @@ import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.UUID;
 
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/billing/webhook")
 public class PaddleWebhookController {
-
-    private static final Logger log = LoggerFactory.getLogger(PaddleWebhookController.class);
 
     private final PaddleSignatureVerifier verifier;
     private final BillingProperties props;
@@ -39,18 +39,6 @@ public class PaddleWebhookController {
     private final UserEntitlementRepository entitlements;
     private final WebhookIdempotencyService idempotency;
     private final ObjectMapper json = new ObjectMapper();
-
-    public PaddleWebhookController(PaddleSignatureVerifier verifier,
-                                   BillingProperties props,
-                                   SubscriptionProductRepository products,
-                                   UserEntitlementRepository entitlements,
-                                   WebhookIdempotencyService idempotency) {
-        this.verifier = verifier;
-        this.props = props;
-        this.products = products;
-        this.entitlements = entitlements;
-        this.idempotency = idempotency;
-    }
 
     @PostMapping(path = "/paddle", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)

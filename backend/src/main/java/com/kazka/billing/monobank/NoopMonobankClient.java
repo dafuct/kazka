@@ -10,7 +10,7 @@ public class NoopMonobankClient {
     @Bean
     @ConditionalOnMissingBean(MonobankClient.class)
     MonobankClient noopMonobankClient() {
-        return (planId, userId, priceMicro, currency) -> Mono.error(
+        return (_, _, _, _) -> Mono.error(
                 new IllegalStateException("Monobank not configured"));
     }
 }

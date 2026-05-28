@@ -7,29 +7,21 @@ import com.eatthepath.pushy.apns.util.SimpleApnsPayloadBuilder;
 import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
 import com.eatthepath.pushy.apns.util.TokenUtil;
 import com.kazka.auth.AuthProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class PushNotifier {
-
-    private static final Logger log = LoggerFactory.getLogger(PushNotifier.class);
 
     private final DeviceTokenRepository devices;
     private final Optional<ApnsClient> apnsClient;
     private final AuthProperties.Apns apns;
-
-    public PushNotifier(DeviceTokenRepository devices,
-                        Optional<ApnsClient> apnsClient,
-                        AuthProperties.Apns apns) {
-        this.devices = devices;
-        this.apnsClient = apnsClient;
-        this.apns = apns;
-    }
 
     /**
      * Best-effort: enumerates all device tokens for the user, sends the push,

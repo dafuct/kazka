@@ -8,6 +8,7 @@ import com.kazka.child.bedtime.BedtimeScheduleRepository;
 import com.kazka.dashboard.dto.DashboardDto;
 import com.kazka.story.StoryRepository;
 import com.kazka.story.dto.StoryDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -20,6 +21,7 @@ import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Locale;
 
+@RequiredArgsConstructor
 @Service
 public class DashboardService {
 
@@ -27,16 +29,6 @@ public class DashboardService {
     private final ChildProfileRepository childProfiles;
     private final BedtimeScheduleRepository bedtimeSchedules;
     private final EntitlementResolver entitlements;
-
-    public DashboardService(StoryRepository stories,
-                            ChildProfileRepository childProfiles,
-                            BedtimeScheduleRepository bedtimeSchedules,
-                            EntitlementResolver entitlements) {
-        this.stories = stories;
-        this.childProfiles = childProfiles;
-        this.bedtimeSchedules = bedtimeSchedules;
-        this.entitlements = entitlements;
-    }
 
     @Transactional(readOnly = true)
     public Mono<DashboardDto> getDashboard(CurrentUser cu) {

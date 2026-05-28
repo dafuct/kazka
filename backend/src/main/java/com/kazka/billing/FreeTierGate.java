@@ -4,20 +4,16 @@ import com.kazka.story.exception.PaywallRequiredException;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 public class FreeTierGate {
 
     private final EntitlementResolver entitlements;
     private final BillingProperties props;
     private final UserRepository users;
-
-    public FreeTierGate(EntitlementResolver entitlements, BillingProperties props, UserRepository users) {
-        this.entitlements = entitlements;
-        this.props = props;
-        this.users = users;
-    }
 
     /** Throws PaywallRequiredException when a free-tier user has hit the monthly limit. No-op for Pro. */
     public void assertAllowed(User user) {

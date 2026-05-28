@@ -16,8 +16,8 @@ import com.kazka.story.branching.dto.BranchingResponse;
 import com.kazka.story.branching.dto.BranchingStartRequest;
 import com.kazka.story.dto.GenerationRequest;
 import com.kazka.story.exception.PaywallRequiredException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class BranchingService {
-
-    private static final Logger log = LoggerFactory.getLogger(BranchingService.class);
 
     private final StoryRepository stories;
     private final ChildProfileService childProfiles;
@@ -43,24 +43,6 @@ public class BranchingService {
     private final BranchingResponseParser parser = new BranchingResponseParser();
     private final CharacterExtractionWorker extractionWorker;
     private final com.kazka.story.PromptBuilder systemPromptBuilder;
-
-    public BranchingService(StoryRepository stories,
-                            ChildProfileService childProfiles,
-                            CharacterRepository characters,
-                            EntitlementResolver entitlements,
-                            HuggingFaceClient hfClient,
-                            BranchingPromptBuilder promptBuilder,
-                            CharacterExtractionWorker extractionWorker,
-                            com.kazka.story.PromptBuilder systemPromptBuilder) {
-        this.stories = stories;
-        this.childProfiles = childProfiles;
-        this.characters = characters;
-        this.entitlements = entitlements;
-        this.hfClient = hfClient;
-        this.promptBuilder = promptBuilder;
-        this.extractionWorker = extractionWorker;
-        this.systemPromptBuilder = systemPromptBuilder;
-    }
 
     public Mono<BranchingResponse> start(BranchingStartRequest req, CurrentUser cu) {
         ChildProfile child = childProfiles.requireOwned(req.childProfileId(), cu.userId());

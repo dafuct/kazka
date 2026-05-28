@@ -3,6 +3,7 @@ package com.kazka.story;
 import com.kazka.auth.CurrentUserResolver;
 import com.kazka.story.dto.*;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,17 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/stories")
 public class StoryController {
 
     private final StoryService storyService;
     private final CurrentUserResolver currentUserResolver;
-
-    public StoryController(StoryService storyService, CurrentUserResolver currentUserResolver) {
-        this.storyService = storyService;
-        this.currentUserResolver = currentUserResolver;
-    }
 
     @PostMapping(value = "/generate", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<Object>> generate(@Valid @RequestBody GenerationRequest req) {

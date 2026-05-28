@@ -6,8 +6,8 @@ import com.kazka.billing.EntitlementState;
 import com.kazka.billing.UserEntitlement;
 import com.kazka.billing.UserEntitlementRepository;
 import com.kazka.billing.gift.dto.RedemptionResultDto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,44 +17,39 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class GiftCodeService {
-
-    private static final Logger log = LoggerFactory.getLogger(GiftCodeService.class);
 
     private final GiftCodeRepository codes;
     private final UserEntitlementRepository entitlements;
 
-    public GiftCodeService(GiftCodeRepository codes, UserEntitlementRepository entitlements) {
-        this.codes = codes;
-        this.entitlements = entitlements;
-    }
-
     @Transactional
     public RedemptionResultDto redeem(String rawCode, CurrentUser cu) {
         String normalized = normalize(rawCode);
-        GiftCode g = codes.findByCodeForUpdate(normalized)
+        GiftCode giftCode = codes.findByCodeForUpdate(normalized)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (g.getStatus() != GiftCodeStatus.AVAILABLE) {
-            throw new ResponseStatusException(HttpStatus.GONE, g.getStatus().name().toLowerCase());
+        if (giftCode.getStatus() != GiftCodeStatus.AVAILABLE) {
+            throw new ResponseStatusException(HttpStatus.GONE, giftCode.getStatus().name().toLowerCase());
         }
-        if (g.getExpiresAt() != null && g.getExpiresAt().isBefore(Instant.now())) {
-            g.setStatus(GiftCodeStatus.EXPIRED);
-            codes.save(g);
+        if (giftCode.getExpiresAt() != null && giftCode.getExpiresAt().isBefore(Instant.now())) {
+            giftCode.setStatus(GiftCodeStatus.EXPIRED);
+            codes.save(giftCode);
             throw new ResponseStatusException(HttpStatus.GONE, "expired");
         }
 
-        g.setStatus(GiftCodeStatus.REDEEMED);
-        g.setRedeemedBy(cu.userId());
-        g.setRedeemedAt(Instant.now());
-        codes.save(g);
+        giftCode.setStatus(GiftCodeStatus.REDEEMED);
+        giftCode.setRedeemedBy(cu.userId());
+        giftCode.setRedeemedAt(Instant.now());
+        codes.save(giftCode);
 
         Instant now = Instant.now();
         Instant newExpiry = entitlements.findActiveByUserId(cu.userId())
-                .map(existing -> extendExpiry(existing, g.getDurationDays()))
-                .orElseGet(() -> createEntitlement(cu.userId(), g.getDurationDays(), now));
+                .map(existing -> extendExpiry(existing, giftCode.getDurationDays()))
+                .orElseGet(() -> createEntitlement(cu.userId(), giftCode.getDurationDays(), now));
 
-        return new RedemptionResultDto(newExpiry, g.getDurationDays());
+        return new RedemptionResultDto(newExpiry, giftCode.getDurationDays());
     }
 
     private Instant extendExpiry(UserEntitlement existing, int days) {
@@ -70,13 +65,13 @@ public class GiftCodeService {
 
     private Instant createEntitlement(String userId, int days, Instant now) {
         Instant expiresAt = now.plus(days, ChronoUnit.DAYS);
-        UserEntitlement e = new UserEntitlement();
-        e.setId(UUID.randomUUID().toString());
-        e.setUserId(userId);
-        e.setState(EntitlementState.ACTIVE);
-        e.setSource(EntitlementSource.GIFT);
-        e.setExpiresAt(expiresAt);
-        entitlements.save(e);
+        UserEntitlement userEntitlement = new UserEntitlement();
+        userEntitlement.setId(UUID.randomUUID().toString());
+        userEntitlement.setUserId(userId);
+        userEntitlement.setState(EntitlementState.ACTIVE);
+        userEntitlement.setSource(EntitlementSource.GIFT);
+        userEntitlement.setExpiresAt(expiresAt);
+        entitlements.save(userEntitlement);
         return expiresAt;
     }
 

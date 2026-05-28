@@ -7,12 +7,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
+
 @Component
 public class CurrentUserResolver {
 
     public Mono<CurrentUser> currentUser() {
         return ReactiveSecurityContextHolder.getContext()
-                .map(ctx -> ctx.getAuthentication())
+                .map(ctx -> Objects.requireNonNull(ctx.getAuthentication()))
                 .filter(Authentication::isAuthenticated)
                 .map(this::toCurrentUser);
     }
@@ -34,7 +36,7 @@ public class CurrentUserResolver {
                     .anyMatch("ROLE_ADMIN"::equals) ? UserRole.ADMIN : UserRole.USER;
             return new CurrentUser(ud.getUsername(), role);
         }
-        throw new IllegalStateException("Unknown principal type: " + principal.getClass());
+        throw new IllegalStateException("Unknown principal type: " + Objects.requireNonNull(principal).getClass());
     }
 
     public record CurrentUser(String userId, UserRole role) {

@@ -3,14 +3,12 @@ package com.kazka.auth.apple;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kazka.auth.AuthProperties;
+import com.kazka.auth.oidc.JwksKeyStore;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigInteger;
-import java.net.URI;
 import java.security.AlgorithmParameters;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -18,25 +16,20 @@ import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class AppleIdentityTokenVerifier {
 
     private final AuthProperties.Apple apple;
-    private final WebClient webClient = WebClient.create();
-    private final AtomicReference<JwksCache> jwksCache = new AtomicReference<>();
-    private static final Duration JWKS_CACHE_TTL = Duration.ofMinutes(15);
+    private final JwksKeyStore keyStore;
 
     public AppleIdentityTokenVerifier(AuthProperties.Apple apple) {
         this.apple = apple;
+        this.keyStore = new JwksKeyStore(apple.jwksUri(), AppleIdentityTokenVerifier::parseEcKey);
     }
 
     public Verified verify(String identityToken) {
@@ -55,10 +48,8 @@ public class AppleIdentityTokenVerifier {
             }
             String kid = kidNode.asText();
 
-            PublicKey key = jwksByKid().get(kid);
-            if (key == null) {
-                throw new InvalidAppleTokenException("No matching key for kid=" + kid);
-            }
+            PublicKey key = keyStore.findKey(kid)
+                    .orElseThrow(() -> new InvalidAppleTokenException("No matching key for kid=" + kid));
 
             Claims claims = Jwts.parser()
                     .verifyWith(key)
@@ -90,39 +81,19 @@ public class AppleIdentityTokenVerifier {
                     claims.get("email", String.class));
         } catch (InvalidAppleTokenException e) {
             throw e;
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new InvalidAppleTokenException(e.getMessage());
         } catch (Exception e) {
             throw new InvalidAppleTokenException(e.getMessage());
         }
     }
 
-    private Map<String, PublicKey> jwksByKid() {
-        JwksCache current = jwksCache.get();
-        if (current != null && current.fetchedAt().plus(JWKS_CACHE_TTL).isAfter(Instant.now())) {
-            return current.keys();
+    private static PublicKey parseEcKey(JsonNode jwk) throws Exception {
+        if (!"EC".equals(jwk.get("kty").asText())) {
+            return null;
         }
-        String body = webClient.get().uri(URI.create(apple.jwksUri()))
-                .retrieve().bodyToMono(String.class)
-                .block(Duration.ofSeconds(5));
-        Map<String, PublicKey> parsed = new HashMap<>();
-        try {
-            JsonNode root = new ObjectMapper().readTree(body);
-            ECParameterSpec p256Spec = secp256r1Spec();
-            for (JsonNode key : root.get("keys")) {
-                if (!"EC".equals(key.get("kty").asText())) continue;
-                String kid = key.get("kid").asText();
-                BigInteger x = new BigInteger(1, Base64.getUrlDecoder().decode(key.get("x").asText()));
-                BigInteger y = new BigInteger(1, Base64.getUrlDecoder().decode(key.get("y").asText()));
-                PublicKey pub = KeyFactory.getInstance("EC")
-                        .generatePublic(new ECPublicKeySpec(new ECPoint(x, y), p256Spec));
-                parsed.put(kid, pub);
-            }
-        } catch (Exception e) {
-            throw new InvalidAppleTokenException("Failed to parse Apple JWKs: " + e.getMessage());
-        }
-        jwksCache.set(new JwksCache(parsed, Instant.now()));
-        return parsed;
+        BigInteger x = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("x").asText()));
+        BigInteger y = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("y").asText()));
+        return KeyFactory.getInstance("EC")
+                .generatePublic(new ECPublicKeySpec(new ECPoint(x, y), secp256r1Spec()));
     }
 
     private static ECParameterSpec secp256r1Spec() throws Exception {
@@ -132,8 +103,6 @@ public class AppleIdentityTokenVerifier {
     }
 
     public record Verified(String subject, String email) {}
-
-    private record JwksCache(Map<String, PublicKey> keys, Instant fetchedAt) {}
 
     public static final class InvalidAppleTokenException extends RuntimeException {
         public InvalidAppleTokenException(String message) { super(message); }

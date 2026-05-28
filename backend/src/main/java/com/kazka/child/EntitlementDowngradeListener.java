@@ -2,8 +2,8 @@ package com.kazka.child;
 
 import com.kazka.billing.EntitlementDowngradedEvent;
 import com.kazka.billing.EntitlementResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,25 +12,15 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 
+@Slf4j
+@RequiredArgsConstructor
 @Component
 public class EntitlementDowngradeListener {
-
-    private static final Logger log = LoggerFactory.getLogger(EntitlementDowngradeListener.class);
 
     private final ChildProfileRepository profiles;
     private final EntitlementResolver entitlements;
     private final com.kazka.story.StoryRepository stories;
     private final com.kazka.child.bedtime.BedtimeScheduleRepository bedtimeRepo;
-
-    public EntitlementDowngradeListener(ChildProfileRepository profiles,
-                                        EntitlementResolver entitlements,
-                                        com.kazka.story.StoryRepository stories,
-                                        com.kazka.child.bedtime.BedtimeScheduleRepository bedtimeRepo) {
-        this.profiles = profiles;
-        this.entitlements = entitlements;
-        this.stories = stories;
-        this.bedtimeRepo = bedtimeRepo;
-    }
 
     @EventListener
     @Transactional

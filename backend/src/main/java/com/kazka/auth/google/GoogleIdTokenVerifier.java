@@ -3,38 +3,31 @@ package com.kazka.auth.google;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kazka.auth.AuthProperties;
+import com.kazka.auth.oidc.JwksKeyStore;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigInteger;
-import java.net.URI;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.RSAPublicKeySpec;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class GoogleIdTokenVerifier {
 
-    private static final Duration JWKS_CACHE_TTL = Duration.ofMinutes(15);
     private static final Set<String> ALLOWED_ISSUERS =
             Set.of("https://accounts.google.com", "accounts.google.com");
 
     private final AuthProperties.Google google;
-    private final WebClient webClient = WebClient.create();
-    private final AtomicReference<JwksCache> jwksCache = new AtomicReference<>();
+    private final JwksKeyStore keyStore;
 
     public GoogleIdTokenVerifier(AuthProperties.Google google) {
         this.google = google;
+        this.keyStore = new JwksKeyStore(google.jwksUri(), GoogleIdTokenVerifier::parseRsaKey);
     }
 
     public Verified verify(String idToken) {
@@ -52,10 +45,8 @@ public class GoogleIdTokenVerifier {
             }
             String kid = kidNode.asText();
 
-            PublicKey key = jwksByKid().get(kid);
-            if (key == null) {
-                throw new InvalidGoogleTokenException("No matching key for kid=" + kid);
-            }
+            PublicKey key = keyStore.findKey(kid)
+                    .orElseThrow(() -> new InvalidGoogleTokenException("No matching key for kid=" + kid));
 
             Claims claims = Jwts.parser()
                     .verifyWith(key)
@@ -86,43 +77,21 @@ public class GoogleIdTokenVerifier {
                     claims.get("name", String.class));
         } catch (InvalidGoogleTokenException e) {
             throw e;
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new InvalidGoogleTokenException(e.getMessage());
         } catch (Exception e) {
             throw new InvalidGoogleTokenException(e.getMessage());
         }
     }
 
-    private Map<String, PublicKey> jwksByKid() {
-        JwksCache current = jwksCache.get();
-        if (current != null && current.fetchedAt().plus(JWKS_CACHE_TTL).isAfter(Instant.now())) {
-            return current.keys();
+    private static PublicKey parseRsaKey(JsonNode jwk) throws Exception {
+        if (!"RSA".equals(jwk.get("kty").asText())) {
+            return null;
         }
-        String body = webClient.get().uri(URI.create(google.jwksUri()))
-                .retrieve().bodyToMono(String.class)
-                .block(Duration.ofSeconds(5));
-        Map<String, PublicKey> parsed = new HashMap<>();
-        try {
-            JsonNode root = new ObjectMapper().readTree(body);
-            for (JsonNode key : root.get("keys")) {
-                if (!"RSA".equals(key.get("kty").asText())) continue;
-                String kid = key.get("kid").asText();
-                BigInteger n = new BigInteger(1, Base64.getUrlDecoder().decode(key.get("n").asText()));
-                BigInteger e = new BigInteger(1, Base64.getUrlDecoder().decode(key.get("e").asText()));
-                PublicKey pub = KeyFactory.getInstance("RSA")
-                        .generatePublic(new RSAPublicKeySpec(n, e));
-                parsed.put(kid, pub);
-            }
-        } catch (Exception ex) {
-            throw new InvalidGoogleTokenException("Failed to parse Google JWKs: " + ex.getMessage());
-        }
-        jwksCache.set(new JwksCache(parsed, Instant.now()));
-        return parsed;
+        BigInteger n = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("n").asText()));
+        BigInteger e = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("e").asText()));
+        return KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(n, e));
     }
 
     public record Verified(String subject, String email, boolean emailVerified, String name) {}
-
-    private record JwksCache(Map<String, PublicKey> keys, Instant fetchedAt) {}
 
     public static final class InvalidGoogleTokenException extends RuntimeException {
         public InvalidGoogleTokenException(String message) { super(message); }

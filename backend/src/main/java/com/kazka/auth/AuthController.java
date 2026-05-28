@@ -9,6 +9,7 @@ import com.kazka.auth.token.dto.TokenResponse;
 import com.kazka.user.UserDto;
 import com.kazka.user.UserRepository;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +22,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.net.URI;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -31,16 +33,6 @@ public class AuthController {
     private final UserRepository users;
     private final WebSessionServerSecurityContextRepository contextRepo =
             new WebSessionServerSecurityContextRepository();
-
-    public AuthController(AuthService authService,
-                          CurrentUserResolver currentUserResolver,
-                          AuthProperties props,
-                          UserRepository users) {
-        this.authService = authService;
-        this.currentUserResolver = currentUserResolver;
-        this.props = props;
-        this.users = users;
-    }
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
@@ -84,7 +76,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> resendVerification() {
         return currentUserResolver.requireUser()
-                .flatMap(cu -> Mono.fromRunnable(() -> authService.resendVerification(cu.userId()))
+                .flatMap(user -> Mono.fromRunnable(() -> authService.resendVerification(user.userId()))
                         .subscribeOn(Schedulers.boundedElastic()))
                 .then();
     }

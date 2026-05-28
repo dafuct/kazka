@@ -39,6 +39,9 @@ class BedtimeSweepJobIT extends AbstractIT {
 
     @BeforeEach
     void setup() {
+        // runOnce() sweeps the whole table, so leftover schedules from other ITs would
+        // be counted here; clear them so the zero-count assertions reflect only this test.
+        schedules.deleteAll();
         when(entitlements.isPro(anyString())).thenReturn(true);
         when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.just("Title\n\nOnce upon a time..."));
         when(hfClient.streamEdit(anyString(), anyString())).thenReturn(Flux.just("Title\n\nOnce upon a time..."));

@@ -2,6 +2,7 @@ package com.kazka.billing.liqpay;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kazka.billing.BillingProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -11,6 +12,7 @@ import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @Component
 @ConditionalOnProperty(prefix = "kazka.billing.liqpay", name = "public-key")
 public class LiqPayClientImpl implements LiqPayClient {
@@ -18,11 +20,6 @@ public class LiqPayClientImpl implements LiqPayClient {
     private final BillingProperties props;
     private final LiqPaySignatureVerifier sig;
     private final ObjectMapper json = new ObjectMapper();
-
-    public LiqPayClientImpl(BillingProperties props, LiqPaySignatureVerifier sig) {
-        this.props = props;
-        this.sig = sig;
-    }
 
     /**
      * LiqPay checkout uses a GET URL with two params: data (base64 JSON) and signature.

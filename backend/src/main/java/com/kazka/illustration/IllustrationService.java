@@ -13,18 +13,19 @@ import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
 import com.kazka.story.Theme;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class IllustrationService {
 
-    private static final Logger log = LoggerFactory.getLogger(IllustrationService.class);
     private static final int IMAGE_W = 1024;
     private static final int IMAGE_H = 768;
 
@@ -36,24 +37,6 @@ public class IllustrationService {
     private final SuspensionService suspensionService;
     private final ModerationProperties modProps;
     private final PushNotifier pushNotifier;
-
-    public IllustrationService(HuggingFaceClient hfClient,
-                               ImageStorageService imageStorageService,
-                               StoryRepository storyRepository,
-                               PromptBuilder promptBuilder,
-                               ModerationService moderationService,
-                               SuspensionService suspensionService,
-                               ModerationProperties modProps,
-                               PushNotifier pushNotifier) {
-        this.hfClient = hfClient;
-        this.imageStorageService = imageStorageService;
-        this.storyRepository = storyRepository;
-        this.promptBuilder = promptBuilder;
-        this.moderationService = moderationService;
-        this.suspensionService = suspensionService;
-        this.modProps = modProps;
-        this.pushNotifier = pushNotifier;
-    }
 
     public Mono<Void> generateAndStore(String storyId) {
         return Mono.fromCallable(() -> storyRepository.findById(storyId))

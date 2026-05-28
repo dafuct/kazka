@@ -11,12 +11,12 @@ public record EntitlementDto(
         Instant expiresAt,
         String source
 ) {
-    public static EntitlementDto from(UserEntitlement e, SubscriptionProduct p) {
+    public static EntitlementDto from(UserEntitlement entitlement, SubscriptionProduct product) {
         return new EntitlementDto(
-                p.getAppleProductId(),
-                e.getState().name(),
-                e.getExpiresAt(),
-                e.getSource().name()
+                product.getAppleProductId(),
+                entitlement.getState().name(),
+                entitlement.getExpiresAt(),
+                entitlement.getSource().name()
         );
     }
 }

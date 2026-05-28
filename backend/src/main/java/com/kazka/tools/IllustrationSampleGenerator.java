@@ -4,9 +4,9 @@ import com.kazka.hf.HuggingFaceClient;
 import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
 import com.kazka.story.Theme;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Profile;
@@ -17,11 +17,11 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
+@RequiredArgsConstructor
 @Component
 @Profile("sample-gen")
 public class IllustrationSampleGenerator implements CommandLineRunner {
-
-    private static final Logger log = LoggerFactory.getLogger(IllustrationSampleGenerator.class);
 
     private static final Map<String, String> SCENES = Map.of(
             "hero",    "a friendly fox sitting under a starry forest at twilight, with glowing mushrooms",
@@ -41,14 +41,6 @@ public class IllustrationSampleGenerator implements CommandLineRunner {
     private final HuggingFaceClient hfClient;
     private final PromptBuilder promptBuilder;
     private final ConfigurableApplicationContext ctx;
-
-    public IllustrationSampleGenerator(HuggingFaceClient hfClient,
-                                       PromptBuilder promptBuilder,
-                                       ConfigurableApplicationContext ctx) {
-        this.hfClient = hfClient;
-        this.promptBuilder = promptBuilder;
-        this.ctx = ctx;
-    }
 
     @Override
     public void run(String @NonNull ... args) throws Exception {

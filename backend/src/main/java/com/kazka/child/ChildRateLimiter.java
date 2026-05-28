@@ -1,10 +1,12 @@
 package com.kazka.child;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
+@RequiredArgsConstructor
 @Component
 public class ChildRateLimiter {
 
@@ -12,10 +14,6 @@ public class ChildRateLimiter {
     static final Duration WINDOW = Duration.ofHours(24);
 
     private final StringRedisTemplate redis;
-
-    public ChildRateLimiter(StringRedisTemplate redis) {
-        this.redis = redis;
-    }
 
     public void assertAndIncrement(String userId) {
         String key = "child:create:" + userId;

@@ -3,6 +3,7 @@ package com.kazka.child;
 import com.kazka.child.dto.CreateChildProfileRequest;
 import com.kazka.child.dto.UpdateChildProfileRequest;
 import com.kazka.story.exception.PaywallRequiredException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,20 +13,13 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class ChildProfileService {
 
     private final ChildProfileRepository repo;
     private final CharacterRepository characters;
     private final ChildEntitlementResolver tier;
-
-    public ChildProfileService(ChildProfileRepository repo,
-                               CharacterRepository characters,
-                               ChildEntitlementResolver tier) {
-        this.repo = repo;
-        this.characters = characters;
-        this.tier = tier;
-    }
 
     @Transactional
     public ChildProfile create(String userId, CreateChildProfileRequest req) {

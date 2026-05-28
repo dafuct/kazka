@@ -7,8 +7,8 @@ import com.kazka.story.Story;
 import com.kazka.story.StoryService;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +18,14 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
+@RequiredArgsConstructor
 @Component
 public class BedtimeWorker {
 
-    private static final Logger log = LoggerFactory.getLogger(BedtimeWorker.class);
     private static final int MAX_RETRIES = 3;
     private static final Duration RETRY_BACKOFF = Duration.ofMinutes(15);
 
@@ -35,24 +37,6 @@ public class BedtimeWorker {
     private final BedtimeMailer mailer;
     private final NextRunCalculator nextRunCalc;
     private final com.kazka.holidays.HolidayCalendar holidayCalendar;
-
-    public BedtimeWorker(BedtimeScheduleRepository scheduleRepo,
-                         ChildProfileRepository profiles,
-                         UserRepository users,
-                         EntitlementResolver entitlements,
-                         StoryService storyService,
-                         BedtimeMailer mailer,
-                         NextRunCalculator nextRunCalc,
-                         com.kazka.holidays.HolidayCalendar holidayCalendar) {
-        this.scheduleRepo = scheduleRepo;
-        this.profiles = profiles;
-        this.users = users;
-        this.entitlements = entitlements;
-        this.storyService = storyService;
-        this.mailer = mailer;
-        this.nextRunCalc = nextRunCalc;
-        this.holidayCalendar = holidayCalendar;
-    }
 
     @Async
     public CompletableFuture<Void> enqueueAsync(String childProfileId) {
@@ -101,7 +85,7 @@ public class BedtimeWorker {
             }
 
             Story story = storyService.generateForBedtime(child, s, user, themeOverride).block();
-            mailer.send(story, child, user);
+            mailer.send(Objects.requireNonNull(story), child, user);
             s.setLastSentAt(Instant.now());
             s.setRetryCount(0);
             s.setFailedAt(null);

@@ -3,6 +3,7 @@ package com.kazka.device;
 import com.kazka.auth.CurrentUserResolver;
 import com.kazka.device.dto.DeviceRegisterRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -10,17 +11,13 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/devices")
 public class DevicesController {
 
     private final DeviceTokenRepository repository;
     private final CurrentUserResolver currentUserResolver;
-
-    public DevicesController(DeviceTokenRepository repository, CurrentUserResolver currentUserResolver) {
-        this.repository = repository;
-        this.currentUserResolver = currentUserResolver;
-    }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -2,6 +2,7 @@ package com.kazka.holidays;
 
 import com.kazka.holidays.dto.HolidayDto;
 import jakarta.validation.constraints.NotBlank;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,15 +17,12 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/holidays")
 public class HolidayController {
 
     private final HolidayCalendar calendar;
-
-    public HolidayController(HolidayCalendar calendar) {
-        this.calendar = calendar;
-    }
 
     @GetMapping("/today")
     public Mono<ResponseEntity<HolidayDto>> today(@RequestParam @NotBlank String tz,

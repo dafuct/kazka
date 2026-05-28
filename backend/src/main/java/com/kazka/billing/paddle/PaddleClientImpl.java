@@ -1,8 +1,7 @@
 package com.kazka.billing.paddle;
 
 import com.kazka.billing.BillingProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -13,11 +12,10 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 @ConditionalOnProperty(prefix = "kazka.billing.paddle", name = "api-key")
 public class PaddleClientImpl implements PaddleClient {
-
-    private static final Logger log = LoggerFactory.getLogger(PaddleClientImpl.class);
 
     private final WebClient http;
 

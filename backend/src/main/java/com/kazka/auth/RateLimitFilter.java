@@ -1,7 +1,8 @@
 package com.kazka.auth;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -32,12 +33,12 @@ import java.util.Optional;
  * the goal here is "slow attackers down enough to be noisy in logs," not perfect
  * traffic shaping.
  */
+@Slf4j
+@RequiredArgsConstructor
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 @ConditionalOnProperty(name = "kazka.rate-limit.enabled", havingValue = "true", matchIfMissing = true)
 public class RateLimitFilter implements WebFilter {
-
-    private static final Logger log = LoggerFactory.getLogger(RateLimitFilter.class);
 
     private static final String KEY_PREFIX = "kazka:ratelimit:";
 
@@ -60,11 +61,8 @@ public class RateLimitFilter implements WebFilter {
             new Rule(HttpMethod.POST, "/api/stories/generate",              20, Duration.ofMinutes(15))
     );
 
-    public RateLimitFilter(ReactiveStringRedisTemplate redis) {
-        this.redis = redis;
-    }
-
     @Override
+    @NullMarked
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest req = exchange.getRequest();
         Rule rule = match(req);

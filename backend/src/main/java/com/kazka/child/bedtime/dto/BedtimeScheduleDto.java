@@ -17,10 +17,10 @@ public record BedtimeScheduleDto(
         @Schema(nullable = true) Instant lastSentAt,
         @Schema(nullable = true) Instant failedAt
 ) {
-    public static BedtimeScheduleDto from(BedtimeSchedule s) {
+    public static BedtimeScheduleDto from(BedtimeSchedule bedtimeSchedule) {
         return new BedtimeScheduleDto(
-                s.getChildProfileId(), s.isEnabled(), s.getLocalTime(), s.getTimezone(),
-                s.getThemes(), s.isHolidayThemesEnabled(),
-                s.getNextRunAt(), s.getLastSentAt(), s.getFailedAt());
+                bedtimeSchedule.getChildProfileId(), bedtimeSchedule.isEnabled(), bedtimeSchedule.getLocalTime(), bedtimeSchedule.getTimezone(),
+                bedtimeSchedule.getThemes(), bedtimeSchedule.isHolidayThemesEnabled(),
+                bedtimeSchedule.getNextRunAt(), bedtimeSchedule.getLastSentAt(), bedtimeSchedule.getFailedAt());
     }
 }

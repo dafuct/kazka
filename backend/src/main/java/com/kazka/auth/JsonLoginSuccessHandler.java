@@ -3,6 +3,7 @@ package com.kazka.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kazka.user.UserDto;
 import com.kazka.user.UserRepository;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,8 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+
+import java.util.Objects;
 
 class JsonLoginSuccessHandler implements ServerAuthenticationSuccessHandler {
 
@@ -25,11 +28,12 @@ class JsonLoginSuccessHandler implements ServerAuthenticationSuccessHandler {
     void setUsers(UserRepository users) { this.users = users; }
 
     @Override
+    @NullMarked
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange exchange, Authentication auth) {
         KazkaUserDetails kud = (KazkaUserDetails) auth.getPrincipal();
         var context = new SecurityContextImpl(auth);
         return contextRepo.save(exchange.getExchange(), context)
-                .then(Mono.fromCallable(() -> users.findById(kud.getUserId()).orElseThrow())
+                .then(Mono.fromCallable(() -> users.findById(Objects.requireNonNull(kud).getUserId()).orElseThrow())
                         .subscribeOn(Schedulers.boundedElastic())
                         .map(UserDto::from)
                         .flatMap(dto -> writeBody(exchange, dto)));

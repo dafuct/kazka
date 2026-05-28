@@ -3,6 +3,8 @@ package com.kazka.auth;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
 import com.kazka.user.UserRole;
+import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,8 +19,10 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.net.URI;
+import java.util.Objects;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Component
 public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler {
 
@@ -27,15 +31,11 @@ public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler 
     private final WebSessionServerSecurityContextRepository contextRepo =
             new WebSessionServerSecurityContextRepository();
 
-    public OAuth2SuccessHandler(UserRepository users, AuthProperties props) {
-        this.users = users;
-        this.props = props;
-    }
-
     @Override
+    @NullMarked
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange exchange, Authentication auth) {
         OAuth2User oauthUser = (OAuth2User) auth.getPrincipal();
-        String subject = oauthUser.getAttribute("sub");
+        String subject = Objects.requireNonNull(oauthUser).getAttribute("sub");
         String email = oauthUser.getAttribute("email");
         String name = oauthUser.getAttribute("name");
 
@@ -69,16 +69,16 @@ public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler 
             }
         }
 
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(normalized);
-        u.setGoogleSubject(subject);
-        u.setDisplayName(name == null || name.isBlank()
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(normalized);
+        user.setGoogleSubject(subject);
+        user.setDisplayName(name == null || name.isBlank()
                 ? (normalized == null ? "user" : normalized.substring(0, normalized.indexOf('@')))
                 : name);
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        return users.save(u);
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        return users.save(user);
     }
 
     private Mono<Void> redirect(ServerWebExchange exchange, String url) {

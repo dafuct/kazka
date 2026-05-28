@@ -1,12 +1,16 @@
 package com.kazka.child;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
 @Table(name = "story_characters")
+@Getter
+@Setter
 public class StoryCharacter {
 
     @EmbeddedId
@@ -22,12 +26,9 @@ public class StoryCharacter {
         this.role = role;
     }
 
-    public Id getId() { return id; }
-    public void setId(Id id) { this.id = id; }
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
-
     @Embeddable
+    @Getter
+    @Setter
     public static class Id implements Serializable {
         @Column(name = "story_id", length = 36, nullable = false)
         private String storyId;
@@ -39,10 +40,6 @@ public class StoryCharacter {
             this.storyId = storyId;
             this.characterId = characterId;
         }
-        public String getStoryId() { return storyId; }
-        public void setStoryId(String storyId) { this.storyId = storyId; }
-        public String getCharacterId() { return characterId; }
-        public void setCharacterId(String characterId) { this.characterId = characterId; }
 
         @Override public boolean equals(Object o) {
             if (this == o) return true;

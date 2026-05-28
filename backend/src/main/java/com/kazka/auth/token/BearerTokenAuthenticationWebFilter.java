@@ -2,6 +2,8 @@ package com.kazka.auth.token;
 
 import com.kazka.auth.KazkaUserDetails;
 import com.kazka.user.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -13,6 +15,7 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+@RequiredArgsConstructor
 @Component
 public class BearerTokenAuthenticationWebFilter implements WebFilter {
 
@@ -21,13 +24,8 @@ public class BearerTokenAuthenticationWebFilter implements WebFilter {
     private final TokenIssuer tokenIssuer;
     private final UserRepository users;
 
-    public BearerTokenAuthenticationWebFilter(TokenIssuer tokenIssuer,
-                                              UserRepository users) {
-        this.tokenIssuer = tokenIssuer;
-        this.users = users;
-    }
-
     @Override
+    @NullMarked
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String header = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (header == null || !header.startsWith(BEARER_PREFIX)) {

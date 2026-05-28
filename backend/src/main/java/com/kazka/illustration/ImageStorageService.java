@@ -2,8 +2,7 @@ package com.kazka.illustration;
 
 import com.kazka.config.UploadsProperties;
 import com.kazka.story.Theme;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +11,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+@Slf4j
 @Service
 public class ImageStorageService {
-
-    private static final Logger log = LoggerFactory.getLogger(ImageStorageService.class);
 
     private final Path uploadsDir;
 

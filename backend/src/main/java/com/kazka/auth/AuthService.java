@@ -1,6 +1,7 @@
 package com.kazka.auth;
 
 import com.kazka.auth.exception.EmailAlreadyExistsException;
+import com.kazka.auth.exception.InvalidTokenException;
 import com.kazka.auth.token.RefreshTokenService;
 import com.kazka.auth.token.TokenIssuer;
 import com.kazka.auth.token.dto.TokenResponse;
@@ -12,8 +13,8 @@ import com.kazka.user.User;
 import com.kazka.user.UserDto;
 import com.kazka.user.UserRepository;
 import com.kazka.user.UserRole;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.UUID;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class AuthService {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     public record SignupResult(UserDto user, TokenResponse tokens) {}
 
@@ -38,28 +39,6 @@ public class AuthService {
     private final AuthProperties props;
     private final TokenIssuer tokenIssuer;
     private final RefreshTokenService refreshTokens;
-
-    public AuthService(UserRepository users,
-                       EmailVerificationTokenRepository emailTokens,
-                       PasswordResetTokenRepository resetTokens,
-                       PasswordEncoder passwordEncoder,
-                       TokenService tokenService,
-                       MailService mailService,
-                       SessionInvalidator sessionInvalidator,
-                       AuthProperties props,
-                       TokenIssuer tokenIssuer,
-                       RefreshTokenService refreshTokens) {
-        this.users = users;
-        this.emailTokens = emailTokens;
-        this.resetTokens = resetTokens;
-        this.passwordEncoder = passwordEncoder;
-        this.tokenService = tokenService;
-        this.mailService = mailService;
-        this.sessionInvalidator = sessionInvalidator;
-        this.props = props;
-        this.tokenIssuer = tokenIssuer;
-        this.refreshTokens = refreshTokens;
-    }
 
     @Transactional
     public SignupResult signup(String email, String password, String displayName) {
@@ -153,13 +132,13 @@ public class AuthService {
     @Transactional
     public void confirmPasswordReset(String token, String newPassword) {
         var opt = resetTokens.findById(token);
-        if (opt.isEmpty()) throw new com.kazka.auth.exception.InvalidTokenException();
+        if (opt.isEmpty()) throw new InvalidTokenException();
         PasswordResetToken prt = opt.get();
-        if (prt.getConsumedAt() != null) throw new com.kazka.auth.exception.InvalidTokenException();
-        if (prt.getExpiresAt().isBefore(Instant.now())) throw new com.kazka.auth.exception.InvalidTokenException();
+        if (prt.getConsumedAt() != null) throw new InvalidTokenException();
+        if (prt.getExpiresAt().isBefore(Instant.now())) throw new InvalidTokenException();
 
         User user = users.findById(prt.getUserId())
-                .orElseThrow(com.kazka.auth.exception.InvalidTokenException::new);
+                .orElseThrow(InvalidTokenException::new);
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         users.save(user);
 

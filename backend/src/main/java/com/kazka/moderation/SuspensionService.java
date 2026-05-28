@@ -4,8 +4,8 @@ import com.kazka.auth.AuthProperties;
 import com.kazka.auth.MailService;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,28 +13,16 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class SuspensionService {
-
-    private static final Logger log = LoggerFactory.getLogger(SuspensionService.class);
 
     private final UserRepository users;
     private final FlaggedAttemptRepository flags;
     private final MailService mailService;
     private final AuthProperties authProps;
     private final ModerationProperties modProps;
-
-    public SuspensionService(UserRepository users,
-                             FlaggedAttemptRepository flags,
-                             MailService mailService,
-                             AuthProperties authProps,
-                             ModerationProperties modProps) {
-        this.users = users;
-        this.flags = flags;
-        this.mailService = mailService;
-        this.authProps = authProps;
-        this.modProps = modProps;
-    }
 
     public void assertNotSuspended(User user) {
         if (user != null && user.isSuspended()) throw new AccountSuspendedException();

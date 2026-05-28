@@ -1,7 +1,7 @@
 package com.kazka.billing.webhook;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -19,16 +19,12 @@ import java.util.UUID;
  * mutating entitlement state. If the row already exists, the call returns
  * {@code false} and the caller must skip processing.
  */
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class WebhookIdempotencyService {
 
-    private static final Logger log = LoggerFactory.getLogger(WebhookIdempotencyService.class);
-
     private final ProcessedWebhookEventRepository repo;
-
-    public WebhookIdempotencyService(ProcessedWebhookEventRepository repo) {
-        this.repo = repo;
-    }
 
     /**
      * @return true if this is the first time we have seen ({@code provider}, {@code eventId});

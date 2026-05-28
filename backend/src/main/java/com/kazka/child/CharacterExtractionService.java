@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kazka.child.dto.ExtractedCandidateDto;
 import com.kazka.hf.HuggingFaceClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -15,10 +14,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class CharacterExtractionService {
 
-    private static final Logger log = LoggerFactory.getLogger(CharacterExtractionService.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final HuggingFaceClient hfClient;

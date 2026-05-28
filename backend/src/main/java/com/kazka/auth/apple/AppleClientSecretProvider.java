@@ -2,6 +2,8 @@ package com.kazka.auth.apple;
 
 import com.kazka.auth.AuthProperties;
 import io.jsonwebtoken.Jwts;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Component;
 
 import java.security.KeyFactory;
@@ -11,6 +13,8 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.apache.commons.lang3.StringUtils.*;
 
 @Component
 public class AppleClientSecretProvider {
@@ -45,7 +49,7 @@ public class AppleClientSecretProvider {
     }
 
     private static PrivateKey parsePem(String pem) {
-        if (pem == null || pem.isBlank()) {
+        if (isEmpty(pem) || isBlank(pem)) {
             return null;
         }
         String body = pem

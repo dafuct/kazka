@@ -4,21 +4,18 @@ import com.kazka.auth.CurrentUserResolver;
 import com.kazka.child.bedtime.dto.BedtimeScheduleDto;
 import com.kazka.child.bedtime.dto.BedtimeUpdateRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/children/{childId}/bedtime")
 public class BedtimeScheduleController {
 
     private final BedtimeScheduleService svc;
     private final CurrentUserResolver currentUserResolver;
-
-    public BedtimeScheduleController(BedtimeScheduleService svc, CurrentUserResolver currentUserResolver) {
-        this.svc = svc;
-        this.currentUserResolver = currentUserResolver;
-    }
 
     @GetMapping
     public Mono<BedtimeScheduleDto> get(@PathVariable String childId) {

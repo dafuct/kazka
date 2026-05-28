@@ -10,7 +10,7 @@ public class NoopLiqPayClient {
     @Bean
     @ConditionalOnMissingBean(LiqPayClient.class)
     LiqPayClient noopLiqPayClient() {
-        return (planId, userId, priceMicro, currency) -> Mono.error(
+        return (_, _, _, _) -> Mono.error(
                 new IllegalStateException("LiqPay not configured"));
     }
 }

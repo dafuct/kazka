@@ -8,8 +8,8 @@ import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
 import com.kazka.story.dto.StoryDto;
 import com.kazka.story.exception.PaywallRequiredException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,28 +17,16 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class TranslationService {
-
-    private static final Logger log = LoggerFactory.getLogger(TranslationService.class);
 
     private final StoryRepository stories;
     private final EntitlementResolver entitlements;
     private final HuggingFaceClient hfClient;
     private final TranslationPromptBuilder promptBuilder;
     private final PromptBuilder systemPromptBuilder;
-
-    public TranslationService(StoryRepository stories,
-                              EntitlementResolver entitlements,
-                              HuggingFaceClient hfClient,
-                              TranslationPromptBuilder promptBuilder,
-                              PromptBuilder systemPromptBuilder) {
-        this.stories = stories;
-        this.entitlements = entitlements;
-        this.hfClient = hfClient;
-        this.promptBuilder = promptBuilder;
-        this.systemPromptBuilder = systemPromptBuilder;
-    }
 
     @Transactional
     public Mono<StoryDto> translate(String storyId, String targetLanguage, CurrentUser cu) {

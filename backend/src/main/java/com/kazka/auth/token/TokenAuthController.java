@@ -2,12 +2,16 @@ package com.kazka.auth.token;
 
 import com.kazka.auth.AuthProperties;
 import com.kazka.auth.exception.InvalidCredentialsException;
+import com.kazka.auth.exception.InvalidRefreshTokenException;
 import com.kazka.auth.token.dto.TokenLoginRequest;
+import com.kazka.auth.token.dto.TokenLogoutRequest;
+import com.kazka.auth.token.dto.TokenRefreshRequest;
 import com.kazka.auth.token.dto.TokenResponse;
 import com.kazka.user.User;
 import com.kazka.user.UserDto;
 import com.kazka.user.UserRepository;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth/token")
 public class TokenAuthController {
@@ -26,26 +31,14 @@ public class TokenAuthController {
     private final RefreshTokenService refreshTokens;
     private final AuthProperties props;
 
-    public TokenAuthController(UserRepository users,
-                               PasswordEncoder passwordEncoder,
-                               TokenIssuer tokenIssuer,
-                               RefreshTokenService refreshTokens,
-                               AuthProperties props) {
-        this.users = users;
-        this.passwordEncoder = passwordEncoder;
-        this.tokenIssuer = tokenIssuer;
-        this.refreshTokens = refreshTokens;
-        this.props = props;
-    }
-
     @PostMapping("/refresh")
-    public Mono<TokenResponse> refresh(@RequestBody @Valid com.kazka.auth.token.dto.TokenRefreshRequest req) {
+    public Mono<TokenResponse> refresh(@RequestBody @Valid TokenRefreshRequest req) {
         return refreshTokens.rotate(req.refreshToken())
                 .onErrorMap(RefreshTokenService.UnknownRefreshTokenException.class,
-                        e -> new com.kazka.auth.exception.InvalidRefreshTokenException())
+                        e -> new InvalidRefreshTokenException())
                 .flatMap(rotated -> Mono.fromCallable(() -> users.findById(rotated.userId()))
                         .subscribeOn(Schedulers.boundedElastic())
-                        .map(opt -> opt.orElseThrow(com.kazka.auth.exception.InvalidRefreshTokenException::new))
+                        .map(opt -> opt.orElseThrow(InvalidRefreshTokenException::new))
                         .map(u -> new TokenResponse(
                                 tokenIssuer.issueAccessToken(u.getId(), u.getRole()),
                                 rotated.newToken(),
@@ -55,7 +48,7 @@ public class TokenAuthController {
 
     @PostMapping("/logout")
     @org.springframework.web.bind.annotation.ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
-    public Mono<Void> logout(@RequestBody @Valid com.kazka.auth.token.dto.TokenLogoutRequest req) {
+    public Mono<Void> logout(@RequestBody @Valid TokenLogoutRequest req) {
         return refreshTokens.revoke(req.refreshToken());
     }
 
@@ -65,18 +58,18 @@ public class TokenAuthController {
         return Mono.fromCallable(() -> users.findByEmail(normalized))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(opt -> {
-                    User u = opt.orElseThrow(InvalidCredentialsException::new);
-                    if (u.getPasswordHash() == null
-                            || !passwordEncoder.matches(req.password(), u.getPasswordHash())) {
+                    User user = opt.orElseThrow(InvalidCredentialsException::new);
+                    if (user.getPasswordHash() == null
+                            || !passwordEncoder.matches(req.password(), user.getPasswordHash())) {
                         return Mono.error(new InvalidCredentialsException());
                     }
-                    String access = tokenIssuer.issueAccessToken(u.getId(), u.getRole());
-                    return refreshTokens.issue(u.getId())
+                    String access = tokenIssuer.issueAccessToken(user.getId(), user.getRole());
+                    return refreshTokens.issue(user.getId())
                             .map(refresh -> new TokenResponse(
                                     access,
                                     refresh,
                                     props.jwt().accessTtl().toSeconds(),
-                                    UserDto.from(u)));
+                                    UserDto.from(user)));
                 });
     }
 }

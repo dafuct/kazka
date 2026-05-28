@@ -2,6 +2,7 @@ package com.kazka.child;
 
 import com.kazka.child.dto.ExtractedCandidateDto;
 import com.kazka.story.exception.PaywallRequiredException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.util.*;
 
+@RequiredArgsConstructor
 @Service
 public class CharacterService {
 
@@ -17,16 +19,6 @@ public class CharacterService {
     private final ChildProfileService profiles;
     private final ChildEntitlementResolver tier;
     private final StoryCharacterRepository joinRepo;
-
-    public CharacterService(CharacterRepository repo,
-                            ChildProfileService profiles,
-                            ChildEntitlementResolver tier,
-                            StoryCharacterRepository joinRepo) {
-        this.repo = repo;
-        this.profiles = profiles;
-        this.tier = tier;
-        this.joinRepo = joinRepo;
-    }
 
     @Transactional(readOnly = true)
     public List<com.kazka.child.Character> listForProfile(String childProfileId, String userId) {

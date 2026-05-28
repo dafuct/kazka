@@ -3,19 +3,17 @@ package com.kazka.auth.apple;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
 import com.kazka.user.UserRole;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class AppleOAuthService {
 
     private final UserRepository users;
-
-    public AppleOAuthService(UserRepository users) {
-        this.users = users;
-    }
 
     @Transactional
     public User linkOrCreate(String appleSubject, String email, String displayName) {
@@ -26,11 +24,11 @@ public class AppleOAuthService {
         if (normalizedEmail != null) {
             var byEmail = users.findByEmail(normalizedEmail);
             if (byEmail.isPresent()) {
-                User u = byEmail.get();
-                u.setAppleSubject(appleSubject);
-                u.setAppleEmailRelay(normalizedEmail);
-                u.setEmailVerified(true);
-                return users.save(u);
+                User user = byEmail.get();
+                user.setAppleSubject(appleSubject);
+                user.setAppleEmailRelay(normalizedEmail);
+                user.setEmailVerified(true);
+                return users.save(user);
             }
         }
 
@@ -38,16 +36,16 @@ public class AppleOAuthService {
                 ? normalizedEmail
                 : appleSubject + "@privaterelay.appleid.invalid";
 
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(storedEmail);
-        u.setAppleSubject(appleSubject);
-        u.setAppleEmailRelay(normalizedEmail);  // null if Apple omitted email
-        u.setDisplayName(displayName == null || displayName.isBlank()
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(storedEmail);
+        user.setAppleSubject(appleSubject);
+        user.setAppleEmailRelay(normalizedEmail);  // null if Apple omitted email
+        user.setDisplayName(displayName == null || displayName.isBlank()
                 ? "Apple user"
                 : displayName.trim());
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        return users.save(u);
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        return users.save(user);
     }
 }

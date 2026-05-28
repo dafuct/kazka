@@ -10,7 +10,7 @@ public class NoopPaddleClient {
     @Bean
     @ConditionalOnMissingBean(PaddleClient.class)
     PaddleClient noopPaddleClient() {
-        return (productId, userId, email) -> Mono.error(
+        return (_, _, _) -> Mono.error(
                 new IllegalStateException("Paddle not configured (set PADDLE_API_KEY)"));
     }
 }

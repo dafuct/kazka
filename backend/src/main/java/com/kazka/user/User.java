@@ -1,6 +1,9 @@
 package com.kazka.user;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -8,6 +11,8 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "users")
+@Getter
+@Setter
 public class User {
 
     @Id
@@ -56,45 +61,13 @@ public class User {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
+    @Setter(AccessLevel.NONE)
     private Instant createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
+    @Setter(AccessLevel.NONE)
     private Instant updatedAt;
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getPasswordHash() { return passwordHash; }
-    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
-    public String getGoogleSubject() { return googleSubject; }
-    public void setGoogleSubject(String googleSubject) { this.googleSubject = googleSubject; }
-    public String getAppleSubject() { return appleSubject; }
-    public void setAppleSubject(String appleSubject) { this.appleSubject = appleSubject; }
-    public String getAppleEmailRelay() { return appleEmailRelay; }
-    public void setAppleEmailRelay(String appleEmailRelay) { this.appleEmailRelay = appleEmailRelay; }
-    public String getDisplayName() { return displayName; }
-    public void setDisplayName(String displayName) { this.displayName = displayName; }
-    public UserRole getRole() { return role; }
-    public void setRole(UserRole role) { this.role = role; }
-    public boolean isEmailVerified() { return emailVerified; }
-    public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
-    public Instant getSuspendedAt() { return suspendedAt; }
-    public void setSuspendedAt(Instant suspendedAt) { this.suspendedAt = suspendedAt; }
-    public String getSuspendedReason() { return suspendedReason; }
-    public void setSuspendedReason(String suspendedReason) { this.suspendedReason = suspendedReason; }
-    public String getSuspendedBy() { return suspendedBy; }
-    public void setSuspendedBy(String suspendedBy) { this.suspendedBy = suspendedBy; }
-
-    public int getStoriesThisMonth() { return storiesThisMonth; }
-    public void setStoriesThisMonth(int v) { this.storiesThisMonth = v; }
-
-    public Instant getCounterResetAt() { return counterResetAt; }
-    public void setCounterResetAt(Instant t) { this.counterResetAt = t; }
-
     public boolean isSuspended() { return suspendedAt != null; }
-
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
 }

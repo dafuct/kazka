@@ -13,6 +13,7 @@ import com.kazka.moderation.SuspensionService;
 import com.kazka.story.dto.*;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class StoryService {
 
@@ -41,34 +43,6 @@ public class StoryService {
     private final com.kazka.child.StoryCharacterRepository storyCharacters;
     private final com.kazka.child.ChildEntitlementResolver childTier;
     private final com.kazka.child.CharacterExtractionWorker extractionWorker;
-
-    public StoryService(StoryRepository repository, UserRepository users,
-                        HuggingFaceClient hfClient, PromptBuilder promptBuilder,
-                        IllustrationService illustrationService,
-                        ModerationService moderationService,
-                        SuspensionService suspensionService,
-                        ModerationProperties moderationProperties,
-                        com.kazka.billing.FreeTierGate freeTier,
-                        com.kazka.child.ChildProfileService childProfiles,
-                        com.kazka.child.CharacterRepository characters,
-                        com.kazka.child.StoryCharacterRepository storyCharacters,
-                        com.kazka.child.ChildEntitlementResolver childTier,
-                        com.kazka.child.CharacterExtractionWorker extractionWorker) {
-        this.repository = repository;
-        this.users = users;
-        this.hfClient = hfClient;
-        this.promptBuilder = promptBuilder;
-        this.illustrationService = illustrationService;
-        this.moderationService = moderationService;
-        this.suspensionService = suspensionService;
-        this.moderationProperties = moderationProperties;
-        this.freeTier = freeTier;
-        this.childProfiles = childProfiles;
-        this.characters = characters;
-        this.storyCharacters = storyCharacters;
-        this.childTier = childTier;
-        this.extractionWorker = extractionWorker;
-    }
 
     public Flux<SseEvent> generate(GenerationRequest req, CurrentUser currentUser) {
         String userId = currentUser.userId();

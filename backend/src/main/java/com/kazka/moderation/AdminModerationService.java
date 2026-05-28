@@ -3,6 +3,7 @@ package com.kazka.moderation;
 import com.kazka.story.dto.PageResponse;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -12,16 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @Service
 public class AdminModerationService {
 
     private final FlaggedAttemptRepository flags;
     private final UserRepository users;
-
-    public AdminModerationService(FlaggedAttemptRepository flags, UserRepository users) {
-        this.flags = flags;
-        this.users = users;
-    }
 
     @Transactional(readOnly = true)
     public PageResponse<FlaggedAttemptDto> listFlagged(int page, int size) {

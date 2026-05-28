@@ -5,6 +5,8 @@ import com.kazka.billing.dto.EntitlementDto;
 import com.kazka.billing.dto.IapVerifyRequest;
 import com.kazka.billing.dto.ProductDto;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -13,20 +15,14 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/billing")
 public class BillingController {
 
-    private static final org.slf4j.Logger log =
-            org.slf4j.LoggerFactory.getLogger(BillingController.class);
-
     private final BillingService service;
     private final CurrentUserResolver currentUserResolver;
-
-    public BillingController(BillingService service, CurrentUserResolver currentUserResolver) {
-        this.service = service;
-        this.currentUserResolver = currentUserResolver;
-    }
 
     @GetMapping("/products")
     public Mono<List<ProductDto>> products() {

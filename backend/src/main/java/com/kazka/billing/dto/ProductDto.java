@@ -11,8 +11,8 @@ public record ProductDto(
         String period,
         String tier
 ) {
-    public static ProductDto from(SubscriptionProduct p) {
-        return new ProductDto(p.getId(), p.getAppleProductId(), p.getName(),
-                p.getPriceMicro(), p.getCurrency(), p.getPeriod(), p.getTier());
+    public static ProductDto from(SubscriptionProduct product) {
+        return new ProductDto(product.getId(), product.getAppleProductId(), product.getName(),
+                product.getPriceMicro(), product.getCurrency(), product.getPeriod(), product.getTier());
     }
 }

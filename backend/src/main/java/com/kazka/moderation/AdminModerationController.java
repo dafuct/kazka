@@ -1,6 +1,7 @@
 package com.kazka.moderation;
 
 import com.kazka.story.dto.PageResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -10,15 +11,12 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/admin/moderation")
 public class AdminModerationController {
 
     private final AdminModerationService service;
-
-    public AdminModerationController(AdminModerationService service) {
-        this.service = service;
-    }
 
     @GetMapping("/flagged")
     public Mono<PageResponse<FlaggedAttemptDto>> listFlagged(

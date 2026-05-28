@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.kazka.config.HuggingFaceProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -16,10 +15,10 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class HuggingFaceClient {
 
-    private static final Logger log = LoggerFactory.getLogger(HuggingFaceClient.class);
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final WebClient textClient;

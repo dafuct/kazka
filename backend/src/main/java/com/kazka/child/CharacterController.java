@@ -5,6 +5,7 @@ import com.kazka.child.dto.CharacterDto;
 import com.kazka.child.dto.ConfirmCharactersRequest;
 import com.kazka.child.dto.UpdateCharacterRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -12,16 +13,12 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 public class CharacterController {
 
     private final CharacterService svc;
     private final CurrentUserResolver currentUserResolver;
-
-    public CharacterController(CharacterService svc, CurrentUserResolver currentUserResolver) {
-        this.svc = svc;
-        this.currentUserResolver = currentUserResolver;
-    }
 
     @GetMapping("/api/children/{childId}/characters")
     public Mono<List<CharacterDto>> list(@PathVariable String childId) {

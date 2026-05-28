@@ -1,6 +1,9 @@
 package com.kazka.child;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -9,6 +12,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "child_profiles")
+@Getter
+@Setter
 public class ChildProfile {
 
     @Id
@@ -32,6 +37,7 @@ public class ChildProfile {
 
     @Convert(converter = InterestsConverter.class)
     @Column(columnDefinition = "JSON", nullable = false)
+    @Setter(AccessLevel.NONE)
     private List<String> interests = List.of();
 
     @Column(name = "avatar_seed", nullable = false, length = 40)
@@ -42,30 +48,13 @@ public class ChildProfile {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
+    @Setter(AccessLevel.NONE)
     private Instant createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
+    @Setter(AccessLevel.NONE)
     private Instant updatedAt;
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public Short getBirthYear() { return birthYear; }
-    public void setBirthYear(Short birthYear) { this.birthYear = birthYear; }
-    public String getGender() { return gender; }
-    public void setGender(String gender) { this.gender = gender; }
-    public String getPreferredLanguage() { return preferredLanguage; }
-    public void setPreferredLanguage(String preferredLanguage) { this.preferredLanguage = preferredLanguage; }
-    public List<String> getInterests() { return interests; }
     public void setInterests(List<String> interests) { this.interests = interests == null ? List.of() : interests; }
-    public String getAvatarSeed() { return avatarSeed; }
-    public void setAvatarSeed(String avatarSeed) { this.avatarSeed = avatarSeed; }
-    public Instant getArchivedAt() { return archivedAt; }
-    public void setArchivedAt(Instant archivedAt) { this.archivedAt = archivedAt; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
 }

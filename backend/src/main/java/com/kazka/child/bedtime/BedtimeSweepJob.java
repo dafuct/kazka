@@ -1,7 +1,6 @@
 package com.kazka.child.bedtime;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -9,10 +8,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
+@Slf4j
 @Component
 public class BedtimeSweepJob {
 
-    private static final Logger log = LoggerFactory.getLogger(BedtimeSweepJob.class);
     private static final Duration HORIZON = Duration.ofHours(1);
 
     private final BedtimeScheduleRepository repo;

@@ -9,6 +9,7 @@ import com.kazka.auth.token.dto.TokenResponse;
 import com.kazka.user.User;
 import com.kazka.user.UserDto;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth/oauth")
 public class GoogleOAuthController {
@@ -31,18 +33,6 @@ public class GoogleOAuthController {
     private final AuthProperties props;
     private final WebSessionServerSecurityContextRepository contextRepo =
             new WebSessionServerSecurityContextRepository();
-
-    public GoogleOAuthController(GoogleIdTokenVerifier verifier,
-                                 GoogleOAuthService oauthService,
-                                 TokenIssuer tokenIssuer,
-                                 RefreshTokenService refreshTokens,
-                                 AuthProperties props) {
-        this.verifier = verifier;
-        this.oauthService = oauthService;
-        this.tokenIssuer = tokenIssuer;
-        this.refreshTokens = refreshTokens;
-        this.props = props;
-    }
 
     @PostMapping("/google")
     public Mono<TokenResponse> google(@RequestBody @Valid GoogleLoginRequest req,

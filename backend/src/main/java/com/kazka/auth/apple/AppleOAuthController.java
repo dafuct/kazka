@@ -9,6 +9,7 @@ import com.kazka.auth.token.dto.TokenResponse;
 import com.kazka.user.User;
 import com.kazka.user.UserDto;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth/oauth")
 public class AppleOAuthController {
@@ -31,18 +33,6 @@ public class AppleOAuthController {
     private final AuthProperties props;
     private final WebSessionServerSecurityContextRepository contextRepo =
             new WebSessionServerSecurityContextRepository();
-
-    public AppleOAuthController(AppleIdentityTokenVerifier verifier,
-                                AppleOAuthService oauthService,
-                                TokenIssuer tokenIssuer,
-                                RefreshTokenService refreshTokens,
-                                AuthProperties props) {
-        this.verifier = verifier;
-        this.oauthService = oauthService;
-        this.tokenIssuer = tokenIssuer;
-        this.refreshTokens = refreshTokens;
-        this.props = props;
-    }
 
     @PostMapping("/apple")
     public Mono<TokenResponse> apple(@RequestBody @Valid AppleLoginRequest req,
@@ -65,12 +55,12 @@ public class AppleOAuthController {
         return contextRepo.save(exchange, new SecurityContextImpl(token));
     }
 
-    private Mono<TokenResponse> issueTokens(User u) {
-        String access = tokenIssuer.issueAccessToken(u.getId(), u.getRole());
-        return refreshTokens.issue(u.getId())
+    private Mono<TokenResponse> issueTokens(User user) {
+        String access = tokenIssuer.issueAccessToken(user.getId(), user.getRole());
+        return refreshTokens.issue(user.getId())
                 .map(refresh -> new TokenResponse(
                         access, refresh,
                         props.jwt().accessTtl().toSeconds(),
-                        UserDto.from(u)));
+                        UserDto.from(user)));
     }
 }

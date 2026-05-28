@@ -1,6 +1,9 @@
 package com.kazka.story;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -9,6 +12,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "stories")
+@Getter
+@Setter
 public class Story {
 
     @Id
@@ -75,69 +80,12 @@ public class Story {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
+    @Setter(AccessLevel.NONE)
     private Instant createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
+    @Setter(AccessLevel.NONE)
     private Instant updatedAt;
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
-
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-
-    public String getTheme() { return theme; }
-    public void setTheme(String theme) { this.theme = theme; }
-
-    public List<String> getCharacters() { return characters; }
-    public void setCharacters(List<String> characters) { this.characters = characters; }
-
-    public String getAgeGroup() { return ageGroup; }
-    public void setAgeGroup(String ageGroup) { this.ageGroup = ageGroup; }
-
-    public String getLength() { return length; }
-    public void setLength(String length) { this.length = length; }
-
-    public String getLanguage() { return language; }
-    public void setLanguage(String language) { this.language = language; }
-
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
-
-    public String getIllustrationPathLight() { return illustrationPathLight; }
-    public void setIllustrationPathLight(String illustrationPathLight) { this.illustrationPathLight = illustrationPathLight; }
-
-    public String getIllustrationPathDark() { return illustrationPathDark; }
-    public void setIllustrationPathDark(String illustrationPathDark) { this.illustrationPathDark = illustrationPathDark; }
-
-    public IllustrationStatus getIllustrationStatus() { return illustrationStatus; }
-    public void setIllustrationStatus(IllustrationStatus illustrationStatus) { this.illustrationStatus = illustrationStatus; }
-
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
-
-    public String getChildProfileId() { return childProfileId; }
-    public void setChildProfileId(String childProfileId) { this.childProfileId = childProfileId; }
-
-    public com.kazka.child.ExtractionStatus getExtractionStatus() { return extractionStatus; }
-    public void setExtractionStatus(com.kazka.child.ExtractionStatus extractionStatus) { this.extractionStatus = extractionStatus; }
-
-    public boolean isBranching() { return isBranching; }
-    public void setBranching(boolean branching) { this.isBranching = branching; }
-
-    public String getBranchingState() { return branchingState; }
-    public void setBranchingState(String branchingState) { this.branchingState = branchingState; }
-
-    public java.util.List<com.kazka.story.branching.dto.BranchingChoice> getPendingChoices() { return pendingChoices; }
-    public void setPendingChoices(java.util.List<com.kazka.story.branching.dto.BranchingChoice> pendingChoices) { this.pendingChoices = pendingChoices; }
-
-    public String getTranslatedContent() { return translatedContent; }
-    public void setTranslatedContent(String translatedContent) { this.translatedContent = translatedContent; }
-
-    public String getTranslatedLanguage() { return translatedLanguage; }
-    public void setTranslatedLanguage(String translatedLanguage) { this.translatedLanguage = translatedLanguage; }
 }

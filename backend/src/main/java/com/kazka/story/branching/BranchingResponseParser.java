@@ -1,16 +1,14 @@
 package com.kazka.story.branching;
 
 import com.kazka.story.branching.dto.BranchingChoice;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class BranchingResponseParser {
-
-    private static final Logger log = LoggerFactory.getLogger(BranchingResponseParser.class);
 
     private static final Pattern SEPARATOR = Pattern.compile("\\s*\\n\\s*-{3,}\\s*\\n\\s*");
     private static final Pattern CHOICE_LINE = Pattern.compile("(?im)^\\s*CHOICE_([AB])\\s*:\\s*(.+?)\\s*$");

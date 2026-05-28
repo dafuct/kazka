@@ -5,6 +5,7 @@ import com.kazka.child.dto.ChildProfileDto;
 import com.kazka.child.dto.CreateChildProfileRequest;
 import com.kazka.child.dto.UpdateChildProfileRequest;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -12,6 +13,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/children")
 public class ChildProfileController {
@@ -19,14 +21,6 @@ public class ChildProfileController {
     private final ChildProfileService svc;
     private final ChildRateLimiter rateLimiter;
     private final CurrentUserResolver currentUserResolver;
-
-    public ChildProfileController(ChildProfileService svc,
-                                  ChildRateLimiter rateLimiter,
-                                  CurrentUserResolver currentUserResolver) {
-        this.svc = svc;
-        this.rateLimiter = rateLimiter;
-        this.currentUserResolver = currentUserResolver;
-    }
 
     @PostMapping
     public Mono<ChildProfileDto> create(@Valid @RequestBody CreateChildProfileRequest req) {
