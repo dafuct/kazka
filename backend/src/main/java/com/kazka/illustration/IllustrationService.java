@@ -30,7 +30,7 @@ public class IllustrationService {
     private static final int IMAGE_H = 768;
 
     private final HuggingFaceClient hfClient;
-    private final ImageStorageService imageStorageService;
+    private final ImageStorage imageStorage;
     private final StoryRepository storyRepository;
     private final PromptBuilder promptBuilder;
     private final ModerationService moderationService;
@@ -102,10 +102,10 @@ public class IllustrationService {
 
     private Mono<Void> savePair(Story story, byte[] light, byte[] dark) {
         return Mono.fromRunnable(() -> {
-            String lightPath = imageStorageService.savePng(story.getId(), Theme.LIGHT, light);
-            String darkPath = imageStorageService.savePng(story.getId(), Theme.DARK, dark);
-            story.setIllustrationPathLight(lightPath);
-            story.setIllustrationPathDark(darkPath);
+            String lightKey = imageStorage.store(story.getId(), Theme.LIGHT, light);
+            String darkKey = imageStorage.store(story.getId(), Theme.DARK, dark);
+            story.setIllustrationPathLight(lightKey);
+            story.setIllustrationPathDark(darkKey);
             story.setIllustrationStatus(IllustrationStatus.READY);
             storyRepository.save(story);
         }).subscribeOn(Schedulers.boundedElastic()).then();
@@ -119,6 +119,6 @@ public class IllustrationService {
     }
 
     public void deleteImage(String storyId) {
-        imageStorageService.delete(storyId);
+        imageStorage.delete(storyId);
     }
 }

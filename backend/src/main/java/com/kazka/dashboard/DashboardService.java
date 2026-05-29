@@ -6,6 +6,7 @@ import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.child.bedtime.BedtimeScheduleRepository;
 import com.kazka.dashboard.dto.DashboardDto;
+import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.StoryRepository;
 import com.kazka.story.dto.StoryDto;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class DashboardService {
     private final ChildProfileRepository childProfiles;
     private final BedtimeScheduleRepository bedtimeSchedules;
     private final EntitlementResolver entitlements;
+    private final ImageUrlResolver images;
 
     @Transactional(readOnly = true)
     public Mono<DashboardDto> getDashboard(CurrentUser cu) {
@@ -47,7 +49,7 @@ public class DashboardService {
                     .toList();
 
             List<StoryDto> recent = stories.findTop5ByUserIdOrderByCreatedAtDesc(userId).stream()
-                    .map(StoryDto::from)
+                    .map(s -> StoryDto.from(s, images))
                     .toList();
 
             boolean isPro = entitlements.isPro(userId);
@@ -63,7 +65,7 @@ public class DashboardService {
     private DashboardDto.ChildSummary summarize(ChildProfile c) {
         long count = stories.countByChildProfileId(c.getId());
         StoryDto latest = stories.findFirstByChildProfileIdOrderByCreatedAtDesc(c.getId())
-                .map(StoryDto::from)
+                .map(s -> StoryDto.from(s, images))
                 .orElse(null);
         Instant lastBedtimeAt = bedtimeSchedules.findByChildProfileId(c.getId())
                 .map(b -> b.getLastSentAt())

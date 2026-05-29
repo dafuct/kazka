@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 class IllustrationServiceTest {
 
     @Mock HuggingFaceClient hfClient;
-    @Mock ImageStorageService imageStorage;
+    @Mock ImageStorage imageStorage;
     @Mock StoryRepository storyRepo;
     @Mock PromptBuilder promptBuilder;
     @Mock ModerationService moderationService;
@@ -79,15 +79,15 @@ class IllustrationServiceTest {
         when(promptBuilder.buildImagePrompt(eq(story), anyString(), eq(Theme.DARK))).thenReturn("dark-prompt");
         when(hfClient.generateImage(eq("light-prompt"), eq(1024), eq(768))).thenReturn(Mono.just(new byte[]{1}));
         when(hfClient.generateImage(eq("dark-prompt"), eq(1024), eq(768))).thenReturn(Mono.just(new byte[]{2}));
-        when(imageStorage.savePng("s1", Theme.LIGHT, new byte[]{1})).thenReturn("/uploads/s1-light.png");
-        when(imageStorage.savePng("s1", Theme.DARK, new byte[]{2})).thenReturn("/uploads/s1-dark.png");
+        when(imageStorage.store("s1", Theme.LIGHT, new byte[]{1})).thenReturn("s1-light.png");
+        when(imageStorage.store("s1", Theme.DARK, new byte[]{2})).thenReturn("s1-dark.png");
 
         StepVerifier.create(service.generateAndStore("s1")).verifyComplete();
 
         ArgumentCaptor<Story> saved = ArgumentCaptor.forClass(Story.class);
         verify(storyRepo).save(saved.capture());
-        assertThat(saved.getValue().getIllustrationPathLight()).isEqualTo("/uploads/s1-light.png");
-        assertThat(saved.getValue().getIllustrationPathDark()).isEqualTo("/uploads/s1-dark.png");
+        assertThat(saved.getValue().getIllustrationPathLight()).isEqualTo("s1-light.png");
+        assertThat(saved.getValue().getIllustrationPathDark()).isEqualTo("s1-dark.png");
         assertThat(saved.getValue().getIllustrationStatus()).isEqualTo(IllustrationStatus.READY);
     }
 
@@ -146,7 +146,7 @@ class IllustrationServiceTest {
                 .thenReturn(com.kazka.moderation.ModerationResult.Refused.of(com.kazka.moderation.ModerationCategory.VIOLENCE));
         when(hfClient.generateImage(anyString(), eq(1024), eq(768)))
                 .thenReturn(reactor.core.publisher.Mono.just(new byte[]{1, 2, 3}));
-        lenient().when(imageStorage.savePng(anyString(), any(), any())).thenReturn("/uploads/fallback.png");
+        lenient().when(imageStorage.store(anyString(), any(), any())).thenReturn("fallback.png");
 
         service.generateAndStore("story-1").block();
 

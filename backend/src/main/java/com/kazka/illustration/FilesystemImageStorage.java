@@ -3,26 +3,23 @@ package com.kazka.illustration;
 import com.kazka.config.UploadsProperties;
 import com.kazka.story.Theme;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/** Stores illustrations on the local filesystem and serves them via the {@code /uploads/} path. */
 @Slf4j
-@Service
-public class ImageStorageService {
+public class FilesystemImageStorage implements ImageStorage {
 
     private final Path uploadsDir;
 
-    @Autowired
-    public ImageStorageService(UploadsProperties props) {
+    public FilesystemImageStorage(UploadsProperties props) {
         this(props.getDir());
     }
 
-    ImageStorageService(String dir) {
+    FilesystemImageStorage(String dir) {
         this.uploadsDir = Path.of(dir);
         try {
             Files.createDirectories(uploadsDir);
@@ -31,17 +28,23 @@ public class ImageStorageService {
         }
     }
 
-    public String savePng(String storyId, Theme theme, byte[] imageBytes) {
-        String filename = storyId + "-" + theme.slug() + ".png";
-        Path file = uploadsDir.resolve(filename);
+    @Override
+    public String store(String storyId, Theme theme, byte[] png) {
+        String key = storyId + "-" + theme.slug() + ".png";
         try {
-            Files.write(file, imageBytes);
+            Files.write(uploadsDir.resolve(key), png);
         } catch (IOException e) {
             throw new UncheckedIOException("Cannot save PNG for story " + storyId + " theme " + theme, e);
         }
-        return "/uploads/" + filename;
+        return key;
     }
 
+    @Override
+    public String urlFor(String key) {
+        return key == null ? null : "/uploads/" + key;
+    }
+
+    @Override
     public void delete(String storyId) {
         tryDelete(uploadsDir.resolve(storyId + ".png"));
         tryDelete(uploadsDir.resolve(storyId + ".svg"));

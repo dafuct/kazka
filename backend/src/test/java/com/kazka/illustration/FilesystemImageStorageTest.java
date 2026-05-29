@@ -12,54 +12,68 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class ImageStorageServiceTest {
+class FilesystemImageStorageTest {
 
     @TempDir
     Path tempDir;
 
     @Test
-    void savePng_light_writesFileWithLightSuffix() throws IOException {
-        ImageStorageService service = new ImageStorageService(tempDir.toString());
+    void store_light_returnsBareKeyAndWritesFile() throws IOException {
+        FilesystemImageStorage storage = new FilesystemImageStorage(tempDir.toString());
         byte[] bytes = "fake-png-light".getBytes();
 
-        String path = service.savePng("story-123", Theme.LIGHT, bytes);
+        String key = storage.store("story-123", Theme.LIGHT, bytes);
 
-        assertThat(path).isEqualTo("/uploads/story-123-light.png");
+        assertThat(key).isEqualTo("story-123-light.png");
         Path file = tempDir.resolve("story-123-light.png");
         assertThat(file).exists();
         assertThat(Files.readAllBytes(file)).isEqualTo(bytes);
     }
 
     @Test
-    void savePng_dark_writesFileWithDarkSuffix() throws IOException {
-        ImageStorageService service = new ImageStorageService(tempDir.toString());
+    void store_dark_returnsBareKeyAndWritesFile() throws IOException {
+        FilesystemImageStorage storage = new FilesystemImageStorage(tempDir.toString());
         byte[] bytes = "fake-png-dark".getBytes();
 
-        String path = service.savePng("story-456", Theme.DARK, bytes);
+        String key = storage.store("story-456", Theme.DARK, bytes);
 
-        assertThat(path).isEqualTo("/uploads/story-456-dark.png");
+        assertThat(key).isEqualTo("story-456-dark.png");
         assertThat(Files.readAllBytes(tempDir.resolve("story-456-dark.png"))).isEqualTo(bytes);
     }
 
     @Test
-    void savePng_throwsUncheckedIOException_whenWriteFails() throws IOException {
-        ImageStorageService service = new ImageStorageService(tempDir.toString());
+    void urlFor_prependsUploadsPath() {
+        FilesystemImageStorage storage = new FilesystemImageStorage(tempDir.toString());
+
+        assertThat(storage.urlFor("story-123-light.png")).isEqualTo("/uploads/story-123-light.png");
+    }
+
+    @Test
+    void urlFor_null_returnsNull() {
+        FilesystemImageStorage storage = new FilesystemImageStorage(tempDir.toString());
+
+        assertThat(storage.urlFor(null)).isNull();
+    }
+
+    @Test
+    void store_throwsUncheckedIOException_whenWriteFails() throws IOException {
+        FilesystemImageStorage storage = new FilesystemImageStorage(tempDir.toString());
         Files.createDirectory(tempDir.resolve("blocker-light.png"));
 
-        assertThatThrownBy(() -> service.savePng("blocker", Theme.LIGHT, new byte[]{1, 2}))
+        assertThatThrownBy(() -> storage.store("blocker", Theme.LIGHT, new byte[]{1, 2}))
                 .isInstanceOf(UncheckedIOException.class)
                 .hasMessageContaining("blocker");
     }
 
     @Test
     void delete_removesAllVariants() throws IOException {
-        ImageStorageService service = new ImageStorageService(tempDir.toString());
+        FilesystemImageStorage storage = new FilesystemImageStorage(tempDir.toString());
         Files.writeString(tempDir.resolve("story-xyz.png"), "legacy");
         Files.writeString(tempDir.resolve("story-xyz.svg"), "<svg/>");
         Files.writeString(tempDir.resolve("story-xyz-light.png"), "light");
         Files.writeString(tempDir.resolve("story-xyz-dark.png"), "dark");
 
-        service.delete("story-xyz");
+        storage.delete("story-xyz");
 
         assertThat(tempDir.resolve("story-xyz.png")).doesNotExist();
         assertThat(tempDir.resolve("story-xyz.svg")).doesNotExist();
@@ -69,7 +83,7 @@ class ImageStorageServiceTest {
 
     @Test
     void delete_doesNothingIfFilesAbsent() {
-        ImageStorageService service = new ImageStorageService(tempDir.toString());
-        service.delete("nonexistent");
+        FilesystemImageStorage storage = new FilesystemImageStorage(tempDir.toString());
+        storage.delete("nonexistent");
     }
 }

@@ -3,6 +3,7 @@ package com.kazka.story.translation;
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.hf.HuggingFaceClient;
+import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
@@ -36,6 +37,7 @@ class TranslationServiceTest {
     @Mock HuggingFaceClient hfClient;
     @Mock TranslationPromptBuilder promptBuilder;
     @Mock PromptBuilder systemPromptBuilder;
+    @Mock ImageUrlResolver images;
     @InjectMocks TranslationService svc;
 
     private CurrentUser user() {

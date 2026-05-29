@@ -3,6 +3,7 @@ package com.kazka.story.translation;
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.hf.HuggingFaceClient;
+import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
@@ -27,6 +28,7 @@ public class TranslationService {
     private final HuggingFaceClient hfClient;
     private final TranslationPromptBuilder promptBuilder;
     private final PromptBuilder systemPromptBuilder;
+    private final ImageUrlResolver images;
 
     @Transactional
     public Mono<StoryDto> translate(String storyId, String targetLanguage, CurrentUser cu) {
@@ -45,7 +47,7 @@ public class TranslationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "same_language");
         }
         if (targetLanguage.equals(story.getTranslatedLanguage()) && story.getTranslatedContent() != null) {
-            return Mono.just(StoryDto.from(story));
+            return Mono.just(StoryDto.from(story, images));
         }
 
         String systemPrompt = systemPromptBuilder.buildStorySystem(targetLanguage);
@@ -57,7 +59,7 @@ public class TranslationService {
                     story.setTranslatedContent(translated.strip());
                     story.setTranslatedLanguage(targetLanguage);
                     stories.save(story);
-                    return StoryDto.from(story);
+                    return StoryDto.from(story, images);
                 }).subscribeOn(Schedulers.boundedElastic()));
     }
 }

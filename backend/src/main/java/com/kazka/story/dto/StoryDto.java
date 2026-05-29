@@ -1,6 +1,7 @@
 package com.kazka.story.dto;
 
 import com.kazka.child.ExtractionStatus;
+import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.IllustrationStatus;
 import com.kazka.story.Story;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,11 +31,11 @@ public record StoryDto(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant createdAt,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant updatedAt
 ) {
-    public static StoryDto from(Story s) {
+    public static StoryDto from(Story s, ImageUrlResolver images) {
         return new StoryDto(
                 s.getId(), s.getTitle(), s.getTheme(), s.getCharacters(),
                 s.getAgeGroup(), s.getLength(), s.getLanguage(), s.getContent(),
-                s.getIllustrationPathLight(), s.getIllustrationPathDark(),
+                images.urlFor(s.getIllustrationPathLight()), images.urlFor(s.getIllustrationPathDark()),
                 s.getIllustrationStatus(),
                 s.getChildProfileId(), s.getExtractionStatus(),
                 s.isBranching(), s.getBranchingState(), s.getPendingChoices(),

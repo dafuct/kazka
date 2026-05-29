@@ -4,6 +4,7 @@ import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.auth.exception.EmailNotVerifiedException;
 import com.kazka.hf.HuggingFaceClient;
 import com.kazka.illustration.IllustrationService;
+import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.moderation.ModerationCategory;
 import com.kazka.moderation.ModerationPipeline;
 import com.kazka.moderation.ModerationProperties;
@@ -43,6 +44,7 @@ public class StoryService {
     private final com.kazka.child.StoryCharacterRepository storyCharacters;
     private final com.kazka.child.ChildEntitlementResolver childTier;
     private final com.kazka.child.CharacterExtractionWorker extractionWorker;
+    private final ImageUrlResolver images;
 
     public Flux<SseEvent> generate(GenerationRequest req, CurrentUser currentUser) {
         String userId = currentUser.userId();
@@ -199,7 +201,7 @@ public class StoryService {
                         currentUser.userId(), childProfileIdFilter, PageRequest.of(page, size));
             }
             return new PageResponse<>(
-                    p.getContent().stream().map(StoryDto::from).toList(),
+                    p.getContent().stream().map(s -> StoryDto.from(s, images)).toList(),
                     p.getNumber(), p.getSize(), p.getTotalElements());
         }).subscribeOn(Schedulers.boundedElastic());
     }
@@ -208,7 +210,7 @@ public class StoryService {
         return Mono.fromCallable(() ->
                 repository.findByCursor(currentUser.userId(), null, null,
                                 PageRequest.of(0, 1))
-                        .stream().findFirst().map(StoryDto::from).orElse(null))
+                        .stream().findFirst().map(s -> StoryDto.from(s, images)).orElse(null))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -222,7 +224,7 @@ public class StoryService {
                     PageRequest.of(0, limit + 1));
             boolean hasMore = rows.size() > limit;
             java.util.List<Story> page = hasMore ? rows.subList(0, limit) : rows;
-            java.util.List<StoryDto> items = page.stream().map(StoryDto::from).toList();
+            java.util.List<StoryDto> items = page.stream().map(s -> StoryDto.from(s, images)).toList();
             String next = hasMore
                     ? new StoryCursor(
                             page.get(page.size() - 1).getCreatedAt(),
@@ -235,7 +237,7 @@ public class StoryService {
     public Mono<StoryDto> findById(String id, CurrentUser currentUser) {
         return Mono.fromCallable(() -> findOwned(id, currentUser))
                 .subscribeOn(Schedulers.boundedElastic())
-                .map(StoryDto::from);
+                .map(s -> StoryDto.from(s, images));
     }
 
     public Mono<StoryDto> update(String id, UpdateStoryRequest req, CurrentUser currentUser) {
@@ -252,7 +254,7 @@ public class StoryService {
                 story.setChildProfileId(req.childProfileId());
             }
             return repository.save(story);
-        }).subscribeOn(Schedulers.boundedElastic()).map(StoryDto::from);
+        }).subscribeOn(Schedulers.boundedElastic()).map(s -> StoryDto.from(s, images));
     }
 
     public Mono<Void> delete(String id, CurrentUser currentUser) {

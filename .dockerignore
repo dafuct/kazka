@@ -1,0 +1,19 @@
+# Belt-and-suspenders: keep secrets and local junk out of any build context.
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+.git
+.gitignore
+node_modules
+**/node_modules
+**/build
+**/dist
+**/.gradle
+**/.idea
+*.iml
+.DS_Store
+**/.DS_Store

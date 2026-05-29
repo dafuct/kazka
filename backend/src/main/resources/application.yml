@@ -78,6 +78,16 @@ kazka:
     editor-max-tokens: ${HF_EDITOR_MAX_TOKENS:4096}
   uploads:
     dir: ${UPLOADS_DIR:./uploads}
+  storage:
+    # "filesystem" (default, local dir served at /uploads) or "r2" (private Cloudflare R2 bucket,
+    # browser gets short-lived presigned URLs).
+    provider: ${STORAGE_PROVIDER:filesystem}
+    r2:
+      endpoint: ${R2_ENDPOINT:}
+      access-key: ${R2_ACCESS_KEY:}
+      secret-key: ${R2_SECRET_KEY:}
+      bucket: ${R2_BUCKET:}
+      presign-ttl: ${R2_PRESIGN_TTL:12h}
   moderation:
     judge-model: ${MODERATION_MODEL:Qwen/Qwen3-32B}
     judge-base-url: ${MODERATION_BASE_URL:https://router.huggingface.co}

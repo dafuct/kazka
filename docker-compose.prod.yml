@@ -1,0 +1,157 @@
+# Production compose — deploy as a single "Docker Compose" resource in Coolify.
+# See docs/DEPLOYMENT.md for the full runbook.
+#
+# Rules:
+#  - NO secrets in this file. Every ${VAR} is set in Coolify's Environment Variables.
+#  - mysql/redis are NOT published to the host (no `ports:`) — they're reachable only
+#    on the internal compose network via the service names `mysql` / `redis`.
+#  - The frontend's nginx.conf proxies /api, /uploads, /oauth2 to http://backend:8080,
+#    which resolves because all services share this compose network. Keep service
+#    names as `backend` / `mysql` / `redis`.
+#  - Named volumes (mysqldata, redisdata, uploads) are persisted by Coolify across
+#    redeploys. The `uploads` volume is your image storage — back it up (see runbook).
+
+services:
+  mysql:
+    image: mysql:8.4
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME:-kazkar}
+    volumes:
+      - mysqldata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    # AOF persistence so Spring Session (14d TTL) survives a restart — without this,
+    # every redis restart logs out all users.
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      # --- Data ---
+      DB_URL: jdbc:mysql://mysql:3306/${DB_NAME:-kazkar}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: "6379"
+      # --- Image storage: private Cloudflare R2 bucket, presigned URLs (see docs/DEPLOYMENT.md) ---
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-r2}
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      R2_ACCESS_KEY: ${R2_ACCESS_KEY}
+      R2_SECRET_KEY: ${R2_SECRET_KEY}
+      R2_BUCKET: ${R2_BUCKET:-kazka-illustrations}
+      R2_PRESIGN_TTL: ${R2_PRESIGN_TTL:-12h}
+      # Only used when STORAGE_PROVIDER=filesystem (named volume below); ignored under r2.
+      UPLOADS_DIR: /app/uploads
+      # --- Public URLs (https, real domain) ---
+      APP_BASE_URL: ${APP_BASE_URL}
+      PUBLIC_BASE_URL: ${APP_BASE_URL}
+      COOKIE_SECURE: "true"
+      # --- JVM heap: keep headroom for mysql+redis on the same box ---
+      JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--Xmx1g -XX:MaxRAMPercentage=60}
+      # --- HuggingFace ---
+      HUGGINGFACE_API_TOKEN: ${HUGGINGFACE_API_TOKEN}
+      HF_TEXT_MODEL: ${HF_TEXT_MODEL:-INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v1.0:featherless-ai}
+      HF_EDITOR_MODEL: ${HF_EDITOR_MODEL:-lapa-llm/lapa-12b-pt:featherless-ai}
+      HF_IMAGE_MODEL: ${HF_IMAGE_MODEL:-black-forest-labs/FLUX.1-schnell}
+      MODERATION_MODEL: ${MODERATION_MODEL:-Qwen/Qwen3-32B}
+      MODERATION_BASE_URL: ${MODERATION_BASE_URL:-https://router.huggingface.co}
+      # --- Auth / JWT ---
+      KAZKA_JWT_SECRET: ${KAZKA_JWT_SECRET}
+      KAZKA_JWT_ISSUER: ${KAZKA_JWT_ISSUER:-kazka}
+      # --- Mail ---
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
+      # --- Seeded admin ---
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      # --- Google OAuth (web + native) ---
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_IOS_CLIENT_ID: ${GOOGLE_IOS_CLIENT_ID:-}
+      GOOGLE_ANDROID_CLIENT_ID: ${GOOGLE_ANDROID_CLIENT_ID:-}
+      # --- Sign in with Apple (web + native) ---
+      APPLE_TEAM_ID: ${APPLE_TEAM_ID:-not-configured}
+      APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-app.kazka.ios}
+      APPLE_WEB_CLIENT_ID: ${APPLE_WEB_CLIENT_ID:-}
+      APPLE_KEY_ID: ${APPLE_KEY_ID:-not-configured}
+      APPLE_PRIVATE_KEY_PEM: ${APPLE_PRIVATE_KEY_PEM:-}
+      # --- APNs push ---
+      APNS_TEAM_ID: ${APNS_TEAM_ID:-not-configured}
+      APNS_KEY_ID: ${APNS_KEY_ID:-not-configured}
+      APNS_PRIVATE_KEY_PEM: ${APNS_PRIVATE_KEY_PEM:-}
+      APNS_BUNDLE_ID: ${APNS_BUNDLE_ID:-app.kazka.ios}
+      APNS_HOST: ${APNS_HOST:-api.push.apple.com}
+      APNS_ENABLED: ${APNS_ENABLED:-true}
+      # --- Billing: Apple IAP (App Store Server API) ---
+      BILLING_ENABLED: ${BILLING_ENABLED:-true}
+      BILLING_ENVIRONMENT: ${BILLING_ENVIRONMENT:-Production}
+      BILLING_BUNDLE_ID: ${BILLING_BUNDLE_ID:-app.kazka.ios}
+      BILLING_APP_APPLE_ID: ${BILLING_APP_APPLE_ID:-not-configured}
+      BILLING_ISSUER_ID: ${BILLING_ISSUER_ID:-}
+      BILLING_KEY_ID: ${BILLING_KEY_ID:-}
+      BILLING_PRIVATE_KEY_PEM: ${BILLING_PRIVATE_KEY_PEM:-}
+      # --- Billing: web providers ---
+      PADDLE_API_KEY: ${PADDLE_API_KEY:-}
+      PADDLE_WEBHOOK_SECRET: ${PADDLE_WEBHOOK_SECRET:-}
+      PADDLE_ENVIRONMENT: ${PADDLE_ENVIRONMENT:-production}
+      LIQPAY_PUBLIC_KEY: ${LIQPAY_PUBLIC_KEY:-}
+      LIQPAY_PRIVATE_KEY: ${LIQPAY_PRIVATE_KEY:-}
+      MONOBANK_TOKEN: ${MONOBANK_TOKEN:-}
+      MONOBANK_WEBHOOK_PUBLIC_KEY: ${MONOBANK_WEBHOOK_PUBLIC_KEY:-}
+      BILLING_SUCCESS_URL: ${BILLING_SUCCESS_URL}
+      BILLING_CANCEL_URL: ${BILLING_CANCEL_URL}
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      # Baked into the static bundle at build time. Mark these as BUILD-TIME vars in Coolify.
+      args:
+        VITE_APPLE_WEB_CLIENT_ID: ${VITE_APPLE_WEB_CLIENT_ID:-}
+        VITE_APPLE_WEB_REDIRECT_URI: ${VITE_APPLE_WEB_REDIRECT_URI:-}
+        VITE_PADDLE_CLIENT_TOKEN: ${VITE_PADDLE_CLIENT_TOKEN:-}
+        VITE_PADDLE_ENVIRONMENT: ${VITE_PADDLE_ENVIRONMENT:-production}
+    # Coolify/Traefik terminates TLS and routes the assigned domain to this port.
+    expose:
+      - "80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mysqldata: {}
+  redisdata: {}
+  uploads: {}

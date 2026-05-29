@@ -41,12 +41,17 @@ dependencies {
     implementation 'com.eatthepath:pushy:0.15.4'
     implementation 'com.apple.itunes.storekit:app-store-server-library:3.6.0'
 
+    implementation platform('software.amazon.awssdk:bom:2.31.0')
+    implementation 'software.amazon.awssdk:s3'
+    implementation 'software.amazon.awssdk:url-connection-client'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.testcontainers:junit-jupiter:1.21.3'
     testImplementation 'org.testcontainers:mysql:1.21.3'
     testImplementation 'org.testcontainers:jdbc:1.21.3'
+    testImplementation 'org.testcontainers:minio:1.21.3'
     testImplementation 'com.redis:testcontainers-redis:2.2.2'
     testImplementation 'com.icegreen:greenmail-junit5:2.1.0'
     testImplementation 'org.awaitility:awaitility:4.2.2'
