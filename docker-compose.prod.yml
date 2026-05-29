@@ -137,7 +137,9 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      # Repo-root context (not ./frontend) so the npm workspace lockfile + @kazka/shared resolve.
+      context: .
+      dockerfile: frontend/Dockerfile
       # Baked into the static bundle at build time. Mark these as BUILD-TIME vars in Coolify.
       args:
         VITE_APPLE_WEB_CLIENT_ID: ${VITE_APPLE_WEB_CLIENT_ID:-}
