@@ -1,68 +1,42 @@
-# Казкар — Ukrainian Fairy Tale Generator
+# Казкар (Kazka) — Ukrainian Fairy Tale Generator
 
-A full-stack app that generates personalized Ukrainian fairy tales using local AI (Ollama). Everything runs on your machine — no cloud, no subscriptions, full privacy.
+A full-stack app that generates personalized, illustrated Ukrainian fairy tales
+with AI. It runs on the web and on iOS/Android, supports accounts and
+subscriptions, and streams stories token-by-token as they are written.
 
-## Prerequisites
+Production: **[kazkatales.com](https://kazkatales.com)**.
 
-- **Java 25** (`sdk install java 25-open` via SDKMAN, or download from [jdk.java.net](https://jdk.java.net/25/))
-- **Node.js 20+** and npm
-- **Docker** (for MySQL via docker-compose)
-- **Ollama** installed and running ([ollama.ai](https://ollama.ai))
+> Story and illustration generation use the **Hugging Face Inference** API
+> (Ukrainian-tuned Gemma text models such as MamayLM, FLUX image models, and a
+> Qwen judge for moderation). A free Hugging Face token is required to run the
+> backend.
 
-## Quick Start
+## Features
 
-### 1. Start MySQL
+- **Real-time streaming** — story text appears word by word over SSE as the model writes it.
+- **Two-pass generation** — a storyteller pass plus an editor pass that fixes invented words and Ukrainian typography.
+- **Illustrations** — AI-generated cover art (FLUX), with a decorative SVG fallback when generation is unavailable.
+- **Child profiles & characters** — per-child preferences (age, language) and a reusable character library extracted from past stories.
+- **Branching tales** — interactive "choose what happens next" stories.
+- **Bedtime ritual** — schedule a nightly story per child.
+- **Bilingual** — Ukrainian and English, switchable per user/child.
+- **Seasonal / holiday packs** — themed prompts tied to the current date and locale.
+- **Parent dashboard** — activity overview across children.
+- **Accounts** — email/password (with verification + reset), Google, and Apple sign-in; JWT sessions.
+- **Subscriptions** — free tier (3 stories/month) plus Pro via Paddle, LiqPay, Monobank (web) and Apple In-App Purchase (mobile); gift codes.
+- **Content moderation** — an LLM judge screens prompts; repeated violations auto-suspend.
 
-```bash
-docker-compose up -d
-```
+## Tech stack
 
-### 2. Database migrations
-
-The backend uses **Liquibase** to manage schema. The root changelog lives at
-`backend/src/main/resources/db/changelog/db.changelog-master.yaml`, which
-includes the changesets under `db/changelog/changes/`. Migrations run
-automatically on every backend start — no manual step required.
-
-If you have a pre-Liquibase database (i.e., one that was previously
-initialised by the hand-applied `schema.sql`), the baseline changeset
-auto-detects existing tables via a precondition and marks itself as
-already-applied without re-running. No `liquibase changelog-sync` step is
-needed.
-
-To inspect migration state from the host:
-
-```bash
-docker exec -i kazkar-mysql mysql -ukazkar -pkazkar kazkar \
-  -e "SELECT id, author, filename, dateexecuted, exectype FROM DATABASECHANGELOG ORDER BY orderexecuted"
-```
-
-If you ever need to reset the dev database completely:
-
-```bash
-docker-compose down -v && docker-compose up -d
-```
-
-### 3. Start the backend
-
-```bash
-cd backend
-./gradlew bootRun
-```
-
-The backend starts on `http://localhost:8080`. On first run it pulls the Ollama models automatically (requires Ollama running).
-
-### 4. Start the frontend
-
-See the [Monorepo layout](#monorepo-layout) section for workspace commands.
-The short version:
-
-```bash
-npm install
-npm run frontend:dev
-```
-
-Open `http://localhost:5173`.
+| Layer      | Stack                                                                 |
+|------------|-----------------------------------------------------------------------|
+| Backend    | Spring Boot 4 (WebFlux), Java 25, Gradle                              |
+| Data       | MySQL 8 (Liquibase migrations) · Redis (Spring Session)              |
+| AI         | Hugging Face Inference Router (text, image, moderation)              |
+| Web        | React 19 + TypeScript + Vite                                         |
+| Mobile     | Expo (React Native) — iOS & Android                                  |
+| Shared     | `@kazka/shared` — TS types generated from the backend OpenAPI spec   |
+| Storage    | Local filesystem (dev) or private Cloudflare R2 (presigned URLs)     |
 
 ## Monorepo layout
 
@@ -72,23 +46,86 @@ The repo is an npm workspaces monorepo:
 kazka/
 ├─ backend/                # Spring Boot 4 (WebFlux) — Gradle
 ├─ frontend/               # React 19 + Vite — npm workspace "frontend"
+├─ mobile/                 # Expo / React Native — npm workspace "@kazka/mobile"
 ├─ packages/
 │  └─ shared/              # @kazka/shared — TS types generated from backend OpenAPI
 ├─ scripts/
-│  └─ gen-types.sh         # codegen script
+│  └─ gen-types.sh         # OpenAPI → TS codegen
+├─ docker-compose.yml      # local full stack (mysql, redis, backend, frontend)
+├─ docker-compose.prod.yml # production stack
 └─ package.json            # root workspaces config
 ```
 
-### Setup
+## Prerequisites
+
+- **Java 25** (`sdk install java 25-open` via SDKMAN, or [jdk.java.net/25](https://jdk.java.net/25/))
+- **Node.js 20+** and npm
+- **Docker** (MySQL + Redis, and the full-stack compose)
+- **A Hugging Face API token** — free at [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+
+## Quick start
+
+### 1. Configure environment
 
 ```bash
-npm install                 # installs all workspaces
+cp .env.example .env
+# At minimum, set HUGGINGFACE_API_TOKEN. KAZKA_JWT_SECRET has a dev default
+# but should be rotated for anything real (openssl rand -base64 48).
 ```
 
-### Generating shared TypeScript types
+`.env.example` documents every variable, grouped by area (AI, database, auth,
+storage, billing). Most have sensible local defaults; only the Hugging Face
+token is strictly required to generate stories.
 
-The frontend (and future mobile app) consume API types from `@kazka/shared`,
-which is generated from the backend's OpenAPI spec at `/v3/api-docs`.
+### 2a. Run the whole stack with Docker (simplest)
+
+```bash
+docker-compose up -d   # mysql + redis + backend + frontend
+```
+
+The web app is served at `http://localhost`. Liquibase migrations run
+automatically on backend start.
+
+### 2b. Run locally for development (hot reload)
+
+```bash
+# Infra only (MySQL + Redis):
+docker-compose up -d mysql redis
+
+# Backend (port 8080):
+cd backend && ./gradlew bootRun
+
+# Web frontend (port 5173, proxies /api to :8080):
+npm install
+npm run frontend:dev
+```
+
+Open `http://localhost:5173`.
+
+## Configuration
+
+All configuration is via environment variables (see `.env.example`). Highlights:
+
+| Variable                | Purpose                                                          |
+|-------------------------|-----------------------------------------------------------------|
+| `HUGGINGFACE_API_TOKEN` | **Required.** Hugging Face Inference token.                      |
+| `HF_TEXT_MODEL`         | Text/storyteller model (default: a Ukrainian-tuned Gemma).       |
+| `HF_IMAGE_MODEL`        | Illustration model (default: `black-forest-labs/FLUX.1-schnell`).|
+| `DB_URL` / `DB_USER` / `DB_PASS` | MySQL connection.                                      |
+| `SPRING_DATA_REDIS_HOST` / `..._PORT` | Redis (session store).                     |
+| `KAZKA_JWT_SECRET`      | JWT signing secret (min 32 chars for HS256).                    |
+| `APP_BASE_URL`          | Base URL used in email links and OAuth redirects.               |
+| `STORAGE_PROVIDER`      | `filesystem` (default) or `r2`.                                 |
+| `GOOGLE_CLIENT_ID` / `APPLE_WEB_CLIENT_ID` | Social sign-in (optional).            |
+| `PADDLE_*` / `LIQPAY_*` / `MONOBANK_*` | Subscription providers (optional).       |
+
+Leaving an optional provider's keys blank disables that provider with a clear
+"not configured" error rather than failing startup.
+
+## Shared TypeScript types
+
+The web and mobile apps consume API types from `@kazka/shared`, generated from
+the backend's OpenAPI spec at `/v3/api-docs`.
 
 ```bash
 # Terminal 1: start the backend
@@ -101,7 +138,7 @@ npm run gen:types
 Commit the regenerated `packages/shared/src/api-types.ts`. CI runs
 `npm run verify:types` to fail any PR that ships stale generated types.
 
-### Running the frontend
+## Web frontend
 
 ```bash
 npm run frontend:dev        # http://localhost:5173
@@ -109,84 +146,104 @@ npm run frontend:build
 npm run frontend:lint
 ```
 
-## Environment Variables
+## Mobile app
 
-Copy `.env.example` and customize as needed:
-
-```bash
-cp .env.example .env
-```
-
-| Variable            | Default                             | Description                |
-|---------------------|-------------------------------------|----------------------------|
-| `OLLAMA_BASE_URL`   | `http://localhost:11434`            | Ollama API base URL        |
-| `OLLAMA_TEXT_MODEL` | `gemma3:4b`                         | Model for story generation |
-| `OLLAMA_IMAGE_MODEL`| `x/flux2-klein`                     | Model for illustrations    |
-| `DB_URL`            | `jdbc:mysql://localhost:3306/kazkar` | MySQL connection URL       |
-| `DB_USER`           | `kazkar`                            | MySQL username             |
-| `DB_PASS`           | `kazkar`                            | MySQL password             |
-| `UPLOADS_DIR`       | `./uploads`                         | Directory for illustrations|
-
-Pass env vars to the backend:
+The `@kazka/mobile` workspace is an Expo (React Native) app sharing the same
+backend and generated types. Bundle IDs: `app.kazka.ios` / `app.kazka.android`.
 
 ```bash
-cd backend
-OLLAMA_TEXT_MODEL=llama3.2 ./gradlew bootRun
+npm run mobile:start        # Expo dev server
+npm run mobile:ios          # run on iOS simulator/device
+npm run mobile:lint
+npm run mobile:test
 ```
 
-## Features
+The `mobile/ios/` native project is committed (for the widget extension and
+signing config); `mobile/android/` is generated.
 
-- **Real-time streaming** — story text appears word by word as the AI generates it
-- **Illustration generation** — experimental image generation via `x/flux2-klein` (macOS)
-- **Story archive** — browse, edit, and delete past stories
-- **Dark/light theme** — persisted to localStorage
-- **Ukrainian & English** — switch languages in the nav bar
-- **Offline-capable** — Ollama runs locally; no internet required after setup
+## Database & migrations
+
+Schema is managed with **Liquibase**. The root changelog is
+`backend/src/main/resources/db/changelog/db.changelog-master.yaml`, which
+includes the changesets under `db/changelog/changes/`. Migrations run
+automatically on every backend start — no manual step required. Hibernate runs
+with `ddl-auto: validate`, so the entity model must match the migrated schema.
+
+Inspect migration state:
+
+```bash
+docker exec -i kazkar-mysql mysql -ukazkar -pkazkar kazkar \
+  -e "SELECT id, author, filename, dateexecuted, exectype FROM DATABASECHANGELOG ORDER BY orderexecuted"
+```
+
+Reset the dev database completely:
+
+```bash
+docker-compose down -v && docker-compose up -d
+```
+
+## Image storage
+
+- **`filesystem`** (default) — illustrations are written to `UPLOADS_DIR`
+  (`./uploads`) and served as static resources at `/uploads/`.
+- **`r2`** — illustrations are uploaded to a **private** Cloudflare R2 bucket;
+  the backend mints short-lived presigned GET URLs at DTO-build time, so the
+  bucket is never public and links are only issued for stories the user may see.
+  Configure with `R2_ENDPOINT`, `R2_ACCESS_KEY`, `R2_SECRET_KEY`, `R2_BUCKET`,
+  `R2_PRESIGN_TTL`.
+
+## Subscriptions & billing
+
+Free accounts can generate a limited number of stories per month
+(`BILLING_FREE_LIMIT`, default 3). Pro unlocks unlimited generation and premium
+features. Payment providers are pluggable and region-aware:
+
+- **Paddle** — card checkout (web).
+- **LiqPay (PrivatBank)** and **Monobank** — Ukrainian acquiring (web).
+- **Apple In-App Purchase** — mobile (StoreKit).
+- **Gift codes** — redeemable for Pro entitlements.
+
+Each provider exposes a webhook under `/api/billing/webhook/*`. See
+`.env.example` for the keys each provider needs.
 
 ## API
 
-| Method | Path                          | Description                  |
-|--------|-------------------------------|------------------------------|
-| POST   | `/api/stories/generate`       | Stream story via SSE         |
-| POST   | `/api/stories/{id}/illustrate`| Trigger image generation     |
-| GET    | `/api/stories`                | List stories (paginated)     |
-| GET    | `/api/stories/{id}`           | Get single story             |
-| PUT    | `/api/stories/{id}`           | Update title + content       |
-| DELETE | `/api/stories/{id}`           | Delete story                 |
+The backend is documented via OpenAPI at `/v3/api-docs`. Main areas:
 
-Static uploads are served from `/uploads/`.
+| Area              | Base path                         |
+|-------------------|-----------------------------------|
+| Auth & accounts   | `/api/auth`, `/api/auth/oauth`, `/api/auth/token`, `/api/devices` |
+| Stories           | `/api/stories` (generate via SSE, CRUD, branching, translation)  |
+| Children          | `/api/children`, `/api/children/{childId}/bedtime`               |
+| Holidays          | `/api/holidays`                   |
+| Billing           | `/api/billing`, `/api/billing/webhook/*` |
+| Admin & moderation| `/api/admin`, `/api/admin/moderation` |
 
-## Running Tests
+Core story endpoints:
+
+| Method | Path                          | Description              |
+|--------|-------------------------------|--------------------------|
+| POST   | `/api/stories/generate`       | Stream a story via SSE   |
+| GET    | `/api/stories`                | List stories (paginated) |
+| GET    | `/api/stories/{id}`           | Get a single story       |
+| PUT    | `/api/stories/{id}`           | Update title + content   |
+| DELETE | `/api/stories/{id}`           | Delete a story           |
+
+## Tests & CI
 
 ```bash
-cd backend
-./gradlew test
+cd backend && ./gradlew test     # Testcontainers (MySQL 8) + WireMock — Docker required
 ```
 
-Tests use Testcontainers (MySQL 8) + WireMock — Docker must be running.
+GitHub Actions (`.github/workflows/ci.yml`) runs three jobs on push/PR to `main`:
 
-## Project Structure
+- **Backend tests** — `./gradlew test`
+- **Frontend build + lint** — `npm ci`, `npm audit --audit-level=high`, build, `eslint .`
+- **Shared types up to date** — boots the backend against MySQL/Redis and verifies `api-types.ts` is regenerated
 
-```
-kazka/
-├── backend/           # Spring Boot 4 + WebFlux (port 8080)
-│   └── src/main/java/com/kazka/
-│       ├── story/         # StoryController, StoryService, StoryRepository
-│       ├── ollama/        # OllamaClient, OllamaModelInitializer
-│       ├── illustration/  # IllustrationService, ImageStorageService
-│       └── config/        # WebClient, CORS, uploads config
-├── frontend/          # React 19 + TypeScript + Vite (port 5173)
-│   └── src/
-│       ├── components/    # form, story, home, chrome, modal
-│       ├── lib/           # apiClient, sseClient, LocaleContext, ThemeContext
-│       ├── pages/         # HomePage, ArchivePage, StoryDetailPage
-│       └── locales/       # uk.ts, en.ts
-├── docker-compose.yml
-└── .env.example
-```
+## Production
 
-## Notes on Image Generation
-
-- `x/flux2-klein` is an experimental model that currently works on macOS with Apple Silicon.
-- If generation fails, the UI shows a decorative SVG placeholder — no error is shown to the user.
-- Generated images are saved as PNG in the `uploads/` directory and served as static resources.
+`docker-compose.prod.yml` defines the production stack (MySQL, Redis, backend,
+frontend) with persistent volumes. The frontend image is built from the repo
+root (npm workspace deps) and takes `VITE_*` build args for client-side config.
+Production runs against `kazkatales.com` with R2 storage and `COOKIE_SECURE=true`.
