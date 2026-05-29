@@ -28,7 +28,7 @@ Steps:
    ```
    This creates `Kazkar.xcworkspace`. Open it in Xcode (always use the `.xcworkspace`, never the `.xcodeproj`, so CocoaPods are linked).
 2. Set the signing team in `Kazkar > Targets > Kazkar > Signing & Capabilities`.
-3. Configure release env: `EXPO_PUBLIC_API_BASE_URL=https://api.kazka.app` (or your prod URL).
+3. Configure release env: `EXPO_PUBLIC_API_BASE_URL=https://api.kazkatales.com` (or your prod URL).
 4. Build for "Any iOS Device (arm64)" with the release scheme.
 5. `Product > Archive`, then "Distribute App" → App Store Connect → Upload.
 6. Wait for the build to appear in App Store Connect → assign to internal testers → TestFlight.

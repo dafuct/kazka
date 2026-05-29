@@ -16,7 +16,7 @@ export async function sharePdf(story: Story, opts: { watermark: boolean }): Prom
     ? `.kazka-watermark { position: fixed; bottom: 16px; right: 16px; font-size: 11px; color: #999; }`
     : '';
   const watermarkHtml = opts.watermark
-    ? `<div class="kazka-watermark">Made with Kazka — kazka.app</div>`
+    ? `<div class="kazka-watermark">Made with Kazka — kazkatales.com</div>`
     : '';
   const html = `
     <!DOCTYPE html>

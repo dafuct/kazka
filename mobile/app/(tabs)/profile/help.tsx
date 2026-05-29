@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native-unistyles';
 
 const LINKS: { id: 'about' | 'terms' | 'privacy'; url: string }[] = [
-  { id: 'about', url: 'https://kazka.app/about' },
-  { id: 'terms', url: 'https://kazka.app/terms' },
-  { id: 'privacy', url: 'https://kazka.app/privacy' },
+  { id: 'about', url: 'https://kazkatales.com/about' },
+  { id: 'terms', url: 'https://kazkatales.com/terms' },
+  { id: 'privacy', url: 'https://kazkatales.com/privacy' },
 ];
 
 export default function HelpScreen() {

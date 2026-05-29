@@ -15,7 +15,7 @@ const config: ExpoConfig = {
   ios: {
     supportsTablet: false,
     bundleIdentifier: 'app.kazka.ios',
-    associatedDomains: ['applinks:kazka.app'],
+    associatedDomains: ['applinks:kazkatales.com'],
     usesAppleSignIn: true,
     buildNumber: '4',
     entitlements: {
