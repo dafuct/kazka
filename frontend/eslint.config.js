@@ -18,5 +18,13 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // Pervasive in API/error-handling code; keep visible as a warning, not a build break.
+      '@typescript-eslint/no-explicit-any': 'warn',
+      // react-hooks 7 flags data-fetching effects (setLoading before fetch); intentional pattern here.
+      'react-hooks/set-state-in-effect': 'warn',
+      // Context files co-locate Provider + use* hook by design.
+      'react-refresh/only-export-components': 'warn',
+    },
   },
 ])
