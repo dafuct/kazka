@@ -31,6 +31,7 @@ import { ChildrenListPage } from './pages/ChildrenListPage'
 import { CharacterLibraryPage } from './pages/CharacterLibraryPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { RedeemPage } from './pages/RedeemPage'
+import { LegalPage } from './pages/legal/LegalPage'
 
 function ScrollProgress() {
   const barRef = useRef<HTMLDivElement>(null)
@@ -119,6 +120,9 @@ function AppShell() {
           <Route path="/settings/children/:id/characters" element={<RequireAuth><CharacterLibraryPage /></RequireAuth>} />
           <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
           <Route path="/redeem" element={<RequireAuth><RedeemPage /></RequireAuth>} />
+          <Route path="/legal/terms"   element={<LegalPage slug="terms" />} />
+          <Route path="/legal/privacy" element={<LegalPage slug="privacy" />} />
+          <Route path="/legal/support" element={<LegalPage slug="support" />} />
         </Routes>
       </main>
       <Footer />
