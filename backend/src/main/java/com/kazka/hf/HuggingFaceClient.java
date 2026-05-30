@@ -30,6 +30,8 @@ public class HuggingFaceClient {
         if (props.getApiToken() == null || props.getApiToken().isBlank()) {
             log.warn("kazka.huggingface.api-token is not set — HF API calls will fail with 401");
         }
+        log.info("HF models resolved at startup: text={}, editor={}, scene={}, image={}",
+                props.getTextModel(), props.getEditorModel(), props.getSceneModel(), props.getImageModel());
         this.imageClient = imageClient;
         this.textClient = textClient;
     }
