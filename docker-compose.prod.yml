@@ -22,6 +22,12 @@ services:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASS}
       MYSQL_DATABASE: ${DB_NAME:-kazkar}
+    # Loopback-only bind so SSH-tunnelled clients (IntelliJ, mysql CLI) can reach the DB.
+    # `127.0.0.1:` prefix is critical — without it Docker binds to 0.0.0.0 and exposes
+    # MySQL on the public internet. The internal compose network still resolves `mysql:3306`
+    # by service name for the backend container, so app traffic is unaffected.
+    ports:
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysqldata:/var/lib/mysql
     healthcheck:
