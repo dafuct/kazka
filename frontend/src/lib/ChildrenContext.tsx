@@ -21,9 +21,15 @@ export function ChildrenProvider({ children: kids }: { children: ReactNode }) {
   const [list, setList] = useState<ChildProfileDto[]>([])
   const [activeId, setActiveId] = useState<string | null>(() => localStorage.getItem(STORAGE_KEY))
   const [loading, setLoading] = useState(false)
+  const [fetchedForUserId, setFetchedForUserId] = useState<string | null>(null)
 
   const refetch = useCallback(async () => {
-    if (!user) { setList([]); return }
+    if (!user) {
+      setList([])
+      setFetchedForUserId(null)
+      setLoading(false)
+      return
+    }
     setLoading(true)
     try {
       const rows = await childrenApi.list()
@@ -37,7 +43,10 @@ export function ChildrenProvider({ children: kids }: { children: ReactNode }) {
         setActiveId(stored)
       }
     } catch { setList([]) }
-    finally { setLoading(false) }
+    finally {
+      setFetchedForUserId(user.id)
+      setLoading(false)
+    }
   }, [user])
 
   useEffect(() => { refetch() }, [refetch])
@@ -48,9 +57,12 @@ export function ChildrenProvider({ children: kids }: { children: ReactNode }) {
   }, [])
 
   const active = list.find(c => c.id === activeId) ?? null
+  // Treat "user is set but we haven't fetched for them yet" as loading, so
+  // RequireChild won't mistake the initial empty list for "no children".
+  const externallyLoading = loading || (!!user && fetchedForUserId !== user.id)
 
   return (
-    <Ctx.Provider value={{ children: list, active, setActive, refetch, loading }}>
+    <Ctx.Provider value={{ children: list, active, setActive, refetch, loading: externallyLoading }}>
       {kids}
     </Ctx.Provider>
   )
