@@ -8,7 +8,7 @@ Welcome to Kazka. Please read these terms — by using Kazka you agree to them.
 
 ## 1. Who we are
 
-The Kazka service ("Kazka", "we", "us") is operated by a Ukrainian sole entrepreneur (ФОП) **[FILL: full legal name]**, registration **[FILL: registration number]**, address: **[FILL: registered address]**. The service runs at `kazkatales.com`. Contact: `support@kazkatales.com`.
+The Kazka service ("Kazka", "we", "us") is operated by a Ukrainian sole entrepreneur (ФОП) **Dmytro Makarenko** (Ukrainian tax ID РНОКПП: _to be provided_), address: **Vinnytsia, Ukraine**. The service runs at `kazkatales.com`. Contact: `support@kazkatales.com`.
 
 ## 2. What Kazka is
 

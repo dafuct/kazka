@@ -8,7 +8,7 @@ This policy explains what data Kazka collects, why, and what you can do about it
 
 ## 1. Data controller
 
-The controller of your personal data is the Ukrainian sole entrepreneur (ФОП) **[FILL: full legal name]**, registration **[FILL: registration number]**, address **[FILL: registered address]**. Privacy questions: `support@kazkatales.com`.
+The controller of your personal data is the Ukrainian sole entrepreneur (ФОП) **Dmytro Makarenko** (Ukrainian tax ID РНОКПП: _to be provided_), address: **Vinnytsia, Ukraine**. Privacy questions: `support@kazkatales.com`.
 
 ## 2. What we collect
 
@@ -68,7 +68,7 @@ If you enabled push, we store a device token so we can deliver bedtime reminders
 | Google Sign-In | Your Google identifier, email | USA |
 | Apple Sign-In | Your Apple identifier, email (or relay) | USA |
 | Cloudflare | IP, request metadata (DNS, proxy) | USA |
-| Email provider | Email, contents of verification / system emails | [FILL: email provider] |
+| Google (Gmail SMTP) | Email, contents of verification / system emails | USA |
 | Hetzner | Server logs (hosting) | Germany |
 
 ## 6. International transfers
@@ -105,7 +105,7 @@ Your browser stores:
 
 These are **strictly necessary** for the site to work and don't require separate consent.
 
-Analytics: [FILL: analytics provider or "none"].
+Analytics: we don't use any third-party analytics tools.
 
 ## 10. Security
 
