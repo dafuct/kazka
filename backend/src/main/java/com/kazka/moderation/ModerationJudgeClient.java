@@ -105,18 +105,14 @@ public class ModerationJudgeClient {
 
     private ModerationResult classifyRaw(String userBody) {
         try {
-            // /no_think disables Qwen3's reasoning_content; without it, max_tokens=64 is
-            // consumed by chain-of-thought and message.content comes back null. Ignored by
-            // non-reasoning models.
-            String prompt = userBody + "\n/no_think";
             String responseBody = webClient.post()
-                    .uri("/v1/chat/completions")
+                    .uri("/chat/completions")
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(Map.of(
                             "model", props.getJudgeModel(),
                             "messages", List.of(
                                     Map.of("role", "system", "content", POLICY),
-                                    Map.of("role", "user", "content", prompt)),
+                                    Map.of("role", "user", "content", userBody)),
                             "stream", false,
                             "max_tokens", 64))
                     .retrieve()

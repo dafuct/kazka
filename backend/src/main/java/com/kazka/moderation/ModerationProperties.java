@@ -7,8 +7,8 @@ import java.time.Duration;
 @ConfigurationProperties("kazka.moderation")
 public class ModerationProperties {
 
-    private String judgeModel = "Qwen/Qwen3-32B";
-    private String judgeBaseUrl = "https://router.huggingface.co";
+    private String judgeModel = "gemini-2.5-flash";
+    private String judgeBaseUrl = "https://generativelanguage.googleapis.com/v1beta/openai";
     private Duration judgeTimeout = Duration.ofSeconds(5);
     private int suspensionThreshold = 3;
     private Duration suspensionWindow = Duration.ofHours(24);

@@ -37,8 +37,9 @@ class ModerationJudgeGoldenIT {
     void should_meetGoldenSetThresholds_when_classifyingAllRows() throws Exception {
         String token = System.getenv("HUGGINGFACE_API_TOKEN");
         assertThat(token).as("HUGGINGFACE_API_TOKEN env var").isNotBlank();
-        String model = System.getenv().getOrDefault("MODERATION_MODEL", "Qwen/Qwen3-32B");
-        String baseUrl = System.getenv().getOrDefault("MODERATION_BASE_URL", "https://router.huggingface.co");
+        String model = System.getenv().getOrDefault("MODERATION_MODEL", "gemini-2.5-flash");
+        String baseUrl = System.getenv().getOrDefault("MODERATION_BASE_URL",
+                "https://generativelanguage.googleapis.com/v1beta/openai");
 
         ModerationProperties props = new ModerationProperties();
         props.setJudgeModel(model);

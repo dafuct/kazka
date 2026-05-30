@@ -72,7 +72,7 @@ class ModerationJudgeClientTest {
 
     @Test
     void should_returnJudgeUnavailable_when_judgeReturns500() {
-        wm.stubFor(post(urlEqualTo("/v1/chat/completions"))
+        wm.stubFor(post(urlEqualTo("/chat/completions"))
                 .willReturn(aResponse().withStatus(500)));
         ModerationResult r = client.classify("en", "x", List.of());
         assertThat(((ModerationResult.Refused) r).category()).isEqualTo(ModerationCategory.JUDGE_UNAVAILABLE);
@@ -80,7 +80,7 @@ class ModerationJudgeClientTest {
 
     @Test
     void should_returnJudgeUnavailable_when_judgeTimesOut() {
-        wm.stubFor(post(urlEqualTo("/v1/chat/completions"))
+        wm.stubFor(post(urlEqualTo("/chat/completions"))
                 .willReturn(aResponse().withFixedDelay(5_000).withStatus(200)
                         .withBody(chatJson("safe"))));
         ModerationResult r = client.classify("en", "x", List.of());
@@ -104,14 +104,14 @@ class ModerationJudgeClientTest {
     }
 
     private void stubGuard(String content) {
-        wm.stubFor(post(urlEqualTo("/v1/chat/completions"))
+        wm.stubFor(post(urlEqualTo("/chat/completions"))
                 .willReturn(aResponse().withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(chatJson(content))));
     }
 
     private static String chatJson(String content) {
-        // OpenAI-style chat completion shape that the HF Router returns
+        // OpenAI-style chat completion shape — same for HF/Gemini/OpenRouter.
         String escaped = content.replace("\"", "\\\"").replace("\n", "\\n");
         return """
             {"id":"x","choices":[{"message":{"role":"assistant","content":"%s"}}]}

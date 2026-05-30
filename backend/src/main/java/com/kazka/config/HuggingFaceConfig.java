@@ -12,16 +12,20 @@ public class HuggingFaceConfig {
     public WebClient textClient(WebClient.Builder builder, HuggingFaceProperties huggingFaceProperties) {
         return builder.clone()
                 .baseUrl(huggingFaceProperties.getTextBaseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, getToken(huggingFaceProperties))
+                .defaultHeader(HttpHeaders.AUTHORIZATION, bearer(huggingFaceProperties.getApiToken()))
                 .codecs(c -> c.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
                 .build();
     }
 
+    /**
+     * Fal.ai uses `Authorization: Key <FAL_KEY>` instead of `Bearer …`. Max payload is generous
+     * because `sync_mode=true` returns the image as a base64 data URI inline in the JSON body.
+     */
     @Bean
     public WebClient imageClient(WebClient.Builder builder, HuggingFaceProperties huggingFaceProperties) {
         return builder.clone()
                 .baseUrl(huggingFaceProperties.getImageBaseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, getToken(huggingFaceProperties))
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Key " + huggingFaceProperties.getImageApiToken())
                 .codecs(c -> c.defaultCodecs().maxInMemorySize(20 * 1024 * 1024))
                 .build();
     }
@@ -32,13 +36,12 @@ public class HuggingFaceConfig {
                                     com.kazka.moderation.ModerationProperties modProps) {
         return builder.clone()
                 .baseUrl(modProps.getJudgeBaseUrl())
-                .defaultHeader(org.springframework.http.HttpHeaders.AUTHORIZATION,
-                               "Bearer " + hfProps.getApiToken())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, bearer(hfProps.getApiToken()))
                 .codecs(c -> c.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
                 .build();
     }
 
-    private String getToken(HuggingFaceProperties huggingFaceProperties) {
-        return "Bearer " + huggingFaceProperties.getApiToken();
+    private static String bearer(String token) {
+        return "Bearer " + (token == null ? "" : token);
     }
 }
