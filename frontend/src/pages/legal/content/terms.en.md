@@ -14,9 +14,9 @@ Kazka is an online service that generates children's tales with the help of arti
 
 ## 3. Accounts
 
-- Accounts are created by an adult (18+).
+- Accounts are created by an adult.
 - The account holder is responsible for keeping the password safe and the account secure.
-- Children aged 13 and older may be allowed their own login under parental supervision. Children under 13 may not register.
+- Kazka is intended for adults who create tales for their children. Parents and legal guardians are solely responsible for supervising any minor's use of the service and for any content generated under their account. The platform is not responsible for the child or for how the account holder uses the service in the child's presence.
 - One account per person.
 - We may suspend or terminate an account if we see violations of these terms or abuse of the generator.
 

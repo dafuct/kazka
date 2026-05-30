@@ -165,6 +165,48 @@ function DayCycleSvg({ dark }: { dark: boolean }) {
   )
 }
 
+function DayCycleHorizontalSvg({ dark }: { dark: boolean }) {
+  return (
+    <svg viewBox="0 0 220 100" fill="none" xmlns="http://www.w3.org/2000/svg"
+      style={{ width: '100%', height: '100%', maxHeight: '100px' }} aria-hidden="true">
+      {/* Sun (left) */}
+      <g>
+        <animateTransform attributeName="transform" type="rotate"
+          values="0,55,50;360,55,50" dur="22s" repeatCount="indefinite"/>
+        {Array.from({length:10},(_,i) => {
+          const a=(i*36)*Math.PI/180
+          return <line key={i}
+            x1={55+Math.cos(a)*22} y1={50+Math.sin(a)*22}
+            x2={55+Math.cos(a)*(i%2?29:34)} y2={50+Math.sin(a)*(i%2?29:34)}
+            stroke="#F59E0B" strokeWidth={i%2?1.5:2.2} strokeLinecap="round" opacity="0.9"/>
+        })}
+      </g>
+      <circle cx="55" cy="50" r="16" fill="#FFE040"/>
+      <circle cx="55" cy="50" r="11" fill="#FFF060"/>
+      <circle cx="49" cy="44" r="5" fill="#FFFAA0" opacity="0.45"/>
+
+      {/* Moon (right) */}
+      <circle cx="165" cy="50" r="22" fill={dark ? '#E4ECFF' : '#C4B5FD'} opacity="0.07">
+        <animate attributeName="opacity" values="0.07;0.18;0.07" dur="4s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="165" cy="50" r="18" fill={dark ? '#E4ECFF' : '#C4B5FD'}/>
+      <circle cx="173" cy="43" r="14" fill={dark ? '#060C14' : '#EDE9FE'}/>
+
+      {/* Stars between */}
+      {([
+        [108,32,1.6,0.2], [120,68,1.4,0.7], [98,55,1.3,1.1],
+        [130,42,1.5,0.4], [196,30,1.4,0.9], [200,72,1.3,1.3],
+      ] as [number,number,number,number][]).map(([x,y,r,delay],i) => (
+        <circle key={i} cx={x} cy={y} r={r}
+          fill={dark ? '#CCD8FF' : '#7C3AED'} opacity="0.6">
+          <animate attributeName="opacity" values="0.6;0.08;0.6"
+            dur={`${2.4+i*0.28}s`} begin={`${delay}s`} repeatCount="indefinite"/>
+        </circle>
+      ))}
+    </svg>
+  )
+}
+
 function NarratorsSvg({ dark }: { dark: boolean }) {
   const sage = dark ? '#6EE7B7' : '#059669'
   const warm = dark ? '#FCD34D' : '#D97706'
@@ -237,6 +279,71 @@ function NarratorsSvg({ dark }: { dark: boolean }) {
           <animate attributeName="opacity" values="0.35;0.05;0.35" dur="4.2s" begin="1.8s" repeatCount="indefinite"/>
         </path>
         <path d="M62 136 L63 133 L64 136 L67 137 L64 138 L63 141 L62 138 L59 137Z"
+          fill={wind} opacity="0.65">
+          <animate attributeName="opacity" values="0.65;0.1;0.65" dur="2.6s" begin="0.4s" repeatCount="indefinite"/>
+        </path>
+      </g>
+    </svg>
+  )
+}
+
+function NarratorsHorizontalSvg({ dark }: { dark: boolean }) {
+  const sage = dark ? '#6EE7B7' : '#059669'
+  const warm = dark ? '#FCD34D' : '#D97706'
+  const wind = dark ? '#C4B5FD' : '#7C3AED'
+
+  return (
+    <svg viewBox="0 0 240 80" fill="none" xmlns="http://www.w3.org/2000/svg"
+      style={{ width: '100%', height: '100%', maxHeight: '80px' }} aria-hidden="true">
+      {/* Forest Owl Sage (left) */}
+      <g>
+        <animateTransform attributeName="transform" type="translate"
+          values="0 0;0 -2;0 0" dur="4s" repeatCount="indefinite"/>
+        <ellipse cx="40" cy="40" rx="13" ry="15" fill={dark ? '#112811' : '#ECFDF5'} opacity="0.9"/>
+        <path d="M31 30 L28 20 L35 27Z" fill={sage} opacity="0.8"/>
+        <path d="M49 30 L52 20 L45 27Z" fill={sage} opacity="0.8"/>
+        <circle cx="34.5" cy="36" r="5.5" fill={dark ? '#0A1F0A' : '#FFF'} opacity="0.95"/>
+        <circle cx="45.5" cy="36" r="5.5" fill={dark ? '#0A1F0A' : '#FFF'} opacity="0.95"/>
+        <circle cx="34.5" cy="36" r="3.5" fill={sage}/>
+        <circle cx="45.5" cy="36" r="3.5" fill={sage}/>
+        <circle cx="34.5" cy="36" r="2" fill={dark ? '#0A1F0A' : '#064E3B'}/>
+        <circle cx="45.5" cy="36" r="2" fill={dark ? '#0A1F0A' : '#064E3B'}/>
+        <circle cx="33.2" cy="34.7" r="0.9" fill="#FFF" opacity="0.9"/>
+        <circle cx="44.2" cy="34.7" r="0.9" fill="#FFF" opacity="0.9"/>
+        <path d="M37.5 41 L40 45 L42.5 41Q40 39.5 37.5 41Z" fill={warm} opacity="0.9"/>
+      </g>
+
+      {/* Star Wanderer (middle) */}
+      <g>
+        <animateTransform attributeName="transform" type="translate"
+          values="0 0;0 -2;0 0" dur="5.2s" begin="0.9s" repeatCount="indefinite"/>
+        <path d="M120 22 L122.6 30 L131 30 L124.2 35 L126.8 43 L120 38.2 L113.2 43 L115.8 35 L109 30 L117.4 30Z"
+          fill={warm} opacity="0.95"/>
+        <circle cx="117" cy="33" r="1.1" fill={dark ? '#1C0A00' : '#78350F'}/>
+        <circle cx="123" cy="33" r="1.1" fill={dark ? '#1C0A00' : '#78350F'}/>
+        <path d="M117.5 36 Q120 38 122.5 36" stroke={dark ? '#1C0A00' : '#78350F'} strokeWidth="1" fill="none" strokeLinecap="round"/>
+        <circle cx="100" cy="28" r="1.4" fill={warm} opacity="0.55">
+          <animate attributeName="opacity" values="0.55;0.05;0.55" dur="2.1s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="140" cy="50" r="1.1" fill={warm} opacity="0.45">
+          <animate attributeName="opacity" values="0.45;0.05;0.45" dur="2.7s" begin="0.6s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+
+      {/* Wind Spirit (right) */}
+      <g>
+        <animateTransform attributeName="transform" type="translate"
+          values="0 0;0 -2;0 0" dur="6.1s" begin="1.8s" repeatCount="indefinite"/>
+        <path d="M210 38 Q223 32 220 45 Q217 54 205 50 Q194 46 197 36 Q201 26 212 28 Q225 30 223 41"
+          stroke={wind} strokeWidth="2.2" fill="none" strokeLinecap="round" opacity="0.85"
+          strokeDasharray="60" strokeDashoffset="0">
+          <animate attributeName="stroke-dashoffset" values="0;60;0" dur="4s" repeatCount="indefinite"/>
+        </path>
+        <circle cx="207" cy="41" r="5.5" fill={wind} opacity="0.2">
+          <animate attributeName="opacity" values="0.2;0.45;0.2" dur="3s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="207" cy="41" r="2.5" fill={wind} opacity="0.75"/>
+        <path d="M180 30 L181 27 L182 30 L185 31 L182 32 L181 35 L180 32 L177 31Z"
           fill={wind} opacity="0.65">
           <animate attributeName="opacity" values="0.65;0.1;0.65" dur="2.6s" begin="0.4s" repeatCount="indefinite"/>
         </path>
@@ -391,7 +498,8 @@ export function Features() {
               <p>{t.features.cards[1].desc}</p>
             </div>
             <div className={styles.mediumImg}>
-              <DayCycleSvg dark={dark} />
+              <div className={styles.svgVertical}><DayCycleSvg dark={dark} /></div>
+              <div className={styles.svgHorizontal}><DayCycleHorizontalSvg dark={dark} /></div>
             </div>
           </div>
 
@@ -402,7 +510,8 @@ export function Features() {
               <p>{t.features.cards[2].desc}</p>
             </div>
             <div className={styles.cardTextImg}>
-              <NarratorsSvg dark={dark} />
+              <div className={styles.svgVertical}><NarratorsSvg dark={dark} /></div>
+              <div className={styles.svgHorizontal}><NarratorsHorizontalSvg dark={dark} /></div>
             </div>
           </div>
 

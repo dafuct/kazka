@@ -44,9 +44,8 @@ If you enabled push, we store a device token so we can deliver bedtime reminders
 
 ## 3. Children's data
 
-- Adults create accounts. Children don't register themselves (except for 13+ teens whose parents granted them a separate login).
-- The child's name, age, and interests are entered by the adult. We use this data only to personalise generated tales.
-- If you spot an under-13 account that shouldn't be there, email `d.makarenko.home@gmail.com` and we'll delete it.
+- Adults create accounts. Children don't register themselves on Kazka.
+- The child's name, age band, and interests are entered by the adult and are used only to personalise generated tales.
 
 ## 4. Legal basis for processing (GDPR Art. 6)
 
@@ -112,9 +111,9 @@ Analytics: we don't use any third-party analytics tools.
 - Requests that attempt to generate harmful content are blocked by a moderation pipeline; repeated attempts lead to account suspension.
 - If a data breach happens that could harm you, we'll notify you and the relevant authorities within the timeframes required by law.
 
-## 11. Children's data — COPPA-style note (for non-Ukrainian users)
+## 11. Parental responsibility
 
-We do not knowingly collect personal data of children under 13. If you're a parent and notice your child has registered without your knowledge, email `d.makarenko.home@gmail.com` and the account will be deleted.
+Kazka is intended for adults who create tales for their children. Parents and legal guardians are solely responsible for supervising any minor's use of the service and for any content generated under their account. The platform is not responsible for the child or for how the account holder uses the service in the child's presence.
 
 ## 12. Contact and changes to this policy
 

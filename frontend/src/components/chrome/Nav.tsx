@@ -46,11 +46,14 @@ export function Nav() {
     <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>
       <Link to="/" className={styles.logo}>
         <svg viewBox="0 0 28 28" fill="none" className={styles.logoIcon} aria-hidden="true">
-          <path d="M6 4C6 4 8 6 8 14C8 22 6 24 6 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          <path d="M6 4C10 4 20 4 22 6C24 8 24 10 22 12C20 14 14 14 14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M6 14C10 14 18 14 20 16C22 18 22 20 20 22C18 24 10 24 6 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="21" cy="5" r="1.5" fill="#C4B5FD" opacity="0.7"/>
-          <circle cx="24" cy="9" r="1" fill="#C4B5FD" opacity="0.5"/>
+          <defs>
+            <mask id="kazkaMoonMask">
+              <rect width="28" height="28" fill="white"/>
+              <circle cx="15" cy="11" r="6" fill="black"/>
+            </mask>
+          </defs>
+          <circle cx="11" cy="14" r="7" fill="var(--color-magic)" mask="url(#kazkaMoonMask)"/>
+          <path d="M22 2 L22.9 4.1 L25 5 L22.9 5.9 L22 8 L21.1 5.9 L19 5 L21.1 4.1 Z" fill="var(--color-gold)"/>
         </svg>
         <span>{t.brand}</span>
       </Link>
@@ -93,7 +96,8 @@ export function Nav() {
         )}
         <li>
           <button onClick={toggleTheme} className={styles.themeToggle} aria-label={t.nav.toggleTheme}>
-            {theme === 'light' ? t.nav.themeLight : t.nav.themeDark}
+            <span className={styles.themeIcon} aria-hidden="true">{theme === 'light' ? '🌙' : '☀️'}</span>
+            <span className={styles.themeLabel}>{theme === 'light' ? t.nav.themeLight : t.nav.themeDark}</span>
           </button>
         </li>
         <li>

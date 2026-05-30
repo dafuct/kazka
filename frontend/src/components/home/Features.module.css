@@ -221,6 +221,9 @@
   pointer-events: none;
 }
 
+.svgVertical { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.svgHorizontal { display: none; }
+
 @media (max-width: 860px) {
   .section { padding: 80px 20px; }
   .bento { grid-template-columns: 1fr; }
@@ -231,4 +234,22 @@
   .mediumImg { height: 160px; }
   .cardText { grid-template-columns: 1fr; }
   .cardTextImg { height: 160px; }
+}
+
+@media (max-width: 600px) {
+  .svgVertical { display: none; }
+  .svgHorizontal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0 24px;
+    box-sizing: border-box;
+  }
+  .mediumImg { height: 110px; }
+  .mediumImg::before { display: none; }
+  .cardTextImg { height: 100px; }
+  .cardTextImg::before { display: none; }
+  .cardImg { min-height: 260px; }
+  .imgText { padding: 20px 24px 14px; }
 }
