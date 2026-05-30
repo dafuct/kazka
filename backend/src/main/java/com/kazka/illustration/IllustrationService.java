@@ -52,7 +52,13 @@ public class IllustrationService {
                                     promptBuilder.buildSceneExtractionUser(story.getContent()))
                             .onErrorReturn(fallbackOnError)
                             .map(scene -> scene.isBlank() ? fallbackOnError : scene)
-                            .map(scene -> chooseSafeScene(story, scene))
+                            // chooseSafeScene calls ModerationJudgeClient which uses .block() on
+                            // the WebClient response. Reactor refuses block() on reactor-http
+                            // threads, so we hop to boundedElastic for this step. The judge call
+                            // is short (sub-second judge timeout) and the surrounding LLM/image
+                            // calls already dominate the wall-clock cost.
+                            .flatMap(scene -> Mono.fromCallable(() -> chooseSafeScene(story, scene))
+                                    .subscribeOn(Schedulers.boundedElastic()))
                             .flatMap(scene -> Mono.zip(
                                     hfClient.generateImage(promptBuilder.buildImagePrompt(story, scene, Theme.LIGHT), IMAGE_W, IMAGE_H),
                                     hfClient.generateImage(promptBuilder.buildImagePrompt(story, scene, Theme.DARK), IMAGE_W, IMAGE_H)))

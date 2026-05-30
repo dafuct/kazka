@@ -2,7 +2,6 @@ package com.kazka.hf;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
 import com.kazka.config.HuggingFaceProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -73,11 +72,22 @@ public class HuggingFaceClient {
                         "max_tokens", 4096
                 ))
                 .retrieve()
-                .bodyToMono(JsonNode.class)
-                .defaultIfEmpty(NullNode.getInstance())
+                .bodyToMono(String.class)
+                .defaultIfEmpty("")
                 .doOnError(e -> log.warn("generateText failed (model={}): {}", props.getSceneModel(), e.getMessage()))
-                .map(node -> node.path("choices").path(0)
-                        .path("message").path("content").asText(""));
+                .map(HuggingFaceClient::extractChatContent);
+    }
+
+    private static String extractChatContent(String body) {
+        if (body == null || body.isBlank()) return "";
+        try {
+            JsonNode node = MAPPER.readTree(body);
+            return node.path("choices").path(0).path("message").path("content").asText("");
+        } catch (Exception e) {
+            log.warn("Could not parse chat response body (first 200 chars): {}",
+                    body.substring(0, Math.min(200, body.length())));
+            return "";
+        }
     }
 
     private Flux<String> streamRequest(String model, String system, String user,
@@ -145,7 +155,7 @@ public class HuggingFaceClient {
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .retrieve()
-                .bodyToMono(JsonNode.class)
+                .bodyToMono(String.class)
                 .doOnError(e -> log.warn("generateImage failed (model={}): {}", props.getImageModel(), e.getMessage()))
                 .map(HuggingFaceClient::extractImageBytes);
     }
@@ -163,7 +173,14 @@ public class HuggingFaceClient {
         return r > 1.5 ? "portrait_16_9" : "portrait_4_3";
     }
 
-    private static byte[] extractImageBytes(JsonNode response) {
+    private static byte[] extractImageBytes(String body) {
+        JsonNode response;
+        try {
+            response = MAPPER.readTree(body);
+        } catch (Exception e) {
+            throw new IllegalStateException("Fal response not valid JSON (first 200 chars): "
+                    + body.substring(0, Math.min(200, body.length())), e);
+        }
         JsonNode firstImage = response.path("images").path(0);
         String url = firstImage.path("url").asText("");
         if (url.isEmpty()) {
