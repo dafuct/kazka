@@ -71,15 +71,14 @@ services:
       COOKIE_SECURE: "true"
       # --- JVM heap: keep headroom for mysql+redis on the same box ---
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--Xmx1g -XX:MaxRAMPercentage=60}
-      # --- HuggingFace ---
-      HUGGINGFACE_API_TOKEN: ${HUGGINGFACE_API_TOKEN}
-      # HF model names hardcoded here to bypass Coolify env-var indirection.
-      # Override per-environment by changing this file, not Coolify's UI.
-      HF_TEXT_MODEL: "meta-llama/Llama-3.3-70B-Instruct"
-      HF_EDITOR_MODEL: "meta-llama/Llama-3.3-70B-Instruct"
-      HF_IMAGE_MODEL: "black-forest-labs/FLUX.1-schnell"
-      MODERATION_MODEL: ${MODERATION_MODEL:-Qwen/Qwen3-32B}
-      MODERATION_BASE_URL: ${MODERATION_BASE_URL:-https://router.huggingface.co}
+      # --- LLM providers ---
+      # Migrated off HF on 2026-05-30: Gemini 2.5 Flash for text/editor/scene/judge,
+      # Fal.ai FLUX.1-schnell for images. Models + base URLs live in the backend's
+      # application.yml defaults — no compose-level override needed unless a future
+      # environment needs to run different models. See
+      # wiki/lessons/hf-router-strict-mode-rejects-repetition-penalty.md.
+      HUGGINGFACE_API_TOKEN: ${HUGGINGFACE_API_TOKEN}   # holds the Gemini API key value
+      FAL_KEY: ${FAL_KEY}
       # --- Auth / JWT ---
       KAZKA_JWT_SECRET: ${KAZKA_JWT_SECRET}
       KAZKA_JWT_ISSUER: ${KAZKA_JWT_ISSUER:-kazka}
