@@ -153,6 +153,12 @@ export const en: Locale = {
     support: 'Support',
     copyright: 'Made with ❤️ for little dreamers · Storybook World 2026',
   },
+  legal: {
+    terms: 'Terms of Use',
+    privacy: 'Privacy Policy',
+    support: 'Support',
+    effectiveDate: 'Effective date',
+  },
   errors: {
     generateFailed: 'Failed to generate story. Please try again.',
     loadFailed: 'Failed to load story.',
