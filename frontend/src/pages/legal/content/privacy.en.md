@@ -69,7 +69,7 @@ If you enabled push, we store a device token so we can deliver bedtime reminders
 | Apple Sign-In | Your Apple identifier, email (or relay) | USA |
 | Cloudflare | IP, request metadata (DNS, proxy) | USA |
 | Email provider | Email, contents of verification / system emails | [FILL: email provider] |
-| Hosting | Server logs | [FILL: VPS host name] |
+| Hetzner | Server logs (hosting) | Germany |
 
 ## 6. International transfers
 
