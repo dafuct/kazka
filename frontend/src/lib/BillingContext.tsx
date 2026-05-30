@@ -38,7 +38,9 @@ export function BillingProvider({ children }: { children: ReactNode }) {
     refresh()
   }, [refresh])
 
-  const isPro = entitlements.some(e => e.state === 'ACTIVE' || e.state === 'GRACE')
+  const isPro =
+    user?.role === 'ADMIN' ||
+    entitlements.some(e => e.state === 'ACTIVE' || e.state === 'GRACE')
 
   return <Ctx.Provider value={{ isPro, entitlements, loading, refresh }}>{children}</Ctx.Provider>
 }

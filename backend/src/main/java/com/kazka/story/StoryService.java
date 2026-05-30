@@ -165,9 +165,24 @@ public class StoryService {
                                             return SseEvent.done(id, title);
                                         }).subscribeOn(Schedulers.boundedElastic()))
                             ))
-                            .onErrorResume(e -> Flux.just(SseEvent.error(e.getMessage())));
+                            .onErrorResume(e -> deleteIfStillEmpty(id)
+                                    .thenMany(Flux.just(SseEvent.error(e.getMessage()))));
                     return meta.concatWith(tokens);
                 });
+    }
+
+    /**
+     * If generation fails before title/content land in DB, drop the placeholder row so it
+     * doesn't haunt "Архів казок" as an empty card. Only deletes when the row is still empty —
+     * a downstream side-effect failing after the story was populated must NOT delete real content.
+     */
+    private Mono<Void> deleteIfStillEmpty(String storyId) {
+        return Mono.fromRunnable(() -> repository.findById(storyId).ifPresent(s -> {
+            if ((s.getTitle() == null || s.getTitle().isBlank())
+                    && (s.getContent() == null || s.getContent().isBlank())) {
+                repository.deleteById(storyId);
+            }
+        })).subscribeOn(Schedulers.boundedElastic()).then();
     }
 
     private static boolean looksLikeTitle(String line) {
@@ -200,9 +215,15 @@ public class StoryService {
                 p = repository.findAllByUserIdAndChildProfileIdOrderByCreatedAtDesc(
                         currentUser.userId(), childProfileIdFilter, PageRequest.of(page, size));
             }
-            return new PageResponse<>(
-                    p.getContent().stream().map(s -> StoryDto.from(s, images)).toList(),
-                    p.getNumber(), p.getSize(), p.getTotalElements());
+            // Defense in depth: hide rows that failed mid-generation (empty content) — the
+            // on-error cleanup handles the live SSE path, but a crashed worker or stale row
+            // could still leave a placeholder behind. Branching tales always have content,
+            // so this filter is safe for them.
+            var items = p.getContent().stream()
+                    .filter(s -> s.getContent() != null && !s.getContent().isBlank())
+                    .map(s -> StoryDto.from(s, images))
+                    .toList();
+            return new PageResponse<>(items, p.getNumber(), p.getSize(), p.getTotalElements());
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -385,6 +406,7 @@ public class StoryService {
                             repository.save(saved);
                             extractionWorker.enqueue(saved.getId(), child.getId(), user.getId());
                             return saved;
-                        }).subscribeOn(Schedulers.boundedElastic())));
+                        }).subscribeOn(Schedulers.boundedElastic())))
+                .onErrorResume(e -> deleteIfStillEmpty(story.getId()).then(Mono.error(e)));
     }
 }
