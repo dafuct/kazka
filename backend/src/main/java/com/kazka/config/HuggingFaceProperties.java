@@ -15,12 +15,12 @@ public class HuggingFaceProperties {
 
     private double textTemperature = 0.75;
     private double textTopP = 0.9;
-    private double textRepetitionPenalty = 1.08;
+    private double textRepetitionPenalty = 1.0;
     private int textMaxTokens = 4096;
 
     private double editorTemperature = 0.3;
     private double editorTopP = 0.9;
-    private double editorRepetitionPenalty = 1.05;
+    private double editorRepetitionPenalty = 1.0;
     private int editorMaxTokens = 4096;
 
     public String getApiToken() { return apiToken; }

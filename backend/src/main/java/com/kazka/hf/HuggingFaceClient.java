@@ -82,7 +82,12 @@ public class HuggingFaceClient {
         body.put("max_tokens", maxTokens);
         body.put("temperature", temperature);
         body.put("top_p", topP);
-        body.put("repetition_penalty", repetitionPenalty);
+        // repetition_penalty is a Featherless/older-provider extension; Groq (which HF's router
+        // sends Llama 3.3 to) returns 400 "property unsupported" if it's present. Send only when
+        // explicitly enabled (>1.0) so swapping providers stays declarative.
+        if (repetitionPenalty > 1.0) {
+            body.put("repetition_penalty", repetitionPenalty);
+        }
         return textClient.post()
                 .uri("/v1/chat/completions")
                 .contentType(MediaType.APPLICATION_JSON)

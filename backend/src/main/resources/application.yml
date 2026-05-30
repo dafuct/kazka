@@ -70,11 +70,11 @@ kazka:
     image-base-url: ${HF_IMAGE_BASE_URL:https://router.huggingface.co}
     text-temperature: ${HF_TEXT_TEMPERATURE:0.75}
     text-top-p: ${HF_TEXT_TOP_P:0.9}
-    text-repetition-penalty: ${HF_TEXT_REPETITION_PENALTY:1.08}
+    text-repetition-penalty: ${HF_TEXT_REPETITION_PENALTY:1.0}
     text-max-tokens: ${HF_TEXT_MAX_TOKENS:4096}
     editor-temperature: ${HF_EDITOR_TEMPERATURE:0.3}
     editor-top-p: ${HF_EDITOR_TOP_P:0.9}
-    editor-repetition-penalty: ${HF_EDITOR_REPETITION_PENALTY:1.05}
+    editor-repetition-penalty: ${HF_EDITOR_REPETITION_PENALTY:1.0}
     editor-max-tokens: ${HF_EDITOR_MAX_TOKENS:4096}
   uploads:
     dir: ${UPLOADS_DIR:./uploads}
