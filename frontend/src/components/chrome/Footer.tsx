@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useLocale } from '../../lib/LocaleContext'
 import styles from './Footer.module.css'
 
@@ -14,9 +15,9 @@ export function Footer() {
         <span className={styles.tagline}>{t.footer.tagline}</span>
       </div>
       <div className={styles.links}>
-        <a href="#" className={styles.link}>{t.footer.terms}</a>
-        <a href="#" className={styles.link}>{t.footer.privacy}</a>
-        <a href="#" className={styles.link}>{t.footer.support}</a>
+        <Link to="/legal/terms" className={styles.link}>{t.footer.terms}</Link>
+        <Link to="/legal/privacy" className={styles.link}>{t.footer.privacy}</Link>
+        <Link to="/legal/support" className={styles.link}>{t.footer.support}</Link>
       </div>
       <div className={styles.bottom}>{t.footer.copyright}</div>
     </footer>
