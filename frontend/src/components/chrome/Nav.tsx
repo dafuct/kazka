@@ -125,7 +125,9 @@ export function Nav() {
             <li className={styles.userWrap} ref={menuRef}>
               <button className={styles.userBtn} onClick={() => setMenuOpen(o => !o)}>
                 <span>{user.displayName}</span>
-                {isPro && <span className={styles.proBadge}>Pro</span>}
+                {user.role === 'ADMIN'
+                  ? <span className={styles.proBadge}>Admin</span>
+                  : isPro && <span className={styles.proBadge}>Pro</span>}
                 <span aria-hidden="true">▾</span>
               </button>
               {menuOpen && (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { dashboard as dashboardApi } from '../lib/apiClient'
 import { useLocale } from '../lib/LocaleContext'
+import { useAuth } from '../lib/AuthContext'
 import type { Dashboard } from '@kazka/shared'
 import styles from './DashboardPage.module.css'
 import { StatCard } from '../components/dashboard/StatCard'
@@ -10,6 +11,8 @@ import { QuickLinks } from '../components/dashboard/QuickLinks'
 
 export function DashboardPage() {
   const { t } = useLocale()
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'ADMIN'
   const td = (t as any).dashboard ?? {}
   const [data, setData] = useState<Dashboard | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -27,8 +30,8 @@ export function DashboardPage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.title}>{td.title ?? 'Dashboard'}</h1>
-        <span className={data.isPro ? styles.pillPro : styles.pillFree}>
-          {data.isPro ? (td.pillPro ?? '⭐ Pro') : (td.pillFree ?? 'Free')}
+        <span className={isAdmin ? styles.pillPro : (data.isPro ? styles.pillPro : styles.pillFree)}>
+          {isAdmin ? 'Admin' : (data.isPro ? (td.pillPro ?? '⭐ Pro') : (td.pillFree ?? 'Free'))}
         </span>
       </header>
       <section className={styles.statsRow}>

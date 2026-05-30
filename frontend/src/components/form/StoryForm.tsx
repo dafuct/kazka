@@ -159,9 +159,10 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
         />
         <span className={styles.magicToggleIcon} aria-hidden="true">✨</span>
         <span className={styles.magicToggleLabel}>
-          {(t as any).branching?.formToggle ?? 'Branching tale'}
+          {((t as any).branching?.formToggle ?? 'Branching tale')
+            .replace(/\s*\((Pro|PRO)\)\s*$/i, user?.role === 'ADMIN' ? '' : ' (Pro)')}
         </span>
-        <span className={styles.magicToggleBadge}>Pro</span>
+        {user?.role !== 'ADMIN' && <span className={styles.magicToggleBadge}>Pro</span>}
       </label>
 
       <button

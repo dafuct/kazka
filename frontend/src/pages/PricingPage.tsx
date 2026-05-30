@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams, Link } from 'react-router-dom'
+import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import styles from './PricingPage.module.css'
 import { PlanToggle, type Period } from '../components/billing/PlanToggle'
 import { PlanCard } from '../components/billing/PlanCard'
@@ -28,6 +28,12 @@ export function PricingPage() {
   const { user } = useAuth()
   const { openAuth } = useAuthModal()
   const { entitlements, isPro, refresh: refreshBilling } = useBilling()
+  const navigate = useNavigate()
+
+  // Admin has full access via EntitlementResolver — pricing page is irrelevant for them.
+  useEffect(() => {
+    if (user?.role === 'ADMIN') navigate('/dashboard', { replace: true })
+  }, [user?.role, navigate])
   const [params] = useSearchParams()
   const [period, setPeriod] = useState<Period>('yearly')
   const [products, setProducts] = useState<Product[]>([])
