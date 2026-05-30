@@ -62,8 +62,8 @@ kazka:
   public-base-url: ${PUBLIC_BASE_URL:http://localhost:5173}
   huggingface:
     api-token: ${HUGGINGFACE_API_TOKEN:}
-    text-model: ${HF_TEXT_MODEL:INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v1.0:featherless-ai}
-    editor-model: ${HF_EDITOR_MODEL:INSAIT-Institute/MamayLM-Gemma-3-12B-IT-v1.0:featherless-ai}
+    text-model: ${HF_TEXT_MODEL:meta-llama/Llama-3.3-70B-Instruct}
+    editor-model: ${HF_EDITOR_MODEL:meta-llama/Llama-3.3-70B-Instruct}
     image-model: ${HF_IMAGE_MODEL:black-forest-labs/FLUX.1-schnell}
     scene-model: ${HF_SCENE_MODEL:Qwen/Qwen3-32B}
     text-base-url: ${HF_TEXT_BASE_URL:https://router.huggingface.co}
