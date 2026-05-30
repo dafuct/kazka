@@ -13,6 +13,7 @@
     "@kazka/shared": "*",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "react-markdown": "^9.1.0",
     "react-router-dom": "^7.14.2"
   },
   "devDependencies": {
