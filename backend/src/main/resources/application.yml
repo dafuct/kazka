@@ -104,7 +104,9 @@ kazka:
   moderation:
     judge-model: ${MODERATION_MODEL:gemini-2.5-flash}
     judge-base-url: ${MODERATION_BASE_URL:https://generativelanguage.googleapis.com/v1beta/openai}
-    judge-timeout: 5s
+    # Gemini Flash occasionally takes 8-10s on a cold path under free-tier rate limiting.
+    # 15s buys headroom without making the user-visible "generate" call feel hung.
+    judge-timeout: 15s
     suspension-threshold: 3
     suspension-window: 24h
     retention-days: 90

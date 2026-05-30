@@ -132,20 +132,32 @@ public class ModerationJudgeClient {
 
     private ModerationResult parseGuardResponse(String content) {
         if (content.isEmpty()) return ModerationResult.Refused.of(ModerationCategory.JUDGE_UNAVAILABLE);
-        // Find the first line that is exactly 'safe' or 'unsafe' — Qwen sometimes emits a preamble
-        // line ("Assessment:") or a code-fence wrapper, so locking on lines[0] is too strict.
+        // Scan lines for a 'safe' / 'unsafe' token. Different judge models phrase the verdict
+        // differently — Qwen sometimes prefixes "Assessment:", Gemini sometimes adds trailing
+        // punctuation or wraps it in a phrase ("Verdict: safe", "**safe**", "safe."). Strip
+        // backticks/asterisks/punctuation and check via word-boundary match. "unsafe" is checked
+        // BEFORE "safe" because "safe" is a substring of "unsafe".
         String[] lines = content.split("\\r?\\n");
         int verdictIdx = -1;
         String verdict = null;
         for (int i = 0; i < lines.length; i++) {
-            String trimmed = lines[i].trim().toLowerCase();
-            if ("safe".equals(trimmed) || "unsafe".equals(trimmed)) {
-                verdictIdx = i;
-                verdict = trimmed;
-                break;
+            String cleaned = lines[i].toLowerCase()
+                    .replaceAll("[`*_#>\"']", "")
+                    .replaceAll("[.,:;!?]", " ")
+                    .trim();
+            if (cleaned.isEmpty()) continue;
+            if (cleaned.matches(".*\\bunsafe\\b.*")) {
+                verdictIdx = i; verdict = "unsafe"; break;
+            }
+            if (cleaned.matches(".*\\bsafe\\b.*")) {
+                verdictIdx = i; verdict = "safe"; break;
             }
         }
-        if (verdict == null) return ModerationResult.Refused.of(ModerationCategory.JUDGE_UNAVAILABLE);
+        if (verdict == null) {
+            log.warn("Judge response unparseable, treating as JUDGE_UNAVAILABLE (first 200 chars): {}",
+                    content.substring(0, Math.min(200, content.length())));
+            return ModerationResult.Refused.of(ModerationCategory.JUDGE_UNAVAILABLE);
+        }
         if ("safe".equals(verdict)) return ModerationResult.Allowed.INSTANCE;
         // unsafe — find the next non-blank line for category codes
         String codeLine = null;
