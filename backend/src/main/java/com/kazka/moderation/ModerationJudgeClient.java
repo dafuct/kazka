@@ -105,6 +105,14 @@ public class ModerationJudgeClient {
 
     private ModerationResult classifyRaw(String userBody) {
         try {
+            // `reasoning_effort: "none"` disables Gemini 2.5's chain-of-thought for this call.
+            // Without it, thinking consumes the entire 64-token budget before any visible
+            // output is produced, so `message.content` comes back missing and the parser
+            // returns JUDGE_UNAVAILABLE. Thinking adds zero quality for a 1-token "safe" /
+            // "unsafe" verdict — keep it enabled only for creative paths (storyteller, editor).
+            // Field is OpenAI-standard (used by o3-series too) so works against OpenAI /
+            // OpenRouter as well; non-reasoning models ignore it. Bumped max_tokens 64 -> 128
+            // as belt-and-suspenders in case a future model needs slightly more room.
             String responseBody = webClient.post()
                     .uri("/chat/completions")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -114,7 +122,8 @@ public class ModerationJudgeClient {
                                     Map.of("role", "system", "content", POLICY),
                                     Map.of("role", "user", "content", userBody)),
                             "stream", false,
-                            "max_tokens", 64))
+                            "max_tokens", 128,
+                            "reasoning_effort", "none"))
                     .retrieve()
                     .bodyToMono(String.class)
                     .timeout(props.getJudgeTimeout())

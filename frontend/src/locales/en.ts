@@ -212,7 +212,7 @@ export const en: Locale = {
   },
   moderation: {
     BLOCKED_INPUT: "Let's try a different theme! Tell me about adventures, animals, or magical worlds.",
-    JUDGE_UNAVAILABLE: 'Story generation is temporarily unavailable. Please try again in a moment.',
+    JUDGE_UNAVAILABLE: "Content check is temporarily unavailable — it's not your theme, it's our service. Please try again in a moment.",
     accountSuspended: 'Your account has been suspended for review. Contact support:',
     formDisabledSuspended: 'Story generation is unavailable for suspended accounts',
     contactSupport: 'Contact support',
