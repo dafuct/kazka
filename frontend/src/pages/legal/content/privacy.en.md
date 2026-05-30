@@ -8,7 +8,7 @@ This policy explains what data Kazka collects, why, and what you can do about it
 
 ## 1. Data controller
 
-The controller of your personal data is the Ukrainian sole entrepreneur (ФОП) **Dmytro Makarenko** (Ukrainian tax ID РНОКПП: _to be provided_), address: **Vinnytsia, Ukraine**. Privacy questions: `support@kazkatales.com`.
+The controller of your personal data is the Ukrainian sole entrepreneur (ФОП) **Dmytro Makarenko** (Ukrainian tax ID РНОКПП: _to be provided_), address: **Vinnytsia, Ukraine**. Privacy questions: `d.makarenko.home@gmail.com`.
 
 ## 2. What we collect
 
@@ -48,7 +48,7 @@ If you enabled push, we store a device token so we can deliver bedtime reminders
 
 - Adults create accounts. Children don't register themselves (except for 13+ teens whose parents granted them a separate login).
 - The child's name, age, and interests are entered by the adult. We use this data only to personalise generated tales.
-- If you spot an under-13 account that shouldn't be there, email `support@kazkatales.com` and we'll delete it.
+- If you spot an under-13 account that shouldn't be there, email `d.makarenko.home@gmail.com` and we'll delete it.
 
 ## 4. Legal basis for processing (GDPR Art. 6)
 
@@ -93,7 +93,7 @@ You have the right to:
 - **Withdraw consent** — where processing relies on consent.
 - **Complaint** — file with the Ukrainian Parliament Commissioner for Human Rights (Ukraine's data-protection authority); if you live in the EU — your national data-protection authority.
 
-To exercise any of these, email `support@kazkatales.com`. We respond within **30 days**.
+To exercise any of these, email `d.makarenko.home@gmail.com`. We respond within **30 days**.
 
 ## 9. Cookies and local storage
 
@@ -116,8 +116,8 @@ Analytics: we don't use any third-party analytics tools.
 
 ## 11. Children's data — COPPA-style note (for non-Ukrainian users)
 
-We do not knowingly collect personal data of children under 13. If you're a parent and notice your child has registered without your knowledge, email `support@kazkatales.com` and the account will be deleted.
+We do not knowingly collect personal data of children under 13. If you're a parent and notice your child has registered without your knowledge, email `d.makarenko.home@gmail.com` and the account will be deleted.
 
 ## 12. Contact and changes to this policy
 
-Questions, requests, complaints — `support@kazkatales.com`. If we make material changes to this policy, we'll give at least 14 days' notice via the account email.
+Questions, requests, complaints — `d.makarenko.home@gmail.com`. If we make material changes to this policy, we'll give at least 14 days' notice via the account email.

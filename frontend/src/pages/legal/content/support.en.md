@@ -8,7 +8,7 @@ Got a question? Something broken? Want a refund or to delete your account? We're
 
 ## How to reach us
 
-Email: **`support@kazkatales.com`**
+Email: **`d.makarenko.home@gmail.com`**
 
 We reply within **2 business days**. If you don't hear back, check your spam folder, or write again with "follow-up" in the subject.
 
@@ -24,7 +24,7 @@ Depends where you signed up:
 
 ### How do I delete my account?
 
-Email `support@kazkatales.com` from the address tied to the account. We'll delete the account and all your tales within 30 days.
+Email `d.makarenko.home@gmail.com` from the address tied to the account. We'll delete the account and all your tales within 30 days.
 
 ### Why was my tale blocked / my account suspended?
 
@@ -38,7 +38,7 @@ That's AI being AI — it sometimes "hallucinates". You can regenerate for free 
 
 - Check spam / filtered folders.
 - Try again after 5 minutes — there's a "Resend" button on the sign-in page.
-- If it never arrives, email `support@kazkatales.com` with the address you used and we'll verify manually.
+- If it never arrives, email `d.makarenko.home@gmail.com` with the address you used and we'll verify manually.
 
 ### Can I use Kazka in a school / classroom?
 
@@ -58,4 +58,4 @@ If a tale comes out with invented words, broken plot, or just feels weak — sen
 
 ## Reporting abuse
 
-If you see something that endangers children, or believe the service is being misused, email `support@kazkatales.com` with "abuse" in the subject. We treat these as top priority.
+If you see something that endangers children, or believe the service is being misused, email `d.makarenko.home@gmail.com` with "abuse" in the subject. We treat these as top priority.

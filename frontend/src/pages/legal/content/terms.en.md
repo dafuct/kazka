@@ -8,7 +8,7 @@ Welcome to Kazka. Please read these terms — by using Kazka you agree to them.
 
 ## 1. Who we are
 
-The Kazka service ("Kazka", "we", "us") is operated by a Ukrainian sole entrepreneur (ФОП) **Dmytro Makarenko** (Ukrainian tax ID РНОКПП: _to be provided_), address: **Vinnytsia, Ukraine**. The service runs at `kazkatales.com`. Contact: `support@kazkatales.com`.
+The Kazka service ("Kazka", "we", "us") is operated by a Ukrainian sole entrepreneur (ФОП) **Dmytro Makarenko** (Ukrainian tax ID РНОКПП: _to be provided_), address: **Vinnytsia, Ukraine**. The service runs at `kazkatales.com`. Contact: `d.makarenko.home@gmail.com`.
 
 ## 2. What Kazka is
 
@@ -56,11 +56,11 @@ Cancellation depends on where you paid:
 
 - **Apple App Store** — on your iPhone: Settings → your name → Subscriptions → Kazka.
 - **Paddle** — your receipt email links to a Customer Portal where you can cancel.
-- **LiqPay / Monobank** — these are one-period payments; they only continue if you pay again manually. If you want to end access earlier, write to `support@kazkatales.com`.
+- **LiqPay / Monobank** — these are one-period payments; they only continue if you pay again manually. If you want to end access earlier, write to `d.makarenko.home@gmail.com`.
 
 ## 7. Refunds
 
-We refund the full Pro subscription price within **14 days** of payment if you've generated **fewer than 3 tales** in that window. Email `support@kazkatales.com` with the payment details.
+We refund the full Pro subscription price within **14 days** of payment if you've generated **fewer than 3 tales** in that window. Email `d.makarenko.home@gmail.com` with the payment details.
 
 - Apple App Store payments are refunded by Apple via `reportaproblem.apple.com`.
 - Gift codes are non-refundable.
@@ -82,4 +82,4 @@ These terms are governed by the laws of Ukraine. Disputes that can't be resolved
 
 ---
 
-If anything in these terms is unclear, email `support@kazkatales.com` and we'll explain.
+If anything in these terms is unclear, email `d.makarenko.home@gmail.com` and we'll explain.
