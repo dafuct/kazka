@@ -217,6 +217,17 @@ export const en: Locale = {
     formDisabledSuspended: 'Story generation is unavailable for suspended accounts',
     contactSupport: 'Contact support',
     tryAnotherTheme: 'Try another theme',
+    byCategory: {
+      SEXUAL: "Kazka stories don't include intimate themes. Try a story about friendship or adventure.",
+      VIOLENCE: 'In Kazka, heroes win with cleverness and kindness, not fighting. Try a different theme.',
+      HATE: 'In Kazka, everyone is a friend. Try a theme about respect or helping each other.',
+      SELF_HARM: 'This theme may not be safe for a child. Try something playful or cosy instead.',
+      DANGEROUS: 'This theme describes risky activities. Try a story about magic, animals, or journeys.',
+      SUBSTANCE: "Kazka stories don't mention alcohol or other substances. Try another theme.",
+      PROFANITY: 'This theme contains harsh words. Try something gentler — about animals or magical worlds.',
+      DEATH: "In Kazka stories, heroes don't die — villains vanish or transform. Try a different theme, like friendship or adventure.",
+      WAR: 'Instead of war, Kazka stories have peace and friendship. Try an adventure in a magical forest or another planet.',
+    },
   },
   pricing: {
     title: 'Upgrade to Pro',

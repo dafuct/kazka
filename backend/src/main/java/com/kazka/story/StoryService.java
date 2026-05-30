@@ -76,9 +76,9 @@ public class StoryService {
                                         moderationProperties.getJudgeModel()))
                                 .subscribeOn(Schedulers.boundedElastic())
                                 .thenMany(Flux.just(
-                                        SseEvent.errorCode(refused.category() ==
-                                                ModerationCategory.JUDGE_UNAVAILABLE
-                                                ? "JUDGE_UNAVAILABLE" : "BLOCKED_INPUT")));
+                                        refused.category() == ModerationCategory.JUDGE_UNAVAILABLE
+                                                ? SseEvent.errorCode("JUDGE_UNAVAILABLE")
+                                                : SseEvent.errorCode("BLOCKED_INPUT", refused.category().name())));
                     }
                     return generateInternal(req, userId);
                 });

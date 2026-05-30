@@ -12,6 +12,7 @@ export type {
   User,
   AuthErrorCode,
   ModerationErrorCode,
+  ModerationCategory,
   ApiErrorBody,
   ChildProfileDto,
   CharacterDto,

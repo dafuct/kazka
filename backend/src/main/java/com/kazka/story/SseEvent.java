@@ -23,4 +23,8 @@ public record SseEvent(String type, Object data) {
     public static SseEvent errorCode(String code) {
         return new SseEvent("error", Map.of("code", code));
     }
+
+    public static SseEvent errorCode(String code, String category) {
+        return new SseEvent("error", Map.of("code", code, "category", category));
+    }
 }

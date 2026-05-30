@@ -94,10 +94,13 @@ export function StoryModal() {
           api.illustrate(id).catch(() => null)
           pollUntilReady(id)
         },
-        onError: ({ code, message }) => {
+        onError: ({ code, category, message }) => {
           if (cancelled) return
           if (code && (MODERATION_CODES as readonly string[]).includes(code)) {
-            setError(t.moderation[code as ModerationErrorCode])
+            const perCategory = code === 'BLOCKED_INPUT' && category
+              ? t.moderation.byCategory?.[category]
+              : undefined
+            setError(perCategory ?? t.moderation[code as ModerationErrorCode])
             // Suspension may have just kicked in — refresh AuthContext so the banner appears.
             refresh()
           } else {

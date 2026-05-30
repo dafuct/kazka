@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { streamStory } from '../../lib/sseClient'
-import type { GenerationRequest, ModerationErrorCode } from '../../lib/types'
+import type { GenerationRequest, ModerationErrorCode, ModerationCategory } from '../../lib/types'
 import { RefusalCard } from './RefusalCard'
 import { useAuth } from '../../lib/AuthContext'
 import styles from './StoryStream.module.css'
@@ -16,7 +16,7 @@ const MODERATION_CODES: readonly ModerationErrorCode[] = ['BLOCKED_INPUT', 'JUDG
 
 export function StoryStream({ request, onDone, onError, onTryAnother }: StoryStreamProps) {
   const [tokens, setTokens] = useState<string[]>([])
-  const [refusal, setRefusal] = useState<ModerationErrorCode | null>(null)
+  const [refusal, setRefusal] = useState<{ code: ModerationErrorCode; category?: ModerationCategory } | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const { refresh } = useAuth()
@@ -32,9 +32,9 @@ export function StoryStream({ request, onDone, onError, onTryAnother }: StoryStr
       {
         onToken: ({ text }) => setTokens(prev => [...prev, text]),
         onDone: ({ id, title }) => onDone(id, title),
-        onError: ({ code, message }) => {
+        onError: ({ code, category, message }) => {
           if (code && (MODERATION_CODES as readonly string[]).includes(code)) {
-            setRefusal(code as ModerationErrorCode)
+            setRefusal({ code: code as ModerationErrorCode, category })
             // Suspension may have just kicked in; refresh AuthContext
             refresh()
             return
@@ -56,7 +56,7 @@ export function StoryStream({ request, onDone, onError, onTryAnother }: StoryStr
     }
   }, [tokens])
 
-  if (refusal) return <RefusalCard code={refusal} onTryAnother={onTryAnother} />
+  if (refusal) return <RefusalCard code={refusal.code} category={refusal.category} onTryAnother={onTryAnother} />
 
   const text = tokens.join('')
   return (

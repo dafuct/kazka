@@ -21,6 +21,20 @@ export type AuthErrorCode =
 
 export type ModerationErrorCode = 'BLOCKED_INPUT' | 'JUDGE_UNAVAILABLE';
 
+// Mirrors com.kazka.moderation.ModerationCategory. Sent on BLOCKED_INPUT SSE error
+// events so the UI can show a category-specific message explaining what was blocked.
+// JUDGE_UNAVAILABLE never carries a category — it's a system error, not a content issue.
+export type ModerationCategory =
+  | 'SEXUAL'
+  | 'VIOLENCE'
+  | 'HATE'
+  | 'SELF_HARM'
+  | 'DANGEROUS'
+  | 'SUBSTANCE'
+  | 'PROFANITY'
+  | 'DEATH'
+  | 'WAR';
+
 export interface ApiErrorBody {
   error: AuthErrorCode | string;
   message?: string;
