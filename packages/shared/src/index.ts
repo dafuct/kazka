@@ -59,6 +59,7 @@ export type UserRole = 'USER' | 'ADMIN';
 export type {
   AuthErrorCode,
   ModerationErrorCode,
+  ModerationCategory,
   ApiErrorBody,
 } from './errors';
 
