@@ -20,16 +20,19 @@ export function LegalPage({ slug }: { slug: Slug }) {
   const [text, setText] = useState<string>('')
 
   useEffect(() => {
+    // Guard against a stale loader resolving after a newer slug/lang has been requested.
+    let cancelled = false
     const key = `${slug}-${lang}` as keyof typeof sources
     const loader = sources[key] ?? sources[`${slug}-uk` as keyof typeof sources]
-    loader().then(m => setText(m.default))
+    loader().then(m => { if (!cancelled) setText(m.default) })
+    return () => { cancelled = true }
   }, [slug, lang])
 
   const title = t.legal[slug]
 
   useEffect(() => {
-    document.title = `${title} · Казкар`
-  }, [title])
+    document.title = `${title} · ${t.brand}`
+  }, [title, t.brand])
 
   return (
     <main className={styles.page}>
