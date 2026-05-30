@@ -1,5 +1,3 @@
-<!-- Drafted with AI assistance — not lawyer-reviewed. Send to a Ukrainian IT-law specialist before launch. -->
-
 # Terms of Use
 
 **Effective date:** 30 May 2026

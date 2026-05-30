@@ -1,5 +1,3 @@
-<!-- Drafted with AI assistance — not lawyer-reviewed. Send to a Ukrainian IT-law specialist before launch. -->
-
 # Підтримка
 
 **Дата набрання чинності:** 30 травня 2026
