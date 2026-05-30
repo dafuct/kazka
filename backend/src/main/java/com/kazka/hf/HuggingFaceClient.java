@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kazka.config.HuggingFaceProperties;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -90,6 +92,9 @@ public class HuggingFaceClient {
         }
     }
 
+    private static final ParameterizedTypeReference<ServerSentEvent<String>> SSE_TYPE =
+            new ParameterizedTypeReference<>() {};
+
     private Flux<String> streamRequest(String model, String system, String user,
                                         double temperature, double topP,
                                         double frequencyPenalty, double presencePenalty,
@@ -106,23 +111,30 @@ public class HuggingFaceClient {
         body.put("top_p", topP);
         if (frequencyPenalty != 0.0) body.put("frequency_penalty", frequencyPenalty);
         if (presencePenalty != 0.0) body.put("presence_penalty", presencePenalty);
+        // Use Spring's ServerSentEvent codec rather than `bodyToFlux(String.class)`. The latter
+        // emits one String per network buffer, which can carry multiple SSE events glued together
+        // or a partial event split across buffers — both of which cause silent token drops on the
+        // Gemini stream (Gemini batches several tokens into each `data:` event, so each dropped
+        // buffer loses a noticeable chunk of the tale).
         return textClient.post()
                 .uri("/chat/completions")
+                .accept(MediaType.TEXT_EVENT_STREAM)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .retrieve()
-                .bodyToFlux(String.class)
-                .flatMap(line -> {
-                    String trimmed = line.trim();
-                    if (trimmed.isEmpty()) return Flux.empty();
-                    String json = trimmed.startsWith("data:") ? trimmed.substring(5).trim() : trimmed;
-                    if (json.equals("[DONE]")) return Flux.empty();
+                .bodyToFlux(SSE_TYPE)
+                .map(ServerSentEvent::data)
+                .takeWhile(data -> !"[DONE]".equals(data))
+                .flatMap(data -> {
+                    if (data == null || data.isBlank()) return Flux.empty();
                     try {
-                        JsonNode node = MAPPER.readTree(json);
+                        JsonNode node = MAPPER.readTree(data);
                         String token = node.path("choices").path(0)
                                 .path("delta").path("content").asText("");
                         return token.isEmpty() ? Flux.empty() : Flux.just(token);
                     } catch (Exception e) {
+                        log.warn("SSE chunk parse failed (first 200 chars): {}",
+                                data.substring(0, Math.min(200, data.length())));
                         return Flux.empty();
                     }
                 });
