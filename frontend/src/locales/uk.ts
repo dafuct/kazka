@@ -420,6 +420,33 @@ export const uk = {
     noTales: 'Ще немає казок',
     lastBedtime: 'Останній бедтайм',
   },
+  admin: {
+    moderation: {
+      title: 'Модерація',
+      loading: 'Завантаження…',
+      loadError: 'Не вдалося завантажити дані модерації.',
+      suspendedSection: (n: number) => `Призупинені користувачі (${n})`,
+      suspendedEmpty: 'Жодного.',
+      colEmail: 'Пошта',
+      colName: 'Ім’я',
+      colSuspendedAt: 'Призупинено',
+      colReason: 'Причина',
+      colBy: 'Ким',
+      autoBy: 'авто',
+      unsuspend: 'Поновити',
+      unsuspendConfirm: 'Поновити цей акаунт?',
+      flaggedSection: (page: number) => `Останні позначені спроби (сторінка ${page})`,
+      colWhen: 'Коли',
+      colUser: 'Користувач',
+      colPipeline: 'Пайплайн',
+      colCategory: 'Категорія',
+      colLang: 'Мова',
+      colPrompt: 'Запит',
+      prev: 'Назад',
+      next: 'Далі',
+      pageLabel: (page: number) => `Сторінка ${page}`,
+    },
+  },
 }
 
 export type Locale = typeof uk
