@@ -4,7 +4,7 @@ import com.kazka.AbstractIT;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.story.branching.dto.BranchingStartRequest;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
@@ -36,7 +36,7 @@ class BranchingTierIT extends AbstractIT {
     @Autowired ChildProfileRepository profiles;
     @Autowired PasswordEncoder passwordEncoder;
     @MockitoBean EntitlementResolver entitlements;
-    @MockitoBean HuggingFaceClient hfClient;
+    @MockitoBean AiClient aiClient;
 
     String freeUserId;
     String paidUserId;
@@ -45,7 +45,7 @@ class BranchingTierIT extends AbstractIT {
 
     @BeforeEach
     void setup() {
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(
                 Flux.just("Body.\n\n---\n\nCHOICE_A: A\nCHOICE_B: B"));
         freeUserId = seedUser();
         paidUserId = seedUser();

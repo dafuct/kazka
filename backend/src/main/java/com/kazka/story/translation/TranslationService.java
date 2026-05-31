@@ -2,7 +2,7 @@ package com.kazka.story.translation;
 
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.billing.EntitlementResolver;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
@@ -25,7 +25,7 @@ public class TranslationService {
 
     private final StoryRepository stories;
     private final EntitlementResolver entitlements;
-    private final HuggingFaceClient hfClient;
+    private final AiClient aiClient;
     private final TranslationPromptBuilder promptBuilder;
     private final PromptBuilder systemPromptBuilder;
     private final ImageUrlResolver images;
@@ -53,7 +53,7 @@ public class TranslationService {
         String systemPrompt = systemPromptBuilder.buildStorySystem(targetLanguage);
         String userMessage = promptBuilder.buildUserMessage(story.getLanguage(), targetLanguage, story.getContent());
 
-        return hfClient.streamText(systemPrompt, userMessage)
+        return aiClient.streamText(systemPrompt, userMessage)
                 .reduce("", String::concat)
                 .flatMap(translated -> Mono.fromCallable(() -> {
                     story.setTranslatedContent(translated.strip());

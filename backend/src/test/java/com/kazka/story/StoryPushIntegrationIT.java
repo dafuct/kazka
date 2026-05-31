@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@EnabledIfEnvironmentVariable(named = "HUGGINGFACE_API_TOKEN", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "GOOGLE_API_KEY", matches = ".+")
 @org.junit.jupiter.api.Disabled("Replaced by IllustrationServicePushIT — spec O5")
 class StoryPushIntegrationIT extends AbstractIT {
 

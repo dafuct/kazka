@@ -4,7 +4,7 @@ import com.kazka.AbstractIT;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.story.StoryRepository;
 import com.kazka.story.branching.dto.BranchingChoiceRequest;
 import com.kazka.story.branching.dto.BranchingStartRequest;
@@ -41,7 +41,7 @@ class BranchingControllerIT extends AbstractIT {
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder passwordEncoder;
     @MockitoBean EntitlementResolver entitlements;
-    @MockitoBean HuggingFaceClient hfClient;
+    @MockitoBean AiClient aiClient;
 
     String userId;
     String profileId;
@@ -56,7 +56,7 @@ class BranchingControllerIT extends AbstractIT {
     @Test
     void full_three_call_flow_persists_complete_tale() {
         // Three canned responses for the three LLM calls (in order).
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(
                 Flux.just("Opening text.\n\n---\n\nCHOICE_A: Go left\nCHOICE_B: Go right"),
                 Flux.just("Middle text.\n\n---\n\nCHOICE_A: Climb the tree\nCHOICE_B: Cross the bridge"),
                 Flux.just("Closing text. The tale ends happily."));

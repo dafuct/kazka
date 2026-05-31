@@ -78,12 +78,10 @@ services:
       # --- JVM heap: keep headroom for mysql+redis on the same box ---
       JAVA_TOOL_OPTIONS: ${JAVA_TOOL_OPTIONS:--Xmx1g -XX:MaxRAMPercentage=60}
       # --- LLM providers ---
-      # Migrated off HF on 2026-05-30: Gemini 2.5 Flash for text/editor/scene/judge,
-      # Fal.ai FLUX.1-schnell for images. Models + base URLs live in the backend's
-      # application.yml defaults — no compose-level override needed unless a future
-      # environment needs to run different models. See
-      # wiki/lessons/hf-router-strict-mode-rejects-repetition-penalty.md.
-      HUGGINGFACE_API_TOKEN: ${HUGGINGFACE_API_TOKEN}   # holds the Gemini API key value
+      # Gemini 2.5 Flash for text/editor/scene/judge, Fal.ai FLUX.1-schnell for images.
+      # Models + base URLs live in the backend's application.yml defaults — no
+      # compose-level override needed unless a future environment runs different models.
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
       FAL_KEY: ${FAL_KEY}
       # --- Auth / JWT ---
       KAZKA_JWT_SECRET: ${KAZKA_JWT_SECRET}

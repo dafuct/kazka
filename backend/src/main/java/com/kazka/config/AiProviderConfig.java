@@ -6,13 +6,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class HuggingFaceConfig {
+public class AiProviderConfig {
 
     @Bean
-    public WebClient textClient(WebClient.Builder builder, HuggingFaceProperties huggingFaceProperties) {
+    public WebClient textClient(WebClient.Builder builder, AiProviderProperties aiProps) {
         return builder.clone()
-                .baseUrl(huggingFaceProperties.getTextBaseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, bearer(huggingFaceProperties.getApiToken()))
+                .baseUrl(aiProps.getTextBaseUrl())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, bearer(aiProps.getApiToken()))
                 .codecs(c -> c.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
                 .build();
     }
@@ -22,21 +22,21 @@ public class HuggingFaceConfig {
      * because `sync_mode=true` returns the image as a base64 data URI inline in the JSON body.
      */
     @Bean
-    public WebClient imageClient(WebClient.Builder builder, HuggingFaceProperties huggingFaceProperties) {
+    public WebClient imageClient(WebClient.Builder builder, AiProviderProperties aiProps) {
         return builder.clone()
-                .baseUrl(huggingFaceProperties.getImageBaseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Key " + huggingFaceProperties.getImageApiToken())
+                .baseUrl(aiProps.getImageBaseUrl())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Key " + aiProps.getImageApiToken())
                 .codecs(c -> c.defaultCodecs().maxInMemorySize(20 * 1024 * 1024))
                 .build();
     }
 
     @Bean
     public WebClient judgeWebClient(WebClient.Builder builder,
-                                    HuggingFaceProperties hfProps,
+                                    AiProviderProperties aiProps,
                                     com.kazka.moderation.ModerationProperties modProps) {
         return builder.clone()
                 .baseUrl(modProps.getJudgeBaseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, bearer(hfProps.getApiToken()))
+                .defaultHeader(HttpHeaders.AUTHORIZATION, bearer(aiProps.getApiToken()))
                 .codecs(c -> c.defaultCodecs().maxInMemorySize(2 * 1024 * 1024))
                 .build();
     }

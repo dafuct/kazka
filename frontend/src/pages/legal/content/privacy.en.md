@@ -57,7 +57,8 @@ If you enabled push, we store a device token so we can deliver bedtime reminders
 
 | Provider | What it sees | Jurisdiction |
 |---|---|---|
-| HuggingFace | Your prompt text and the generated tale / illustration (no user identifier attached) | USA |
+| Google (Gemini API) | Your prompt text and the generated tale text (no user identifier attached) — used for tale generation, editing, scene extraction, and moderation | USA |
+| Fal.ai | The image scene description (derived from your prompt; no user identifier attached) — used for illustration generation | USA |
 | Paddle | Email, payment amount | UK / Ireland |
 | LiqPay | Email, payment amount | Ukraine |
 | Monobank | Email, payment amount | Ukraine |

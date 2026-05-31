@@ -1,6 +1,6 @@
 package com.kazka.child;
 
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CharacterExtractionServiceTest {
 
-    @Mock HuggingFaceClient hfClient;
+    @Mock AiClient aiClient;
     @InjectMocks CharacterExtractionService svc;
 
     @Test
@@ -23,7 +23,7 @@ class CharacterExtractionServiceTest {
         String json = """
                 [{"name":"Мурка","kind":"animal","description":"a cat","traits":["curious"],"role":"companion"}]
                 """;
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.just(json));
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(json));
 
         var candidates = svc.extract("body text").block();
         assertThat(candidates).hasSize(1);
@@ -33,14 +33,14 @@ class CharacterExtractionServiceTest {
 
     @Test
     void should_return_empty_list_on_malformed_json() {
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.just("not json"));
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just("not json"));
         var candidates = svc.extract("body").block();
         assertThat(candidates).isEmpty();
     }
 
     @Test
     void should_strip_markdown_fences_when_present() {
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
                 "```json\n[{\"name\":\"X\",\"kind\":\"boy\",\"description\":\"d\",\"traits\":[],\"role\":\"protagonist\"}]\n```"));
         var candidates = svc.extract("body").block();
         assertThat(candidates).hasSize(1);
@@ -52,7 +52,7 @@ class CharacterExtractionServiceTest {
         String json = "[{\"name\":\"X\",\"kind\":\"boy\",\"description\":\"d\"," +
                 "\"traits\":[\"a\",\"b\",\"c\",\"d\",\"e\",\"f\",\"g\",\"h\",\"i\",\"j\"]," +
                 "\"role\":\"protagonist\"}]";
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.just(json));
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(json));
         var candidates = svc.extract("body").block();
         assertThat(candidates.get(0).traits()).hasSize(8);
     }

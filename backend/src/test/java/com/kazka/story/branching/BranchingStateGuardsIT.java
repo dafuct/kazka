@@ -4,7 +4,7 @@ import com.kazka.AbstractIT;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
 import com.kazka.story.branching.dto.BranchingChoice;
@@ -39,7 +39,7 @@ class BranchingStateGuardsIT extends AbstractIT {
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder passwordEncoder;
     @MockitoBean EntitlementResolver entitlements;
-    @MockitoBean HuggingFaceClient hfClient;
+    @MockitoBean AiClient aiClient;
 
     String userA;
     String userB;

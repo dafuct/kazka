@@ -34,7 +34,7 @@ class BranchingServiceTest {
     @Mock ChildProfileService childProfiles;
     @Mock com.kazka.child.CharacterRepository characters;
     @Mock EntitlementResolver entitlements;
-    @Mock com.kazka.hf.HuggingFaceClient hfClient;
+    @Mock com.kazka.ai.AiClient aiClient;
     @Mock BranchingPromptBuilder promptBuilder;
     @Mock com.kazka.child.CharacterExtractionWorker extractionWorker;
     @Mock com.kazka.story.PromptBuilder systemPromptBuilder;
@@ -68,7 +68,7 @@ class BranchingServiceTest {
         when(entitlements.isPro("u1")).thenReturn(true);
         when(systemPromptBuilder.buildStorySystem(anyString())).thenReturn("system prompt");
         when(promptBuilder.buildOpeningUserMessage(any(), any(), any())).thenReturn("opening prompt");
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
                 "Opening body.\n\n---\n\nCHOICE_A: Option A\nCHOICE_B: Option B"));
         when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
 

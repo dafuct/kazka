@@ -4,7 +4,7 @@ import com.kazka.AbstractIT;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
 import com.kazka.user.UserRole;
@@ -34,7 +34,7 @@ class BedtimeSweepJobIT extends AbstractIT {
     @Autowired ChildProfileRepository profiles;
     @Autowired UserRepository users;
     @Autowired PasswordEncoder passwordEncoder;
-    @MockitoBean HuggingFaceClient hfClient;
+    @MockitoBean AiClient aiClient;
     @MockitoBean EntitlementResolver entitlements;
 
     @BeforeEach
@@ -43,8 +43,8 @@ class BedtimeSweepJobIT extends AbstractIT {
         // be counted here; clear them so the zero-count assertions reflect only this test.
         schedules.deleteAll();
         when(entitlements.isPro(anyString())).thenReturn(true);
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.just("Title\n\nOnce upon a time..."));
-        when(hfClient.streamEdit(anyString(), anyString())).thenReturn(Flux.just("Title\n\nOnce upon a time..."));
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just("Title\n\nOnce upon a time..."));
+        when(aiClient.streamEdit(anyString(), anyString())).thenReturn(Flux.just("Title\n\nOnce upon a time..."));
     }
 
     @Test

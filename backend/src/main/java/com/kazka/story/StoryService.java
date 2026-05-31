@@ -2,7 +2,7 @@ package com.kazka.story;
 
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.auth.exception.EmailNotVerifiedException;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.illustration.IllustrationService;
 import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.moderation.ModerationCategory;
@@ -32,7 +32,7 @@ public class StoryService {
 
     private final StoryRepository repository;
     private final UserRepository users;
-    private final HuggingFaceClient hfClient;
+    private final AiClient aiClient;
     private final PromptBuilder promptBuilder;
     private final IllustrationService illustrationService;
     private final ModerationService moderationService;
@@ -126,11 +126,11 @@ public class StoryService {
                 .flatMapMany(saved -> {
                     Flux<SseEvent> meta = Flux.just(SseEvent.meta(id));
                     StringBuilder rawBuffer = new StringBuilder();
-                    Flux<SseEvent> tokens = hfClient.streamText(storySystem, storyUser)
+                    Flux<SseEvent> tokens = aiClient.streamText(storySystem, storyUser)
                             .doOnNext(rawBuffer::append)
                             .map(SseEvent::token)
                             .concatWith(Mono.defer(() ->
-                                hfClient.streamEdit(editorSystem, rawBuffer.toString())
+                                aiClient.streamEdit(editorSystem, rawBuffer.toString())
                                         .reduce("", String::concat)
                                         .flatMap(corrected -> Mono.fromCallable(() -> {
                                             String[] lines = corrected.split("\n");
@@ -381,9 +381,9 @@ public class StoryService {
 
         return Mono.fromCallable(() -> repository.save(story))
                 .subscribeOn(Schedulers.boundedElastic())
-                .flatMap(saved -> hfClient.streamText(storySystem, storyUser)
+                .flatMap(saved -> aiClient.streamText(storySystem, storyUser)
                         .reduce("", String::concat)
-                        .flatMap(raw -> hfClient.streamEdit(editorSystem, raw)
+                        .flatMap(raw -> aiClient.streamEdit(editorSystem, raw)
                                 .reduce("", String::concat))
                         .flatMap(corrected -> Mono.fromCallable(() -> {
                             String[] lines = corrected.split("\n");

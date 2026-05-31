@@ -60,35 +60,34 @@ server:
         http-only: true
 kazka:
   public-base-url: ${PUBLIC_BASE_URL:http://localhost:5173}
-  # Despite the `huggingface` namespace, this block now configures Gemini (text/editor/scene)
-  # and Fal.ai (images). The HF router was retired 2026-05-30 — see
-  # wiki/lessons/hf-router-strict-mode-rejects-repetition-penalty.md. Env var names are
-  # preserved (HF_*) to minimise Coolify churn; class rename can come later.
-  huggingface:
-    api-token: ${HUGGINGFACE_API_TOKEN:}           # holds GOOGLE_API_KEY value
+  # Text/editor/scene/judge → Google Gemini 2.5 Flash via OpenAI-compatible endpoint.
+  # Images → Fal.ai FLUX.1-schnell. Migrated off the HuggingFace Inference Router on
+  # 2026-05-30 — see wiki/lessons/hf-router-strict-mode-rejects-repetition-penalty.md.
+  ai:
+    api-token: ${GOOGLE_API_KEY:}                  # Gemini key
     image-api-token: ${FAL_KEY:}                   # Fal.ai key for image generation
-    text-model: ${HF_TEXT_MODEL:gemini-2.5-flash}
-    editor-model: ${HF_EDITOR_MODEL:gemini-2.5-flash}
-    image-model: ${HF_IMAGE_MODEL:fal-ai/flux/schnell}
-    scene-model: ${HF_SCENE_MODEL:gemini-2.5-flash}
-    text-base-url: ${HF_TEXT_BASE_URL:https://generativelanguage.googleapis.com/v1beta/openai}
-    image-base-url: ${HF_IMAGE_BASE_URL:https://fal.run}
+    text-model: ${AI_TEXT_MODEL:gemini-2.5-flash}
+    editor-model: ${AI_EDITOR_MODEL:gemini-2.5-flash}
+    image-model: ${AI_IMAGE_MODEL:fal-ai/flux/schnell}
+    scene-model: ${AI_SCENE_MODEL:gemini-2.5-flash}
+    text-base-url: ${AI_TEXT_BASE_URL:https://generativelanguage.googleapis.com/v1beta/openai}
+    image-base-url: ${AI_IMAGE_BASE_URL:https://fal.run}
     # Fal's FLUX safety classifier false-positives on children's-book aesthetics. Kazka's own
     # ModerationJudgeClient already screens the scene prompt before it reaches Fal, so this is
     # off by default. Set FAL_SAFETY_CHECKER=true to re-enable for defence-in-depth.
     image-safety-checker: ${FAL_SAFETY_CHECKER:false}
-    text-temperature: ${HF_TEXT_TEMPERATURE:0.75}
-    text-top-p: ${HF_TEXT_TOP_P:0.9}
+    text-temperature: ${AI_TEXT_TEMPERATURE:0.75}
+    text-top-p: ${AI_TEXT_TOP_P:0.9}
     # Gemini OpenAI-compat 400s on frequency/presence penalty fields. Default 0.0 = skip-send.
     # Override only when pointed at OpenAI/OpenRouter/Together which do accept them.
-    text-frequency-penalty: ${HF_TEXT_FREQUENCY_PENALTY:0.0}
-    text-presence-penalty: ${HF_TEXT_PRESENCE_PENALTY:0.0}
-    text-max-tokens: ${HF_TEXT_MAX_TOKENS:4096}
-    editor-temperature: ${HF_EDITOR_TEMPERATURE:0.3}
-    editor-top-p: ${HF_EDITOR_TOP_P:0.9}
-    editor-frequency-penalty: ${HF_EDITOR_FREQUENCY_PENALTY:0.0}
-    editor-presence-penalty: ${HF_EDITOR_PRESENCE_PENALTY:0.0}
-    editor-max-tokens: ${HF_EDITOR_MAX_TOKENS:4096}
+    text-frequency-penalty: ${AI_TEXT_FREQUENCY_PENALTY:0.0}
+    text-presence-penalty: ${AI_TEXT_PRESENCE_PENALTY:0.0}
+    text-max-tokens: ${AI_TEXT_MAX_TOKENS:4096}
+    editor-temperature: ${AI_EDITOR_TEMPERATURE:0.3}
+    editor-top-p: ${AI_EDITOR_TOP_P:0.9}
+    editor-frequency-penalty: ${AI_EDITOR_FREQUENCY_PENALTY:0.0}
+    editor-presence-penalty: ${AI_EDITOR_PRESENCE_PENALTY:0.0}
+    editor-max-tokens: ${AI_EDITOR_MAX_TOKENS:4096}
   uploads:
     dir: ${UPLOADS_DIR:./uploads}
   storage:

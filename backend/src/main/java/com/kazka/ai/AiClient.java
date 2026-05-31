@@ -1,8 +1,8 @@
-package com.kazka.hf;
+package com.kazka.ai;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kazka.config.HuggingFaceProperties;
+import com.kazka.config.AiProviderProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -18,27 +18,27 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Thin OpenAI-compatible chat client (text/editor/scene) + Fal.ai image client.
- * Name retained for blast-radius reasons after the HF → Gemini/Fal migration
- * (wiki/lessons/hf-router-strict-mode-rejects-repetition-penalty.md).
+ * Thin OpenAI-compatible chat client (text/editor/scene → Gemini 2.5 Flash) + Fal.ai image client.
+ * Migrated off the HuggingFace Inference Router on 2026-05-30 —
+ * see wiki/lessons/hf-router-strict-mode-rejects-repetition-penalty.md for the why.
  */
 @Slf4j
 @Component
-public class HuggingFaceClient {
+public class AiClient {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final WebClient textClient;
     private final WebClient imageClient;
-    private final HuggingFaceProperties props;
+    private final AiProviderProperties props;
 
-    public HuggingFaceClient(HuggingFaceProperties props, WebClient textClient, WebClient imageClient) {
+    public AiClient(AiProviderProperties props, WebClient textClient, WebClient imageClient) {
         this.props = props;
         if (props.getApiToken() == null || props.getApiToken().isBlank()) {
-            log.warn("kazka.huggingface.api-token is not set — chat-completion calls will fail with 401");
+            log.warn("kazka.ai.api-token is not set — chat-completion calls will fail with 401");
         }
         if (props.getImageApiToken() == null || props.getImageApiToken().isBlank()) {
-            log.warn("kazka.huggingface.image-api-token (FAL_KEY) is not set — image calls will fail with 401");
+            log.warn("kazka.ai.image-api-token (FAL_KEY) is not set — image calls will fail with 401");
         }
         log.info("LLM models resolved at startup: text={}, editor={}, scene={}, image={}",
                 props.getTextModel(), props.getEditorModel(), props.getSceneModel(), props.getImageModel());
@@ -77,7 +77,7 @@ public class HuggingFaceClient {
                 .bodyToMono(String.class)
                 .defaultIfEmpty("")
                 .doOnError(e -> log.warn("generateText failed (model={}): {}", props.getSceneModel(), e.getMessage()))
-                .map(HuggingFaceClient::extractChatContent);
+                .map(AiClient::extractChatContent);
     }
 
     private static String extractChatContent(String body) {
@@ -169,7 +169,7 @@ public class HuggingFaceClient {
                 .retrieve()
                 .bodyToMono(String.class)
                 .doOnError(e -> log.warn("generateImage failed (model={}): {}", props.getImageModel(), e.getMessage()))
-                .map(HuggingFaceClient::extractImageBytes);
+                .map(AiClient::extractImageBytes);
     }
 
     private static String mapImageSize(int width, int height) {

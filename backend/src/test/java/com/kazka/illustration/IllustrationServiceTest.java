@@ -1,6 +1,6 @@
 package com.kazka.illustration;
 
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.moderation.ModerationCategory;
 import com.kazka.moderation.ModerationPipeline;
 import com.kazka.moderation.ModerationProperties;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class IllustrationServiceTest {
 
-    @Mock HuggingFaceClient hfClient;
+    @Mock AiClient aiClient;
     @Mock ImageStorage imageStorage;
     @Mock StoryRepository storyRepo;
     @Mock PromptBuilder promptBuilder;
@@ -72,13 +72,13 @@ class IllustrationServiceTest {
     void generateAndStore_savesLightAndDarkPng_onSuccess() {
         Story story = sampleStory();
         when(storyRepo.findById("s1")).thenReturn(Optional.of(story));
-        when(hfClient.generateText(any(), any())).thenReturn(Mono.just("a fox under a tree"));
+        when(aiClient.generateText(any(), any())).thenReturn(Mono.just("a fox under a tree"));
         when(promptBuilder.buildSceneExtractionSystem()).thenReturn("scene-sys");
         when(promptBuilder.buildSceneExtractionUser(anyString())).thenReturn("scene-user");
         when(promptBuilder.buildImagePrompt(eq(story), anyString(), eq(Theme.LIGHT))).thenReturn("light-prompt");
         when(promptBuilder.buildImagePrompt(eq(story), anyString(), eq(Theme.DARK))).thenReturn("dark-prompt");
-        when(hfClient.generateImage(eq("light-prompt"), eq(1024), eq(768))).thenReturn(Mono.just(new byte[]{1}));
-        when(hfClient.generateImage(eq("dark-prompt"), eq(1024), eq(768))).thenReturn(Mono.just(new byte[]{2}));
+        when(aiClient.generateImage(eq("light-prompt"), eq(1024), eq(768))).thenReturn(Mono.just(new byte[]{1}));
+        when(aiClient.generateImage(eq("dark-prompt"), eq(1024), eq(768))).thenReturn(Mono.just(new byte[]{2}));
         when(imageStorage.store("s1", Theme.LIGHT, new byte[]{1})).thenReturn("s1-light.png");
         when(imageStorage.store("s1", Theme.DARK, new byte[]{2})).thenReturn("s1-dark.png");
 
@@ -95,14 +95,14 @@ class IllustrationServiceTest {
     void generateAndStore_marksFailed_whenImageCallFails() {
         Story story = sampleStory();
         when(storyRepo.findById("s1")).thenReturn(Optional.of(story));
-        when(hfClient.generateText(any(), any())).thenReturn(Mono.just("a fox"));
+        when(aiClient.generateText(any(), any())).thenReturn(Mono.just("a fox"));
         lenient().when(promptBuilder.buildSceneExtractionSystem()).thenReturn("scene-sys");
         lenient().when(promptBuilder.buildSceneExtractionUser(anyString())).thenReturn("scene-user");
         when(promptBuilder.buildImagePrompt(any(), anyString(), eq(Theme.LIGHT))).thenReturn("light-prompt");
         when(promptBuilder.buildImagePrompt(any(), anyString(), eq(Theme.DARK))).thenReturn("dark-prompt");
-        when(hfClient.generateImage(eq("light-prompt"), eq(1024), eq(768)))
+        when(aiClient.generateImage(eq("light-prompt"), eq(1024), eq(768)))
                 .thenReturn(Mono.error(new RuntimeException("HF down")));
-        lenient().when(hfClient.generateImage(eq("dark-prompt"), eq(1024), eq(768)))
+        lenient().when(aiClient.generateImage(eq("dark-prompt"), eq(1024), eq(768)))
                 .thenReturn(Mono.just(new byte[]{2}));
 
         StepVerifier.create(service.generateAndStore("s1")).verifyComplete();
@@ -141,17 +141,17 @@ class IllustrationServiceTest {
                 .thenReturn("illustrated style: " + fallbackScene + " (light)");
         when(promptBuilder.buildImagePrompt(any(), eq(fallbackScene), eq(Theme.DARK)))
                 .thenReturn("illustrated style: " + fallbackScene + " (dark)");
-        when(hfClient.generateText(anyString(), anyString())).thenReturn(reactor.core.publisher.Mono.just("the witch with bloody hands"));
+        when(aiClient.generateText(anyString(), anyString())).thenReturn(reactor.core.publisher.Mono.just("the witch with bloody hands"));
         when(moderationService.checkScene(eq("uk"), eq("the witch with bloody hands")))
                 .thenReturn(com.kazka.moderation.ModerationResult.Refused.of(com.kazka.moderation.ModerationCategory.VIOLENCE));
-        when(hfClient.generateImage(anyString(), eq(1024), eq(768)))
+        when(aiClient.generateImage(anyString(), eq(1024), eq(768)))
                 .thenReturn(reactor.core.publisher.Mono.just(new byte[]{1, 2, 3}));
         lenient().when(imageStorage.store(anyString(), any(), any())).thenReturn("fallback.png");
 
         service.generateAndStore("story-1").block();
 
         org.mockito.ArgumentCaptor<String> captor = org.mockito.ArgumentCaptor.forClass(String.class);
-        verify(hfClient, times(2)).generateImage(captor.capture(), eq(1024), eq(768));
+        verify(aiClient, times(2)).generateImage(captor.capture(), eq(1024), eq(768));
         for (String prompt : captor.getAllValues()) {
             org.assertj.core.api.Assertions.assertThat(prompt).contains("two friends in a sunlit forest at sunset");
             org.assertj.core.api.Assertions.assertThat(prompt).doesNotContain("bloody");

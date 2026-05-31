@@ -1,7 +1,7 @@
 package com.kazka.child;
 
 import com.kazka.AbstractIT;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
 import com.kazka.user.User;
@@ -31,11 +31,11 @@ class ExtractionPipelineIT extends AbstractIT {
     @Autowired ChildProfileRepository profiles;
     @Autowired UserRepository users;
     @Autowired PasswordEncoder passwordEncoder;
-    @MockitoBean HuggingFaceClient hfClient;
+    @MockitoBean AiClient aiClient;
 
     @Test
     void should_transition_pending_running_done_on_happy_path() {
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
                 "[{\"name\":\"Мурка\",\"kind\":\"animal\",\"description\":\"a cat\",\"traits\":[\"curious\"],\"role\":\"companion\"}]"));
 
         String userId = seedUser();
@@ -52,7 +52,7 @@ class ExtractionPipelineIT extends AbstractIT {
 
     @Test
     void should_mark_done_with_empty_extraction_when_LLM_returns_empty_array() {
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.just("[]"));
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just("[]"));
 
         String userId = seedUser();
         String profileId = seedProfile(userId);

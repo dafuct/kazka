@@ -1,7 +1,7 @@
 package com.kazka.illustration;
 
+import com.kazka.ai.AiClient;
 import com.kazka.device.PushNotifier;
-import com.kazka.hf.HuggingFaceClient;
 import com.kazka.moderation.ModerationCategory;
 import com.kazka.moderation.ModerationPipeline;
 import com.kazka.moderation.ModerationProperties;
@@ -29,7 +29,7 @@ public class IllustrationService {
     private static final int IMAGE_W = 1024;
     private static final int IMAGE_H = 768;
 
-    private final HuggingFaceClient hfClient;
+    private final AiClient aiClient;
     private final ImageStorage imageStorage;
     private final StoryRepository storyRepository;
     private final PromptBuilder promptBuilder;
@@ -47,7 +47,7 @@ public class IllustrationService {
                     String firstChar = (chars != null && !chars.isEmpty()) ? chars.get(0) : "a character";
                     String fallbackOnError = firstChar + " in a magical scene from " + story.getTitle();
 
-                    return hfClient.generateText(
+                    return aiClient.generateText(
                                     promptBuilder.buildSceneExtractionSystem(),
                                     promptBuilder.buildSceneExtractionUser(story.getContent()))
                             .onErrorReturn(fallbackOnError)
@@ -60,8 +60,8 @@ public class IllustrationService {
                             .flatMap(scene -> Mono.fromCallable(() -> chooseSafeScene(story, scene))
                                     .subscribeOn(Schedulers.boundedElastic()))
                             .flatMap(scene -> Mono.zip(
-                                    hfClient.generateImage(promptBuilder.buildImagePrompt(story, scene, Theme.LIGHT), IMAGE_W, IMAGE_H),
-                                    hfClient.generateImage(promptBuilder.buildImagePrompt(story, scene, Theme.DARK), IMAGE_W, IMAGE_H)))
+                                    aiClient.generateImage(promptBuilder.buildImagePrompt(story, scene, Theme.LIGHT), IMAGE_W, IMAGE_H),
+                                    aiClient.generateImage(promptBuilder.buildImagePrompt(story, scene, Theme.DARK), IMAGE_W, IMAGE_H)))
                             .flatMap(tuple -> savePair(story, tuple.getT1(), tuple.getT2())
                                     .doOnSuccess(v -> {
                                         try {

@@ -37,7 +37,7 @@ services:
       DB_PASS: kazkar
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: "6379"
-      HUGGINGFACE_API_TOKEN: ${HUGGINGFACE_API_TOKEN}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
       FAL_KEY: ${FAL_KEY:-}
       UPLOADS_DIR: /uploads
       APP_BASE_URL: ${APP_BASE_URL:-http://localhost}

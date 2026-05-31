@@ -3,14 +3,15 @@ package com.kazka.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Config slot for LLM + image providers. Named "huggingface" for historical reasons —
- * the values now point at Gemini (text/editor/scene) and Fal.ai (images). See
- * wiki/lessons/hf-router-strict-mode-rejects-repetition-penalty.md for the migration.
+ * Config slot for LLM + image providers. Text/editor/scene/judge use Google Gemini 2.5 Flash
+ * via the OpenAI-compatible endpoint; images use Fal.ai FLUX.1-schnell. Migrated off the
+ * HuggingFace Inference Router on 2026-05-30 —
+ * see wiki/lessons/hf-router-strict-mode-rejects-repetition-penalty.md.
  */
-@ConfigurationProperties("kazka.huggingface")
-public class HuggingFaceProperties {
+@ConfigurationProperties("kazka.ai")
+public class AiProviderProperties {
 
-    private String apiToken = null;        // Gemini key (HUGGINGFACE_API_TOKEN env slot)
+    private String apiToken = null;        // Gemini key (GOOGLE_API_KEY env slot)
     private String imageApiToken = null;   // Fal.ai key (FAL_KEY env slot)
     private String textModel = "gemini-2.5-flash";
     private String editorModel = "gemini-2.5-flash";

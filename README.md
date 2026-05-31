@@ -6,10 +6,11 @@ subscriptions, and streams stories token-by-token as they are written.
 
 Production: **[kazkatales.com](https://kazkatales.com)**.
 
-> Story and illustration generation use the **Hugging Face Inference** API
-> (Ukrainian-tuned Gemma text models such as MamayLM, FLUX image models, and a
-> Qwen judge for moderation). A free Hugging Face token is required to run the
-> backend.
+> Story generation, editing, scene extraction, and moderation use **Google
+> Gemini 2.5 Flash** via the OpenAI-compatible endpoint. Illustrations use
+> **Fal.ai FLUX.1-schnell**. Free tiers exist for both — a Google API key
+> (Gemini) is required to run the backend; a Fal.ai key is required to
+> generate illustrations.
 
 ## Features
 
@@ -32,7 +33,7 @@ Production: **[kazkatales.com](https://kazkatales.com)**.
 |------------|-----------------------------------------------------------------------|
 | Backend    | Spring Boot 4 (WebFlux), Java 25, Gradle                              |
 | Data       | MySQL 8 (Liquibase migrations) · Redis (Spring Session)              |
-| AI         | Hugging Face Inference Router (text, image, moderation)              |
+| AI         | Google Gemini 2.5 Flash (text, editor, scene, moderation) · Fal.ai FLUX.1-schnell (images) |
 | Web        | React 19 + TypeScript + Vite                                         |
 | Mobile     | Expo (React Native) — iOS & Android                                  |
 | Shared     | `@kazka/shared` — TS types generated from the backend OpenAPI spec   |
@@ -61,7 +62,8 @@ kazka/
 - **Java 25** (`sdk install java 25-open` via SDKMAN, or [jdk.java.net/25](https://jdk.java.net/25/))
 - **Node.js 20+** and npm
 - **Docker** (MySQL + Redis, and the full-stack compose)
-- **A Hugging Face API token** — free at [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+- **A Google Gemini API key** — free at [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+- **A Fal.ai API key** — free starter credit at [fal.ai/dashboard/keys](https://fal.ai/dashboard/keys) (only needed if you want generated illustrations; the app falls back to decorative SVG covers when missing)
 
 ## Quick start
 
@@ -69,13 +71,14 @@ kazka/
 
 ```bash
 cp .env.example .env
-# At minimum, set HUGGINGFACE_API_TOKEN. KAZKA_JWT_SECRET has a dev default
-# but should be rotated for anything real (openssl rand -base64 48).
+# At minimum, set GOOGLE_API_KEY (Gemini). FAL_KEY enables generated
+# illustrations. KAZKA_JWT_SECRET has a dev default but should be rotated
+# for anything real (openssl rand -base64 48).
 ```
 
 `.env.example` documents every variable, grouped by area (AI, database, auth,
-storage, billing). Most have sensible local defaults; only the Hugging Face
-token is strictly required to generate stories.
+storage, billing). Most have sensible local defaults; only the Google Gemini
+API key is strictly required to generate stories.
 
 ### 2a. Run the whole stack with Docker (simplest)
 
@@ -108,9 +111,10 @@ All configuration is via environment variables (see `.env.example`). Highlights:
 
 | Variable                | Purpose                                                          |
 |-------------------------|-----------------------------------------------------------------|
-| `HUGGINGFACE_API_TOKEN` | **Required.** Hugging Face Inference token.                      |
-| `HF_TEXT_MODEL`         | Text/storyteller model (default: a Ukrainian-tuned Gemma).       |
-| `HF_IMAGE_MODEL`        | Illustration model (default: `black-forest-labs/FLUX.1-schnell`).|
+| `GOOGLE_API_KEY`        | **Required.** Google Gemini API key (text, editor, scene, judge). |
+| `FAL_KEY`               | Fal.ai key for illustration generation (FLUX.1-schnell).         |
+| `AI_TEXT_MODEL`         | Text/storyteller model (default: `gemini-2.5-flash`).            |
+| `AI_IMAGE_MODEL`        | Illustration model (default: `fal-ai/flux/schnell`).             |
 | `DB_URL` / `DB_USER` / `DB_PASS` | MySQL connection.                                      |
 | `SPRING_DATA_REDIS_HOST` / `..._PORT` | Redis (session store).                     |
 | `KAZKA_JWT_SECRET`      | JWT signing secret (min 32 chars for HS256).                    |

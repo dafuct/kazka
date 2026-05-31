@@ -57,7 +57,7 @@ public class RateLimitFilter implements WebFilter {
             new Rule(HttpMethod.POST, "/api/auth/oauth/google",             10, Duration.ofMinutes(1)),
             new Rule(HttpMethod.POST, "/api/auth/verify-email/resend",       3, Duration.ofMinutes(15)),
             // Expensive endpoint: limits per-IP burst at the platform edge before
-            // FreeTierGate (which is per-user) and HuggingFace quota.
+            // FreeTierGate (which is per-user) and upstream provider quota (Gemini / Fal).
             new Rule(HttpMethod.POST, "/api/stories/generate",              20, Duration.ofMinutes(15))
     );
 

@@ -4,7 +4,7 @@ import com.kazka.AbstractIT;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.holidays.Holiday;
 import com.kazka.holidays.HolidayCalendar;
 import com.kazka.story.Story;
@@ -39,7 +39,7 @@ class BedtimeWorkerHolidayIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder passwordEncoder;
-    @MockitoBean HuggingFaceClient hfClient;
+    @MockitoBean AiClient aiClient;
     @MockitoBean EntitlementResolver entitlements;
     @MockitoBean HolidayCalendar holidayCalendar;
 
@@ -49,9 +49,9 @@ class BedtimeWorkerHolidayIT extends AbstractIT {
     @BeforeEach
     void setup() {
         when(entitlements.isPro(anyString())).thenReturn(true);
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(
                 Flux.just("Bedtime Title\n\nOnce upon a time, a child named Test went to sleep peacefully."));
-        when(hfClient.streamEdit(anyString(), anyString())).thenReturn(
+        when(aiClient.streamEdit(anyString(), anyString())).thenReturn(
                 Flux.just("Bedtime Title\n\nOnce upon a time, a child named Test went to sleep peacefully."));
 
         userId = seedUser("parent-" + UUID.randomUUID() + "@test");

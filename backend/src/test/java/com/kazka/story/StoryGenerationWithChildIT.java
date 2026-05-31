@@ -4,7 +4,7 @@ import com.kazka.AbstractIT;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.moderation.ModerationResult;
 import com.kazka.moderation.ModerationService;
 import com.kazka.story.dto.GenerationRequest;
@@ -46,8 +46,8 @@ class StoryGenerationWithChildIT extends AbstractIT {
     @TestConfiguration
     static class MockConfig {
         @Bean @Primary
-        HuggingFaceClient mockHf() {
-            HuggingFaceClient m = mock(HuggingFaceClient.class);
+        AiClient mockAi() {
+            AiClient m = mock(AiClient.class);
             when(m.streamText(anyString(), anyString()))
                     .thenReturn(Flux.just("Пригода\n\nЖив-був дракон."));
             when(m.streamEdit(anyString(), anyString()))

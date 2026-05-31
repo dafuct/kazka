@@ -17,17 +17,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Golden test that calls the live moderation judge over a curated set of safe / unsafe prompts.
- * Gated behind RUN_GOLDEN_TESTS=true so CI never pays the HF cost. Uses HUGGINGFACE_API_TOKEN
- * env var and an optional MODERATION_MODEL override (defaults to Qwen3-32B).
+ * Gated behind RUN_GOLDEN_TESTS=true so CI never pays the Gemini cost. Uses GOOGLE_API_KEY
+ * env var and an optional MODERATION_MODEL override (defaults to gemini-2.5-flash).
  *
  * Run manually:
  *   cd backend && \
- *     HUGGINGFACE_API_TOKEN=$(grep '^HUGGINGFACE_API_TOKEN=' ../.env | cut -d= -f2) \
+ *     GOOGLE_API_KEY=$(grep '^GOOGLE_API_KEY=' ../.env | cut -d= -f2) \
  *     RUN_GOLDEN_TESTS=true \
  *     ./gradlew test --tests com.kazka.moderation.ModerationJudgeGoldenIT -i
  *
  * To test a different judge model:
- *   ... MODERATION_MODEL='Qwen/Qwen3-32B:cheapest' ...
+ *   ... MODERATION_MODEL='gemini-2.0-flash' ...
  */
 @Tag("golden")
 @EnabledIfEnvironmentVariable(named = "RUN_GOLDEN_TESTS", matches = "true")
@@ -35,8 +35,8 @@ class ModerationJudgeGoldenIT {
 
     @Test
     void should_meetGoldenSetThresholds_when_classifyingAllRows() throws Exception {
-        String token = System.getenv("HUGGINGFACE_API_TOKEN");
-        assertThat(token).as("HUGGINGFACE_API_TOKEN env var").isNotBlank();
+        String token = System.getenv("GOOGLE_API_KEY");
+        assertThat(token).as("GOOGLE_API_KEY env var").isNotBlank();
         String model = System.getenv().getOrDefault("MODERATION_MODEL", "gemini-2.5-flash");
         String baseUrl = System.getenv().getOrDefault("MODERATION_BASE_URL",
                 "https://generativelanguage.googleapis.com/v1beta/openai");

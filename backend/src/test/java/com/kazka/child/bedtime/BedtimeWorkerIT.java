@@ -4,7 +4,7 @@ import com.kazka.AbstractIT;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.story.StoryRepository;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
@@ -35,7 +35,7 @@ class BedtimeWorkerIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder passwordEncoder;
-    @MockitoBean HuggingFaceClient hfClient;
+    @MockitoBean AiClient aiClient;
     @MockitoBean EntitlementResolver entitlements;
 
     String userId;
@@ -44,8 +44,8 @@ class BedtimeWorkerIT extends AbstractIT {
     @BeforeEach
     void setup() {
         when(entitlements.isPro(anyString())).thenReturn(true);
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.just("Bedtime Title\n\nOnce upon a time, a child named Test went to sleep peacefully."));
-        when(hfClient.streamEdit(anyString(), anyString())).thenReturn(Flux.just("Bedtime Title\n\nOnce upon a time, a child named Test went to sleep peacefully."));
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just("Bedtime Title\n\nOnce upon a time, a child named Test went to sleep peacefully."));
+        when(aiClient.streamEdit(anyString(), anyString())).thenReturn(Flux.just("Bedtime Title\n\nOnce upon a time, a child named Test went to sleep peacefully."));
 
         userId = seedUser("parent-" + UUID.randomUUID() + "@test");
         profileId = seedProfile(userId);
@@ -87,7 +87,7 @@ class BedtimeWorkerIT extends AbstractIT {
 
     @Test
     void should_bump_retry_on_failure_and_back_off_15_minutes() throws Exception {
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.error(new RuntimeException("LLM down")));
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.error(new RuntimeException("LLM down")));
         schedules.save(enabledSchedule(profileId));
 
         worker.enqueueAsync(profileId).get();
@@ -102,7 +102,7 @@ class BedtimeWorkerIT extends AbstractIT {
 
     @Test
     void should_mark_failed_after_three_retries() throws Exception {
-        when(hfClient.streamText(anyString(), anyString())).thenReturn(Flux.error(new RuntimeException("LLM down")));
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.error(new RuntimeException("LLM down")));
         BedtimeSchedule s = enabledSchedule(profileId);
         s.setRetryCount(2);
         schedules.save(s);

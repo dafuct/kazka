@@ -107,7 +107,7 @@ jobs:
           DB_PASS: kazkar
           SPRING_DATA_REDIS_HOST: localhost
           SPRING_DATA_REDIS_PORT: '6379'
-          HUGGINGFACE_API_TOKEN: ci-dummy
+          GOOGLE_API_KEY: ci-dummy
           KAZKA_JWT_SECRET: ci-dummy-secret-32-characters-minimum-for-hs256-ok
           APP_BASE_URL: http://localhost:5173
         run: |

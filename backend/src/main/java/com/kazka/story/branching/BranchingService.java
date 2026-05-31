@@ -7,7 +7,7 @@ import com.kazka.child.CharacterExtractionWorker;
 import com.kazka.child.CharacterRepository;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileService;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.story.Story;
 import com.kazka.story.IllustrationStatus;
 import com.kazka.story.StoryRepository;
@@ -38,7 +38,7 @@ public class BranchingService {
     private final ChildProfileService childProfiles;
     private final CharacterRepository characters;
     private final EntitlementResolver entitlements;
-    private final HuggingFaceClient hfClient;
+    private final AiClient aiClient;
     private final BranchingPromptBuilder promptBuilder;
     private final BranchingResponseParser parser = new BranchingResponseParser();
     private final CharacterExtractionWorker extractionWorker;
@@ -58,7 +58,7 @@ public class BranchingService {
         String storySystem = systemPromptBuilder.buildStorySystem(req.language());
         String userMessage = promptBuilder.buildOpeningUserMessage(genReq, child, recurringCast);
 
-        return hfClient.streamText(storySystem, userMessage)
+        return aiClient.streamText(storySystem, userMessage)
                 .reduce("", String::concat)
                 .map(parser::parse)
                 .flatMap(parsed -> Mono.fromCallable(() -> {
@@ -120,7 +120,7 @@ public class BranchingService {
                     ? promptBuilder.buildClosingUserMessage(contentWithTransition, chosen.text())
                     : promptBuilder.buildMiddleUserMessage(contentWithTransition, chosen.text());
 
-            return hfClient.streamText(storySystem, userMessage)
+            return aiClient.streamText(storySystem, userMessage)
                     .reduce("", String::concat)
                     .map(raw -> isLastSegment ? parser.parseFinal(raw) : parser.parse(raw))
                     .flatMap(parsed -> Mono.fromCallable(() -> {

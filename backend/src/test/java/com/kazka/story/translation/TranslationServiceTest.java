@@ -2,7 +2,7 @@ package com.kazka.story.translation;
 
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.billing.EntitlementResolver;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
@@ -34,7 +34,7 @@ class TranslationServiceTest {
 
     @Mock StoryRepository stories;
     @Mock EntitlementResolver entitlements;
-    @Mock HuggingFaceClient hfClient;
+    @Mock AiClient aiClient;
     @Mock TranslationPromptBuilder promptBuilder;
     @Mock PromptBuilder systemPromptBuilder;
     @Mock ImageUrlResolver images;
@@ -110,7 +110,7 @@ class TranslationServiceTest {
 
         assertThat(dto).isNotNull();
         assertThat(dto.translatedContent()).isEqualTo("Once upon a time…");
-        verify(hfClient, never()).streamText(anyString(), anyString());
+        verify(aiClient, never()).streamText(anyString(), anyString());
     }
 
     @Test
@@ -119,7 +119,7 @@ class TranslationServiceTest {
         when(entitlements.isPro("u1")).thenReturn(true);
         when(systemPromptBuilder.buildStorySystem("en")).thenReturn("system");
         when(promptBuilder.buildUserMessage("uk", "en", "Жив-був дракон.")).thenReturn("user");
-        when(hfClient.streamText("system", "user")).thenReturn(Flux.just("Once upon a time, a dragon lived."));
+        when(aiClient.streamText("system", "user")).thenReturn(Flux.just("Once upon a time, a dragon lived."));
         when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
 
         StoryDto dto = svc.translate("s1", "en", user()).block();

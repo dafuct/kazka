@@ -3,7 +3,7 @@ package com.kazka.child;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kazka.child.dto.ExtractedCandidateDto;
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -20,11 +20,11 @@ public class CharacterExtractionService {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private final HuggingFaceClient hfClient;
+    private final AiClient aiClient;
     private final String systemPrompt;
 
-    public CharacterExtractionService(HuggingFaceClient hfClient) {
-        this.hfClient = hfClient;
+    public CharacterExtractionService(AiClient aiClient) {
+        this.aiClient = aiClient;
         this.systemPrompt = loadPrompt();
     }
 
@@ -42,7 +42,7 @@ public class CharacterExtractionService {
 
     public Mono<List<ExtractedCandidateDto>> extract(String storyBody) {
         if (storyBody == null || storyBody.isBlank()) return Mono.just(List.of());
-        return hfClient.streamText(systemPrompt, storyBody)
+        return aiClient.streamText(systemPrompt, storyBody)
                 .reduce("", String::concat)
                 .map(this::parse)
                 .onErrorResume(e -> {

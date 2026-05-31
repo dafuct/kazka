@@ -1,6 +1,6 @@
 package com.kazka.tools;
 
-import com.kazka.hf.HuggingFaceClient;
+import com.kazka.ai.AiClient;
 import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
 import com.kazka.story.Theme;
@@ -38,7 +38,7 @@ public class IllustrationSampleGenerator implements CommandLineRunner {
     private static final List<String> AGES = List.of("3-5", "6-8", "9-12");
     private static final Path OUT_DIR = Path.of("../frontend/public/illustrations");
 
-    private final HuggingFaceClient hfClient;
+    private final AiClient aiClient;
     private final PromptBuilder promptBuilder;
     private final ConfigurableApplicationContext ctx;
 
@@ -63,7 +63,7 @@ public class IllustrationSampleGenerator implements CommandLineRunner {
                         String prompt = promptBuilder.buildImagePrompt(dummy, scene, theme);
                         long seed = (long) name.hashCode() & 0xFFFFFFFFL;
                         log.info("[{}] generating {} ({}x{} seed={})...", total, name, dims[0], dims[1], seed);
-                        byte[] bytes = hfClient.generateImage(prompt, dims[0], dims[1], seed).block();
+                        byte[] bytes = aiClient.generateImage(prompt, dims[0], dims[1], seed).block();
                         if (bytes == null || bytes.length == 0) {
                             throw new IllegalStateException("empty image bytes");
                         }

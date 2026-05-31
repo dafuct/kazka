@@ -33,8 +33,8 @@ class IllustrationServicePushIT extends AbstractIT {
     @Test
     void should_fire_push_when_illustration_saves() {
         org.junit.jupiter.api.Assumptions.assumeTrue(
-                System.getenv("HUGGINGFACE_API_TOKEN") != null,
-                "HUGGINGFACE_API_TOKEN not set");
+                System.getenv("GOOGLE_API_KEY") != null,
+                "GOOGLE_API_KEY not set");
 
         User u = new User();
         u.setId(UUID.randomUUID().toString());
