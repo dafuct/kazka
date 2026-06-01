@@ -837,7 +837,7 @@ export interface components {
             narration: string;
             dialog: components["schemas"]["DialogLine"][];
             /** @enum {string} */
-            aspect: "LANDSCAPE" | "SQUARE";
+            aspect: "LANDSCAPE" | "SQUARE" | "PAGE";
         };
         BedtimeUpdateRequest: {
             enabled: boolean;
@@ -2203,7 +2203,9 @@ export interface operations {
     };
     candidates: {
         parameters: {
-            query?: never;
+            query?: {
+                lang?: string;
+            };
             header?: never;
             path: {
                 id: string;
