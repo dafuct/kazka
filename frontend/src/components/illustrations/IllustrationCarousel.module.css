@@ -20,6 +20,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Zoom slightly so any residual edge margin the model leaves around the
+     artwork is clipped by the frame's overflow: hidden. Worst observed
+     case is ~3.5% per side (how-9-12-dark); 1.08 leaves a safety margin. */
+  transform: scale(1.08);
+  transform-origin: center;
   transition: opacity 300ms ease-in-out;
 }
 
