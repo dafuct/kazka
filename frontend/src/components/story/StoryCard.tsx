@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import type { Story } from '../../lib/types'
-import { IllustrationFrame } from './IllustrationFrame'
+import { InProgressCard } from '../comics/InProgressCard'
 import styles from './StoryCard.module.css'
 
 interface StoryCardProps {
@@ -11,15 +11,21 @@ interface StoryCardProps {
 
 export function StoryCard({ story, onDelete, badge }: StoryCardProps) {
   const preview = story.content.slice(0, 120).replace(/\n/g, ' ')
+  const cover = story.panels[0]?.imageUrl ?? null
+  const failed = story.illustrationStatus === 'FAILED'
 
   return (
     <article className={styles.card}>
       <Link to={`/stories/${story.id}`} className={styles.imageLink}>
-        <IllustrationFrame
-          pathLight={story.illustrationPathLight}
-          pathDark={story.illustrationPathDark}
-          status={story.illustrationStatus}
-        />
+        {failed ? (
+          <div className={styles.errorBadge} role="img" aria-label="Помилка ілюстрації">
+            ⚠ Ілюстрації не вдалися
+          </div>
+        ) : cover ? (
+          <img src={cover} alt={story.title} className={styles.cover} />
+        ) : (
+          <InProgressCard title={story.title} />
+        )}
       </Link>
       <div className={styles.body}>
         <div className={styles.titleRow}>

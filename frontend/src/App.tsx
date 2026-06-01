@@ -7,7 +7,9 @@ import { AuthProvider, useAuth } from './lib/AuthContext'
 import { BillingProvider } from './lib/BillingContext'
 import { ChildrenProvider } from './lib/ChildrenContext'
 import { AuthModalProvider } from './lib/AuthModalContext'
+import { ActiveStoryProvider, useActiveStory } from './lib/ActiveStoryContext'
 import { StoryModal } from './components/modal/StoryModal'
+import { ProgressWidget } from './components/comics/ProgressWidget'
 import { AuthModal } from './components/auth/AuthModal'
 import { Nav } from './components/chrome/Nav'
 import { SuspensionBanner } from './components/chrome/SuspensionBanner'
@@ -93,6 +95,11 @@ function GoogleAuthLanding() {
   return null
 }
 
+function ActiveStoryProgressWidget() {
+  const { activeStoryId, setActiveStoryId } = useActiveStory()
+  return <ProgressWidget storyId={activeStoryId} onClear={() => setActiveStoryId(null)} />
+}
+
 function AppShell() {
   return (
     <>
@@ -128,6 +135,7 @@ function AppShell() {
       <Footer />
       <StoryModal />
       <AuthModal />
+      <ActiveStoryProgressWidget />
     </>
   )
 }
@@ -142,7 +150,9 @@ export default function App() {
               <ChildrenProvider>
                 <AuthModalProvider>
                   <StoryModalProvider>
-                    <AppShell />
+                    <ActiveStoryProvider>
+                      <AppShell />
+                    </ActiveStoryProvider>
                   </StoryModalProvider>
                 </AuthModalProvider>
               </ChildrenProvider>

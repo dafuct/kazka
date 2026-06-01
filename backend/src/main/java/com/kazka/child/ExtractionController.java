@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
@@ -24,13 +25,15 @@ public class ExtractionController {
     private final CurrentUserResolver currentUserResolver;
 
     @GetMapping("/api/stories/{id}/extraction-candidates")
-    public Mono<List<ExtractedCandidateDto>> candidates(@PathVariable String id) {
+    public Mono<List<ExtractedCandidateDto>> candidates(@PathVariable String id,
+                                                        @RequestParam(required = false) String lang) {
         return currentUserResolver.requireUser()
                 .flatMap(cu -> Mono.fromCallable(() -> {
                     Story s = stories.findByIdAndUserId(id, cu.userId())
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-                    return s.getContent();
+                    return s;
                 }).subscribeOn(Schedulers.boundedElastic()))
-                .flatMap(extraction::extract);
+                .flatMap(s -> extraction.extract(s.getContent(),
+                        lang != null && !lang.isBlank() ? lang : s.getLanguage()));
     }
 }

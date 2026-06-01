@@ -18,14 +18,16 @@ public class AiProviderConfig {
     }
 
     /**
-     * Fal.ai uses `Authorization: Key <FAL_KEY>` instead of `Bearer …`. Max payload is generous
-     * because `sync_mode=true` returns the image as a base64 data URI inline in the JSON body.
+     * Nano Banana (Gemini 2.5 Flash Image) native endpoint. Auth header is
+     * {@code x-goog-api-key} — NOT {@code Authorization: Bearer}. The 20 MiB
+     * in-memory cap is generous because Gemini returns the panel as a
+     * base64-encoded {@code inline_data.data} field inline in the JSON body.
      */
     @Bean
-    public WebClient imageClient(WebClient.Builder builder, AiProviderProperties aiProps) {
+    public WebClient nanoBananaWebClient(WebClient.Builder builder, AiProviderProperties aiProps) {
         return builder.clone()
-                .baseUrl(aiProps.getImageBaseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Key " + aiProps.getImageApiToken())
+                .baseUrl(aiProps.getNanoBananaBaseUrl())
+                .defaultHeader("x-goog-api-key", aiProps.getApiToken() == null ? "" : aiProps.getApiToken())
                 .codecs(c -> c.defaultCodecs().maxInMemorySize(20 * 1024 * 1024))
                 .build();
     }

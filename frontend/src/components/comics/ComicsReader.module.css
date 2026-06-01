@@ -1,0 +1,38 @@
+.pageWrap {
+  max-width: 560px;
+  margin: 0 auto;
+}
+.page {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+.skeleton {
+  max-width: 560px;
+  margin: 0 auto;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 8px;
+  background: linear-gradient(110deg, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.06) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+.failed {
+  text-align: center;
+  padding: 24px;
+  color: #ff9999;
+}
+.retryButton {
+  margin-top: 12px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.27);
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+}

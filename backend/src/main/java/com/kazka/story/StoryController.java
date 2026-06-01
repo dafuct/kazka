@@ -75,6 +75,17 @@ public class StoryController {
         return currentUserResolver.requireUser().flatMap(cu -> storyService.findById(id, cu));
     }
 
+    @GetMapping("/{id}/status")
+    public Mono<StoryStatusDto> getStatus(@PathVariable String id) {
+        return currentUserResolver.requireUser().flatMap(cu -> storyService.getStatus(id, cu));
+    }
+
+    @PostMapping("/{id}/retry")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Mono<Void> retry(@PathVariable String id) {
+        return currentUserResolver.requireUser().flatMap(cu -> storyService.retry(id, cu));
+    }
+
     @PutMapping("/{id}")
     public Mono<StoryDto> update(@PathVariable String id, @Valid @RequestBody UpdateStoryRequest req) {
         return currentUserResolver.requireUser().flatMap(cu -> storyService.update(id, req, cu));

@@ -56,3 +56,6 @@ databaseChangeLog:
   - include:
       file: changes/019-user-entitlements-nullable-product.sql
       relativeToChangelogFile: true
+  - include:
+      file: changes/020-comics-panels.sql
+      relativeToChangelogFile: true

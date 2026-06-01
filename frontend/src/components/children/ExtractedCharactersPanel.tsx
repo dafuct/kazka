@@ -11,6 +11,7 @@ export interface ExtractedCharactersPanelProps {
   storyId: string
   childProfileId: string
   extractionStatus: ExtractionStatus
+  language?: string
   onConfirmed: () => void
 }
 
@@ -25,11 +26,11 @@ export function ExtractedCharactersPanel(props: ExtractedCharactersPanelProps) {
 
   useEffect(() => {
     if (props.extractionStatus !== 'DONE') return
-    extraction.candidates(props.storyId).then(rows => {
+    extraction.candidates(props.storyId, props.language).then(rows => {
       setCandidates(rows)
       setPicked(new Set(rows.map((_, i) => i)))
     }).catch(() => setCandidates([]))
-  }, [props.storyId, props.extractionStatus])
+  }, [props.storyId, props.extractionStatus, props.language])
 
   const statusLabels: Record<ExtractionStatus, string> = {
     PENDING:  tc.extractionStatus?.PENDING  ?? 'Preparing character analysis…',

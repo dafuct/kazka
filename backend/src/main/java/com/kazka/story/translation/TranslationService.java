@@ -3,6 +3,7 @@ package com.kazka.story.translation;
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.ai.AiClient;
+import com.kazka.comics.StoryPanelRepository;
 import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
@@ -29,6 +30,7 @@ public class TranslationService {
     private final TranslationPromptBuilder promptBuilder;
     private final PromptBuilder systemPromptBuilder;
     private final ImageUrlResolver images;
+    private final StoryPanelRepository panelRepository;
 
     @Transactional
     public Mono<StoryDto> translate(String storyId, String targetLanguage, CurrentUser cu) {
@@ -47,7 +49,7 @@ public class TranslationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "same_language");
         }
         if (targetLanguage.equals(story.getTranslatedLanguage()) && story.getTranslatedContent() != null) {
-            return Mono.just(StoryDto.from(story, images));
+            return Mono.just(StoryDto.from(story, panelRepository.findByStoryIdOrderByPanelIndexAsc(story.getId()), images));
         }
 
         String systemPrompt = systemPromptBuilder.buildStorySystem(targetLanguage);
@@ -59,7 +61,7 @@ public class TranslationService {
                     story.setTranslatedContent(translated.strip());
                     story.setTranslatedLanguage(targetLanguage);
                     stories.save(story);
-                    return StoryDto.from(story, images);
+                    return StoryDto.from(story, panelRepository.findByStoryIdOrderByPanelIndexAsc(story.getId()), images);
                 }).subscribeOn(Schedulers.boundedElastic()));
     }
 }

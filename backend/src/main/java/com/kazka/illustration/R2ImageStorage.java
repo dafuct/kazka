@@ -1,6 +1,5 @@
 package com.kazka.illustration;
 
-import com.kazka.story.Theme;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -11,12 +10,14 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.time.Duration;
-import java.util.List;
 
 /**
- * Stores illustrations in a private Cloudflare R2 (S3-compatible) bucket and serves them as
- * short-lived presigned GET URLs. The bucket is never public: the backend only mints a signed
- * link for a story the requesting user is already authorized to see.
+ * Stores comics panel illustrations in a private Cloudflare R2 (S3-compatible) bucket and serves
+ * them as short-lived presigned GET URLs. The bucket is never public: the backend only mints a
+ * signed link for a story the requesting user is already authorized to see.
+ *
+ * Keys live under a {@code panels/} prefix ({@code panels/<storyId>/p<panelIndex>.png}) so the
+ * bucket stays tidy and panels are easy to enumerate per story.
  */
 @Slf4j
 public class R2ImageStorage implements ImageStorage {
@@ -34,8 +35,8 @@ public class R2ImageStorage implements ImageStorage {
     }
 
     @Override
-    public String store(String storyId, Theme theme, byte[] png) {
-        String key = storyId + "-" + theme.slug() + ".png";
+    public String storePanel(String storyId, int panelIndex, byte[] png) {
+        String key = "panels/" + storyId + "/p" + panelIndex + ".png";
         s3.putObject(
                 PutObjectRequest.builder().bucket(bucket).key(key).contentType("image/png").build(),
                 RequestBody.fromBytes(png));
@@ -55,16 +56,12 @@ public class R2ImageStorage implements ImageStorage {
     }
 
     @Override
-    public void delete(String storyId) {
-        List<String> keys = List.of(
-                storyId + ".png", storyId + ".svg",
-                storyId + "-light.png", storyId + "-dark.png");
-        for (String key : keys) {
-            try {
-                s3.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
-            } catch (Exception e) {
-                log.warn("Could not delete R2 object {}: {}", key, e.getMessage());
-            }
+    public void deleteByKey(String key) {
+        if (key == null || key.isBlank()) return;
+        try {
+            s3.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
+        } catch (Exception e) {
+            log.warn("Could not delete R2 object {}: {}", key, e.getMessage());
         }
     }
 }

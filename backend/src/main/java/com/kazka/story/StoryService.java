@@ -3,7 +3,6 @@ package com.kazka.story;
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.auth.exception.EmailNotVerifiedException;
 import com.kazka.ai.AiClient;
-import com.kazka.illustration.IllustrationService;
 import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.moderation.ModerationCategory;
 import com.kazka.moderation.ModerationPipeline;
@@ -34,7 +33,6 @@ public class StoryService {
     private final UserRepository users;
     private final AiClient aiClient;
     private final PromptBuilder promptBuilder;
-    private final IllustrationService illustrationService;
     private final ModerationService moderationService;
     private final SuspensionService suspensionService;
     private final ModerationProperties moderationProperties;
@@ -45,6 +43,8 @@ public class StoryService {
     private final com.kazka.child.ChildEntitlementResolver childTier;
     private final com.kazka.child.CharacterExtractionWorker extractionWorker;
     private final ImageUrlResolver images;
+    private final com.kazka.comics.ComicsBuilder comicsBuilder;
+    private final com.kazka.comics.StoryPanelRepository panelRepository;
 
     public Flux<SseEvent> generate(GenerationRequest req, CurrentUser currentUser) {
         String userId = currentUser.userId();
@@ -162,6 +162,7 @@ public class StoryService {
                                             }
                                             extractionWorker.enqueue(saved.getId(), child.getId(), userId);
                                             freeTier.recordUsage(userId);
+                                            triggerComics(saved.getId());
                                             return SseEvent.done(id, title);
                                         }).subscribeOn(Schedulers.boundedElastic()))
                             ))
@@ -192,12 +193,24 @@ public class StoryService {
         return line.split("\\s+").length <= 6;
     }
 
+    /** Kick off the comic build for a freshly written story. Fire-and-forget;
+     *  ComicsBuilder.build no-ops unless the story is PENDING and flips the status itself. */
+    private void triggerComics(String storyId) {
+        comicsBuilder.build(storyId).subscribe();
+    }
+
     public Mono<Void> illustrate(String id, CurrentUser currentUser) {
+        // Fire-and-forget manual backfill: the single-page comic pipeline takes ~15 s; the
+        // caller (controller) shouldn't block on it. Build runs on its own scheduler and
+        // no-ops unless the story is PENDING; errors surface via the `illustration_status =
+        // FAILED` flip, which the frontend's progress widget polls via GET /{id}/status.
+        // NOTE: the normal flow is triggered server-side after generation; this endpoint is
+        // for manual recovery only and is no longer auto-called by the client.
         return ensureVerified(currentUser)
                 .then(Mono.fromCallable(() -> findOwned(id, currentUser))
                         .subscribeOn(Schedulers.boundedElastic()))
-                .then(illustrationService.generateAndStore(id)
-                        .subscribeOn(Schedulers.boundedElastic()));
+                .doOnSuccess(__ -> comicsBuilder.build(id).subscribe())
+                .then();
     }
 
     public Mono<PageResponse<StoryDto>> list(int page, int size, String childProfileIdFilter, CurrentUser currentUser) {
@@ -219,9 +232,13 @@ public class StoryService {
             // on-error cleanup handles the live SSE path, but a crashed worker or stale row
             // could still leave a placeholder behind. Branching tales always have content,
             // so this filter is safe for them.
-            var items = p.getContent().stream()
+            java.util.List<Story> filtered = p.getContent().stream()
                     .filter(s -> s.getContent() != null && !s.getContent().isBlank())
-                    .map(s -> StoryDto.from(s, images))
+                    .toList();
+            java.util.Map<String, java.util.List<com.kazka.comics.StoryPanel>> panelsByStory =
+                    fetchPanelsByStory(filtered);
+            var items = filtered.stream()
+                    .map(s -> StoryDto.from(s, panelsByStory.getOrDefault(s.getId(), java.util.List.of()), images))
                     .toList();
             return new PageResponse<>(items, p.getNumber(), p.getSize(), p.getTotalElements());
         }).subscribeOn(Schedulers.boundedElastic());
@@ -231,7 +248,9 @@ public class StoryService {
         return Mono.fromCallable(() ->
                 repository.findByCursor(currentUser.userId(), null, null,
                                 PageRequest.of(0, 1))
-                        .stream().findFirst().map(s -> StoryDto.from(s, images)).orElse(null))
+                        .stream().findFirst()
+                        .map(s -> StoryDto.from(s, loadPanels(s.getId()), images))
+                        .orElse(null))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
@@ -245,7 +264,11 @@ public class StoryService {
                     PageRequest.of(0, limit + 1));
             boolean hasMore = rows.size() > limit;
             java.util.List<Story> page = hasMore ? rows.subList(0, limit) : rows;
-            java.util.List<StoryDto> items = page.stream().map(s -> StoryDto.from(s, images)).toList();
+            java.util.Map<String, java.util.List<com.kazka.comics.StoryPanel>> panelsByStory =
+                    fetchPanelsByStory(page);
+            java.util.List<StoryDto> items = page.stream()
+                    .map(s -> StoryDto.from(s, panelsByStory.getOrDefault(s.getId(), java.util.List.of()), images))
+                    .toList();
             String next = hasMore
                     ? new StoryCursor(
                             page.get(page.size() - 1).getCreatedAt(),
@@ -256,9 +279,10 @@ public class StoryService {
     }
 
     public Mono<StoryDto> findById(String id, CurrentUser currentUser) {
-        return Mono.fromCallable(() -> findOwned(id, currentUser))
-                .subscribeOn(Schedulers.boundedElastic())
-                .map(s -> StoryDto.from(s, images));
+        return Mono.fromCallable(() -> {
+            Story story = findOwned(id, currentUser);
+            return StoryDto.from(story, loadPanels(story.getId()), images);
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
     public Mono<StoryDto> update(String id, UpdateStoryRequest req, CurrentUser currentUser) {
@@ -275,16 +299,18 @@ public class StoryService {
                 story.setChildProfileId(req.childProfileId());
             }
             return repository.save(story);
-        }).subscribeOn(Schedulers.boundedElastic()).map(s -> StoryDto.from(s, images));
+        }).subscribeOn(Schedulers.boundedElastic())
+          .map(s -> StoryDto.from(s, loadPanels(s.getId()), images));
     }
 
     public Mono<Void> delete(String id, CurrentUser currentUser) {
         return Mono.fromCallable(() -> findOwned(id, currentUser))
                 .subscribeOn(Schedulers.boundedElastic())
                 .flatMap(story -> Mono.fromRunnable(() -> {
-                    if (story.getIllustrationPathLight() != null || story.getIllustrationPathDark() != null) {
-                        illustrationService.deleteImage(id);
-                    }
+                    // deletePanels removes both the panel rows AND their stored image files / R2 objects.
+                    // The FK cascade on story_panels.story_id would handle row removal on its own, but
+                    // it can't delete blobs in object storage, so we call this explicitly first.
+                    comicsBuilder.deletePanels(id);
                     repository.deleteById(id);
                 }).subscribeOn(Schedulers.boundedElastic()))
                 .then();
@@ -300,6 +326,61 @@ public class StoryService {
         }).subscribeOn(Schedulers.boundedElastic())
                 .flatMap(story -> Mono.fromRunnable(() ->
                         extractionWorker.enqueueAsync(story.getId())).then());
+    }
+
+    public Mono<StoryStatusDto> getStatus(String id, CurrentUser currentUser) {
+        return Mono.fromCallable(() -> {
+            Story story = findOwned(id, currentUser);
+            long panelsReady = panelRepository.countByStoryId(id);
+            StoryStatusDto.Phase phase = derivePhase(story, panelsReady);
+            return new StoryStatusDto(phase, (int) panelsReady,
+                    story.getTitle() == null ? "" : story.getTitle());
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public Mono<Void> retry(String id, CurrentUser currentUser) {
+        return ensureVerified(currentUser)
+                .then(Mono.fromCallable(() -> {
+                    Story story = findOwned(id, currentUser);
+                    if (story.getIllustrationStatus() == IllustrationStatus.READY) {
+                        throw new ResponseStatusException(HttpStatus.CONFLICT, "story already has a comic");
+                    }
+                    return story;
+                }).subscribeOn(Schedulers.boundedElastic()))
+                .doOnSuccess(story -> comicsBuilder.retry(story.getId()).subscribe())
+                .then();
+    }
+
+    private static StoryStatusDto.Phase derivePhase(Story story, long panelsReady) {
+        return switch (story.getIllustrationStatus()) {
+            case PENDING -> {
+                if (panelsReady == 0) {
+                    yield (story.getContent() == null || story.getContent().isBlank())
+                            ? StoryStatusDto.Phase.WRITING
+                            : StoryStatusDto.Phase.EXTRACTING_ACTS;
+                }
+                yield StoryStatusDto.Phase.DRAWING;
+            }
+            case READY -> StoryStatusDto.Phase.READY;
+            case FAILED -> StoryStatusDto.Phase.FAILED;
+        };
+    }
+
+    private java.util.List<com.kazka.comics.StoryPanel> loadPanels(String storyId) {
+        return panelRepository.findByStoryIdOrderByPanelIndexAsc(storyId);
+    }
+
+    private java.util.Map<String, java.util.List<com.kazka.comics.StoryPanel>> fetchPanelsByStory(
+            java.util.List<Story> stories) {
+        if (stories.isEmpty()) return java.util.Map.of();
+        java.util.List<String> ids = stories.stream().map(Story::getId).toList();
+        java.util.List<com.kazka.comics.StoryPanel> all =
+                panelRepository.findByStoryIdInOrderByStoryIdAscPanelIndexAsc(ids);
+        java.util.Map<String, java.util.List<com.kazka.comics.StoryPanel>> grouped = new java.util.LinkedHashMap<>();
+        for (com.kazka.comics.StoryPanel p : all) {
+            grouped.computeIfAbsent(p.getStoryId(), k -> new java.util.ArrayList<>()).add(p);
+        }
+        return grouped;
     }
 
     private Story findOwned(String id, CurrentUser currentUser) {
@@ -405,6 +486,7 @@ public class StoryService {
                             saved.setContent(body);
                             repository.save(saved);
                             extractionWorker.enqueue(saved.getId(), child.getId(), user.getId());
+                            triggerComics(saved.getId());
                             return saved;
                         }).subscribeOn(Schedulers.boundedElastic())))
                 .onErrorResume(e -> deleteIfStillEmpty(story.getId()).then(Mono.error(e)));

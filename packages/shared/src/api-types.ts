@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/stories/{id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/stories/{id}/illustrate": {
         parameters: {
             query?: never;
@@ -532,6 +548,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/stories/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/stories/{id}/extraction-candidates": {
         parameters: {
             query?: never;
@@ -769,6 +801,10 @@ export interface components {
             id: string;
             text: string;
         } | null;
+        DialogLine: {
+            speaker?: string;
+            line?: string;
+        };
         StoryDto: {
             id: string;
             title: string;
@@ -778,8 +814,6 @@ export interface components {
             length: string;
             language: string;
             content: string;
-            illustrationPathLight?: string | null;
-            illustrationPathDark?: string | null;
             /** @enum {string} */
             illustrationStatus: "PENDING" | "READY" | "FAILED";
             childProfileId?: string | null;
@@ -790,10 +824,20 @@ export interface components {
             pendingChoices?: components["schemas"]["BranchingChoice"][] | null;
             translatedContent?: string | null;
             translatedLanguage?: string | null;
+            panels: components["schemas"]["StoryPanelDto"][];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+        };
+        StoryPanelDto: {
+            /** Format: int32 */
+            panelIndex: number;
+            imageUrl: string;
+            narration: string;
+            dialog: components["schemas"]["DialogLine"][];
+            /** @enum {string} */
+            aspect: "LANDSCAPE" | "SQUARE";
         };
         BedtimeUpdateRequest: {
             enabled: boolean;
@@ -1017,6 +1061,13 @@ export interface components {
             /** Format: int64 */
             total?: number;
         };
+        StoryStatusDto: {
+            /** @enum {string} */
+            status: "WRITING" | "EXTRACTING_ACTS" | "DRAWING" | "READY" | "FAILED";
+            /** Format: int32 */
+            panelsReady: number;
+            title: string;
+        };
         CursorPageResponseStoryDto: {
             items: components["schemas"]["StoryDto"][];
             nextCursor?: string | null;
@@ -1120,7 +1171,9 @@ export interface components {
 }
 export type SchemaUpdateStoryRequest = components['schemas']['UpdateStoryRequest'];
 export type SchemaBranchingChoice = components['schemas']['BranchingChoice'];
+export type SchemaDialogLine = components['schemas']['DialogLine'];
 export type SchemaStoryDto = components['schemas']['StoryDto'];
+export type SchemaStoryPanelDto = components['schemas']['StoryPanelDto'];
 export type SchemaBedtimeUpdateRequest = components['schemas']['BedtimeUpdateRequest'];
 export type SchemaBedtimeScheduleDto = components['schemas']['BedtimeScheduleDto'];
 export type SchemaTranslateRequest = components['schemas']['TranslateRequest'];
@@ -1156,6 +1209,7 @@ export type SchemaUpdateCharacterRequest = components['schemas']['UpdateCharacte
 export type SchemaUpdateProfileRequest = components['schemas']['UpdateProfileRequest'];
 export type SchemaAuthResponse = components['schemas']['AuthResponse'];
 export type SchemaPageResponseStoryDto = components['schemas']['PageResponseStoryDto'];
+export type SchemaStoryStatusDto = components['schemas']['StoryStatusDto'];
 export type SchemaCursorPageResponseStoryDto = components['schemas']['CursorPageResponseStoryDto'];
 export type SchemaHolidayDto = components['schemas']['HolidayDto'];
 export type SchemaAggregates = components['schemas']['Aggregates'];
@@ -1308,6 +1362,26 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["StoryDto"];
                 };
+            };
+        };
+    };
+    retry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Accepted */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2101,6 +2175,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PageResponseStoryDto"];
+                };
+            };
+        };
+    };
+    getStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["StoryStatusDto"];
                 };
             };
         };
