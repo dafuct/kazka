@@ -29,9 +29,14 @@ export function ArchivePage() {
 
   const handleDelete = useCallback(async () => {
     if (!deleteId) return
-    await api.deleteStory(deleteId).catch(() => null)
-    setStories(prev => prev.filter(s => s.id !== deleteId))
-    setDeleteId(null)
+    try {
+      await api.deleteStory(deleteId)
+      setStories(prev => prev.filter(s => s.id !== deleteId))
+    } catch {
+      setError(t.errors.saveFailed)
+    } finally {
+      setDeleteId(null)
+    }
   }, [deleteId])
 
   return (

@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { StoryForm } from '../form/StoryForm'
@@ -6,31 +6,30 @@ import { useStoryModal } from '../../lib/StoryModalContext'
 import { useLocale } from '../../lib/LocaleContext'
 import { useAuth } from '../../lib/AuthContext'
 import { streamStory } from '../../lib/sseClient'
-import { api } from '../../lib/apiClient'
+import { useActiveStory } from '../../lib/ActiveStoryContext'
 import type { GenerationRequest, ModerationErrorCode } from '../../lib/types'
 import styles from './StoryModal.module.css'
 
 type Phase = 'form' | 'creating'
-
-const POLL_INTERVAL_MS = 2000
-const POLL_TIMEOUT_MS = 60000
 
 export function StoryModal() {
   const { open, closeModal } = useStoryModal()
   const { t } = useLocale()
   const navigate = useNavigate()
   const { user, resendVerification, refresh } = useAuth()
+  const { setActiveStoryId } = useActiveStory()
   const MODERATION_CODES: readonly ModerationErrorCode[] = ['BLOCKED_INPUT', 'JUDGE_UNAVAILABLE']
   const needsVerify = !!user && !user.emailVerified
   const [resendDone, setResendDone] = useState(false)
   const [phase, setPhase] = useState<Phase>('form')
-  const [request, setRequest] = useState<GenerationRequest | null>(null)
   const [error, setError] = useState<string | null>(null)
+  // Active SSE controller — stored in a ref so React StrictMode's effect
+  // double-invocation can't accidentally abort an in-flight stream.
+  const activeCtrlRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     if (open) {
       setPhase('form')
-      setRequest(null)
       setError(null)
     }
   }, [open])
@@ -49,85 +48,73 @@ export function StoryModal() {
     return () => { document.body.style.overflow = '' }
   }, [open])
 
+  // Cleanup on actual component unmount: abort any in-flight SSE.
+  // Empty dep array → runs ONCE on real unmount, not on StrictMode dance.
   useEffect(() => {
-    if (!open || phase !== 'creating' || !request) return
-
-    const ctrl = new AbortController()
-    let cancelled = false
-    let pollTimer: number | undefined
-
-    const pollUntilReady = async (id: string) => {
-      const startedAt = Date.now()
-      const tick = async () => {
-        if (cancelled) return
-        try {
-          const story = await api.getStory(id)
-          if (story.illustrationStatus !== 'PENDING') {
-            if (!cancelled) {
-              closeModal()
-              navigate(`/stories/${id}`)
-            }
-            return
-          }
-        } catch {
-          // network blip — keep polling until timeout
-        }
-        if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
-          if (!cancelled) {
-            closeModal()
-            navigate(`/stories/${id}`)
-          }
-          return
-        }
-        pollTimer = window.setTimeout(tick, POLL_INTERVAL_MS)
-      }
-      tick()
+    return () => {
+      activeCtrlRef.current?.abort()
+      activeCtrlRef.current = null
     }
+  }, [])
+
+  // SSE is triggered IMPERATIVELY from handleSubmit (not from a useEffect)
+  // so React StrictMode's double-effect-invocation can't kill the stream
+  // between create-and-cleanup cycles. The AbortController is parked in a
+  // ref for real-unmount cleanup.
+  const handleSubmit = useCallback((req: GenerationRequest) => {
+    // If a previous SSE is still alive (e.g., user re-submitted somehow), abort it.
+    activeCtrlRef.current?.abort()
+    const ctrl = new AbortController()
+    activeCtrlRef.current = ctrl
+
+    setError(null)
+    setPhase('creating')
 
     streamStory(
-      request,
+      req,
       {
+        onMeta: ({ id }) => {
+          if (ctrl.signal.aborted) return
+          // Story row exists — route the user to the story page immediately so they
+          // can watch content + panels fill in there. The SSE keeps streaming via
+          // the controller stored in activeCtrlRef.
+          setActiveStoryId(id)
+          closeModal()
+          navigate(`/stories/${id}`)
+        },
         onToken: () => {},
-        onDone: ({ id }) => {
-          if (cancelled) return
-          // Best-effort: poll loop observes the resulting illustrationStatus.
-          api.illustrate(id).catch(() => null)
-          pollUntilReady(id)
+        onDone: () => {
+          if (ctrl.signal.aborted) return
+          // Text streaming finished + content saved. The SERVER now kicks off the comic
+          // build automatically (StoryService.generateInternal), so the client does not
+          // trigger it — a second trigger would race the server's build and fail on the
+          // story_panels unique key.
+          activeCtrlRef.current = null
         },
         onError: ({ code, category, message }) => {
-          if (cancelled) return
+          if (ctrl.signal.aborted) return
           if (code && (MODERATION_CODES as readonly string[]).includes(code)) {
             const perCategory = code === 'BLOCKED_INPUT' && category
               ? t.moderation.byCategory?.[category]
               : undefined
             setError(perCategory ?? t.moderation[code as ModerationErrorCode])
-            // Suspension may have just kicked in — refresh AuthContext so the banner appears.
             refresh()
           } else {
             setError(message ?? null)
           }
           setPhase('form')
+          activeCtrlRef.current = null
         },
       },
       ctrl.signal,
     ).catch(err => {
-      if (cancelled || err?.name === 'AbortError') return
+      if (ctrl.signal.aborted || err?.name === 'AbortError') return
       setError(String(err))
       setPhase('form')
+      activeCtrlRef.current = null
     })
-
-    return () => {
-      cancelled = true
-      ctrl.abort()
-      if (pollTimer) window.clearTimeout(pollTimer)
-    }
-  }, [open, phase, request, closeModal, navigate])
-
-  const handleSubmit = useCallback((req: GenerationRequest) => {
-    setRequest(req)
-    setError(null)
-    setPhase('creating')
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setActiveStoryId, closeModal, navigate, refresh, t])
 
   if (!open) return null
 
@@ -177,7 +164,7 @@ export function StoryModal() {
             </div>
           )}
           {phase === 'form' && !needsVerify && (
-            <StoryForm onSubmit={handleSubmit} loading={false} inModal />
+            <StoryForm onSubmit={handleSubmit} loading={phase !== 'form'} inModal />
           )}
           {phase === 'creating' && (
             <div className={styles.creating}>

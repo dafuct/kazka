@@ -61,21 +61,23 @@ server:
 kazka:
   public-base-url: ${PUBLIC_BASE_URL:http://localhost:5173}
   # Text/editor/scene/judge → Google Gemini 2.5 Flash via OpenAI-compatible endpoint.
-  # Images → Fal.ai FLUX.1-schnell. Migrated off the HuggingFace Inference Router on
-  # 2026-05-30 — see wiki/lessons/hf-router-strict-mode-rejects-repetition-penalty.md.
+  # Comics panels → Google's native Nano Banana endpoint (gemini-2.5-flash-image). Both share
+  # the single GOOGLE_API_KEY. Migrated off the HuggingFace Inference Router on 2026-05-30
+  # (see wiki/lessons/hf-router-strict-mode-rejects-repetition-penalty.md) and off Fal.ai on
+  # 2026-05-31 when comics replaced single-cover illustrations.
   ai:
-    api-token: ${GOOGLE_API_KEY:}                  # Gemini key
-    image-api-token: ${FAL_KEY:}                   # Fal.ai key for image generation
+    api-token: ${GOOGLE_API_KEY:}                  # Gemini key (text + Nano Banana)
     text-model: ${AI_TEXT_MODEL:gemini-2.5-flash}
     editor-model: ${AI_EDITOR_MODEL:gemini-2.5-flash}
-    image-model: ${AI_IMAGE_MODEL:fal-ai/flux/schnell}
     scene-model: ${AI_SCENE_MODEL:gemini-2.5-flash}
     text-base-url: ${AI_TEXT_BASE_URL:https://generativelanguage.googleapis.com/v1beta/openai}
-    image-base-url: ${AI_IMAGE_BASE_URL:https://fal.run}
-    # Fal's FLUX safety classifier false-positives on children's-book aesthetics. Kazka's own
-    # ModerationJudgeClient already screens the scene prompt before it reaches Fal, so this is
-    # off by default. Set FAL_SAFETY_CHECKER=true to re-enable for defence-in-depth.
-    image-safety-checker: ${FAL_SAFETY_CHECKER:false}
+    nano-banana-model: ${AI_NANO_BANANA_MODEL:gemini-2.5-flash-image}
+    nano-banana-base-url: ${AI_NANO_BANANA_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
+    comics:
+      panels-per-tale: 4
+      panel-aspects: [LANDSCAPE, SQUARE, SQUARE, LANDSCAPE]
+      pipeline-timeout: 60s
+      max-concurrent-per-user: 1
     text-temperature: ${AI_TEXT_TEMPERATURE:0.75}
     text-top-p: ${AI_TEXT_TOP_P:0.9}
     # Gemini OpenAI-compat 400s on frequency/presence penalty fields. Default 0.0 = skip-send.

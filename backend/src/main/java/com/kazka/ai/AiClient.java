@@ -12,13 +12,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Thin OpenAI-compatible chat client (text/editor/scene → Gemini 2.5 Flash) + Fal.ai image client.
+ * Thin OpenAI-compatible chat client for text/editor/scene Gemini calls.
+ * Image generation lives in {@link com.kazka.comics.NanoBananaClient}; this class no longer handles images.
  * Migrated off the HuggingFace Inference Router on 2026-05-30 —
  * see wiki/lessons/hf-router-strict-mode-rejects-repetition-penalty.md for the why.
  */
@@ -29,20 +29,15 @@ public class AiClient {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final WebClient textClient;
-    private final WebClient imageClient;
     private final AiProviderProperties props;
 
-    public AiClient(AiProviderProperties props, WebClient textClient, WebClient imageClient) {
+    public AiClient(AiProviderProperties props, WebClient textClient) {
         this.props = props;
         if (props.getApiToken() == null || props.getApiToken().isBlank()) {
             log.warn("kazka.ai.api-token is not set — chat-completion calls will fail with 401");
         }
-        if (props.getImageApiToken() == null || props.getImageApiToken().isBlank()) {
-            log.warn("kazka.ai.image-api-token (FAL_KEY) is not set — image calls will fail with 401");
-        }
-        log.info("LLM models resolved at startup: text={}, editor={}, scene={}, image={}",
-                props.getTextModel(), props.getEditorModel(), props.getSceneModel(), props.getImageModel());
-        this.imageClient = imageClient;
+        log.info("LLM models resolved at startup: text={}, editor={}, scene={}",
+                props.getTextModel(), props.getEditorModel(), props.getSceneModel());
         this.textClient = textClient;
     }
 
@@ -61,6 +56,11 @@ public class AiClient {
     }
 
     public Mono<String> generateText(String system, String user) {
+        // `reasoning_effort: "none"` disables Gemini 2.5's chain-of-thought. Without it,
+        // thinking can consume most of the max_tokens budget and the visible JSON output
+        // gets truncated mid-field (see ModerationJudgeClient for the same fix). This is
+        // a structured-output path (ActsStructurer parses a 5-beat JSON array), so thinking
+        // adds no value but breaks reliability.
         return textClient.post()
                 .uri("/chat/completions")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -71,7 +71,8 @@ public class AiClient {
                                 Map.of("role", "user", "content", user)
                         ),
                         "stream", false,
-                        "max_tokens", 4096
+                        "max_tokens", 4096,
+                        "reasoning_effort", "none"
                 ))
                 .retrieve()
                 .bodyToMono(String.class)
@@ -140,72 +141,4 @@ public class AiClient {
                 });
     }
 
-    public Mono<byte[]> generateImage(String prompt, int width, int height) {
-        return generateImage(prompt, width, height, null);
-    }
-
-    /**
-     * Generate one image via Fal.ai FLUX.1-schnell. Uses `sync_mode=true` so the response
-     * carries the image inline as a data URI — saves a follow-up HTTP fetch.
-     * Fal accepts preset image sizes only for this model, so (width,height) is mapped to
-     * the closest preset; unknown ratios fall back to landscape_4_3 with a warning log.
-     */
-    public Mono<byte[]> generateImage(String prompt, int width, int height, Long seed) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("prompt", prompt);
-        body.put("image_size", mapImageSize(width, height));
-        body.put("num_inference_steps", 4);
-        body.put("num_images", 1);
-        body.put("enable_safety_checker", props.isImageSafetyChecker());
-        body.put("output_format", "png");
-        body.put("sync_mode", true);
-        if (seed != null) body.put("seed", seed);
-
-        return imageClient.post()
-                .uri("/" + props.getImageModel())
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono(String.class)
-                .doOnError(e -> log.warn("generateImage failed (model={}): {}", props.getImageModel(), e.getMessage()))
-                .map(AiClient::extractImageBytes);
-    }
-
-    private static String mapImageSize(int width, int height) {
-        if (width == 1024 && height == 768) return "landscape_4_3";
-        if (width == 768 && height == 1024) return "portrait_4_3";
-        if (width == 1024 && height == 1024) return "square_hd";
-        if (width == height) return "square";
-        if (width > height) {
-            double r = (double) width / height;
-            return r > 1.5 ? "landscape_16_9" : "landscape_4_3";
-        }
-        double r = (double) height / width;
-        return r > 1.5 ? "portrait_16_9" : "portrait_4_3";
-    }
-
-    private static byte[] extractImageBytes(String body) {
-        JsonNode response;
-        try {
-            response = MAPPER.readTree(body);
-        } catch (Exception e) {
-            throw new IllegalStateException("Fal response not valid JSON (first 200 chars): "
-                    + body.substring(0, Math.min(200, body.length())), e);
-        }
-        JsonNode firstImage = response.path("images").path(0);
-        String url = firstImage.path("url").asText("");
-        if (url.isEmpty()) {
-            throw new IllegalStateException("Fal response missing images[0].url");
-        }
-        // sync_mode=true returns a data URI like `data:image/png;base64,iVBORw0KGgo...`.
-        // If a non-sync response slips through with a plain https URL, fail loudly — the
-        // calling code expects bytes and there is no follow-up fetch wired up here yet.
-        int comma = url.indexOf(',');
-        if (!url.startsWith("data:") || comma < 0) {
-            throw new IllegalStateException("Expected data: URI from Fal sync_mode=true, got: "
-                    + url.substring(0, Math.min(64, url.length())));
-        }
-        return Base64.getDecoder().decode(url.substring(comma + 1));
-    }
 }

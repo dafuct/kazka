@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { IllustrationFrame } from '../components/story/IllustrationFrame'
+import { ComicsReader } from '../components/comics/ComicsReader'
 import { ConfirmModal } from '../components/modal/ConfirmModal'
 import { AvatarInitials } from '../components/children/AvatarInitials'
 import { ExtractedCharactersPanel } from '../components/children/ExtractedCharactersPanel'
@@ -25,7 +25,6 @@ export function StoryDetailPage() {
   const [editTitle, setEditTitle] = useState('')
   const [editContent, setEditContent] = useState('')
   const [saving, setSaving] = useState(false)
-  const [illustrating, setIllustrating] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
   const [viewLanguage, setViewLanguage] = useState<'original' | 'translated'>('original')
 
@@ -60,13 +59,20 @@ export function StoryDetailPage() {
     return () => clearInterval(interval)
   }, [story?.extractionStatus, story?.id])
 
-  const handleIllustrate = useCallback(async () => {
+  // Poll while illustrations are being generated (panels filling in or status still PENDING).
+  useEffect(() => {
     if (!story) return
-    setIllustrating(true)
-    await api.illustrate(story.id).catch(() => null)
-    setStory(prev => prev ? { ...prev, illustrationStatus: 'PENDING' } : prev)
-    setIllustrating(false)
-  }, [story])
+    if (story.illustrationStatus !== 'PENDING') return
+    if (story.panels.length >= 1) return
+    const interval = setInterval(() => refresh(), 3000)
+    return () => clearInterval(interval)
+  }, [story?.illustrationStatus, story?.panels.length, story?.id])
+
+  const handleRetry = useCallback(async () => {
+    if (!story) return
+    await api.retry(story.id).catch(() => null)
+    refresh()
+  }, [story, refresh])
 
   const handleSave = useCallback(async () => {
     if (!story) return
@@ -84,9 +90,14 @@ export function StoryDetailPage() {
 
   const handleDelete = useCallback(async () => {
     if (!story) return
-    await api.deleteStory(story.id).catch(() => null)
-    navigate('/stories')
-  }, [story, navigate])
+    try {
+      await api.deleteStory(story.id)
+      navigate('/stories')
+    } catch {
+      setError(t.errors.saveFailed)
+      setShowDelete(false)
+    }
+  }, [story, navigate, t])
 
   if (loading) return <div className={styles.state}>...</div>
   if (error || !story) return <div className={styles.state}>{error ?? t.errors.loadFailed}</div>
@@ -110,111 +121,96 @@ export function StoryDetailPage() {
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
-        <Link to="/stories" className={styles.back}>← {t.story.back}</Link>
+        <div className={styles.topBar}>
+          <Link to="/stories" className={styles.back}>← {t.story.back}</Link>
+          {!(story.isBranching && story.branchingState !== 'complete') && (
+            <LanguageToggle
+              story={story}
+              active={viewLanguage}
+              onSwitch={(active, updated) => {
+                setViewLanguage(active)
+                if (updated) setStory(updated)
+              }}
+            />
+          )}
+        </div>
 
-        {!(story.isBranching && story.branchingState !== 'complete') && (
-          <LanguageToggle
-            story={story}
-            active={viewLanguage}
-            onSwitch={(active, updated) => {
-              setViewLanguage(active)
-              if (updated) setStory(updated)
-            }}
+        {editing ? (
+          <input
+            className={styles.titleInput}
+            value={editTitle}
+            onChange={e => setEditTitle(e.target.value)}
+          />
+        ) : (
+          <h1 className={styles.title}>{story.title}</h1>
+        )}
+
+        {childProfile && (
+          <p className={styles.forChild}>
+            <AvatarInitials name={childProfile.name} seed={childProfile.avatarSeed} size={18} />
+            <span>{(t as any).children?.forChild ? (t as any).children.forChild(childProfile.name) : `for ${childProfile.name}`}</span>
+          </p>
+        )}
+
+        <div className={styles.meta}>
+          <span className={styles.tag}>{story.ageGroup}</span>
+          <span className={styles.tag}>{story.length}</span>
+          <span className={styles.tag}>{story.language.toUpperCase()}</span>
+        </div>
+
+        <div className={styles.comicsBlock}>
+          <ComicsReader story={story} onRetry={handleRetry} />
+        </div>
+
+        {editing ? (
+          <textarea
+            className={styles.contentInput}
+            value={editContent}
+            onChange={e => setEditContent(e.target.value)}
+            rows={20}
+          />
+        ) : (
+          <div className={styles.content}>
+            {displayedContent
+              .split(/\n\s*\n+/)
+              .map(p => p.trim())
+              .filter(Boolean)
+              .map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+          </div>
+        )}
+
+        {story.childProfileId && story.extractionStatus !== 'SKIPPED' && (
+          <ExtractedCharactersPanel
+            storyId={story.id}
+            childProfileId={story.childProfileId}
+            extractionStatus={story.extractionStatus as any}
+            language={viewLanguage === 'translated' ? (story.translatedLanguage ?? undefined) : story.language}
+            onConfirmed={() => refresh()}
           />
         )}
 
-        <div className={styles.layout}>
-          <div className={styles.main}>
-            {editing ? (
-              <input
-                className={styles.titleInput}
-                value={editTitle}
-                onChange={e => setEditTitle(e.target.value)}
-              />
-            ) : (
-              <h1 className={styles.title}>{story.title}</h1>
-            )}
-
-            {childProfile && (
-              <p className={styles.forChild}>
-                <AvatarInitials name={childProfile.name} seed={childProfile.avatarSeed} size={18} />
-                <span>{(t as any).children?.forChild ? (t as any).children.forChild(childProfile.name) : `for ${childProfile.name}`}</span>
-              </p>
-            )}
-
-            <div className={styles.meta}>
-              <span className={styles.tag}>{story.ageGroup}</span>
-              <span className={styles.tag}>{story.length}</span>
-              <span className={styles.tag}>{story.language.toUpperCase()}</span>
-            </div>
-
-            {editing ? (
-              <textarea
-                className={styles.contentInput}
-                value={editContent}
-                onChange={e => setEditContent(e.target.value)}
-                rows={20}
-              />
-            ) : (
-              <div className={styles.content}>
-                {displayedContent
-                  .split(/\n\s*\n+/)
-                  .map(p => p.trim())
-                  .filter(Boolean)
-                  .map((para, i) => (
-                    <p key={i}>{para}</p>
-                  ))}
-              </div>
-            )}
-
-            {story.childProfileId && story.extractionStatus !== 'SKIPPED' && (
-              <ExtractedCharactersPanel
-                storyId={story.id}
-                childProfileId={story.childProfileId}
-                extractionStatus={story.extractionStatus as any}
-                onConfirmed={() => refresh()}
-              />
-            )}
-
-            <div className={styles.actions}>
-              {editing ? (
-                <>
-                  <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
-                    {t.story.save}
-                  </button>
-                  <button className={styles.cancelBtn} onClick={() => setEditing(false)}>
-                    {t.story.cancel}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button className={styles.editBtn} onClick={() => setEditing(true)}>
-                    {t.story.edit}
-                  </button>
-                  <button className={styles.deleteBtn} onClick={() => setShowDelete(true)}>
-                    {t.story.delete}
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          <aside className={styles.aside}>
-            <IllustrationFrame
-              pathLight={story.illustrationPathLight}
-              pathDark={story.illustrationPathDark}
-              status={story.illustrationStatus}
-            />
-            {story.illustrationStatus !== 'PENDING' && (
-              <button
-                className={styles.illustrateBtn}
-                onClick={handleIllustrate}
-                disabled={illustrating}
-              >
-                {illustrating ? t.story.illustrating : t.story.illustrate}
+        <div className={styles.actions}>
+          {editing ? (
+            <>
+              <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
+                {t.story.save}
               </button>
-            )}
-          </aside>
+              <button className={styles.cancelBtn} onClick={() => setEditing(false)}>
+                {t.story.cancel}
+              </button>
+            </>
+          ) : (
+            <>
+              <button className={styles.editBtn} onClick={() => setEditing(true)}>
+                {t.story.edit}
+              </button>
+              <button className={styles.deleteBtn} onClick={() => setShowDelete(true)}>
+                {t.story.delete}
+              </button>
+            </>
+          )}
         </div>
       </div>
 

@@ -45,12 +45,6 @@ public class Story {
     @Column(columnDefinition = "LONGTEXT")
     private String content;
 
-    @Column(name = "illustration_path_light", length = 500)
-    private String illustrationPathLight;
-
-    @Column(name = "illustration_path_dark", length = 500)
-    private String illustrationPathDark;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "illustration_status", length = 20)
     private IllustrationStatus illustrationStatus = IllustrationStatus.PENDING;

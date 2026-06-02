@@ -54,6 +54,9 @@ export const api = {
   illustrate(id: string): Promise<void> {
     return request(`${STORIES}/${id}/illustrate`, { method: 'POST' })
   },
+  retry(id: string): Promise<void> {
+    return request(`${STORIES}/${id}/retry`, { method: 'POST' })
+  },
 }
 
 interface AuthEnvelope { user: User }
@@ -207,8 +210,9 @@ export const charactersApi = {
 }
 
 export const extraction = {
-  candidates(storyId: string): Promise<ExtractedCandidateDto[]> {
-    return request(`/api/stories/${storyId}/extraction-candidates`)
+  candidates(storyId: string, lang?: string): Promise<ExtractedCandidateDto[]> {
+    const qs = lang ? `?lang=${encodeURIComponent(lang)}` : ''
+    return request(`/api/stories/${storyId}/extraction-candidates${qs}`)
   },
   retrigger(storyId: string): Promise<void> {
     return request(`/api/stories/${storyId}/extract-characters`, { method: 'POST' })

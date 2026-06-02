@@ -1,6 +1,5 @@
 package com.kazka.illustration;
 
-import com.kazka.story.Theme;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
@@ -69,12 +68,12 @@ class R2ImageStorageIT {
     }
 
     @Test
-    void store_uploadsObjectUnderBareKey() {
-        byte[] png = "fake-png-light".getBytes();
+    void storePanel_uploadsObjectUnderPanelKey() {
+        byte[] png = "fake-png-p1".getBytes();
 
-        String key = storage.store("story-1", Theme.LIGHT, png);
+        String key = storage.storePanel("story-1", 1, png);
 
-        assertThat(key).isEqualTo("story-1-light.png");
+        assertThat(key).isEqualTo("panels/story-1/p1.png");
         byte[] inBucket = s3.getObjectAsBytes(
                 GetObjectRequest.builder().bucket(BUCKET).key(key).build()).asByteArray();
         assertThat(inBucket).isEqualTo(png);
@@ -82,12 +81,12 @@ class R2ImageStorageIT {
 
     @Test
     void urlFor_returnsPresignedUrlThatDownloadsTheBytes() throws Exception {
-        byte[] png = "fake-png-dark".getBytes();
-        String key = storage.store("story-2", Theme.DARK, png);
+        byte[] png = "fake-png-p2".getBytes();
+        String key = storage.storePanel("story-2", 2, png);
 
         String url = storage.urlFor(key);
 
-        assertThat(url).contains("X-Amz-Signature").contains(key);
+        assertThat(url).contains("X-Amz-Signature").contains("p2.png");
         HttpResponse<byte[]> res = HttpClient.newHttpClient().send(
                 HttpRequest.newBuilder(URI.create(url)).GET().build(),
                 HttpResponse.BodyHandlers.ofByteArray());
@@ -98,7 +97,7 @@ class R2ImageStorageIT {
     @Test
     void bucketIsPrivate_unsignedGetIsDenied() throws Exception {
         byte[] png = "secret".getBytes();
-        String key = storage.store("story-3", Theme.LIGHT, png);
+        String key = storage.storePanel("story-3", 1, png);
 
         String unsignedUrl = minio.getS3URL() + "/" + BUCKET + "/" + key;
         HttpResponse<byte[]> res = HttpClient.newHttpClient().send(
@@ -114,14 +113,21 @@ class R2ImageStorageIT {
     }
 
     @Test
-    void delete_removesAllVariants() {
-        storage.store("story-9", Theme.LIGHT, "l".getBytes());
-        storage.store("story-9", Theme.DARK, "d".getBytes());
+    void deleteByKey_removesSingleObject() {
+        String key = storage.storePanel("story-9", 1, "p1".getBytes());
 
-        storage.delete("story-9");
+        storage.deleteByKey(key);
 
-        assertThat(objectExists("story-9-light.png")).isFalse();
-        assertThat(objectExists("story-9-dark.png")).isFalse();
+        assertThat(objectExists(key)).isFalse();
+    }
+
+    @Test
+    void deleteByKey_swallowsErrorsForMissingObjects() {
+        // R2/S3 DELETE on a non-existent key is a no-op (204), but deleteByKey must also
+        // swallow null/blank without hitting the API at all.
+        storage.deleteByKey(null);
+        storage.deleteByKey("");
+        storage.deleteByKey("panels/story-does-not-exist/p1.png");
     }
 
     private boolean objectExists(String key) {

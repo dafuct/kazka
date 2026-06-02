@@ -1,7 +1,6 @@
 package com.kazka.illustration;
 
 import com.kazka.config.UploadsProperties;
-import com.kazka.story.Theme;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -9,7 +8,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/** Stores illustrations on the local filesystem and serves them via the {@code /uploads/} path. */
+/** Stores comics panel illustrations on the local filesystem and serves them via {@code /uploads/}. */
 @Slf4j
 public class FilesystemImageStorage implements ImageStorage {
 
@@ -29,12 +28,12 @@ public class FilesystemImageStorage implements ImageStorage {
     }
 
     @Override
-    public String store(String storyId, Theme theme, byte[] png) {
-        String key = storyId + "-" + theme.slug() + ".png";
+    public String storePanel(String storyId, int panelIndex, byte[] png) {
+        String key = storyId + "-p" + panelIndex + ".png";
         try {
             Files.write(uploadsDir.resolve(key), png);
         } catch (IOException e) {
-            throw new UncheckedIOException("Cannot save PNG for story " + storyId + " theme " + theme, e);
+            throw new UncheckedIOException("Cannot save panel PNG for story " + storyId + " panel " + panelIndex, e);
         }
         return key;
     }
@@ -45,18 +44,12 @@ public class FilesystemImageStorage implements ImageStorage {
     }
 
     @Override
-    public void delete(String storyId) {
-        tryDelete(uploadsDir.resolve(storyId + ".png"));
-        tryDelete(uploadsDir.resolve(storyId + ".svg"));
-        tryDelete(uploadsDir.resolve(storyId + "-light.png"));
-        tryDelete(uploadsDir.resolve(storyId + "-dark.png"));
-    }
-
-    private void tryDelete(Path file) {
+    public void deleteByKey(String key) {
+        if (key == null || key.isBlank()) return;
         try {
-            Files.deleteIfExists(file);
+            Files.deleteIfExists(uploadsDir.resolve(key));
         } catch (IOException e) {
-            log.warn("Could not delete file {}: {}", file, e.getMessage());
+            log.warn("Could not delete file {}: {}", key, e.getMessage());
         }
     }
 }

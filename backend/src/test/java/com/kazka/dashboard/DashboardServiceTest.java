@@ -6,6 +6,7 @@ import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.child.bedtime.BedtimeSchedule;
 import com.kazka.child.bedtime.BedtimeScheduleRepository;
+import com.kazka.comics.StoryPanelRepository;
 import com.kazka.dashboard.dto.DashboardDto;
 import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.Story;
@@ -35,6 +36,7 @@ class DashboardServiceTest {
     @Mock BedtimeScheduleRepository bedtimeSchedules;
     @Mock EntitlementResolver entitlements;
     @Mock ImageUrlResolver images;
+    @Mock StoryPanelRepository panelRepository;
     @InjectMocks DashboardService svc;
 
     private CurrentUser user() {

@@ -1,8 +1,11 @@
 package com.kazka.story.dto;
 
 import com.kazka.illustration.ImageUrlResolver;
+import com.kazka.story.IllustrationStatus;
 import com.kazka.story.Story;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,26 +16,17 @@ class StoryDtoTest {
             key -> key == null ? null : "https://signed.example/" + key;
 
     @Test
-    void from_resolvesIllustrationKeysToUrls() {
+    void from_mapsBasicFields() {
         Story s = new Story();
         s.setId("s1");
-        s.setIllustrationPathLight("s1-light.png");
-        s.setIllustrationPathDark("s1-dark.png");
+        s.setTitle("The Fox");
+        s.setIllustrationStatus(IllustrationStatus.PENDING);
 
-        StoryDto dto = StoryDto.from(s, RESOLVER);
+        StoryDto dto = StoryDto.from(s, List.of(), RESOLVER);
 
-        assertThat(dto.illustrationPathLight()).isEqualTo("https://signed.example/s1-light.png");
-        assertThat(dto.illustrationPathDark()).isEqualTo("https://signed.example/s1-dark.png");
-    }
-
-    @Test
-    void from_nullIllustration_staysNull() {
-        Story s = new Story();
-        s.setId("s2");
-
-        StoryDto dto = StoryDto.from(s, RESOLVER);
-
-        assertThat(dto.illustrationPathLight()).isNull();
-        assertThat(dto.illustrationPathDark()).isNull();
+        assertThat(dto.id()).isEqualTo("s1");
+        assertThat(dto.title()).isEqualTo("The Fox");
+        assertThat(dto.illustrationStatus()).isEqualTo(IllustrationStatus.PENDING);
+        assertThat(dto.panels()).isEmpty();
     }
 }

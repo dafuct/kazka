@@ -52,7 +52,7 @@ public class CharacterExtractionWorker {
         story.setExtractionStatus(ExtractionStatus.RUNNING);
         stories.save(story);
         try {
-            extraction.extract(story.getContent()).block();
+            extraction.extract(story.getContent(), story.getLanguage()).block();
             // We don't persist candidates — confirmation happens via REST endpoint.
             // The candidate list is re-derived on demand via GET /api/stories/{id}/extraction-candidates.
             story.setExtractionStatus(ExtractionStatus.DONE);

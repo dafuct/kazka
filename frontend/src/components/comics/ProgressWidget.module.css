@@ -1,0 +1,23 @@
+.widget {
+  position: fixed;
+  right: 16px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
+  z-index: 50;
+  padding: 12px 16px;
+  background: rgba(20, 14, 60, 0.92);
+  color: #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  font-size: 0.875rem;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: none;
+  text-align: left;
+}
+.title { font-weight: 600; }
+.bar { letter-spacing: 2px; font-family: ui-monospace, SFMono-Regular, monospace; }
+.ready { background: rgba(40, 120, 60, 0.92); }
+.failed { background: rgba(140, 30, 30, 0.92); }

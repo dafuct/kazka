@@ -40,15 +40,22 @@ public class CharacterExtractionService {
         }
     }
 
-    public Mono<List<ExtractedCandidateDto>> extract(String storyBody) {
+    public Mono<List<ExtractedCandidateDto>> extract(String storyBody, String language) {
         if (storyBody == null || storyBody.isBlank()) return Mono.just(List.of());
-        return aiClient.streamText(systemPrompt, storyBody)
+        String langName = "uk".equalsIgnoreCase(language) ? "Ukrainian" : "English";
+        String sys = systemPrompt + "\n\nWrite the 'description' field in " + langName
+                + ". Keep proper names ('name' field) as they appear in the tale.";
+        return aiClient.streamText(sys, storyBody)
                 .reduce("", String::concat)
                 .map(this::parse)
                 .onErrorResume(e -> {
                     log.warn("Extraction LLM call failed: {}", e.getMessage());
                     return Mono.just(List.of());
                 });
+    }
+
+    public Mono<List<ExtractedCandidateDto>> extract(String storyBody) {
+        return extract(storyBody, "en");
     }
 
     private List<ExtractedCandidateDto> parse(String raw) {

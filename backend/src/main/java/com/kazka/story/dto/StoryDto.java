@@ -1,6 +1,7 @@
 package com.kazka.story.dto;
 
 import com.kazka.child.ExtractionStatus;
+import com.kazka.comics.StoryPanel;
 import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.IllustrationStatus;
 import com.kazka.story.Story;
@@ -18,8 +19,6 @@ public record StoryDto(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String length,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String language,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String content,
-        @Schema(nullable = true) String illustrationPathLight,
-        @Schema(nullable = true) String illustrationPathDark,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) IllustrationStatus illustrationStatus,
         @Schema(nullable = true) String childProfileId,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) ExtractionStatus extractionStatus,
@@ -28,18 +27,22 @@ public record StoryDto(
         @Schema(nullable = true) List<com.kazka.story.branching.dto.BranchingChoice> pendingChoices,
         @Schema(nullable = true) String translatedContent,
         @Schema(nullable = true) String translatedLanguage,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) List<StoryPanelDto> panels,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant createdAt,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant updatedAt
 ) {
-    public static StoryDto from(Story s, ImageUrlResolver images) {
+    public static StoryDto from(Story s, List<StoryPanel> panels, ImageUrlResolver resolver) {
+        List<StoryPanelDto> panelDtos = panels == null
+                ? List.of()
+                : panels.stream().map(p -> StoryPanelDto.from(p, resolver)).toList();
         return new StoryDto(
                 s.getId(), s.getTitle(), s.getTheme(), s.getCharacters(),
                 s.getAgeGroup(), s.getLength(), s.getLanguage(), s.getContent(),
-                images.urlFor(s.getIllustrationPathLight()), images.urlFor(s.getIllustrationPathDark()),
                 s.getIllustrationStatus(),
                 s.getChildProfileId(), s.getExtractionStatus(),
                 s.isBranching(), s.getBranchingState(), s.getPendingChoices(),
                 s.getTranslatedContent(), s.getTranslatedLanguage(),
+                panelDtos,
                 s.getCreatedAt(), s.getUpdatedAt()
         );
     }
