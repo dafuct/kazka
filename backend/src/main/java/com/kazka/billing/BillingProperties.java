@@ -21,7 +21,7 @@ public record BillingProperties(
         String cancelUrl
 ) {
     public record Paddle(String apiKey, String webhookSecret, String environment) {}
-    public record Monobank(String token, String webhookPublicKey, Recurring recurring) {
+    public record Monobank(String token, Recurring recurring) {
         public record Recurring(
                 Duration tickInterval,
                 Integer graceMaxRetries,

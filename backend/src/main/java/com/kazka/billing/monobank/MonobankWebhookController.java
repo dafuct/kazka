@@ -26,10 +26,12 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.Base64;
 import java.util.UUID;
 
 @Slf4j
@@ -46,23 +48,42 @@ public class MonobankWebhookController {
     private final UserEntitlementRepository entitlements;
     private final WebhookIdempotencyService idempotency;
     private final ApplicationEventPublisher events;
+    private final MonobankPubKeyService pubKeyService;
     private final ObjectMapper json = new ObjectMapper();
 
     @PostMapping(path = "/monobank", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Mono<Void> handle(@RequestHeader(name = "X-Sign", required = false) String sign,
                              @RequestBody String body) {
-        String expected = props.monobank() == null ? null : props.monobank().webhookPublicKey();
-        if (expected == null || expected.isBlank() || sign == null
-                || !MessageDigest.isEqual(
-                        expected.getBytes(StandardCharsets.UTF_8),
-                        sign.getBytes(StandardCharsets.UTF_8))) {
-            log.warn("Monobank webhook X-Sign mismatch; ignoring");
+        if (sign == null || sign.isBlank()) {
+            log.warn("Monobank webhook missing X-Sign; ignoring");
             return Mono.empty();
         }
-        return Mono.fromRunnable(() -> process(body))
-                .subscribeOn(Schedulers.boundedElastic())
-                .then();
+        return pubKeyService.publicKey()
+                .switchIfEmpty(Mono.fromRunnable(() ->
+                        log.warn("Monobank webhook received but pubkey unavailable; ignoring")))
+                .flatMap(pk -> {
+                    if (!verify(pk, body, sign)) {
+                        // Key may have rotated; drop the cache so the next webhook re-fetches.
+                        pubKeyService.invalidate();
+                        log.warn("Monobank webhook X-Sign verification failed; ignoring");
+                        return Mono.empty();
+                    }
+                    return Mono.fromRunnable(() -> process(body))
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .then();
+                });
+    }
+
+    private static boolean verify(PublicKey pk, String body, String signBase64) {
+        try {
+            Signature s = Signature.getInstance("SHA256withECDSA");
+            s.initVerify(pk);
+            s.update(body.getBytes(StandardCharsets.UTF_8));
+            return s.verify(Base64.getDecoder().decode(signBase64));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @Transactional
@@ -74,7 +95,15 @@ public class MonobankWebhookController {
             String invoiceId = root.path("invoiceId").asText(null);
 
             if (!withinReplayWindow(root)) return;
-            String eventId = invoiceId == null ? null : invoiceId + ":" + status;
+            // Monobank can send two success webhooks per invoice: the first with
+            // walletData.status="new" (no cardToken yet) and the second with
+            // walletData.status="created" (cardToken populated). Including the
+            // walletData.status in the event id lets both be processed so the
+            // card token actually lands in the entitlement row.
+            String walletStatus = root.path("walletData").path("status").asText("");
+            String eventId = invoiceId == null
+                    ? null
+                    : invoiceId + ":" + status + (walletStatus.isBlank() ? "" : ":" + walletStatus);
             if (eventId != null && !idempotency.markProcessed("monobank", eventId)) return;
 
             if (reference.startsWith("renew-")) {
@@ -117,8 +146,9 @@ public class MonobankWebhookController {
             e.setExpiresAt(expires);
             e.setNextRenewalAt(expires.minus(RENEW_LEAD));
             e.setRenewalRetryCount(0);
-            String walletId = root.path("walletId").asText(null);
-            String cardToken = root.path("cardToken").asText(null);
+            JsonNode walletData = root.path("walletData");
+            String walletId = walletData.path("walletId").asText(null);
+            String cardToken = walletData.path("cardToken").asText(null);
             if (walletId != null && !walletId.isBlank()) e.setMonobankWalletId(walletId);
             if (cardToken != null && !cardToken.isBlank()) e.setMonobankCardToken(cardToken);
         }

@@ -164,7 +164,6 @@ kazka:
       environment: ${PADDLE_ENVIRONMENT:sandbox}
     monobank:
       token: ${MONOBANK_TOKEN:}
-      webhook-public-key: ${MONOBANK_WEBHOOK_PUBLIC_KEY:}
       recurring:
         tick-interval: ${MONOBANK_RECURRING_TICK:PT1H}
         grace-max-retries: ${MONOBANK_RECURRING_RETRIES:3}

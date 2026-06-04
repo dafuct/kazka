@@ -96,7 +96,6 @@ kazka:
       environment: sandbox
     monobank:
       token: ""
-      webhook-public-key: ""
       recurring:
         tick-interval: PT24H
         grace-max-retries: 3

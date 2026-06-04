@@ -1,7 +1,6 @@
 package com.kazka.billing.monobank;
 
 import com.kazka.AbstractIT;
-import com.kazka.billing.BillingProperties;
 import com.kazka.billing.EntitlementSource;
 import com.kazka.billing.EntitlementState;
 import com.kazka.billing.SubscriptionProduct;
@@ -16,9 +15,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.Signature;
+import java.security.spec.ECGenParameterSpec;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,20 +32,27 @@ import static org.mockito.Mockito.when;
 
 class MonobankWebhookIT extends AbstractIT {
 
-    private static final String SIGN_KEY = "shared_test_secret";
+    private static final KeyPair KEYS;
+    static {
+        try {
+            KeyPairGenerator g = KeyPairGenerator.getInstance("EC");
+            g.initialize(new ECGenParameterSpec("secp256r1"));
+            KEYS = g.generateKeyPair();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     @Autowired UserRepository users;
     @Autowired UserEntitlementRepository entitlements;
     @Autowired SubscriptionProductRepository products;
-    @MockitoBean BillingProperties props;
+    @MockitoBean MonobankPubKeyService pubKeyService;
 
     @BeforeEach
     void seed() {
         entitlements.deleteAll();
         users.deleteAll();
-        when(props.monobank()).thenReturn(new BillingProperties.Monobank(
-                "tok", SIGN_KEY,
-                new BillingProperties.Monobank.Recurring(Duration.ofHours(1), 3, "renew-")));
+        when(pubKeyService.publicKey()).thenReturn(Mono.just(KEYS.getPublic()));
         SubscriptionProduct p = products.findByAppleProductId("kazka_pro_monthly").orElseThrow();
         p.setMonobankPlanId("mono_monthly_test");
         products.save(p);
@@ -52,11 +65,11 @@ class MonobankWebhookIT extends AbstractIT {
         String body = """
             {"invoiceId":"inv_1","status":"success",
              "reference":"mono_monthly_test:%s",
-             "walletId":"wallet-xyz","cardToken":"card-abc"}
+             "walletData":{"walletId":"wallet-xyz","cardToken":"card-abc","status":"created"}}
             """.formatted(u.getId()).replaceAll("\\s+", " ");
 
         client().post().uri("/api/billing/webhook/monobank")
-                .header("X-Sign", SIGN_KEY)
+                .header("X-Sign", sign(body))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .exchange()
@@ -88,7 +101,7 @@ class MonobankWebhookIT extends AbstractIT {
             """.formatted(u.getId()).replaceAll("\\s+", " ");
 
         client().post().uri("/api/billing/webhook/monobank")
-                .header("X-Sign", SIGN_KEY)
+                .header("X-Sign", sign(body))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .exchange()
@@ -112,7 +125,7 @@ class MonobankWebhookIT extends AbstractIT {
             """.formatted(u.getId()).replaceAll("\\s+", " ");
 
         client().post().uri("/api/billing/webhook/monobank")
-                .header("X-Sign", SIGN_KEY)
+                .header("X-Sign", sign(body))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .exchange()
@@ -136,7 +149,7 @@ class MonobankWebhookIT extends AbstractIT {
             """.formatted(u.getId()).replaceAll("\\s+", " ");
 
         client().post().uri("/api/billing/webhook/monobank")
-                .header("X-Sign", SIGN_KEY)
+                .header("X-Sign", sign(body))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .exchange()
@@ -156,6 +169,35 @@ class MonobankWebhookIT extends AbstractIT {
                 .exchange()
                 .expectStatus().isOk();
         assertThat(entitlements.findAll()).isEmpty();
+    }
+
+    @Test
+    void should_returnOkButNotPersist_when_xSignDoesNotMatchBody() {
+        User u = newUser("mono5@example.com");
+        String body = """
+            {"invoiceId":"inv_5","status":"success",
+             "reference":"mono_monthly_test:%s"}
+            """.formatted(u.getId()).replaceAll("\\s+", " ");
+        String badSign = sign("{\"different\":\"body\"}");
+
+        client().post().uri("/api/billing/webhook/monobank")
+                .header("X-Sign", badSign)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .exchange()
+                .expectStatus().isOk();
+        assertThat(entitlements.findByUserId(u.getId())).isEmpty();
+    }
+
+    private static String sign(String body) {
+        try {
+            Signature s = Signature.getInstance("SHA256withECDSA");
+            s.initSign(KEYS.getPrivate());
+            s.update(body.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(s.sign());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private UserEntitlement newMonobankEntitlement(User u, int retries) {

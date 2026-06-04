@@ -35,7 +35,7 @@ class MonobankClientImplTest {
                 new BillingProperties.Monobank.Recurring(Duration.ofHours(1), 3, "renew-");
         BillingProperties props = new BillingProperties(
                 "bundle", "0", 0L, "Sandbox", "", "", "", false, 3,
-                null, new BillingProperties.Monobank("tok", "sig", recurring),
+                null, new BillingProperties.Monobank("tok", recurring),
                 "http://localhost/success", "http://localhost/cancel"
         );
 

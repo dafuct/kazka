@@ -31,6 +31,8 @@ services:
 
   backend:
     build: ./backend
+    env_file:
+      - .env
     environment:
       DB_URL: jdbc:mysql://mysql:3306/kazkar
       DB_USER: kazkar
@@ -50,6 +52,11 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      MONOBANK_TOKEN: ${MONOBANK_TOKEN:-}
+      BILLING_SUCCESS_URL: ${BILLING_SUCCESS_URL:-http://localhost:5173/subscription/success}
+      BILLING_CANCEL_URL: ${BILLING_CANCEL_URL:-http://localhost:5173/pricing?cancelled=1}
+    ports:
+      - "8080:8080"
     volumes:
       - uploads:/uploads
     depends_on:
