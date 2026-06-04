@@ -94,11 +94,12 @@ kazka:
       api-key: ""
       webhook-secret: ""
       environment: sandbox
-    liqpay:
-      public-key: ""
-      private-key: ""
     monobank:
       token: ""
       webhook-public-key: ""
+      recurring:
+        tick-interval: PT24H
+        grace-max-retries: 3
+        idempotency-prefix: renew-
     success-url: http://localhost:5173/subscription/success
     cancel-url: http://localhost:5173/pricing?cancelled=1

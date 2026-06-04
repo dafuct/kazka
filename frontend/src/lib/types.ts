@@ -52,7 +52,7 @@ export interface Entitlement {
   productAppleId: string
   state: 'ACTIVE' | 'GRACE' | 'EXPIRED' | 'REFUNDED'
   expiresAt: string | null
-  source: 'APPLE' | 'PADDLE' | 'LIQPAY' | 'MONOBANK' | 'GIFT'
+  source: 'APPLE' | 'PADDLE' | 'MONOBANK' | 'GIFT'
 }
 
 export interface GeoResponse {
@@ -60,7 +60,7 @@ export interface GeoResponse {
   isUkraine: boolean
 }
 
-export type ProviderName = 'paddle' | 'liqpay' | 'monobank'
+export type ProviderName = 'paddle' | 'monobank'
 
 export interface CheckoutSessionResponse {
   provider: ProviderName

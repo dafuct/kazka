@@ -3,6 +3,7 @@ package com.kazka.billing.monobank;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kazka.billing.BillingProperties;
+import com.kazka.billing.EntitlementDowngradedEvent;
 import com.kazka.billing.EntitlementSource;
 import com.kazka.billing.EntitlementState;
 import com.kazka.billing.SubscriptionProductRepository;
@@ -11,6 +12,7 @@ import com.kazka.billing.UserEntitlementRepository;
 import com.kazka.billing.webhook.WebhookIdempotencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.UUID;
@@ -35,10 +38,14 @@ import java.util.UUID;
 @RequestMapping("/api/billing/webhook")
 public class MonobankWebhookController {
 
+    private static final Duration PERIOD = Duration.ofDays(30);
+    private static final Duration RENEW_LEAD = Duration.ofDays(1);
+
     private final BillingProperties props;
     private final SubscriptionProductRepository products;
     private final UserEntitlementRepository entitlements;
     private final WebhookIdempotencyService idempotency;
+    private final ApplicationEventPublisher events;
     private final ObjectMapper json = new ObjectMapper();
 
     @PostMapping(path = "/monobank", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -64,55 +71,115 @@ public class MonobankWebhookController {
             JsonNode root = json.readTree(body);
             String status = root.path("status").asText("");
             String reference = root.path("reference").asText("");
-            // Replay window: modifiedDate is ISO 8601.
-            String modifiedDate = root.path("modifiedDate").asText(null);
-            if (modifiedDate != null && !modifiedDate.isBlank()) {
-                try {
-                    Instant ts = Instant.parse(modifiedDate);
-                    Instant now = Instant.now();
-                    if (ts.isBefore(now.minusSeconds(600)) || ts.isAfter(now.plusSeconds(600))) {
-                        log.warn("Monobank webhook stale/future modifiedDate={} (now={}); ignoring", ts, now);
-                        return;
-                    }
-                } catch (DateTimeParseException e) {
-                    log.warn("Monobank webhook unparseable modifiedDate={}; processing anyway", modifiedDate);
-                }
-            }
-            // Mono delivers invoiceId per transaction; combine with status so different
-            // lifecycle events on the same invoice are not collapsed.
             String invoiceId = root.path("invoiceId").asText(null);
-            String eventId = (invoiceId == null ? null : invoiceId + ":" + status);
-            if (eventId != null && !idempotency.markProcessed("monobank", eventId)) {
-                return;
+
+            if (!withinReplayWindow(root)) return;
+            String eventId = invoiceId == null ? null : invoiceId + ":" + status;
+            if (eventId != null && !idempotency.markProcessed("monobank", eventId)) return;
+
+            if (reference.startsWith("renew-")) {
+                handleRenewal(reference, status);
+            } else {
+                handleFirstPayment(root, reference, status, invoiceId);
             }
-            String[] parts = reference.split(":");
-            if (parts.length < 2) {
-                log.warn("Monobank webhook bad reference: {}", reference);
-                return;
-            }
-            String monoPlanId = parts[0];
-            String userId = parts[1];
-            var product = products.findAll().stream()
-                    .filter(p -> monoPlanId.equals(p.getMonobankPlanId()))
-                    .findFirst().orElse(null);
-            if (product == null) {
-                log.warn("Monobank webhook: no product for monoPlanId={}", monoPlanId);
-                return;
-            }
-            EntitlementState state = mapState(status);
-            if (state == null) {
-                log.info("Monobank status={} ignored", status);
-                return;
-            }
-            UserEntitlement e = invoiceId == null
-                    ? newEntitlement(userId, product.getId(), null)
-                    : entitlements.findByOriginalTransactionId(invoiceId)
-                            .orElseGet(() -> newEntitlement(userId, product.getId(), invoiceId));
-            e.setState(state);
-            entitlements.save(e);
         } catch (Exception ex) {
             log.warn("Monobank webhook processing failed: {}", ex.getMessage());
         }
+    }
+
+    private void handleFirstPayment(JsonNode root, String reference, String status, String invoiceId) {
+        String[] parts = reference.split(":");
+        if (parts.length < 2) {
+            log.warn("Monobank webhook bad reference: {}", reference);
+            return;
+        }
+        String monoPlanId = parts[0];
+        String userId = parts[1];
+        var product = products.findAll().stream()
+                .filter(p -> monoPlanId.equals(p.getMonobankPlanId()))
+                .findFirst().orElse(null);
+        if (product == null) {
+            log.warn("Monobank webhook: no product for monoPlanId={}", monoPlanId);
+            return;
+        }
+        EntitlementState state = mapState(status);
+        if (state == null) {
+            log.info("Monobank status={} ignored", status);
+            return;
+        }
+        UserEntitlement e = invoiceId == null
+                ? newEntitlement(userId, product.getId(), null)
+                : entitlements.findByOriginalTransactionId(invoiceId)
+                        .orElseGet(() -> newEntitlement(userId, product.getId(), invoiceId));
+        e.setState(state);
+        if (state == EntitlementState.ACTIVE) {
+            Instant expires = Instant.now().plus(PERIOD);
+            e.setExpiresAt(expires);
+            e.setNextRenewalAt(expires.minus(RENEW_LEAD));
+            e.setRenewalRetryCount(0);
+            String walletId = root.path("walletId").asText(null);
+            String cardToken = root.path("cardToken").asText(null);
+            if (walletId != null && !walletId.isBlank()) e.setMonobankWalletId(walletId);
+            if (cardToken != null && !cardToken.isBlank()) e.setMonobankCardToken(cardToken);
+        }
+        entitlements.save(e);
+    }
+
+    private void handleRenewal(String reference, String status) {
+        // reference = "renew-{userId}-{yyyyMM}"
+        // userId is a UUID (contains dashes); split off the trailing -yyyyMM.
+        String tail = reference.substring("renew-".length());
+        int lastDash = tail.lastIndexOf('-');
+        if (lastDash < 0) {
+            log.warn("Monobank renewal webhook bad reference: {}", reference);
+            return;
+        }
+        String userId = tail.substring(0, lastDash);
+        var ent = entitlements.findActiveByUserId(userId).orElse(null);
+        if (ent == null || ent.getSource() != EntitlementSource.MONOBANK) {
+            log.warn("Monobank renewal webhook: no MONOBANK entitlement for userId={}", userId);
+            return;
+        }
+        int maxRetries = props.monobank().recurring() != null
+                ? props.monobank().recurring().graceMaxRetries() : 3;
+
+        EntitlementState mapped = mapState(status);
+        if (mapped == EntitlementState.ACTIVE) {
+            Instant base = ent.getExpiresAt() != null && ent.getExpiresAt().isAfter(Instant.now())
+                    ? ent.getExpiresAt()
+                    : Instant.now();
+            Instant expires = base.plus(PERIOD);
+            ent.setExpiresAt(expires);
+            ent.setNextRenewalAt(expires.minus(RENEW_LEAD));
+            ent.setRenewalRetryCount(0);
+            entitlements.save(ent);
+        } else if (mapped == EntitlementState.EXPIRED) {
+            int retries = ent.getRenewalRetryCount() + 1;
+            ent.setRenewalRetryCount(retries);
+            if (retries < maxRetries) {
+                ent.setNextRenewalAt(Instant.now().plus(Duration.ofDays(1)));
+            } else {
+                ent.setNextRenewalAt(null);
+                events.publishEvent(new EntitlementDowngradedEvent(ent.getUserId()));
+            }
+            entitlements.save(ent);
+        }
+    }
+
+    private boolean withinReplayWindow(JsonNode root) {
+        String modifiedDate = root.path("modifiedDate").asText(null);
+        if (modifiedDate == null || modifiedDate.isBlank()) return true;
+        try {
+            Instant ts = Instant.parse(modifiedDate);
+            Instant now = Instant.now();
+            if (ts.isBefore(now.minusSeconds(600)) || ts.isAfter(now.plusSeconds(600))) {
+                log.warn("Monobank webhook stale/future modifiedDate={} (now={}); ignoring", ts, now);
+                return false;
+            }
+        } catch (DateTimeParseException e) {
+            log.warn("Monobank webhook unparseable modifiedDate={}; processing anyway", modifiedDate);
+        }
+        return true;
     }
 
     private static EntitlementState mapState(String status) {

@@ -59,3 +59,9 @@ databaseChangeLog:
   - include:
       file: changes/020-comics-panels.sql
       relativeToChangelogFile: true
+  - include:
+      file: changes/021-remove-liqpay-from-subscription-products.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/022-add-monobank-recurring-fields.sql
+      relativeToChangelogFile: true

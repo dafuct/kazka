@@ -45,7 +45,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,prometheus
       base-path: /actuator
   endpoint:
     health:
@@ -162,11 +162,12 @@ kazka:
       api-key: ${PADDLE_API_KEY:}
       webhook-secret: ${PADDLE_WEBHOOK_SECRET:}
       environment: ${PADDLE_ENVIRONMENT:sandbox}
-    liqpay:
-      public-key: ${LIQPAY_PUBLIC_KEY:}
-      private-key: ${LIQPAY_PRIVATE_KEY:}
     monobank:
       token: ${MONOBANK_TOKEN:}
       webhook-public-key: ${MONOBANK_WEBHOOK_PUBLIC_KEY:}
+      recurring:
+        tick-interval: ${MONOBANK_RECURRING_TICK:PT1H}
+        grace-max-retries: ${MONOBANK_RECURRING_RETRIES:3}
+        idempotency-prefix: ${MONOBANK_RECURRING_PREFIX:renew-}
     success-url: ${BILLING_SUCCESS_URL:http://localhost:5173/subscription/success}
     cancel-url:  ${BILLING_CANCEL_URL:http://localhost:5173/pricing?cancelled=1}

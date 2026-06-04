@@ -24,7 +24,7 @@ Production: **[kazkatales.com](https://kazkatales.com)**.
 - **Seasonal / holiday packs** — themed prompts tied to the current date and locale.
 - **Parent dashboard** — activity overview across children.
 - **Accounts** — email/password (with verification + reset), Google, and Apple sign-in; JWT sessions.
-- **Subscriptions** — free tier (3 stories/month) plus Pro via Paddle, LiqPay, Monobank (web) and Apple In-App Purchase (mobile); gift codes.
+- **Subscriptions** — free tier (3 stories/month) plus Pro via Paddle and Monobank (web) and Apple In-App Purchase (mobile); gift codes.
 - **Content moderation** — an LLM judge screens prompts; repeated violations auto-suspend.
 
 ## Tech stack
@@ -121,7 +121,7 @@ All configuration is via environment variables (see `.env.example`). Highlights:
 | `APP_BASE_URL`          | Base URL used in email links and OAuth redirects.               |
 | `STORAGE_PROVIDER`      | `filesystem` (default) or `r2`.                                 |
 | `GOOGLE_CLIENT_ID` / `APPLE_WEB_CLIENT_ID` | Social sign-in (optional).            |
-| `PADDLE_*` / `LIQPAY_*` / `MONOBANK_*` | Subscription providers (optional).       |
+| `PADDLE_*` / `MONOBANK_*` | Subscription providers (optional).       |
 
 Leaving an optional provider's keys blank disables that provider with a clear
 "not configured" error rather than failing startup.
@@ -203,7 +203,7 @@ Free accounts can generate a limited number of stories per month
 features. Payment providers are pluggable and region-aware:
 
 - **Paddle** — card checkout (web).
-- **LiqPay (PrivatBank)** and **Monobank** — Ukrainian acquiring (web).
+- **Monobank Acquiring** — Ukrainian tokenized recurring (web); first charge saves the card, a `@Scheduled` job renews monthly via pay-by-token.
 - **Apple In-App Purchase** — mobile (StoreKit).
 - **Gift codes** — redeemable for Pro entitlements.
 

@@ -41,9 +41,6 @@ public class SubscriptionProduct {
     @Column(name = "paddle_product_id", length = 120)
     private String paddleProductId;
 
-    @Column(name = "liqpay_plan_id", length = 120)
-    private String liqpayPlanId;
-
     @Column(name = "monobank_plan_id", length = 120)
     private String monobankPlanId;
 

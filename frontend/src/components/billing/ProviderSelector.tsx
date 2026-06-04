@@ -22,16 +22,10 @@ export function ProviderSelector({ country, isUkraine, loading, onSubscribe, onC
       <div className={styles.label}>{t.pricing.payWith}</div>
       <div className={styles.buttons}>
         {isUkraine ? (
-          <>
-            <button className={styles.btn} disabled={loading}
-                    onClick={() => onSubscribe('liqpay')}>
-              🇺🇦 {t.pricing.liqpay}
-            </button>
-            <button className={styles.btn} disabled={loading}
-                    onClick={() => onSubscribe('monobank')}>
-              🇺🇦 {t.pricing.monobank}
-            </button>
-          </>
+          <button className={styles.btn} disabled={loading}
+                  onClick={() => onSubscribe('monobank')}>
+            💳 {t.pricing.monobankRecurring}
+          </button>
         ) : (
           <button className={styles.btn} disabled={loading}
                   onClick={() => onSubscribe('paddle')}>
@@ -39,6 +33,12 @@ export function ProviderSelector({ country, isUkraine, loading, onSubscribe, onC
           </button>
         )}
       </div>
+      {isUkraine && (
+        <>
+          <p className={styles.disclosure}>{t.pricing.paymentMethods}</p>
+          <p className={styles.disclosure}>{t.pricing.autoRenewalDisclosure}</p>
+        </>
+      )}
       <div className={styles.geoRow}>
         <span>{t.pricing.detectedCountry.replace('{country}', country)}</span>
         <button className={styles.linkBtn} onClick={() => setEditingCountry(v => !v)}>

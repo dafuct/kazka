@@ -43,10 +43,10 @@ The Pro subscription is processed via one of these providers:
 
 - **Apple App Store** — for payments via iPhone/iPad.
 - **Paddle** — for international card payments.
-- **LiqPay** and **Monobank** — for Ukrainian bank-card payments.
+- **Monobank Acquiring** — for Ukrainian bank-card payments.
 - **Gift codes** — one-time activation for a fixed term.
 
-Subscriptions renew automatically at the end of each period until you cancel.
+Subscriptions renew automatically at the end of each period until you cancel. Subscriptions purchased via Monobank Acquiring renew automatically every month at the price shown at checkout. You may cancel at any time from the Settings page; your Pro access continues until the end of the period you have already paid for.
 
 ### How to cancel
 
@@ -54,7 +54,7 @@ Cancellation depends on where you paid:
 
 - **Apple App Store** — on your iPhone: Settings → your name → Subscriptions → Kazka.
 - **Paddle** — your receipt email links to a Customer Portal where you can cancel.
-- **LiqPay / Monobank** — these are one-period payments; they only continue if you pay again manually. If you want to end access earlier, write to `d.makarenko.home@gmail.com`.
+- **Monobank Acquiring** — open the Settings page in Kazka and turn off auto-renewal; your Pro access stays until the end of the period you have already paid for.
 
 ## 7. Refunds
 

@@ -40,6 +40,8 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.eatthepath:pushy:0.15.4'
     implementation 'com.apple.itunes.storekit:app-store-server-library:3.6.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 
     implementation platform('software.amazon.awssdk:bom:2.31.0')
     implementation 'software.amazon.awssdk:s3'

@@ -24,7 +24,6 @@ class CheckoutSessionServiceTest {
     @Mock SubscriptionProductRepository products;
     @Mock UserRepository users;
     @Mock CheckoutProvider paddleProvider;
-    @Mock CheckoutProvider liqpayProvider;
     @Mock CheckoutProvider monobankProvider;
 
     CheckoutSessionService service;
@@ -45,11 +44,10 @@ class CheckoutSessionServiceTest {
         lenient().when(users.findById("user-1")).thenReturn(Optional.of(user));
 
         when(paddleProvider.provider()).thenReturn("paddle");
-        when(liqpayProvider.provider()).thenReturn("liqpay");
         when(monobankProvider.provider()).thenReturn("monobank");
 
         service = new CheckoutSessionService(products, users,
-                List.of(paddleProvider, liqpayProvider, monobankProvider));
+                List.of(paddleProvider, monobankProvider));
     }
 
     @Test
@@ -60,18 +58,6 @@ class CheckoutSessionServiceTest {
 
         StepVerifier.create(service.create("user-1",
                         new CheckoutSessionRequest("prod-1", "paddle", "DE")))
-                .expectNext(expected)
-                .verifyComplete();
-    }
-
-    @Test
-    void should_dispatchToMatchingProvider_when_providerIsLiqpay() {
-        CheckoutSessionResponse expected =
-                new CheckoutSessionResponse("liqpay", "https://liqpay.ua/checkout/xyz", null);
-        when(liqpayProvider.createSession(user, product)).thenReturn(Mono.just(expected));
-
-        StepVerifier.create(service.create("user-1",
-                        new CheckoutSessionRequest("prod-1", "liqpay", "UA")))
                 .expectNext(expected)
                 .verifyComplete();
     }

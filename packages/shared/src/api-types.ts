@@ -228,22 +228,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/billing/webhook/liqpay": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["handle_2"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/billing/subscription/cancel": {
         parameters: {
             query?: never;

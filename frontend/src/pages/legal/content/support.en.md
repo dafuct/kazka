@@ -18,7 +18,7 @@ Depends where you signed up:
 
 - **Apple App Store (iPhone/iPad)** — Settings → your name → Subscriptions → Kazka → Cancel.
 - **Paddle (international card)** — the receipt email links to a Customer Portal with a Cancel button.
-- **LiqPay / Monobank (Ukrainian card)** — these are one-period payments; nothing to cancel. Just don't pay next time. To stop access before the period ends, email us.
+- **Monobank Acquiring (Ukrainian card)** — open Settings inside Kazka and turn off auto-renewal. Your Pro access stays until the end of the period you already paid for.
 
 ### How do I delete my account?
 

@@ -38,6 +38,7 @@ export function SettingsPage() {
     e => e.state === 'ACTIVE' || e.state === 'GRACE'
   )
   const isAppleManaged = activeEntitlement?.source === 'APPLE'
+  const isMonobankRecurring = activeEntitlement?.source === 'MONOBANK'
 
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault()
@@ -64,7 +65,14 @@ export function SettingsPage() {
       await billingApi.cancelSubscription()
       await refreshBilling()
       setCancelStatus('saved')
-      setCancelMsg(t.settings.cancelled)
+      if (isMonobankRecurring) {
+        setCancelMsg(
+          (t.settings.cancelledNotice ?? t.settings.cancelled)
+            .replace('{date}', formatDate(activeEntitlement?.expiresAt ?? null))
+        )
+      } else {
+        setCancelMsg(t.settings.cancelled)
+      }
     } catch (err) {
       setCancelStatus('error')
       if (err instanceof ApiError && err.body?.error === 'APPLE_MANAGED') {
@@ -173,7 +181,12 @@ export function SettingsPage() {
         <div className={styles.modalOverlay} onClick={() => setConfirmOpen(false)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>{t.settings.cancelConfirmTitle}</h3>
-            <p>{t.settings.cancelConfirmBody}</p>
+            <p>
+              {isMonobankRecurring
+                ? (t.settings.cancelMonobankConfirmBody ?? t.settings.cancelConfirmBody)
+                    .replace('{date}', formatDate(activeEntitlement?.expiresAt ?? null))
+                : t.settings.cancelConfirmBody}
+            </p>
             <div className={styles.modalActions}>
               <button className={styles.ghostBtn} onClick={() => setConfirmOpen(false)}>
                 {t.settings.cancelConfirmNo}

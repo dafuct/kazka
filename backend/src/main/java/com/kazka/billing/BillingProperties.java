@@ -2,6 +2,8 @@ package com.kazka.billing;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 @ConfigurationProperties("kazka.billing")
 public record BillingProperties(
         String bundleId,
@@ -14,12 +16,16 @@ public record BillingProperties(
         Boolean enabled,
         Integer freeMonthlyStoryLimit,
         Paddle paddle,
-        LiqPay liqpay,
         Monobank monobank,
         String successUrl,
         String cancelUrl
 ) {
     public record Paddle(String apiKey, String webhookSecret, String environment) {}
-    public record LiqPay(String publicKey, String privateKey) {}
-    public record Monobank(String token, String webhookPublicKey) {}
+    public record Monobank(String token, String webhookPublicKey, Recurring recurring) {
+        public record Recurring(
+                Duration tickInterval,
+                Integer graceMaxRetries,
+                String idempotencyPrefix
+        ) {}
+    }
 }

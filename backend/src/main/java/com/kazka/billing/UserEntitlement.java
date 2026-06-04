@@ -41,6 +41,18 @@ public class UserEntitlement {
     @Column(name = "source", nullable = false, length = 16)
     private EntitlementSource source = EntitlementSource.APPLE;
 
+    @Column(name = "monobank_wallet_id", length = 64)
+    private String monobankWalletId;
+
+    @Column(name = "monobank_card_token", length = 120)
+    private String monobankCardToken;
+
+    @Column(name = "next_renewal_at")
+    private Instant nextRenewalAt;
+
+    @Column(name = "renewal_retry_count", nullable = false)
+    private int renewalRetryCount = 0;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     @Setter(AccessLevel.NONE)

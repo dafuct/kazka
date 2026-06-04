@@ -150,12 +150,27 @@ public class BillingService {
             if (appleManaged) {
                 throw new AppleManagedSubscriptionException();
             }
+            boolean anyDowngraded = false;
             for (UserEntitlement e : active) {
-                e.setState(EntitlementState.REVOKED);
-                e.setExpiresAt(Instant.now());
-                entitlements.save(e);
+                switch (e.getSource()) {
+                    case MONOBANK -> {
+                        // Stop the scheduler but keep the active period intact.
+                        // Card token is NOT cleared so the user can re-subscribe without re-entry.
+                        e.setNextRenewalAt(null);
+                        entitlements.save(e);
+                    }
+                    case PADDLE, GIFT -> {
+                        e.setState(EntitlementState.REVOKED);
+                        e.setExpiresAt(Instant.now());
+                        entitlements.save(e);
+                        anyDowngraded = true;
+                    }
+                    case APPLE -> { /* unreachable — handled above */ }
+                }
             }
-            events.publishEvent(new EntitlementDowngradedEvent(userId));
+            if (anyDowngraded) {
+                events.publishEvent(new EntitlementDowngradedEvent(userId));
+            }
             return active;
         }).subscribeOn(Schedulers.boundedElastic());
     }
