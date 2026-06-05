@@ -31,6 +31,7 @@ import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
+import org.springframework.web.server.adapter.ForwardedHeaderTransformer;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -151,6 +152,16 @@ public class SecurityConfig {
             if (token != null) return token.then(chain.filter(exchange));
             return chain.filter(exchange);
         };
+    }
+
+    // Behind nginx + Cloudflare, the inner connection is HTTP. Without this bean Spring
+    // builds the OAuth2 redirect_uri as "http://kazkatales.com/login/oauth2/code/google"
+    // which Google rejects with redirect_uri_mismatch. The transformer reads
+    // X-Forwarded-Proto / X-Forwarded-Host from the proxy and rewrites the request URI
+    // so outbound URL building uses https://kazkatales.com/... correctly.
+    @Bean
+    public ForwardedHeaderTransformer forwardedHeaderTransformer() {
+        return new ForwardedHeaderTransformer();
     }
 
     @Profile("dev")
