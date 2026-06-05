@@ -196,7 +196,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/billing/webhook/paddle": {
+    "/api/billing/webhook/paypro": {
         parameters: {
             query?: never;
             header?: never;
@@ -965,7 +965,7 @@ export interface components {
         CheckoutSessionResponse: {
             provider?: string;
             checkoutUrl?: string;
-            paddleTransactionId?: string;
+            providerReference?: string;
         };
         TokenRefreshRequest: {
             refreshToken: string;
@@ -1578,17 +1578,11 @@ export interface operations {
     handle: {
         parameters: {
             query?: never;
-            header?: {
-                "Paddle-Signature"?: string;
-            };
+            header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": string;
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {

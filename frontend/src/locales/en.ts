@@ -256,7 +256,7 @@ export const en: Locale = {
     monobankRecurring: 'Subscribe with Monobank — auto-renews monthly',
     paymentMethods: 'Pay with any card · Apple Pay · Google Pay · cards saved by Monobank',
     autoRenewalDisclosure: 'Auto-renews monthly. Cancel anytime in Settings.',
-    paddle: 'Card (international)',
+    paypro: 'Card (international)',
     changeCountry: 'Change country',
     detectedCountry: 'Detected: {country}',
     alreadyPro: "You're already on Pro",
@@ -371,7 +371,7 @@ export const en: Locale = {
     sourceLabel: 'Payment method',
     sources: {
       APPLE: 'App Store',
-      PADDLE: 'Card (Paddle)',
+      PAYPRO: 'Card',
       MONOBANK: 'Monobank',
       GIFT: 'Gift code',
     },

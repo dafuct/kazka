@@ -28,8 +28,8 @@ export function ProviderSelector({ country, isUkraine, loading, onSubscribe, onC
           </button>
         ) : (
           <button className={styles.btn} disabled={loading}
-                  onClick={() => onSubscribe('paddle')}>
-            💳 {t.pricing.paddle}
+                  onClick={() => onSubscribe('paypro')}>
+            💳 {t.pricing.paypro}
           </button>
         )}
       </div>
