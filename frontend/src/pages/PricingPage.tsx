@@ -91,11 +91,6 @@ export function PricingPage() {
     }
   }
 
-  async function handleCountryOverride(country: string | null) {
-    const next = await billing.geo(country ?? undefined)
-    setGeo(next)
-  }
-
   async function handleCancel() {
     setConfirmOpen(false)
     setCancelling(true)
@@ -186,11 +181,9 @@ export function PricingPage() {
       {!isPro && (
         <div className={styles.providerRow}>
           <ProviderSelector
-            country={geo?.country ?? 'US'}
             isUkraine={geo?.isUkraine ?? false}
             loading={submitting}
             onSubscribe={handleSubscribe}
-            onCountryChange={handleCountryOverride}
           />
         </div>
       )}

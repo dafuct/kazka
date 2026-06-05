@@ -255,6 +255,7 @@ export const uk = {
     paymentMethods: 'Будь-яка картка · Apple Pay · Google Pay · картки збережено Монобанком',
     autoRenewalDisclosure: 'Підписка поновлюється щомісяця автоматично. Можна скасувати у Налаштуваннях.',
     paypro: 'Картка (міжнародна)',
+    comingSoonForCountry: 'Pro скоро буде доступний у вашій країні. Слідкуйте за новинами.',
     changeCountry: 'Змінити країну',
     detectedCountry: 'Виявлено: {country}',
     alreadyPro: 'Ви вже на Pro',

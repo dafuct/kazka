@@ -257,6 +257,7 @@ export const en: Locale = {
     paymentMethods: 'Pay with any card · Apple Pay · Google Pay · cards saved by Monobank',
     autoRenewalDisclosure: 'Auto-renews monthly. Cancel anytime in Settings.',
     paypro: 'Card (international)',
+    comingSoonForCountry: 'Pro is coming soon to your country. Stay tuned.',
     changeCountry: 'Change country',
     detectedCountry: 'Detected: {country}',
     alreadyPro: "You're already on Pro",
