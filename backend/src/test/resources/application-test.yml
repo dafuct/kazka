@@ -90,10 +90,11 @@ kazka:
     private-key-pem: ""
     enabled: false
     free-monthly-story-limit: 3
-    paddle:
-      api-key: ""
-      webhook-secret: ""
-      environment: sandbox
+    paypro:
+      vendor-id: 1
+      api-key: "test-api-key"
+      ipn-secret: "test-validation-key"
+      use-test-mode: true
     monobank:
       token: ""
       recurring:

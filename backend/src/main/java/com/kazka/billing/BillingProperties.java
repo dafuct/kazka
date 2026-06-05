@@ -15,12 +15,12 @@ public record BillingProperties(
         String privateKeyPem,
         Boolean enabled,
         Integer freeMonthlyStoryLimit,
-        Paddle paddle,
+        PayPro paypro,
         Monobank monobank,
         String successUrl,
         String cancelUrl
 ) {
-    public record Paddle(String apiKey, String webhookSecret, String environment) {}
+    public record PayPro(Integer vendorId, String apiKey, String ipnSecret, Boolean useTestMode) {}
     public record Monobank(String token, Recurring recurring) {
         public record Recurring(
                 Duration tickInterval,

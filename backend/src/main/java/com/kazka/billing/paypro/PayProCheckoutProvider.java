@@ -1,4 +1,4 @@
-package com.kazka.billing.paddle;
+package com.kazka.billing.paypro;
 
 import com.kazka.billing.CheckoutProvider;
 import com.kazka.billing.SubscriptionProduct;
@@ -10,20 +10,21 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 @Component
-public class PaddleCheckoutProvider implements CheckoutProvider {
+public class PayProCheckoutProvider implements CheckoutProvider {
 
-    private final PaddleClient paddle;
+    private final PayProUrlBuilder urls;
 
     @Override
     public String provider() {
-        return "paddle";
+        return "paypro";
     }
 
     @Override
     public Mono<CheckoutSessionResponse> createSession(User user, SubscriptionProduct product) {
-        return Mono.defer(() -> paddle.createTransaction(
-                        requireConfigured(product.getPaddleProductId(), "paddleProductId"),
-                        user.getId(), user.getEmail()))
-                .map(pt -> new CheckoutSessionResponse("paddle", pt.checkoutUrl(), pt.id()));
+        return Mono.fromCallable(() -> {
+            requireConfigured(product.getPayproProductId(), "payproProductId");
+            String url = urls.build(user, product);
+            return new CheckoutSessionResponse("paypro", url, null);
+        });
     }
 }

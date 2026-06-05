@@ -58,6 +58,7 @@ dependencies {
     testImplementation 'com.icegreen:greenmail-junit5:2.1.0'
     testImplementation 'org.awaitility:awaitility:4.2.2'
     testImplementation 'org.wiremock:wiremock-standalone:3.9.1'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
 }
 
 tasks.withType(Test).configureEach {
