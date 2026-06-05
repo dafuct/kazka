@@ -25,10 +25,9 @@ export function ProviderSelector({ isUkraine, loading, onSubscribe }: Props) {
       <div className={styles.buttons}>
         <button className={styles.btn} disabled={loading}
                 onClick={() => onSubscribe('monobank')}>
-          💳 {t.pricing.monobankRecurring}
+          {t.pricing.monobankRecurring}
         </button>
       </div>
-      <p className={styles.disclosure}>{t.pricing.paymentMethods}</p>
       <p className={styles.disclosure}>{t.pricing.autoRenewalDisclosure}</p>
     </div>
   )

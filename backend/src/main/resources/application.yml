@@ -41,6 +41,10 @@ spring:
             client-id: ${GOOGLE_CLIENT_ID:not-configured}
             client-secret: ${GOOGLE_CLIENT_SECRET:not-configured}
             scope: openid,email,profile
+            # Behind Cloudflare + nginx, X-Forwarded-Proto / Port may not survive intact.
+            # Setting redirect-uri here bypasses Spring's request-based URL guessing and
+            # avoids "http://kazkatales.com:443/..." redirect_uri_mismatch from Google.
+            redirect-uri: ${OAUTH_REDIRECT_URI_GOOGLE:{baseUrl}/login/oauth2/code/{registrationId}}
 management:
   endpoints:
     web:
