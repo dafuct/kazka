@@ -158,10 +158,11 @@ kazka:
     private-key-pem: ${BILLING_PRIVATE_KEY_PEM:}
     enabled: ${BILLING_ENABLED:false}
     free-monthly-story-limit: ${BILLING_FREE_LIMIT:3}
-    paddle:
-      api-key: ${PADDLE_API_KEY:}
-      webhook-secret: ${PADDLE_WEBHOOK_SECRET:}
-      environment: ${PADDLE_ENVIRONMENT:sandbox}
+    paypro:
+      vendor-id: ${PAYPRO_VENDOR_ID:}
+      api-key: ${PAYPRO_API_KEY:}
+      ipn-secret: ${PAYPRO_IPN_SECRET:}
+      use-test-mode: ${PAYPRO_USE_TEST_MODE:true}
     monobank:
       token: ${MONOBANK_TOKEN:}
       recurring:

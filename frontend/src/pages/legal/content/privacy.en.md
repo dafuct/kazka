@@ -36,7 +36,7 @@ The controller of your personal data is the Ukrainian sole entrepreneur (ФОП)
 
 **Payment data**
 
-We **don't** store the full card number. Payment is handled by one of the providers — Apple, Paddle, Monobank Acquiring. Monobank Acquiring stores the card token securely on its side; we keep only the `walletId` and `cardToken` values needed to charge again. We never see the full card number. On our side we also keep an entitlement record: which plan is active, until when, via which provider.
+We **don't** store the full card number. Payment is handled by one of the providers — Apple, PayPro Global, Monobank Acquiring. Monobank Acquiring stores the card token securely on its side; we keep only the `walletId` and `cardToken` values needed to charge again. We never see the full card number. On our side we also keep an entitlement record: which plan is active, until when, via which provider.
 
 **Push notifications (mobile app only)**
 
@@ -59,7 +59,7 @@ If you enabled push, we store a device token so we can deliver bedtime reminders
 |---|---|---|
 | Google (Gemini API) | Your prompt text and the generated tale text (no user identifier attached) — used for tale generation, editing, scene extraction, and moderation | USA |
 | Fal.ai | The image scene description (derived from your prompt; no user identifier attached) — used for illustration generation | USA |
-| Paddle | Email, payment amount | UK / Ireland |
+| PayPro Global | Email, payment amount | USA / EU |
 | Monobank Acquiring | Email, payment amount, card token | Ukraine |
 | Apple App Store | Apple ID, payment amount | USA |
 | Google Sign-In | Your Google identifier, email | USA |

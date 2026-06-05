@@ -40,7 +40,7 @@ class MonobankCheckoutProviderTest {
                 .assertNext(resp -> {
                     assertThat(resp.provider()).isEqualTo("monobank");
                     assertThat(resp.checkoutUrl()).contains("monobank");
-                    assertThat(resp.paddleTransactionId()).isNull();
+                    assertThat(resp.providerReference()).isNull();
                 })
                 .verifyComplete();
     }

@@ -42,7 +42,7 @@ Repeated violations lead to account suspension without refund.
 The Pro subscription is processed via one of these providers:
 
 - **Apple App Store** — for payments via iPhone/iPad.
-- **Paddle** — for international card payments.
+- **PayPro Global** — for international card payments.
 - **Monobank Acquiring** — for Ukrainian bank-card payments.
 - **Gift codes** — one-time activation for a fixed term.
 
@@ -53,7 +53,7 @@ Subscriptions renew automatically at the end of each period until you cancel. Su
 Cancellation depends on where you paid:
 
 - **Apple App Store** — on your iPhone: Settings → your name → Subscriptions → Kazka.
-- **Paddle** — your receipt email links to a Customer Portal where you can cancel.
+- **PayPro Global** — your receipt email links to a Customer Portal where you can cancel.
 - **Monobank Acquiring** — open the Settings page in Kazka and turn off auto-renewal; your Pro access stays until the end of the period you have already paid for.
 
 ## 7. Refunds
