@@ -118,7 +118,7 @@ public class SecurityConfig {
                                 "/api/auth/oauth/apple",
                                 "/api/auth/oauth/google").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/auth/me", "/api/auth/verify-email").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/billing/products").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/api/billing/products", "/api/billing/geo").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/holidays/**").permitAll()
                         .pathMatchers(HttpMethod.POST,
                                 "/api/billing/iap/webhook",
