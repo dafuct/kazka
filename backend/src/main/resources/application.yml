@@ -161,7 +161,7 @@ kazka:
     key-id: ${BILLING_KEY_ID:}
     private-key-pem: ${BILLING_PRIVATE_KEY_PEM:}
     enabled: ${BILLING_ENABLED:false}
-    free-monthly-story-limit: ${BILLING_FREE_LIMIT:3}
+    free-monthly-story-limit: ${BILLING_FREE_LIMIT:5}
     paypro:
       vendor-id: ${PAYPRO_VENDOR_ID:}
       api-key: ${PAYPRO_API_KEY:}

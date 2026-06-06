@@ -238,7 +238,7 @@ export const uk = {
     free: {
       name: 'Безкоштовно',
       price: 'Безкоштовно',
-      bullets: ['3 казки на місяць'],
+      bullets: ['5 казок на місяць'],
     },
     pro: {
       name: 'Pro',

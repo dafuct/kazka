@@ -89,7 +89,7 @@ kazka:
     key-id: ""
     private-key-pem: ""
     enabled: false
-    free-monthly-story-limit: 3
+    free-monthly-story-limit: 5
     paypro:
       vendor-id: 1
       api-key: "test-api-key"

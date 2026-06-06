@@ -56,8 +56,8 @@ xcrun simctl openurl booted "kazka://story/<id>"
 ## Free-tier paywall enforcement
 
 19. Sign in as a fresh user (not Pro).
-20. Generate 3 stories. The 4th attempt should fail with a 402 PAYMENT_REQUIRED error.
-21. (Optionally) verify in DB: `SELECT stories_this_month FROM users WHERE email = '<email>';` → 3.
+20. Generate 5 stories. The 6th attempt should fail with a 402 PAYMENT_REQUIRED error.
+21. (Optionally) verify in DB: `SELECT stories_this_month FROM users WHERE email = '<email>';` → 5.
 
 ## In-app push smoke
 
