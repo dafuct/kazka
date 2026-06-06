@@ -240,7 +240,7 @@ export const en: Locale = {
     free: {
       name: 'Free',
       price: 'Free',
-      bullets: ['3 stories per month'],
+      bullets: ['5 stories per month'],
     },
     pro: {
       name: 'Pro',

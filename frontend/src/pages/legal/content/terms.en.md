@@ -58,11 +58,11 @@ Cancellation depends on where you paid:
 
 ## 7. Refunds
 
-We refund the full Pro subscription price within **14 days** of payment if you've generated **fewer than 3 tales** in that window. Email `d.makarenko.home@gmail.com` with the payment details.
+We refund the full Pro subscription price within **14 days** of payment if you've generated **fewer than 5 tales** in that window. Email `d.makarenko.home@gmail.com` with the payment details.
 
 - Apple App Store payments are refunded by Apple via `reportaproblem.apple.com`.
 - Gift codes are non-refundable.
-- After 14 days or 3+ tales, refunds are at our discretion on a case-by-case basis.
+- After 14 days or 5+ tales, refunds are at our discretion on a case-by-case basis.
 
 ## 8. Liability
 

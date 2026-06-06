@@ -33,6 +33,6 @@ public class FreeTierGate {
     }
 
     private int limit() {
-        return props.freeMonthlyStoryLimit() == null ? 3 : props.freeMonthlyStoryLimit();
+        return props.freeMonthlyStoryLimit() == null ? 5 : props.freeMonthlyStoryLimit();
     }
 }

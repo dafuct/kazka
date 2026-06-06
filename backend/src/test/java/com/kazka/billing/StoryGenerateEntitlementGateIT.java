@@ -84,7 +84,7 @@ class StoryGenerateEntitlementGateIT extends AbstractIT {
         u.setDisplayName("Tester");
         u.setRole(UserRole.USER);
         u.setEmailVerified(true);
-        u.setStoriesThisMonth(3); // at default free limit
+        u.setStoriesThisMonth(5); // at default free limit
         return users.save(u);
     }
 
