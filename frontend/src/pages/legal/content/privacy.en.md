@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Effective date:** 30 May 2026
+**Effective date:** 7 June 2026
 
 This policy explains what data Kazka collects, why, and what you can do about it.
 
@@ -34,10 +34,6 @@ The controller of your personal data is the Ukrainian sole entrepreneur (ФОП)
 - Last login time.
 - Technical request logs (IP, user-agent) for security and error diagnostics.
 
-**Payment data**
-
-We **don't** store the full card number. Payment is handled by one of the providers — Apple, Monobank Acquiring. Monobank Acquiring stores the card token securely on its side; we keep only the `walletId` and `cardToken` values needed to charge again. We never see the full card number. On our side we also keep an entitlement record: which plan is active, until when, via which provider.
-
 **Push notifications (mobile app only)**
 
 If you enabled push, we store a device token so we can deliver bedtime reminders.
@@ -49,7 +45,7 @@ If you enabled push, we store a device token so we can deliver bedtime reminders
 
 ## 4. Legal basis for processing (GDPR Art. 6)
 
-- **Performance of a contract** — to deliver the service (generate tales, process payments, send verification emails).
+- **Performance of a contract** — to deliver the service (generate tales, send verification emails).
 - **Legitimate interest** — content moderation, abuse prevention, basic error diagnostics.
 - **Consent** — any marketing communication (we currently don't send any; if we start, we'll ask explicitly).
 
@@ -59,8 +55,6 @@ If you enabled push, we store a device token so we can deliver bedtime reminders
 |---|---|---|
 | Google (Gemini API) | Your prompt text and the generated tale text (no user identifier attached) — used for tale generation, editing, scene extraction, and moderation | USA |
 | Fal.ai | The image scene description (derived from your prompt; no user identifier attached) — used for illustration generation | USA |
-| Monobank Acquiring | Email, payment amount, card token | Ukraine |
-| Apple App Store | Apple ID, payment amount | USA |
 | Google Sign-In | Your Google identifier, email | USA |
 | Apple Sign-In | Your Apple identifier, email (or relay) | USA |
 | Cloudflare | IP, request metadata (DNS, proxy) | USA |
@@ -75,7 +69,6 @@ Some of these providers operate outside Ukraine and the EU. Transfers are protec
 
 - Account data — for as long as the account is active + 30 days after a deletion request.
 - Generated tales — for as long as the account is active; you can delete individual tales from the archive.
-- Payment records — 3 years, as required by Ukrainian tax law.
 - Technical logs — 90 days.
 
 ## 8. Your rights

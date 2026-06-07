@@ -1,6 +1,6 @@
 # Terms of Use
 
-**Effective date:** 30 May 2026
+**Effective date:** 7 June 2026
 
 Welcome to Kazka. Please read these terms — by using Kazka you agree to them.
 
@@ -10,7 +10,7 @@ The Kazka service ("Kazka", "we", "us") is operated by a Ukrainian sole entrepre
 
 ## 2. What Kazka is
 
-Kazka is an online service that generates children's tales with the help of artificial intelligence. An adult creates a child profile, picks a theme and a few other settings, and the service writes a personalised tale with an illustration. There is a free tier (with a monthly tale limit) and a paid Pro plan (no limit, plus extra features: saved recurring characters, the bedtime ritual, and interactive branching tales).
+Kazka is an online service that generates children's tales with the help of artificial intelligence. An adult creates a child profile, picks a theme and a few other settings, and the service writes a personalised tale with an illustration. Kazka is free to use: every account can generate a limited number of tales per month, and all features (saved recurring characters, the bedtime ritual, and interactive branching tales) are available to everyone.
 
 ## 3. Accounts
 
@@ -35,44 +35,23 @@ You must not:
 - Use the service via bots, scripts, or automated scraping.
 - Resell or re-brand Kazka as your own service without written permission.
 
-Repeated violations lead to account suspension without refund.
+Repeated violations lead to account suspension.
 
-## 6. Payments and subscriptions
+## 6. Cost and donations
 
-The Pro subscription is processed via one of these providers:
+Kazka is free. We don't sell any paid plans or charge for the service. If you'd like to help cover running costs, you can make a **voluntary donation via the "Support" link in the app**. Donations are optional, unlock no extra features, and cannot be returned.
 
-- **Apple App Store** — for payments via iPhone/iPad.
-- **Monobank Acquiring** — for Ukrainian bank-card payments.
-- **Gift codes** — one-time activation for a fixed term.
-
-Subscriptions renew automatically at the end of each period until you cancel. Subscriptions purchased via Monobank Acquiring renew automatically every month at the price shown at checkout. You may cancel at any time from the Settings page; your Pro access continues until the end of the period you have already paid for.
-
-### How to cancel
-
-Cancellation depends on where you paid:
-
-- **Apple App Store** — on your iPhone: Settings → your name → Subscriptions → Kazka.
-- **Monobank Acquiring** — open the Settings page in Kazka and turn off auto-renewal; your Pro access stays until the end of the period you have already paid for.
-
-## 7. Refunds
-
-We refund the full Pro subscription price within **14 days** of payment if you've generated **fewer than 5 tales** in that window. Email `d.makarenko.home@gmail.com` with the payment details.
-
-- Apple App Store payments are refunded by Apple via `reportaproblem.apple.com`.
-- Gift codes are non-refundable.
-- After 14 days or 5+ tales, refunds are at our discretion on a case-by-case basis.
-
-## 8. Liability
+## 7. Liability
 
 - Kazka is provided "as is". We don't guarantee uninterrupted or error-free operation.
 - We are not liable for the literary quality of any particular generated tale, nor for decisions made based on its content.
-- Our maximum liability under any circumstances is the amount the user paid in the previous 12 months.
+- Because Kazka is provided free of charge, our liability is limited to the maximum extent permitted by applicable law.
 
-## 9. Changes to these terms
+## 8. Changes to these terms
 
 We may update these terms. We'll notify you of material changes at least **14 days** in advance via the email on file. If you don't agree, you can delete your account before the new terms take effect.
 
-## 10. Governing law
+## 9. Governing law
 
 These terms are governed by the laws of Ukraine. Disputes that can't be resolved by correspondence go to the court at the operator's registered address.
 

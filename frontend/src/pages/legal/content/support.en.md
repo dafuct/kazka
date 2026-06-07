@@ -1,8 +1,8 @@
 # Support
 
-**Effective date:** 30 May 2026
+**Effective date:** 7 June 2026
 
-Got a question? Something broken? Want a refund or to delete your account? We're here.
+Got a question? Something broken? Want to delete your account? We're here.
 
 ## How to reach us
 
@@ -12,12 +12,9 @@ We reply within **2 business days**. If you don't hear back, check your spam fol
 
 ## Frequently asked questions
 
-### How do I cancel my subscription?
+### Is Kazka free?
 
-Depends where you signed up:
-
-- **Apple App Store (iPhone/iPad)** — Settings → your name → Subscriptions → Kazka → Cancel.
-- **Monobank Acquiring (Ukrainian card)** — open Settings inside Kazka and turn off auto-renewal. Your Pro access stays until the end of the period you already paid for.
+Yes — Kazka is free, with a monthly limit on tales per account, and all features are available to everyone. If you'd like to help cover costs, there's a **Support** (donate) button in the app.
 
 ### How do I delete my account?
 
@@ -43,11 +40,7 @@ Yes — but write to us first. We can offer special terms for educational settin
 
 ### How do I add another child?
 
-In the app: Settings → Child Profiles → Add. The free tier supports one profile; Pro is unlimited.
-
-### How do I redeem a gift code?
-
-Open the app → menu → "Redeem code" → enter the code from your gift card. Once activated, Pro turns on for the duration printed on the code.
+In the app: Settings → Child Profiles → Add. You can add as many child profiles as you like.
 
 ## Reporting tale errors
 
