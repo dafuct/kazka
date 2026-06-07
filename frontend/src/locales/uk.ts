@@ -252,7 +252,6 @@ export const uk = {
     monobankRecurring: 'Монобанк',
     paymentMethods: '',
     autoRenewalDisclosure: 'Підписка поновлюється автоматично. Можна скасувати у Налаштуваннях.',
-    paypro: 'Картка (міжнародна)',
     comingSoonForCountry: 'Pro скоро буде доступний у вашій країні. Слідкуйте за новинами.',
     changeCountry: 'Змінити країну',
     detectedCountry: 'Виявлено: {country}',
@@ -368,7 +367,6 @@ export const uk = {
     sourceLabel: 'Спосіб оплати',
     sources: {
       APPLE: 'App Store',
-      PAYPRO: 'Картка',
       MONOBANK: 'Монобанк',
       GIFT: 'Подарунковий код',
     },

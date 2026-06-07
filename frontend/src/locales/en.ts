@@ -254,7 +254,6 @@ export const en: Locale = {
     monobankRecurring: 'Monobank',
     paymentMethods: '',
     autoRenewalDisclosure: 'Auto-renews automatically. Cancel anytime in Settings.',
-    paypro: 'Card (international)',
     comingSoonForCountry: 'Pro is coming soon to your country. Stay tuned.',
     changeCountry: 'Change country',
     detectedCountry: 'Detected: {country}',
@@ -370,7 +369,6 @@ export const en: Locale = {
     sourceLabel: 'Payment method',
     sources: {
       APPLE: 'App Store',
-      PAYPRO: 'Card',
       MONOBANK: 'Monobank',
       GIFT: 'Gift code',
     },

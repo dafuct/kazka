@@ -68,3 +68,6 @@ databaseChangeLog:
   - include:
       file: changes/023-rename-paddle-to-paypro.sql
       relativeToChangelogFile: true
+  - include:
+      file: changes/024-remove-paypro.sql
+      relativeToChangelogFile: true

@@ -17,7 +17,6 @@ We reply within **2 business days**. If you don't hear back, check your spam fol
 Depends where you signed up:
 
 - **Apple App Store (iPhone/iPad)** — Settings → your name → Subscriptions → Kazka → Cancel.
-- **PayPro Global (international card)** — the receipt email links to a Customer Portal with a Cancel button.
 - **Monobank Acquiring (Ukrainian card)** — open Settings inside Kazka and turn off auto-renewal. Your Pro access stays until the end of the period you already paid for.
 
 ### How do I delete my account?

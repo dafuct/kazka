@@ -196,22 +196,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/billing/webhook/paypro": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["handle"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/billing/webhook/monobank": {
         parameters: {
             query?: never;
@@ -221,7 +205,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["handle_1"];
+        post: operations["handle"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1576,24 +1560,6 @@ export interface operations {
         };
     };
     handle: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    handle_1: {
         parameters: {
             query?: never;
             header?: {

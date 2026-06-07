@@ -38,9 +38,6 @@ public class SubscriptionProduct {
     @Column(nullable = false, length = 32)
     private String tier;
 
-    @Column(name = "paypro_product_id", length = 120)
-    private String payproProductId;
-
     @Column(name = "monobank_plan_id", length = 120)
     private String monobankPlanId;
 

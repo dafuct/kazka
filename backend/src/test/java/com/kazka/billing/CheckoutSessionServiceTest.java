@@ -23,7 +23,6 @@ class CheckoutSessionServiceTest {
 
     @Mock SubscriptionProductRepository products;
     @Mock UserRepository users;
-    @Mock CheckoutProvider payproProvider;
     @Mock CheckoutProvider monobankProvider;
 
     CheckoutSessionService service;
@@ -43,23 +42,10 @@ class CheckoutSessionServiceTest {
         lenient().when(products.findById("prod-1")).thenReturn(Optional.of(product));
         lenient().when(users.findById("user-1")).thenReturn(Optional.of(user));
 
-        when(payproProvider.provider()).thenReturn("paypro");
         when(monobankProvider.provider()).thenReturn("monobank");
 
         service = new CheckoutSessionService(products, users,
-                List.of(payproProvider, monobankProvider));
-    }
-
-    @Test
-    void should_dispatchToMatchingProvider_when_providerIsPaypro() {
-        CheckoutSessionResponse expected =
-                new CheckoutSessionResponse("paypro", "https://store.payproglobal.com/checkout?...", null);
-        when(payproProvider.createSession(user, product)).thenReturn(Mono.just(expected));
-
-        StepVerifier.create(service.create("user-1",
-                        new CheckoutSessionRequest("prod-1", "paypro", "DE")))
-                .expectNext(expected)
-                .verifyComplete();
+                List.of(monobankProvider));
     }
 
     @Test

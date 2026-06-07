@@ -5,7 +5,6 @@ import com.apple.itunes.storekit.model.JWSTransactionDecodedPayload;
 import com.apple.itunes.storekit.model.NotificationTypeV2;
 import com.apple.itunes.storekit.model.ResponseBodyV2DecodedPayload;
 import com.apple.itunes.storekit.model.Subtype;
-import com.kazka.billing.paypro.PayProClient;
 import com.kazka.billing.webhook.WebhookIdempotencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +30,6 @@ public class BillingService {
     private final UserEntitlementRepository entitlements;
     private final WebhookIdempotencyService idempotency;
     private final ApplicationEventPublisher events;
-    private final PayProClient payProClient;
 
     @Transactional
     public Mono<UserEntitlement> verifyAndPersist(String userId, String signedTransaction) {
@@ -160,16 +158,6 @@ public class BillingService {
                         // Card token is NOT cleared so the user can re-subscribe without re-entry.
                         entitlement.setNextRenewalAt(null);
                         entitlements.save(entitlement);
-                    }
-                    case PAYPRO -> {
-                        // Call PayPro API first — local state must reflect provider state.
-                        // If the API throws, the row stays ACTIVE so the user sees a real error
-                        // instead of "cancelled in UI but still being billed".
-                        payProClient.terminate(entitlement.getOriginalTransactionId()).block();
-                        entitlement.setState(EntitlementState.REVOKED);
-                        entitlement.setExpiresAt(Instant.now());
-                        entitlements.save(entitlement);
-                        anyDowngraded = true;
                     }
                     case GIFT -> {
                         entitlement.setState(EntitlementState.REVOKED);

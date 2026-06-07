@@ -11,7 +11,7 @@ import java.util.UUID;
 
 /**
  * Records each inbound webhook event id so duplicate deliveries are processed at
- * most once. Apple ASN V2 retries on 5xx, PayPro retries on 5xx, Monobank can
+ * most once. Apple ASN V2 retries on 5xx, Monobank can
  * deliver the same event twice; without this gate a retry doubles entitlements
  * or re-applies a refund.
  *

@@ -53,7 +53,7 @@ class MonobankRecurringChargeServiceTest {
                 Duration.ofHours(1), 3, "renew-");
         BillingProperties props = new BillingProperties(
                 "bundle", "0", 0L, "Sandbox", "", "", "", true, 3,
-                null, new BillingProperties.Monobank("tok", recurring),
+                new BillingProperties.Monobank("tok", recurring),
                 "http://localhost/success", "http://localhost/cancel");
         service = new MonobankRecurringChargeService(monobank, entitlements, products, props, meters);
     }
