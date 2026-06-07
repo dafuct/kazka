@@ -1,0 +1,98 @@
+.page {
+  padding: calc(64px + 60px) 48px 80px;
+  min-height: 100vh;
+}
+
+.inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.back {
+  color: var(--color-magic);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.back:hover { text-decoration: underline; }
+
+.readonlyBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.2;
+  color: var(--color-text);
+  margin: 0 0 16px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+.comicsBlock {
+  margin-bottom: 32px;
+}
+
+.content {
+  font-family: var(--font-story);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.content p {
+  margin: 0 0 1.1em;
+  text-indent: 1.6em;
+}
+
+.content p:first-child {
+  text-indent: 1.6em;
+}
+
+.state {
+  text-align: center;
+  padding: 96px 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+}
+
+.ctaWrap {
+  margin-top: 48px;
+}
+
+@media (max-width: 860px) {
+  .page { padding: calc(64px + 40px) 20px 60px; }
+}

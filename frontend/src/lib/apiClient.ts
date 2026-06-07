@@ -1,5 +1,6 @@
 import { withCsrf } from './csrf'
 import { ApiError } from './types'
+import type { components } from '@kazka/shared'
 import type {
   Story, PageResponse, UpdateStoryRequest, User, ApiErrorBody,
   Product, Entitlement, GeoResponse, CheckoutSessionResponse, ProviderName,
@@ -179,6 +180,9 @@ export const children = {
   create(body: CreateChildProfileRequest): Promise<ChildProfileDto> {
     return request(`${CHILDREN}`, { method: 'POST', body: JSON.stringify(body) })
   },
+  createBatch(body: { children: CreateChildProfileRequest[] }): Promise<ChildProfileDto[]> {
+    return request(`${CHILDREN}/batch`, { method: 'POST', body: JSON.stringify(body) })
+  },
   update(id: string, body: UpdateChildProfileRequest): Promise<ChildProfileDto> {
     return request(`${CHILDREN}/${id}`, { method: 'PATCH', body: JSON.stringify(body) })
   },
@@ -273,5 +277,25 @@ export const gift = {
       method: 'POST',
       body: JSON.stringify({ code } satisfies RedeemGiftRequest),
     })
+  },
+}
+
+// The OpenAPI-generated @kazka/shared types weren't regenerated for the public
+// showcase endpoints, but the backend returns the same StoryDto shape. Alias it
+// locally so the read-only reader can reuse ComicsReader (which expects StoryDto).
+export type ShowcaseStoryDto = components['schemas']['StoryDto']
+
+const PUBLIC_SHOWCASE = '/api/public/showcase'
+
+// Public, unauthenticated read-only access to curated sample tales. These hit
+// permitAll backend routes, so no Authorization/session is required. The shared
+// request() helper only redirects on 402 (paywall) — never on 401 — so a logged
+// -out visitor calling these will never be bounced into the auth/redirect flow.
+export const showcase = {
+  list(): Promise<ShowcaseStoryDto[]> {
+    return request<ShowcaseStoryDto[]>(PUBLIC_SHOWCASE)
+  },
+  get(id: string): Promise<ShowcaseStoryDto> {
+    return request<ShowcaseStoryDto>(`${PUBLIC_SHOWCASE}/${id}`)
   },
 }

@@ -4,6 +4,7 @@ import com.kazka.AbstractIT;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.dto.ChildProfileDto;
 import com.kazka.child.dto.CreateChildProfileRequest;
+import com.kazka.child.dto.CreateChildProfilesBatchRequest;
 import com.kazka.child.dto.UpdateChildProfileRequest;
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
@@ -76,6 +77,50 @@ class ChildProfileControllerIT extends AbstractIT {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.length()").isEqualTo(2);
+    }
+
+    @Test
+    void should_create_multiple_children_in_one_batch_request() {
+        String userA = seedUser();
+        WebTestClient clientA = authedClient(userA);
+
+        clientA.post().uri("/api/children/batch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new CreateChildProfilesBatchRequest(List.of(
+                        new CreateChildProfileRequest("Мія", (short) 2019, "girl", "uk", List.of("dragons")),
+                        new CreateChildProfileRequest("Тарас", (short) 2017, "boy", "uk", List.of()),
+                        new CreateChildProfileRequest("Sam", null, null, "en", List.of("space")))))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(3)
+                .jsonPath("$[0].name").isEqualTo("Мія")
+                .jsonPath("$[2].name").isEqualTo("Sam");
+
+        clientA.get().uri("/api/children").exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(3);
+    }
+
+    @Test
+    void should_reject_batch_with_invalid_child_with_400() {
+        String userA = seedUser();
+        WebTestClient clientA = authedClient(userA);
+
+        clientA.post().uri("/api/children/batch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new CreateChildProfilesBatchRequest(List.of(
+                        new CreateChildProfileRequest("Valid", null, null, "uk", List.of()),
+                        new CreateChildProfileRequest("  ", null, null, "uk", List.of()))))
+                .exchange()
+                .expectStatus().isBadRequest();
+
+        // None should have been persisted for this user.
+        clientA.get().uri("/api/children").exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(0);
     }
 
     @Test

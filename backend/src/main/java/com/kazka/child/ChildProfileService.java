@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,6 +39,15 @@ public class ChildProfileService {
         profile.setInterests(req.interests() == null ? List.of() : req.interests());
         profile.setAvatarSeed(makeAvatarSeed(req.name(), profile.getId()));
         return repo.save(profile);
+    }
+
+    @Transactional
+    public List<ChildProfile> createBatch(String userId, List<CreateChildProfileRequest> reqs) {
+        List<ChildProfile> created = new ArrayList<>(reqs.size());
+        for (CreateChildProfileRequest req : reqs) {
+            created.add(create(userId, req));
+        }
+        return created;
     }
 
     @Transactional

@@ -22,6 +22,8 @@ public interface StoryRepository extends JpaRepository<Story, String> {
 
     List<Story> findTop5ByUserIdOrderByCreatedAtDesc(String userId);
 
+    List<Story> findAllByShowcaseTrueOrderByCreatedAtDesc();
+
     Page<Story> findAllByUserIdAndChildProfileIdOrderByCreatedAtDesc(
             String userId, String childProfileId, Pageable pageable);
 

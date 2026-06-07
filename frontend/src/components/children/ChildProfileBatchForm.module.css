@@ -1,0 +1,43 @@
+.batch { display: flex; flex-direction: column; gap: 24px; max-width: 480px; }
+.row {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin: 0;
+  background: var(--color-surface);
+}
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 6px;
+  font-weight: 700;
+  color: var(--color-text);
+  font-size: 14px;
+}
+.removeBtn {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: underline;
+  padding: 0;
+}
+.removeBtn:hover { color: #ef4444; }
+.addBtn {
+  align-self: flex-start;
+  padding: 8px 14px;
+  border: 1px dashed var(--color-magic);
+  background: var(--color-surface-2);
+  color: var(--color-magic);
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  transition: background var(--transition), color var(--transition);
+}
+.addBtn:hover:not(:disabled) { background: var(--color-magic); color: #fff; }
+.addBtn:disabled { opacity: 0.4; cursor: not-allowed; }

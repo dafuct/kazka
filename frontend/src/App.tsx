@@ -18,6 +18,8 @@ import { RequireAuth } from './components/auth/RequireAuth'
 import { RequireAdmin } from './components/auth/RequireAdmin'
 import { RequireChild } from './components/children/RequireChild'
 import { HomePage } from './pages/HomePage'
+import { ShowcasePage } from './pages/ShowcasePage'
+import { ShowcaseDetailPage } from './pages/ShowcaseDetailPage'
 import { ArchivePage } from './pages/ArchivePage'
 import { StoryDetailPage } from './pages/StoryDetailPage'
 import { EmailVerifiedPage } from './pages/EmailVerifiedPage'
@@ -99,6 +101,21 @@ function ActiveStoryProgressWidget() {
   return <ProgressWidget storyId={activeStoryId} onClear={() => setActiveStoryId(null)} />
 }
 
+// Logged-out visitors at "/" see the public sample-tale showcase (no auth, no
+// redirect). Logged-in users keep the original RequireChild><HomePage behavior
+// unchanged. ShowcasePage carries no RequireAuth/RequireChild guard, so a
+// logged-out visitor can never enter a redirect loop here.
+function HomeOrShowcase() {
+  const { user, loading } = useAuth()
+  if (loading) return <p style={{ padding: 32, textAlign: 'center' }}>...</p>
+  if (!user) return <ShowcasePage />
+  return (
+    <RequireChild>
+      <HomePage />
+    </RequireChild>
+  )
+}
+
 function AppShell() {
   return (
     <>
@@ -109,7 +126,8 @@ function AppShell() {
       <SuspensionBanner />
       <main>
         <Routes>
-          <Route path="/" element={<RequireChild><HomePage /></RequireChild>} />
+          <Route path="/" element={<HomeOrShowcase />} />
+          <Route path="/showcase/:id" element={<ShowcaseDetailPage />} />
           <Route path="/stories" element={<RequireAuth><RequireChild><ArchivePage /></RequireChild></RequireAuth>} />
           <Route path="/stories/:id" element={<RequireAuth><RequireChild><StoryDetailPage /></RequireChild></RequireAuth>} />
           <Route path="/verify-email" element={<EmailVerifiedPage />} />

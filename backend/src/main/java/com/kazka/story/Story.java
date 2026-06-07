@@ -63,6 +63,9 @@ public class Story {
     @Column(name = "is_branching", nullable = false)
     private boolean isBranching = false;
 
+    @Column(name = "showcase", nullable = false)
+    private boolean showcase = false;
+
     @Column(name = "branching_state", nullable = false, length = 20)
     private String branchingState = "complete";
 

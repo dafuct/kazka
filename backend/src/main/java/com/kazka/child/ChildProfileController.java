@@ -3,6 +3,7 @@ package com.kazka.child;
 import com.kazka.auth.CurrentUserResolver;
 import com.kazka.child.dto.ChildProfileDto;
 import com.kazka.child.dto.CreateChildProfileRequest;
+import com.kazka.child.dto.CreateChildProfilesBatchRequest;
 import com.kazka.child.dto.UpdateChildProfileRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,17 @@ public class ChildProfileController {
                     rateLimiter.assertAndIncrement(cu.userId());
                     ChildProfile profile = svc.create(cu.userId(), req);
                     return ChildProfileDto.from(profile, svc.countCharacters(profile.getId()));
+                }).subscribeOn(Schedulers.boundedElastic()));
+    }
+
+    @PostMapping("/batch")
+    public Mono<List<ChildProfileDto>> createBatch(@Valid @RequestBody CreateChildProfilesBatchRequest req) {
+        return currentUserResolver.requireUser()
+                .flatMap(cu -> Mono.fromCallable(() -> {
+                    rateLimiter.assertAndIncrement(cu.userId(), req.children().size());
+                    return svc.createBatch(cu.userId(), req.children()).stream()
+                            .map(profile -> ChildProfileDto.from(profile, svc.countCharacters(profile.getId())))
+                            .toList();
                 }).subscribeOn(Schedulers.boundedElastic()));
     }
 

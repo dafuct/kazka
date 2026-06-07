@@ -20,4 +20,10 @@ public interface StoryPanelRepository extends JpaRepository<StoryPanel, String> 
 
     /** Used by the /status endpoint to know how many panels exist for a story. */
     long countByStoryId(String storyId);
+
+    /**
+     * Used by the public showcase image route to verify the requested image key
+     * actually belongs to the story before streaming it from disk.
+     */
+    boolean existsByStoryIdAndImagePath(String storyId, String imagePath);
 }

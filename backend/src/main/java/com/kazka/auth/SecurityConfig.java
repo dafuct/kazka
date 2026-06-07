@@ -121,6 +121,11 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/api/auth/me", "/api/auth/verify-email").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/billing/products", "/api/billing/geo").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/holidays/**").permitAll()
+                        // Public sample-tale showcase: read-only, exposed to unregistered
+                        // visitors. Image streaming for showcase tales lives under this prefix
+                        // (ShowcaseImageController) and is intentionally public, while the
+                        // general /uploads/** route above stays auth-gated.
+                        .pathMatchers(HttpMethod.GET, "/api/public/**").permitAll()
                         .pathMatchers(HttpMethod.POST,
                                 "/api/billing/iap/webhook",
                                 "/api/billing/webhook/**").permitAll()

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ChildProfileForm } from '../components/children/ChildProfileForm'
+import { ChildProfileBatchForm } from '../components/children/ChildProfileBatchForm'
 import { children as childrenApi } from '../lib/apiClient'
 import { useChildren } from '../lib/ChildrenContext'
 import { useLocale } from '../lib/LocaleContext'
@@ -29,29 +30,34 @@ export function ChildProfileEditPage() {
   return (
     <div className={styles.page}>
       <h1>{isNew ? (tc.newTitle ?? 'Add a child') : (tc.editTitle ?? 'Edit child')}</h1>
-      <ChildProfileForm
-        initial={initial ?? undefined}
-        submitLabel={isNew ? (tc.createCta ?? 'Create') : (tc.saveCta ?? 'Save')}
-        onSubmit={async (v) => {
-          const body = {
-            name: v.name,
-            birthYear: v.birthYear === '' ? undefined : (v.birthYear as number),
-            gender: v.gender || undefined,
-            preferredLanguage: v.preferredLanguage,
-            interests: v.interests,
-          }
-          if (isNew) {
-            const created = await childrenApi.create(body as any)
+      {isNew ? (
+        <ChildProfileBatchForm
+          submitLabel={tc.createCta ?? 'Create'}
+          onSubmit={async (kids) => {
+            const created = await childrenApi.createBatch({ children: kids })
             await refetch()
-            setActive(created.id)
+            if (created.length > 0) setActive(created[0].id)
             navigate('/settings/children')
-          } else {
+          }}
+        />
+      ) : (
+        <ChildProfileForm
+          initial={initial ?? undefined}
+          submitLabel={tc.saveCta ?? 'Save'}
+          onSubmit={async (v) => {
+            const body = {
+              name: v.name,
+              birthYear: v.birthYear === '' ? undefined : (v.birthYear as number),
+              gender: v.gender || undefined,
+              preferredLanguage: v.preferredLanguage,
+              interests: v.interests,
+            }
             await childrenApi.update(id!, body as any)
             await refetch()
             navigate('/settings/children')
-          }
-        }}
-      />
+          }}
+        />
+      )}
       {!isNew && (
         <section className={styles.bedtimeSection}>
           <hr className={styles.divider} />
