@@ -733,6 +733,7 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            showcase: boolean;
         };
         StoryPanelDto: {
             /** Format: int32 */

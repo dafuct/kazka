@@ -61,6 +61,8 @@ export const en: Locale = {
     save: 'Save',
     cancel: 'Cancel',
     back: 'Back',
+    featureInExamples: '★ Show in examples',
+    removeFromExamples: '★ Remove from examples',
     readTime: (min: number) => `~${min} min read`,
     monthlyLimit: "You've reached your monthly tale limit. You can create new tales next month.",
   },

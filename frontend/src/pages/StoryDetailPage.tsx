@@ -8,7 +8,8 @@ import { BranchingReader } from '../components/branching/BranchingReader'
 import { LanguageToggle } from '../components/translation/LanguageToggle'
 import { useLocale } from '../lib/LocaleContext'
 import { useChildren } from '../lib/ChildrenContext'
-import { api } from '../lib/apiClient'
+import { useAuth } from '../lib/AuthContext'
+import { api, admin } from '../lib/apiClient'
 import type { Story } from '../lib/types'
 import styles from './StoryDetailPage.module.css'
 
@@ -17,6 +18,8 @@ export function StoryDetailPage() {
   const navigate = useNavigate()
   const { t } = useLocale()
   const { children: childProfiles } = useChildren()
+  const { user } = useAuth()
+  const isAdmin = user?.role === 'ADMIN'
 
   const [story, setStory] = useState<Story | null>(null)
   const [loading, setLoading] = useState(true)
@@ -27,6 +30,7 @@ export function StoryDetailPage() {
   const [saving, setSaving] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
   const [viewLanguage, setViewLanguage] = useState<'original' | 'translated'>('original')
+  const [showcaseBusy, setShowcaseBusy] = useState(false)
 
   const refresh = useCallback(() => {
     if (!id) return
@@ -98,6 +102,20 @@ export function StoryDetailPage() {
       setShowDelete(false)
     }
   }, [story, navigate, t])
+
+  const handleToggleShowcase = useCallback(async () => {
+    if (!story) return
+    const next = !story.showcase
+    setShowcaseBusy(true)
+    try {
+      await admin.setShowcase(story.id, next)
+      setStory(prev => (prev ? { ...prev, showcase: next } : prev))
+    } catch {
+      setError(t.errors.saveFailed)
+    } finally {
+      setShowcaseBusy(false)
+    }
+  }, [story, t])
 
   if (loading) return <div className={styles.state}>...</div>
   if (error || !story) return <div className={styles.state}>{error ?? t.errors.loadFailed}</div>
@@ -206,6 +224,15 @@ export function StoryDetailPage() {
               <button className={styles.editBtn} onClick={() => setEditing(true)}>
                 {t.story.edit}
               </button>
+              {isAdmin && (
+                <button
+                  className={styles.editBtn}
+                  onClick={handleToggleShowcase}
+                  disabled={showcaseBusy}
+                >
+                  {story.showcase ? t.story.removeFromExamples : t.story.featureInExamples}
+                </button>
+              )}
               <button className={styles.deleteBtn} onClick={() => setShowDelete(true)}>
                 {t.story.delete}
               </button>

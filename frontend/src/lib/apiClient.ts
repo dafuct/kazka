@@ -101,6 +101,9 @@ export const admin = {
   listUsers(): Promise<AdminUser[]> {
     return request(`/api/admin/users`)
   },
+  setShowcase(storyId: string, on: boolean): Promise<void> {
+    return request(`/api/admin/stories/${storyId}/showcase?on=${on}`, { method: 'POST' })
+  },
 }
 
 export interface FlaggedAttemptDto {

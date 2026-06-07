@@ -59,6 +59,8 @@ export const uk = {
     save: 'Зберегти',
     cancel: 'Скасувати',
     back: 'Назад',
+    featureInExamples: '★ Показати у прикладах',
+    removeFromExamples: '★ Прибрати з прикладів',
     readTime: (min: number) => `~${min} хв читання`,
     monthlyLimit: 'Ви досягли місячного ліміту казок. Нові казки можна буде створити наступного місяця.',
   },

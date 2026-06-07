@@ -30,7 +30,8 @@ public record StoryDto(
         @Schema(nullable = true) String translatedLanguage,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) List<StoryPanelDto> panels,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant createdAt,
-        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant updatedAt
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant updatedAt,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) boolean showcase
 ) {
     public static StoryDto from(Story story, List<StoryPanel> panels, ImageUrlResolver resolver) {
         List<StoryPanelDto> panelDtos = panels == null
@@ -44,7 +45,8 @@ public record StoryDto(
                 story.isBranching(), story.getBranchingState(), story.getPendingChoices(),
                 story.getTranslatedContent(), story.getTranslatedLanguage(),
                 panelDtos,
-                story.getCreatedAt(), story.getUpdatedAt()
+                story.getCreatedAt(), story.getUpdatedAt(),
+                story.isShowcase()
         );
     }
 }
