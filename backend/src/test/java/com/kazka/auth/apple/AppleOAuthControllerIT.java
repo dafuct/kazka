@@ -63,10 +63,10 @@ class AppleOAuthControllerIT extends AbstractIT {
     static void stopWiremock() { wiremock.stop(); }
 
     @DynamicPropertySource
-    static void appleProps(DynamicPropertyRegistry r) {
-        r.add("kazka.auth.apple.jwks-uri", () -> wiremock.baseUrl() + "/auth/keys");
-        r.add("kazka.auth.apple.client-id", () -> "app.kazka.ios.test");
-        r.add("kazka.auth.apple.issuer", () -> "https://appleid.apple.com");
+    static void appleProps(DynamicPropertyRegistry registry) {
+        registry.add("kazka.auth.apple.jwks-uri", () -> wiremock.baseUrl() + "/auth/keys");
+        registry.add("kazka.auth.apple.client-id", () -> "app.kazka.ios.test");
+        registry.add("kazka.auth.apple.issuer", () -> "https://appleid.apple.com");
     }
 
     @BeforeEach
@@ -115,8 +115,8 @@ class AppleOAuthControllerIT extends AbstractIT {
                     .exchange()
                     .expectStatus().isUnauthorized()
                     .expectBody().jsonPath("$.error").isEqualTo("INVALID_APPLE_TOKEN");
-        } catch (Exception e) {
-            throw new AssertionError(e);
+        } catch (Exception exception) {
+            throw new AssertionError(exception);
         }
     }
 

@@ -17,8 +17,8 @@ class CharactersConverter implements AttributeConverter<List<String>, String> {
     public String convertToDatabaseColumn(List<String> attribute) {
         try {
             return MAPPER.writeValueAsString(attribute);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Cannot serialize characters", e);
+        } catch (JsonProcessingException jsonException) {
+            throw new IllegalArgumentException("Cannot serialize characters", jsonException);
         }
     }
 
@@ -26,8 +26,8 @@ class CharactersConverter implements AttributeConverter<List<String>, String> {
     public List<String> convertToEntityAttribute(String dbData) {
         try {
             return MAPPER.readValue(dbData, new TypeReference<>() {});
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Cannot deserialize characters", e);
+        } catch (JsonProcessingException jsonException) {
+            throw new IllegalArgumentException("Cannot deserialize characters", jsonException);
         }
     }
 }

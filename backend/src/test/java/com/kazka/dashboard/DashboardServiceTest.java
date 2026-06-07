@@ -44,18 +44,18 @@ class DashboardServiceTest {
     }
 
     private ChildProfile child(String id, String name) {
-        ChildProfile p = new ChildProfile();
-        p.setId(id); p.setUserId("u1"); p.setName(name); p.setPreferredLanguage("uk");
-        return p;
+        ChildProfile profile = new ChildProfile();
+        profile.setId(id); profile.setUserId("u1"); profile.setName(name); profile.setPreferredLanguage("uk");
+        return profile;
     }
 
     private Story story(String id, String childId, String title) {
-        Story s = new Story();
-        s.setId(id); s.setUserId("u1"); s.setChildProfileId(childId);
-        s.setTitle(title); s.setTheme("th");
-        s.setCharacters(List.of("c")); s.setAgeGroup("6-8");
-        s.setLength("short"); s.setLanguage("uk"); s.setContent("body");
-        return s;
+        Story story = new Story();
+        story.setId(id); story.setUserId("u1"); story.setChildProfileId(childId);
+        story.setTitle(title); story.setTheme("th");
+        story.setCharacters(List.of("c")); story.setAgeGroup("6-8");
+        story.setLength("short"); story.setLanguage("uk"); story.setContent("body");
+        return story;
     }
 
     @Test
@@ -93,8 +93,8 @@ class DashboardServiceTest {
 
     @Test
     void per_child_summary_includes_latest_tale_and_bedtime() {
-        ChildProfile c = child("p1", "Лія");
-        Story s = story("s1", "p1", "Зачарований дракон");
+        ChildProfile childProfile = child("p1", "Лія");
+        Story childStory = story("s1", "p1", "Зачарований дракон");
         // createdAt is @CreationTimestamp-managed — no setter available; it remains null in unit tests
 
         BedtimeSchedule bed = new BedtimeSchedule();
@@ -103,11 +103,11 @@ class DashboardServiceTest {
 
         when(stories.countByUserId("u1")).thenReturn(1L);
         when(stories.countByUserIdAndCreatedAtAfter(eq("u1"), any())).thenReturn(1L);
-        when(childProfiles.findByUserIdAndArchivedAtIsNullOrderByCreatedAtAsc("u1")).thenReturn(List.of(c));
+        when(childProfiles.findByUserIdAndArchivedAtIsNullOrderByCreatedAtAsc("u1")).thenReturn(List.of(childProfile));
         when(stories.countByChildProfileId("p1")).thenReturn(1L);
-        when(stories.findFirstByChildProfileIdOrderByCreatedAtDesc("p1")).thenReturn(Optional.of(s));
+        when(stories.findFirstByChildProfileIdOrderByCreatedAtDesc("p1")).thenReturn(Optional.of(childStory));
         when(bedtimeSchedules.findByChildProfileId("p1")).thenReturn(Optional.of(bed));
-        when(stories.findTop5ByUserIdOrderByCreatedAtDesc("u1")).thenReturn(List.of(s));
+        when(stories.findTop5ByUserIdOrderByCreatedAtDesc("u1")).thenReturn(List.of(childStory));
         when(entitlements.isPro("u1")).thenReturn(true);
 
         DashboardDto dto = svc.getDashboard(user()).block();
@@ -124,11 +124,11 @@ class DashboardServiceTest {
 
     @Test
     void per_child_summary_handles_missing_bedtime() {
-        ChildProfile c = child("p1", "Артем");
+        ChildProfile childProfile2 = child("p1", "Артем");
 
         when(stories.countByUserId(anyString())).thenReturn(0L);
         when(stories.countByUserIdAndCreatedAtAfter(anyString(), any())).thenReturn(0L);
-        when(childProfiles.findByUserIdAndArchivedAtIsNullOrderByCreatedAtAsc("u1")).thenReturn(List.of(c));
+        when(childProfiles.findByUserIdAndArchivedAtIsNullOrderByCreatedAtAsc("u1")).thenReturn(List.of(childProfile2));
         when(stories.countByChildProfileId("p1")).thenReturn(0L);
         when(stories.findFirstByChildProfileIdOrderByCreatedAtDesc("p1")).thenReturn(Optional.empty());
         when(bedtimeSchedules.findByChildProfileId("p1")).thenReturn(Optional.empty());
@@ -145,13 +145,13 @@ class DashboardServiceTest {
 
     @Test
     void recent_tales_are_passed_through_as_dto() {
-        Story s = story("s1", null, "T");
+        Story recentStory = story("s1", null, "T");
         // createdAt is @CreationTimestamp-managed — no setter available
 
         when(stories.countByUserId(anyString())).thenReturn(1L);
         when(stories.countByUserIdAndCreatedAtAfter(anyString(), any())).thenReturn(1L);
         when(childProfiles.findByUserIdAndArchivedAtIsNullOrderByCreatedAtAsc("u1")).thenReturn(List.of());
-        when(stories.findTop5ByUserIdOrderByCreatedAtDesc("u1")).thenReturn(List.of(s));
+        when(stories.findTop5ByUserIdOrderByCreatedAtDesc("u1")).thenReturn(List.of(recentStory));
         when(entitlements.isPro("u1")).thenReturn(true);
 
         DashboardDto dto = svc.getDashboard(user()).block();

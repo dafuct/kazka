@@ -22,8 +22,8 @@ public class FilesystemImageStorage implements ImageStorage {
         this.uploadsDir = Path.of(dir);
         try {
             Files.createDirectories(uploadsDir);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Cannot create uploads directory", e);
+        } catch (IOException ioException) {
+            throw new UncheckedIOException("Cannot create uploads directory", ioException);
         }
     }
 
@@ -32,8 +32,8 @@ public class FilesystemImageStorage implements ImageStorage {
         String key = storyId + "-p" + panelIndex + ".png";
         try {
             Files.write(uploadsDir.resolve(key), png);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Cannot save panel PNG for story " + storyId + " panel " + panelIndex, e);
+        } catch (IOException ioException) {
+            throw new UncheckedIOException("Cannot save panel PNG for story " + storyId + " panel " + panelIndex, ioException);
         }
         return key;
     }
@@ -48,8 +48,8 @@ public class FilesystemImageStorage implements ImageStorage {
         if (key == null || key.isBlank()) return;
         try {
             Files.deleteIfExists(uploadsDir.resolve(key));
-        } catch (IOException e) {
-            log.warn("Could not delete file {}: {}", key, e.getMessage());
+        } catch (IOException ioException) {
+            log.warn("Could not delete file {}: {}", key, ioException.getMessage());
         }
     }
 }

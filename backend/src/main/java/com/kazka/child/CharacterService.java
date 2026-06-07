@@ -21,13 +21,13 @@ public class CharacterService {
     private final StoryCharacterRepository joinRepo;
 
     @Transactional(readOnly = true)
-    public List<com.kazka.child.Character> listForProfile(String childProfileId, String userId) {
+    public List<Character> listForProfile(String childProfileId, String userId) {
         profiles.requireOwned(childProfileId, userId);
         return repo.findByChildProfileIdAndArchivedAtIsNullOrderByLastUsedAtDescCreatedAtAsc(childProfileId);
     }
 
     @Transactional
-    public List<com.kazka.child.Character> upsertConfirmed(String childProfileId, String userId,
+    public List<Character> upsertConfirmed(String childProfileId, String userId,
                                            String storyId, List<ExtractedCandidateDto> candidates) {
         profiles.requireOwned(childProfileId, userId);
         int limit = tier.maxSavedCharacters(userId);
@@ -36,19 +36,19 @@ public class CharacterService {
         if (existingCount + newOnes > limit) {
             throw new PaywallRequiredException("Saved character limit reached for free tier");
         }
-        List<com.kazka.child.Character> result = new ArrayList<>(candidates.size());
+        List<Character> result = new ArrayList<>(candidates.size());
         Instant now = Instant.now();
         for (ExtractedCandidateDto cand : candidates) {
-            com.kazka.child.Character c = repo.findByChildProfileIdAndName(childProfileId, cand.name())
+            Character character = repo.findByChildProfileIdAndName(childProfileId, cand.name())
                     .orElseGet(() -> newCharacter(childProfileId, cand, storyId));
-            if (c.getDescription() == null || c.getDescription().isBlank()) {
-                c.setDescription(safeDesc(cand.description()));
+            if (character.getDescription() == null || character.getDescription().isBlank()) {
+                character.setDescription(safeDesc(cand.description()));
             }
-            c.setTraits(unionTraits(c.getTraits(), cand.traits()));
-            c.setUsageCount(c.getUsageCount() + 1);
-            c.setLastUsedAt(now);
-            result.add(repo.save(c));
-            joinRepo.save(new StoryCharacter(storyId, c.getId(),
+            character.setTraits(unionTraits(character.getTraits(), cand.traits()));
+            character.setUsageCount(character.getUsageCount() + 1);
+            character.setLastUsedAt(now);
+            result.add(repo.save(character));
+            joinRepo.save(new StoryCharacter(storyId, character.getId(),
                     cand.role() == null ? "companion" : cand.role()));
         }
         return result;
@@ -56,34 +56,34 @@ public class CharacterService {
 
     @Transactional
     public void archive(String characterId, String userId) {
-        com.kazka.child.Character c = repo.findById(characterId)
+        Character character = repo.findById(characterId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        profiles.requireOwned(c.getChildProfileId(), userId);
-        c.setArchivedAt(Instant.now());
-        repo.save(c);
+        profiles.requireOwned(character.getChildProfileId(), userId);
+        character.setArchivedAt(Instant.now());
+        repo.save(character);
     }
 
     @Transactional(readOnly = true)
-    public com.kazka.child.Character requireOwned(String characterId, String userId) {
-        com.kazka.child.Character c = repo.findById(characterId)
+    public Character requireOwned(String characterId, String userId) {
+        Character character = repo.findById(characterId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        profiles.requireOwned(c.getChildProfileId(), userId);
-        return c;
+        profiles.requireOwned(character.getChildProfileId(), userId);
+        return character;
     }
 
     @Transactional
-    public com.kazka.child.Character updateOwned(String characterId, String userId,
+    public Character updateOwned(String characterId, String userId,
                                                   String name, String kind,
                                                   String description, List<String> traits) {
-        com.kazka.child.Character c = repo.findById(characterId)
+        Character character = repo.findById(characterId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        profiles.requireOwned(c.getChildProfileId(), userId);
-        c.setName(name.trim());
-        if (kind != null) c.setKind(kind);
-        c.setDescription(description);
-        if (traits != null) c.setTraits(traits);
-        c.setLastUsedAt(Instant.now());
-        return repo.save(c);
+        profiles.requireOwned(character.getChildProfileId(), userId);
+        character.setName(name.trim());
+        if (kind != null) character.setKind(kind);
+        character.setDescription(description);
+        if (traits != null) character.setTraits(traits);
+        character.setLastUsedAt(Instant.now());
+        return repo.save(character);
     }
 
     private long countNew(String childProfileId, List<ExtractedCandidateDto> candidates) {
@@ -92,21 +92,21 @@ public class CharacterService {
                 .count();
     }
 
-    private com.kazka.child.Character newCharacter(String childProfileId, ExtractedCandidateDto cand, String storyId) {
-        com.kazka.child.Character c = new com.kazka.child.Character();
-        c.setId(UUID.randomUUID().toString());
-        c.setChildProfileId(childProfileId);
-        c.setName(cand.name().trim());
-        c.setKind(cand.kind() == null ? "object" : cand.kind());
-        c.setDescription(safeDesc(cand.description()));
-        c.setTraits(cand.traits() == null ? List.of() : cand.traits());
-        c.setFirstStoryId(storyId);
-        return c;
+    private Character newCharacter(String childProfileId, ExtractedCandidateDto cand, String storyId) {
+        Character character = new Character();
+        character.setId(UUID.randomUUID().toString());
+        character.setChildProfileId(childProfileId);
+        character.setName(cand.name().trim());
+        character.setKind(cand.kind() == null ? "object" : cand.kind());
+        character.setDescription(safeDesc(cand.description()));
+        character.setTraits(cand.traits() == null ? List.of() : cand.traits());
+        character.setFirstStoryId(storyId);
+        return character;
     }
 
-    private String safeDesc(String d) {
-        if (d == null) return "";
-        return d.length() > 280 ? d.substring(0, 280) : d;
+    private String safeDesc(String description) {
+        if (description == null) return "";
+        return description.length() > 280 ? description.substring(0, 280) : description;
     }
 
     private List<String> unionTraits(List<String> existing, List<String> incoming) {

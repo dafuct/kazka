@@ -52,18 +52,18 @@ class StoryServiceRetryTest {
     private final CurrentUser user = new CurrentUser("u1", UserRole.USER);
 
     private void verifiedUser() {
-        User u = new User();
-        u.setId("u1");
-        u.setEmailVerified(true);
-        when(users.findById("u1")).thenReturn(Optional.of(u));
+        User user = new User();
+        user.setId("u1");
+        user.setEmailVerified(true);
+        when(users.findById("u1")).thenReturn(Optional.of(user));
     }
 
     private Story storyWith(IllustrationStatus status) {
-        Story s = new Story();
-        s.setId("s1");
-        s.setUserId("u1");
-        s.setIllustrationStatus(status);
-        return s;
+        Story story = new Story();
+        story.setId("s1");
+        story.setUserId("u1");
+        story.setIllustrationStatus(status);
+        return story;
     }
 
     @Test

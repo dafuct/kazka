@@ -30,7 +30,7 @@ public class PayProSignatureVerifier {
             byte[] digest = MessageDigest.getInstance("SHA-256")
                     .digest(input.getBytes(StandardCharsets.UTF_8));
             expected = HexFormat.of().formatHex(digest);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException noSuchAlgorithmException) {
             return false;
         }
         return MessageDigest.isEqual(
@@ -38,5 +38,5 @@ public class PayProSignatureVerifier {
                 sig.toLowerCase().getBytes(StandardCharsets.US_ASCII));
     }
 
-    private static String nz(String s) { return s == null ? "" : s; }
+    private static String nz(String value) { return value == null ? "" : value; }
 }

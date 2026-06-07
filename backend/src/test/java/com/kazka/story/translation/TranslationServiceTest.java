@@ -47,13 +47,13 @@ class TranslationServiceTest {
     }
 
     private Story story(String id, String userId, String language) {
-        Story s = new Story();
-        s.setId(id); s.setUserId(userId); s.setTitle("t"); s.setTheme("th");
-        s.setContent("Жив-був дракон.");
-        s.setLanguage(language);
-        s.setBranching(false);
-        s.setBranchingState("complete");
-        return s;
+        Story story = new Story();
+        story.setId(id); story.setUserId(userId); story.setTitle("t"); story.setTheme("th");
+        story.setContent("Жив-був дракон.");
+        story.setLanguage(language);
+        story.setBranching(false);
+        story.setBranchingState("complete");
+        return story;
     }
 
     @Test
@@ -71,21 +71,21 @@ class TranslationServiceTest {
 
         assertThatThrownBy(() -> svc.translate("s1", "en", user()).block())
                 .isInstanceOf(ResponseStatusException.class)
-                .satisfies(e -> assertThat(((ResponseStatusException) e).getStatusCode())
+                .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
                         .isEqualTo(HttpStatus.NOT_FOUND));
     }
 
     @Test
     void translate_returns_400_when_branching_incomplete() {
-        Story s = story("s1", "u1", "uk");
-        s.setBranching(true);
-        s.setBranchingState("awaiting_choice_1");
-        when(stories.findById("s1")).thenReturn(Optional.of(s));
+        Story incompleteStory = story("s1", "u1", "uk");
+        incompleteStory.setBranching(true);
+        incompleteStory.setBranchingState("awaiting_choice_1");
+        when(stories.findById("s1")).thenReturn(Optional.of(incompleteStory));
         when(entitlements.isPro("u1")).thenReturn(true);
 
         assertThatThrownBy(() -> svc.translate("s1", "en", user()).block())
                 .isInstanceOf(ResponseStatusException.class)
-                .satisfies(e -> assertThat(((ResponseStatusException) e).getStatusCode())
+                .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
                         .isEqualTo(HttpStatus.BAD_REQUEST));
     }
 
@@ -96,16 +96,16 @@ class TranslationServiceTest {
 
         assertThatThrownBy(() -> svc.translate("s1", "uk", user()).block())
                 .isInstanceOf(ResponseStatusException.class)
-                .satisfies(e -> assertThat(((ResponseStatusException) e).getStatusCode())
+                .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
                         .isEqualTo(HttpStatus.BAD_REQUEST));
     }
 
     @Test
     void translate_no_ops_when_already_translated_to_target() {
-        Story s = story("s1", "u1", "uk");
-        s.setTranslatedContent("Once upon a time…");
-        s.setTranslatedLanguage("en");
-        when(stories.findById("s1")).thenReturn(Optional.of(s));
+        Story alreadyTranslated = story("s1", "u1", "uk");
+        alreadyTranslated.setTranslatedContent("Once upon a time…");
+        alreadyTranslated.setTranslatedLanguage("en");
+        when(stories.findById("s1")).thenReturn(Optional.of(alreadyTranslated));
         when(entitlements.isPro("u1")).thenReturn(true);
 
         StoryDto dto = svc.translate("s1", "en", user()).block();

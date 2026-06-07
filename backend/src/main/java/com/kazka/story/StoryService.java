@@ -3,6 +3,20 @@ package com.kazka.story;
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.auth.exception.EmailNotVerifiedException;
 import com.kazka.ai.AiClient;
+import com.kazka.billing.FreeTierGate;
+import com.kazka.child.CharacterExtractionWorker;
+import com.kazka.child.CharacterRepository;
+import com.kazka.child.ChildEntitlementResolver;
+import com.kazka.child.ChildProfile;
+import com.kazka.child.ChildProfileService;
+import com.kazka.child.Character;
+import com.kazka.child.ExtractionStatus;
+import com.kazka.child.StoryCharacter;
+import com.kazka.child.StoryCharacterRepository;
+import com.kazka.child.bedtime.BedtimeSchedule;
+import com.kazka.comics.ComicsBuilder;
+import com.kazka.comics.StoryPanel;
+import com.kazka.comics.StoryPanelRepository;
 import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.moderation.ModerationCategory;
 import com.kazka.moderation.ModerationPipeline;
@@ -23,6 +37,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -36,15 +57,15 @@ public class StoryService {
     private final ModerationService moderationService;
     private final SuspensionService suspensionService;
     private final ModerationProperties moderationProperties;
-    private final com.kazka.billing.FreeTierGate freeTier;
-    private final com.kazka.child.ChildProfileService childProfiles;
-    private final com.kazka.child.CharacterRepository characters;
-    private final com.kazka.child.StoryCharacterRepository storyCharacters;
-    private final com.kazka.child.ChildEntitlementResolver childTier;
-    private final com.kazka.child.CharacterExtractionWorker extractionWorker;
+    private final FreeTierGate freeTier;
+    private final ChildProfileService childProfiles;
+    private final CharacterRepository characters;
+    private final StoryCharacterRepository storyCharacters;
+    private final ChildEntitlementResolver childTier;
+    private final CharacterExtractionWorker extractionWorker;
     private final ImageUrlResolver images;
-    private final com.kazka.comics.ComicsBuilder comicsBuilder;
-    private final com.kazka.comics.StoryPanelRepository panelRepository;
+    private final ComicsBuilder comicsBuilder;
+    private final StoryPanelRepository panelRepository;
 
     public Flux<SseEvent> generate(GenerationRequest req, CurrentUser currentUser) {
         String userId = currentUser.userId();
@@ -85,20 +106,20 @@ public class StoryService {
     }
 
     private Flux<SseEvent> generateInternal(GenerationRequest req, String userId) {
-        com.kazka.child.ChildProfile child = childProfiles.requireOwned(req.childProfileId(), userId);
+        ChildProfile child = childProfiles.requireOwned(req.childProfileId(), userId);
         String effectiveLang = promptBuilder.resolveLanguage(child, req.language());
 
-        java.util.List<com.kazka.child.Character> recurringCast;
+        List<Character> recurringCast;
         if (!childTier.canIncludeCharacters(userId)) {
-            recurringCast = java.util.List.of();   // silently strip for free tier
+            recurringCast = List.of();   // silently strip for free tier
         } else if (req.includeCharacterIds() == null || req.includeCharacterIds().isEmpty()) {
-            recurringCast = java.util.List.of();
+            recurringCast = List.of();
         } else {
             recurringCast = req.includeCharacterIds().stream()
                     .limit(3)
                     .map(characters::findById)
-                    .filter(java.util.Optional::isPresent).map(java.util.Optional::get)
-                    .filter(c -> c.getChildProfileId().equals(child.getId()))
+                    .filter(Optional::isPresent).map(Optional::get)
+                    .filter(character -> character.getChildProfileId().equals(child.getId()))
                     .toList();
         }
 
@@ -119,7 +140,7 @@ public class StoryService {
         story.setContent("");
         story.setIllustrationStatus(IllustrationStatus.PENDING);
         story.setChildProfileId(child.getId());
-        story.setExtractionStatus(com.kazka.child.ExtractionStatus.PENDING);
+        story.setExtractionStatus(ExtractionStatus.PENDING);
 
         return Mono.fromCallable(() -> repository.save(story))
                 .subscribeOn(Schedulers.boundedElastic())
@@ -136,28 +157,28 @@ public class StoryService {
                                             String[] lines = corrected.split("\n");
                                             String title = "";
                                             int storyStart = 0;
-                                            for (int i = 0; i < lines.length; i++) {
-                                                String l = lines[i].strip();
-                                                if (l.isEmpty()) continue;
-                                                if (looksLikeTitle(l)) {
-                                                    title = l;
-                                                    storyStart = i + 1;
+                                            for (int index = 0; index < lines.length; index++) {
+                                                String line = lines[index].strip();
+                                                if (line.isEmpty()) continue;
+                                                if (looksLikeTitle(line)) {
+                                                    title = line;
+                                                    storyStart = index + 1;
                                                 } else {
                                                     title = req.theme();
-                                                    storyStart = i;
+                                                    storyStart = index;
                                                 }
                                                 break;
                                             }
                                             while (storyStart < lines.length && lines[storyStart].strip().isEmpty()) storyStart++;
-                                            String body = String.join("\n", java.util.Arrays.copyOfRange(lines, storyStart, lines.length));
+                                            String body = String.join("\n", Arrays.copyOfRange(lines, storyStart, lines.length));
                                             saved.setTitle(title);
                                             saved.setContent(body);
                                             repository.save(saved);
-                                            for (com.kazka.child.Character cc : recurringCast) {
-                                                storyCharacters.save(new com.kazka.child.StoryCharacter(
+                                            for (Character cc : recurringCast) {
+                                                storyCharacters.save(new StoryCharacter(
                                                         saved.getId(), cc.getId(), "companion"));
                                                 cc.setUsageCount(cc.getUsageCount() + 1);
-                                                cc.setLastUsedAt(java.time.Instant.now());
+                                                cc.setLastUsedAt(Instant.now());
                                                 characters.save(cc);
                                             }
                                             extractionWorker.enqueue(saved.getId(), child.getId(), userId);
@@ -232,13 +253,13 @@ public class StoryService {
             // on-error cleanup handles the live SSE path, but a crashed worker or stale row
             // could still leave a placeholder behind. Branching tales always have content,
             // so this filter is safe for them.
-            java.util.List<Story> filtered = p.getContent().stream()
-                    .filter(s -> s.getContent() != null && !s.getContent().isBlank())
+            List<Story> filtered = p.getContent().stream()
+                    .filter(story -> story.getContent() != null && !story.getContent().isBlank())
                     .toList();
-            java.util.Map<String, java.util.List<com.kazka.comics.StoryPanel>> panelsByStory =
+            Map<String, List<StoryPanel>> panelsByStory =
                     fetchPanelsByStory(filtered);
             var items = filtered.stream()
-                    .map(s -> StoryDto.from(s, panelsByStory.getOrDefault(s.getId(), java.util.List.of()), images))
+                    .map(s -> StoryDto.from(s, panelsByStory.getOrDefault(s.getId(), List.of()), images))
                     .toList();
             return new PageResponse<>(items, p.getNumber(), p.getSize(), p.getTotalElements());
         }).subscribeOn(Schedulers.boundedElastic());
@@ -255,19 +276,19 @@ public class StoryService {
     }
 
     public Mono<CursorPageResponse<StoryDto>> listByCursor(String cursor, int limit, CurrentUser currentUser) {
-        StoryCursor c = (cursor == null || cursor.isBlank()) ? null : StoryCursor.decode(cursor);
+        StoryCursor decoded = (cursor == null || cursor.isBlank()) ? null : StoryCursor.decode(cursor);
         return Mono.fromCallable(() -> {
-            java.util.List<Story> rows = repository.findByCursor(
+            List<Story> rows = repository.findByCursor(
                     currentUser.userId(),
-                    c == null ? null : c.createdAt(),
-                    c == null ? null : c.id(),
+                    decoded == null ? null : decoded.createdAt(),
+                    decoded == null ? null : decoded.id(),
                     PageRequest.of(0, limit + 1));
             boolean hasMore = rows.size() > limit;
-            java.util.List<Story> page = hasMore ? rows.subList(0, limit) : rows;
-            java.util.Map<String, java.util.List<com.kazka.comics.StoryPanel>> panelsByStory =
+            List<Story> page = hasMore ? rows.subList(0, limit) : rows;
+            Map<String, List<StoryPanel>> panelsByStory =
                     fetchPanelsByStory(page);
-            java.util.List<StoryDto> items = page.stream()
-                    .map(s -> StoryDto.from(s, panelsByStory.getOrDefault(s.getId(), java.util.List.of()), images))
+            List<StoryDto> items = page.stream()
+                    .map(s -> StoryDto.from(s, panelsByStory.getOrDefault(s.getId(), List.of()), images))
                     .toList();
             String next = hasMore
                     ? new StoryCursor(
@@ -319,7 +340,7 @@ public class StoryService {
     public Mono<Void> triggerExtraction(String storyId, CurrentUser currentUser) {
         return Mono.fromCallable(() -> {
             Story story = findOwned(storyId, currentUser);
-            if (story.getExtractionStatus() == com.kazka.child.ExtractionStatus.RUNNING) {
+            if (story.getExtractionStatus() == ExtractionStatus.RUNNING) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT);
             }
             return story;
@@ -366,19 +387,19 @@ public class StoryService {
         };
     }
 
-    private java.util.List<com.kazka.comics.StoryPanel> loadPanels(String storyId) {
+    private List<StoryPanel> loadPanels(String storyId) {
         return panelRepository.findByStoryIdOrderByPanelIndexAsc(storyId);
     }
 
-    private java.util.Map<String, java.util.List<com.kazka.comics.StoryPanel>> fetchPanelsByStory(
-            java.util.List<Story> stories) {
-        if (stories.isEmpty()) return java.util.Map.of();
-        java.util.List<String> ids = stories.stream().map(Story::getId).toList();
-        java.util.List<com.kazka.comics.StoryPanel> all =
+    private Map<String, List<StoryPanel>> fetchPanelsByStory(
+            List<Story> stories) {
+        if (stories.isEmpty()) return Map.of();
+        List<String> ids = stories.stream().map(Story::getId).toList();
+        List<StoryPanel> all =
                 panelRepository.findByStoryIdInOrderByStoryIdAscPanelIndexAsc(ids);
-        java.util.Map<String, java.util.List<com.kazka.comics.StoryPanel>> grouped = new java.util.LinkedHashMap<>();
-        for (com.kazka.comics.StoryPanel p : all) {
-            grouped.computeIfAbsent(p.getStoryId(), k -> new java.util.ArrayList<>()).add(p);
+        Map<String, List<StoryPanel>> grouped = new LinkedHashMap<>();
+        for (StoryPanel p : all) {
+            grouped.computeIfAbsent(p.getStoryId(), k -> new ArrayList<>()).add(p);
         }
         return grouped;
     }
@@ -412,18 +433,18 @@ public class StoryService {
      * Does NOT call freeTier.recordUsage — bedtime is paid-only and doesn't count
      * against the free-tier monthly limit.
      */
-    public Mono<Story> generateForBedtime(com.kazka.child.ChildProfile child,
-                                          com.kazka.child.bedtime.BedtimeSchedule schedule,
+    public Mono<Story> generateForBedtime(ChildProfile child,
+                                          BedtimeSchedule schedule,
                                           User user,
                                           String themeOverride) {
         String themeText;
         if (themeOverride != null && !themeOverride.isBlank()) {
             themeText = themeOverride;
         } else {
-            java.util.List<String> themes = !schedule.getThemes().isEmpty()
+            List<String> themes = !schedule.getThemes().isEmpty()
                     ? schedule.getThemes()
                     : (child.getInterests() == null || child.getInterests().isEmpty()
-                            ? java.util.List.of()
+                            ? List.of()
                             : child.getInterests());
             themeText = themes.isEmpty()
                     ? ("uk".equals(child.getPreferredLanguage()) ? "магічна казка" : "a magical bedtime tale")
@@ -432,22 +453,22 @@ public class StoryService {
 
         String effectiveLang = promptBuilder.resolveLanguage(child, "uk");
 
-        com.kazka.story.dto.GenerationRequest req = new com.kazka.story.dto.GenerationRequest(
+        GenerationRequest req = new GenerationRequest(
                 themeText,
-                java.util.List.of(child.getName()),
+                List.of(child.getName()),
                 "6-8",
                 "short",
                 effectiveLang,
                 child.getId(),
-                java.util.List.of()
+                List.of()
         );
 
         String storySystem = promptBuilder.buildStorySystem(effectiveLang);
-        String storyUser = promptBuilder.buildStoryUserMessage(req, child, java.util.List.of());
+        String storyUser = promptBuilder.buildStoryUserMessage(req, child, List.of());
         String editorSystem = promptBuilder.buildEditorSystem(effectiveLang);
 
         Story story = new Story();
-        story.setId(java.util.UUID.randomUUID().toString());
+        story.setId(UUID.randomUUID().toString());
         story.setUserId(user.getId());
         story.setTitle("");
         story.setTheme(req.theme());
@@ -458,7 +479,7 @@ public class StoryService {
         story.setContent("");
         story.setIllustrationStatus(IllustrationStatus.PENDING);
         story.setChildProfileId(child.getId());
-        story.setExtractionStatus(com.kazka.child.ExtractionStatus.PENDING);
+        story.setExtractionStatus(ExtractionStatus.PENDING);
 
         return Mono.fromCallable(() -> repository.save(story))
                 .subscribeOn(Schedulers.boundedElastic())
@@ -481,7 +502,7 @@ public class StoryService {
                             }
                             while (storyStart < lines.length && lines[storyStart].strip().isEmpty()) storyStart++;
                             String body = String.join("\n",
-                                    java.util.Arrays.copyOfRange(lines, storyStart, lines.length));
+                                    Arrays.copyOfRange(lines, storyStart, lines.length));
                             saved.setTitle(title);
                             saved.setContent(body);
                             repository.save(saved);

@@ -46,13 +46,13 @@ public class BillingService {
                     "originalTransactionId must not be null");
             UserEntitlement entitlement = entitlements.findByOriginalTransactionId(origTxn)
                     .orElseGet(() -> {
-                        UserEntitlement e = new UserEntitlement();
-                        e.setId(UUID.randomUUID().toString());
-                        e.setUserId(userId);
-                        e.setProductId(product.getId());
-                        e.setOriginalTransactionId(origTxn);
-                        e.setSource(EntitlementSource.APPLE);
-                        return e;
+                        UserEntitlement newEntitlement = new UserEntitlement();
+                        newEntitlement.setId(UUID.randomUUID().toString());
+                        newEntitlement.setUserId(userId);
+                        newEntitlement.setProductId(product.getId());
+                        newEntitlement.setOriginalTransactionId(origTxn);
+                        newEntitlement.setSource(EntitlementSource.APPLE);
+                        return newEntitlement;
                     });
             entitlement.setState(EntitlementState.ACTIVE);
             entitlement.setExpiresAt(payload.getExpiresDate() == null
@@ -100,26 +100,26 @@ public class BillingService {
             String origTxn = Objects.requireNonNull(
                     txn.getOriginalTransactionId(),
                     "originalTransactionId must not be null").toString();
-            UserEntitlement e = entitlements.findByOriginalTransactionId(origTxn).orElse(null);
-            if (e == null) {
+            UserEntitlement entitlement = entitlements.findByOriginalTransactionId(origTxn).orElse(null);
+            if (entitlement == null) {
                 log.warn("Webhook references unknown originalTransactionId={}; ignoring", origTxn);
                 return null;
             }
             Optional<EntitlementState> nextState = mapNotificationType(type, subtype);
             if (nextState.isEmpty()) {
                 log.warn("ASN V2 type={} subtype={} — no state mapping; leaving entitlement {} unchanged",
-                        type, subtype, e.getId());
+                        type, subtype, entitlement.getId());
                 return null;
             }
             EntitlementState newState = nextState.get();
-            e.setState(newState);
+            entitlement.setState(newState);
             if (txn.getExpiresDate() != null) {
-                e.setExpiresAt(Instant.ofEpochMilli(txn.getExpiresDate()));
+                entitlement.setExpiresAt(Instant.ofEpochMilli(txn.getExpiresDate()));
             }
-            e.setLatestJws(signedTxn);
-            entitlements.save(e);
+            entitlement.setLatestJws(signedTxn);
+            entitlements.save(entitlement);
             if (newState != EntitlementState.ACTIVE && newState != EntitlementState.GRACE) {
-                events.publishEvent(new EntitlementDowngradedEvent(e.getUserId()));
+                events.publishEvent(new EntitlementDowngradedEvent(entitlement.getUserId()));
             }
             return null;
         }).subscribeOn(Schedulers.boundedElastic());
@@ -141,40 +141,40 @@ public class BillingService {
     public Mono<List<UserEntitlement>> revokeActiveForUser(String userId) {
         return Mono.fromCallable(() -> {
             List<UserEntitlement> active = entitlements.findByUserId(userId).stream()
-                    .filter(e -> e.getState() == EntitlementState.ACTIVE
-                            || e.getState() == EntitlementState.GRACE)
+                    .filter(entitlement -> entitlement.getState() == EntitlementState.ACTIVE
+                            || entitlement.getState() == EntitlementState.GRACE)
                     .toList();
             if (active.isEmpty()) {
                 return active;
             }
             boolean appleManaged = active.stream()
-                    .anyMatch(e -> e.getSource() == EntitlementSource.APPLE);
+                    .anyMatch(entitlement -> entitlement.getSource() == EntitlementSource.APPLE);
             if (appleManaged) {
                 throw new AppleManagedSubscriptionException();
             }
             boolean anyDowngraded = false;
-            for (UserEntitlement e : active) {
-                switch (e.getSource()) {
+            for (UserEntitlement entitlement : active) {
+                switch (entitlement.getSource()) {
                     case MONOBANK -> {
                         // Stop the scheduler but keep the active period intact.
                         // Card token is NOT cleared so the user can re-subscribe without re-entry.
-                        e.setNextRenewalAt(null);
-                        entitlements.save(e);
+                        entitlement.setNextRenewalAt(null);
+                        entitlements.save(entitlement);
                     }
                     case PAYPRO -> {
                         // Call PayPro API first — local state must reflect provider state.
                         // If the API throws, the row stays ACTIVE so the user sees a real error
                         // instead of "cancelled in UI but still being billed".
-                        payProClient.terminate(e.getOriginalTransactionId()).block();
-                        e.setState(EntitlementState.REVOKED);
-                        e.setExpiresAt(Instant.now());
-                        entitlements.save(e);
+                        payProClient.terminate(entitlement.getOriginalTransactionId()).block();
+                        entitlement.setState(EntitlementState.REVOKED);
+                        entitlement.setExpiresAt(Instant.now());
+                        entitlements.save(entitlement);
                         anyDowngraded = true;
                     }
                     case GIFT -> {
-                        e.setState(EntitlementState.REVOKED);
-                        e.setExpiresAt(Instant.now());
-                        entitlements.save(e);
+                        entitlement.setState(EntitlementState.REVOKED);
+                        entitlement.setExpiresAt(Instant.now());
+                        entitlements.save(entitlement);
                         anyDowngraded = true;
                     }
                     case APPLE -> { /* unreachable — handled above */ }
@@ -189,7 +189,7 @@ public class BillingService {
 
     public Mono<List<UserEntitlement>> findActive(String userId) {
         return Mono.fromCallable(() -> entitlements.findByUserId(userId).stream()
-                        .filter(e -> e.getState() == EntitlementState.ACTIVE || e.getState() == EntitlementState.GRACE)
+                        .filter(entitlement -> entitlement.getState() == EntitlementState.ACTIVE || entitlement.getState() == EntitlementState.GRACE)
                         .toList())
                 .subscribeOn(Schedulers.boundedElastic());
     }

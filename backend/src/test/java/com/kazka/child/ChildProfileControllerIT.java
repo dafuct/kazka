@@ -42,8 +42,8 @@ class ChildProfileControllerIT extends AbstractIT {
     @Test
     void should_create_then_list_profile() {
         String userA = seedUser();
-        WebTestClient c = authedClient(userA);
-        c.post().uri("/api/children")
+        WebTestClient clientA = authedClient(userA);
+        clientA.post().uri("/api/children")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new CreateChildProfileRequest("Лія", (short) 2020, "girl", "uk", List.of("dragons")))
                 .exchange()
@@ -52,7 +52,7 @@ class ChildProfileControllerIT extends AbstractIT {
                 .jsonPath("$.name").isEqualTo("Лія")
                 .jsonPath("$.characterCount").isEqualTo(0);
 
-        c.get().uri("/api/children").exchange()
+        clientA.get().uri("/api/children").exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.length()").isEqualTo(1);
@@ -62,12 +62,12 @@ class ChildProfileControllerIT extends AbstractIT {
     void should_return402_when_freeTier_atProfileLimit() {
         String userA = seedUser();
         when(entitlements.isPro(userA)).thenReturn(false);
-        WebTestClient c = authedClient(userA);
-        c.post().uri("/api/children")
+        WebTestClient clientA = authedClient(userA);
+        clientA.post().uri("/api/children")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new CreateChildProfileRequest("First", null, null, "uk", List.of()))
                 .exchange().expectStatus().isOk();
-        c.post().uri("/api/children")
+        clientA.post().uri("/api/children")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new CreateChildProfileRequest("Second", null, null, "uk", List.of()))
                 .exchange().expectStatus().isEqualTo(402);
@@ -96,14 +96,14 @@ class ChildProfileControllerIT extends AbstractIT {
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test.example");
-        u.setDisplayName("Tester");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test.example");
+        user.setDisplayName("Tester");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 

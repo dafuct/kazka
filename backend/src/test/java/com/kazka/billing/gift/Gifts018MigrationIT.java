@@ -40,7 +40,7 @@ class Gifts018MigrationIT extends AbstractIT {
         var rows = jdbc.queryForList(
                 "SELECT index_name FROM information_schema.statistics " +
                 "WHERE table_schema = DATABASE() AND table_name = 'gift_codes'");
-        var names = rows.stream().map(r -> r.get("index_name").toString()).toList();
+        var names = rows.stream().map(row -> row.get("index_name").toString()).toList();
         assertThat(names).contains("idx_gift_codes_redeemed_by", "idx_gift_codes_status");
     }
 }

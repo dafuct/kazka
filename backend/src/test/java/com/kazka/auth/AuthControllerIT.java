@@ -39,7 +39,7 @@ class AuthControllerIT extends AbstractIT {
                 .returnResult();
 
         List<String> cookies = result.getResponseHeaders().get(HttpHeaders.SET_COOKIE);
-        assertThat(cookies).anyMatch(c -> c.startsWith("SESSION="));
+        assertThat(cookies).anyMatch(cookie -> cookie.startsWith("SESSION="));
     }
 
     @Test
@@ -106,10 +106,10 @@ class AuthControllerIT extends AbstractIT {
     @Test
     void should_includeSuspendedTrue_when_meCalledForSuspendedUser() {
         signupAndVerify("blocked@example.com");
-        var u = users.findByEmail("blocked@example.com").orElseThrow();
-        u.setSuspendedAt(java.time.Instant.now());
-        u.setSuspendedReason("CONTENT_POLICY");
-        users.save(u);
+        var user = users.findByEmail("blocked@example.com").orElseThrow();
+        user.setSuspendedAt(java.time.Instant.now());
+        user.setSuspendedReason("CONTENT_POLICY");
+        users.save(user);
         client().get().uri("/api/auth/me")
                 .cookie("SESSION", login("blocked@example.com"))
                 .exchange()
@@ -136,9 +136,9 @@ class AuthControllerIT extends AbstractIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("email", email, "password", "password123", "displayName", "Tester"))
                 .exchange().expectStatus().isCreated();
-        var u = users.findByEmail(email).orElseThrow();
-        u.setEmailVerified(true);
-        users.save(u);
+        var user = users.findByEmail(email).orElseThrow();
+        user.setEmailVerified(true);
+        users.save(user);
     }
 
     private String login(String email) {

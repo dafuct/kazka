@@ -31,9 +31,9 @@ class BedtimeScheduleServiceTest {
     @InjectMocks BedtimeScheduleService svc;
 
     private ChildProfile owned() {
-        ChildProfile p = new ChildProfile();
-        p.setId("p1"); p.setUserId("u");
-        return p;
+        ChildProfile profile = new ChildProfile();
+        profile.setId("p1"); profile.setUserId("u");
+        return profile;
     }
 
     @Test

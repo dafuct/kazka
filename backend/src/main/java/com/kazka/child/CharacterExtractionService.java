@@ -35,8 +35,8 @@ public class CharacterExtractionService {
             String fewshot = new ClassPathResource("prompts/character-extraction-fewshot.txt")
                     .getContentAsString(StandardCharsets.UTF_8);
             return sys.strip() + "\n\n---\n\n" + fewshot.strip();
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot load extraction prompt", e);
+        } catch (IOException ioException) {
+            throw new IllegalStateException("Cannot load extraction prompt", ioException);
         }
     }
 
@@ -83,8 +83,8 @@ public class CharacterExtractionService {
                 ));
             }
             return out;
-        } catch (Exception e) {
-            log.warn("Failed to parse extraction JSON: {}", e.getMessage());
+        } catch (Exception exception) {
+            log.warn("Failed to parse extraction JSON: {}", exception.getMessage());
             return List.of();
         }
     }
@@ -94,28 +94,28 @@ public class CharacterExtractionService {
         List<String> traits = new ArrayList<>();
         for (JsonNode t : node) {
             if (traits.size() >= 8) break;
-            String s = t.asText("").trim();
-            if (!s.isEmpty()) traits.add(s);
+            String trait = t.asText("").trim();
+            if (!trait.isEmpty()) traits.add(trait);
         }
         return traits;
     }
 
-    private String normalizeKind(String k) {
-        return switch (k == null ? "" : k.toLowerCase()) {
-            case "boy", "girl", "animal", "creature", "object" -> k.toLowerCase();
+    private String normalizeKind(String kind) {
+        return switch (kind == null ? "" : kind.toLowerCase()) {
+            case "boy", "girl", "animal", "creature", "object" -> kind.toLowerCase();
             default -> "object";
         };
     }
 
-    private String normalizeRole(String r) {
-        return switch (r == null ? "" : r.toLowerCase()) {
-            case "protagonist", "companion", "mentioned" -> r.toLowerCase();
+    private String normalizeRole(String role) {
+        return switch (role == null ? "" : role.toLowerCase()) {
+            case "protagonist", "companion", "mentioned" -> role.toLowerCase();
             default -> "companion";
         };
     }
 
-    private String truncate(String s, int max) {
-        if (s == null) return "";
-        return s.length() > max ? s.substring(0, max) : s;
+    private String truncate(String text, int max) {
+        if (text == null) return "";
+        return text.length() > max ? text.substring(0, max) : text;
     }
 }

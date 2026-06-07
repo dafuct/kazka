@@ -28,34 +28,34 @@ public class ChildProfileService {
             throw new PaywallRequiredException(
                     "Free tier allows only " + tier.maxChildProfiles(userId) + " child profile(s)");
         }
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId);
-        p.setName(req.name().trim());
-        p.setBirthYear(req.birthYear());
-        p.setGender(req.gender());
-        p.setPreferredLanguage(req.preferredLanguage() == null ? "uk" : req.preferredLanguage());
-        p.setInterests(req.interests() == null ? List.of() : req.interests());
-        p.setAvatarSeed(makeAvatarSeed(req.name(), p.getId()));
-        return repo.save(p);
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId);
+        profile.setName(req.name().trim());
+        profile.setBirthYear(req.birthYear());
+        profile.setGender(req.gender());
+        profile.setPreferredLanguage(req.preferredLanguage() == null ? "uk" : req.preferredLanguage());
+        profile.setInterests(req.interests() == null ? List.of() : req.interests());
+        profile.setAvatarSeed(makeAvatarSeed(req.name(), profile.getId()));
+        return repo.save(profile);
     }
 
     @Transactional
     public ChildProfile update(String id, String userId, UpdateChildProfileRequest req) {
-        ChildProfile p = requireOwned(id, userId);
-        p.setName(req.name().trim());
-        p.setBirthYear(req.birthYear());
-        p.setGender(req.gender());
-        p.setPreferredLanguage(req.preferredLanguage() == null ? p.getPreferredLanguage() : req.preferredLanguage());
-        p.setInterests(req.interests() == null ? List.of() : req.interests());
-        return repo.save(p);
+        ChildProfile profile = requireOwned(id, userId);
+        profile.setName(req.name().trim());
+        profile.setBirthYear(req.birthYear());
+        profile.setGender(req.gender());
+        profile.setPreferredLanguage(req.preferredLanguage() == null ? profile.getPreferredLanguage() : req.preferredLanguage());
+        profile.setInterests(req.interests() == null ? List.of() : req.interests());
+        return repo.save(profile);
     }
 
     @Transactional
     public void archive(String id, String userId) {
-        ChildProfile p = requireOwned(id, userId);
-        p.setArchivedAt(Instant.now());
-        repo.save(p);
+        ChildProfile profile = requireOwned(id, userId);
+        profile.setArchivedAt(Instant.now());
+        repo.save(profile);
     }
 
     @Transactional(readOnly = true)

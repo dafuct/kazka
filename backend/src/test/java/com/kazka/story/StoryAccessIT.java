@@ -75,46 +75,46 @@ class StoryAccessIT extends AbstractIT {
     }
 
     private User createVerifiedUser(String email, String password) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setDisplayName(email);
-        u.setPasswordHash(passwordEncoder.encode(password));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        return users.save(u);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setDisplayName(email);
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        return users.save(user);
     }
 
     private User createAdmin(String email, String password) {
-        User u = createVerifiedUser(email, password);
-        u.setRole(UserRole.ADMIN);
-        return users.save(u);
+        User user = createVerifiedUser(email, password);
+        user.setRole(UserRole.ADMIN);
+        return users.save(user);
     }
 
     private Story saveStory(String userId, String title) {
-        Story s = new Story();
-        s.setId(UUID.randomUUID().toString());
-        s.setUserId(userId);
-        s.setTitle(title);
-        s.setTheme("t");
-        s.setCharacters(List.of("hero"));
-        s.setAgeGroup("6-8");
-        s.setLength("short");
-        s.setLanguage("uk");
-        s.setContent("body");
-        s.setIllustrationStatus(IllustrationStatus.PENDING);
-        return stories.save(s);
+        Story story = new Story();
+        story.setId(UUID.randomUUID().toString());
+        story.setUserId(userId);
+        story.setTitle(title);
+        story.setTheme("t");
+        story.setCharacters(List.of("hero"));
+        story.setAgeGroup("6-8");
+        story.setLength("short");
+        story.setLanguage("uk");
+        story.setContent("body");
+        story.setIllustrationStatus(IllustrationStatus.PENDING);
+        return stories.save(story);
     }
 
     private String login(String email, String password) {
-        var r = client().post().uri("/api/auth/login")
+        var response = client().post().uri("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("email", email, "password", password))
                 .exchange()
                 .expectStatus().isOk()
                 .returnResult(Void.class);
-        ResponseCookie c = r.getResponseCookies().getFirst("SESSION");
-        assertThat(c).isNotNull();
-        return "SESSION=" + c.getValue();
+        ResponseCookie sessionCookie = response.getResponseCookies().getFirst("SESSION");
+        assertThat(sessionCookie).isNotNull();
+        return "SESSION=" + sessionCookie.getValue();
     }
 }

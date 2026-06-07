@@ -167,30 +167,30 @@ class MonobankRecurringChargeServiceTest {
     }
 
     private UserEntitlement monobankRow(int retries) {
-        UserEntitlement e = new UserEntitlement();
-        e.setId(UUID.randomUUID().toString());
-        e.setUserId(UUID.randomUUID().toString());
-        e.setProductId("product-1");
-        e.setSource(EntitlementSource.MONOBANK);
-        e.setState(EntitlementState.ACTIVE);
-        e.setExpiresAt(Instant.now().plus(Duration.ofDays(2)));
-        e.setNextRenewalAt(Instant.now().minusSeconds(60));
-        e.setMonobankWalletId("wallet-1");
-        e.setMonobankCardToken("card-1");
-        e.setRenewalRetryCount(retries);
-        return e;
+        UserEntitlement entitlement = new UserEntitlement();
+        entitlement.setId(UUID.randomUUID().toString());
+        entitlement.setUserId(UUID.randomUUID().toString());
+        entitlement.setProductId("product-1");
+        entitlement.setSource(EntitlementSource.MONOBANK);
+        entitlement.setState(EntitlementState.ACTIVE);
+        entitlement.setExpiresAt(Instant.now().plus(Duration.ofDays(2)));
+        entitlement.setNextRenewalAt(Instant.now().minusSeconds(60));
+        entitlement.setMonobankWalletId("wallet-1");
+        entitlement.setMonobankCardToken("card-1");
+        entitlement.setRenewalRetryCount(retries);
+        return entitlement;
     }
 
     private SubscriptionProduct newProduct() {
-        SubscriptionProduct p = new SubscriptionProduct();
-        p.setId("product-1");
-        p.setPriceMicro(99_000_000L);
-        p.setCurrency("UAH");
-        p.setAppleProductId("kazka_pro_monthly");
-        p.setMonobankPlanId("mono_monthly");
-        p.setPeriod("P1M");
-        p.setTier("pro");
-        p.setName("Pro Monthly");
-        return p;
+        SubscriptionProduct product = new SubscriptionProduct();
+        product.setId("product-1");
+        product.setPriceMicro(99_000_000L);
+        product.setCurrency("UAH");
+        product.setAppleProductId("kazka_pro_monthly");
+        product.setMonobankPlanId("mono_monthly");
+        product.setPeriod("P1M");
+        product.setTier("pro");
+        product.setName("Pro Monthly");
+        return product;
     }
 }

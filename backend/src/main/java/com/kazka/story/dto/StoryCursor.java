@@ -24,8 +24,8 @@ public record StoryCursor(Instant createdAt, String id) {
             return new StoryCursor(
                     Instant.ofEpochMilli(Long.parseLong(raw.substring(0, sep))),
                     raw.substring(sep + 1));
-        } catch (RuntimeException e) {
-            throw new IllegalArgumentException("Invalid cursor: " + encoded, e);
+        } catch (RuntimeException runtimeException) {
+            throw new IllegalArgumentException("Invalid cursor: " + encoded, runtimeException);
         }
     }
 }

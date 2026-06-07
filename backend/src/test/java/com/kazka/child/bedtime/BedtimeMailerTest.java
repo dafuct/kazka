@@ -22,21 +22,21 @@ class BedtimeMailerTest {
     @InjectMocks BedtimeMailer mailer;
 
     private ChildProfile child(String name, String lang) {
-        ChildProfile p = new ChildProfile();
-        p.setName(name); p.setAvatarSeed("seed"); p.setPreferredLanguage(lang);
-        return p;
+        ChildProfile profile = new ChildProfile();
+        profile.setName(name); profile.setAvatarSeed("seed"); profile.setPreferredLanguage(lang);
+        return profile;
     }
 
     private Story story(String id, String title, String body, String lang) {
-        Story s = new Story();
-        s.setId(id); s.setTitle(title); s.setContent(body); s.setLanguage(lang);
-        return s;
+        Story story = new Story();
+        story.setId(id); story.setTitle(title); story.setContent(body); story.setLanguage(lang);
+        return story;
     }
 
     private User user(String email) {
-        User u = new User();
-        u.setEmail(email);
-        return u;
+        User user = new User();
+        user.setEmail(email);
+        return user;
     }
 
     @Test

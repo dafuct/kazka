@@ -35,16 +35,16 @@ public class PayProUrlBuilder {
         }
 
         StringBuilder sb = new StringBuilder(BASE).append('?');
-        for (int i = 0; i < params.size(); i++) {
-            if (i > 0) sb.append('&');
+        for (int index = 0; index < params.size(); index++) {
+            if (index > 0) sb.append('&');
             // Keys are hard-coded constants with PayPro's PHP-style bracket syntax
             // (e.g. products[1][id]) — must be sent literal, not %5B/%5D-encoded.
-            sb.append(params.get(i)[0]).append('=').append(encode(params.get(i)[1]));
+            sb.append(params.get(index)[0]).append('=').append(encode(params.get(index)[1]));
         }
         return sb.toString();
     }
 
-    private static String encode(String v) {
-        return URLEncoder.encode(v, StandardCharsets.UTF_8);
+    private static String encode(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 }

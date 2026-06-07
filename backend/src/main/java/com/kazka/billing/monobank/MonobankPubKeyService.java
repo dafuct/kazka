@@ -35,8 +35,8 @@ public class MonobankPubKeyService {
     }
 
     public Mono<PublicKey> publicKey() {
-        PublicKey k = cached.get();
-        if (k != null) return Mono.just(k);
+        PublicKey cachedKey = cached.get();
+        if (cachedKey != null) return Mono.just(cachedKey);
         return fetch().doOnNext(cached::set);
     }
 
@@ -68,8 +68,8 @@ public class MonobankPubKeyService {
             byte[] spki = Base64.getDecoder().decode(der);
             return KeyFactory.getInstance("EC")
                     .generatePublic(new X509EncodedKeySpec(spki));
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to parse Monobank public key", e);
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to parse Monobank public key", exception);
         }
     }
 }

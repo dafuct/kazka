@@ -185,8 +185,8 @@ public class SecurityConfig {
             byte[] body = mapper.writeValueAsBytes(Map.of("error", code));
             return exchange.getResponse().writeWith(Mono.just(
                     exchange.getResponse().bufferFactory().wrap(body)));
-        } catch (Exception e) {
-            return Mono.error(e);
+        } catch (Exception exception) {
+            return Mono.error(exception);
         }
     }
 }

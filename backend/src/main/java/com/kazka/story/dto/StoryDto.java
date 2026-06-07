@@ -5,6 +5,7 @@ import com.kazka.comics.StoryPanel;
 import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.IllustrationStatus;
 import com.kazka.story.Story;
+import com.kazka.story.branching.dto.BranchingChoice;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
@@ -24,26 +25,26 @@ public record StoryDto(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) ExtractionStatus extractionStatus,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) boolean isBranching,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String branchingState,
-        @Schema(nullable = true) List<com.kazka.story.branching.dto.BranchingChoice> pendingChoices,
+        @Schema(nullable = true) List<BranchingChoice> pendingChoices,
         @Schema(nullable = true) String translatedContent,
         @Schema(nullable = true) String translatedLanguage,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) List<StoryPanelDto> panels,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant createdAt,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant updatedAt
 ) {
-    public static StoryDto from(Story s, List<StoryPanel> panels, ImageUrlResolver resolver) {
+    public static StoryDto from(Story story, List<StoryPanel> panels, ImageUrlResolver resolver) {
         List<StoryPanelDto> panelDtos = panels == null
                 ? List.of()
-                : panels.stream().map(p -> StoryPanelDto.from(p, resolver)).toList();
+                : panels.stream().map(panel -> StoryPanelDto.from(panel, resolver)).toList();
         return new StoryDto(
-                s.getId(), s.getTitle(), s.getTheme(), s.getCharacters(),
-                s.getAgeGroup(), s.getLength(), s.getLanguage(), s.getContent(),
-                s.getIllustrationStatus(),
-                s.getChildProfileId(), s.getExtractionStatus(),
-                s.isBranching(), s.getBranchingState(), s.getPendingChoices(),
-                s.getTranslatedContent(), s.getTranslatedLanguage(),
+                story.getId(), story.getTitle(), story.getTheme(), story.getCharacters(),
+                story.getAgeGroup(), story.getLength(), story.getLanguage(), story.getContent(),
+                story.getIllustrationStatus(),
+                story.getChildProfileId(), story.getExtractionStatus(),
+                story.isBranching(), story.getBranchingState(), story.getPendingChoices(),
+                story.getTranslatedContent(), story.getTranslatedLanguage(),
                 panelDtos,
-                s.getCreatedAt(), s.getUpdatedAt()
+                story.getCreatedAt(), story.getUpdatedAt()
         );
     }
 }

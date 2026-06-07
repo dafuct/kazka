@@ -35,21 +35,21 @@ public class BranchingResponseParser {
         String body = text.substring(0, sepMatcher.start()).strip();
         String tail = text.substring(sepMatcher.end());
 
-        Matcher cm = CHOICE_LINE.matcher(tail);
-        String a = null, b = null;
-        while (cm.find()) {
-            String letter = cm.group(1).toUpperCase();
-            String txt = cm.group(2).strip();
-            if ("A".equals(letter)) a = txt;
-            else if ("B".equals(letter)) b = txt;
+        Matcher choiceMatcher = CHOICE_LINE.matcher(tail);
+        String choiceA = null, choiceB = null;
+        while (choiceMatcher.find()) {
+            String letter = choiceMatcher.group(1).toUpperCase();
+            String txt = choiceMatcher.group(2).strip();
+            if ("A".equals(letter)) choiceA = txt;
+            else if ("B".equals(letter)) choiceB = txt;
         }
-        if (a == null || b == null) {
+        if (choiceA == null || choiceB == null) {
             log.warn("Missing CHOICE_A or CHOICE_B in branching response; using fallback");
             return new Parsed(body, FALLBACK_CHOICES);
         }
         return new Parsed(body, List.of(
-                new BranchingChoice("A", a),
-                new BranchingChoice("B", b)));
+                new BranchingChoice("A", choiceA),
+                new BranchingChoice("B", choiceB)));
     }
 
     public Parsed parseFinal(String raw) {

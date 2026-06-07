@@ -60,8 +60,8 @@ public enum Holiday {
         try {
             return new ClassPathResource("prompts/holidays/" + id + "." + lang + ".txt")
                     .getContentAsString(StandardCharsets.UTF_8).strip();
-        } catch (IOException e) {
-            throw new UncheckedIOException("Missing holiday context: " + id + "." + lang, e);
+        } catch (IOException ioException) {
+            throw new UncheckedIOException("Missing holiday context: " + id + "." + lang, ioException);
         }
     }
 

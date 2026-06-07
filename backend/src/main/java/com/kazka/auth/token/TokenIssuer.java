@@ -55,8 +55,8 @@ public class TokenIssuer {
                     UserRole.valueOf(payload.get("role", String.class)),
                     payload.getIssuer(),
                     payload.getExpiration().toInstant());
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new InvalidTokenException(e.getMessage());
+        } catch (JwtException | IllegalArgumentException exception) {
+            throw new InvalidTokenException(exception.getMessage());
         }
     }
 

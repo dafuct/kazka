@@ -111,13 +111,13 @@ class BillingServiceRevokeTest {
     }
 
     private UserEntitlement entitlement(EntitlementSource source) {
-        UserEntitlement e = new UserEntitlement();
-        e.setId(UUID.randomUUID().toString());
-        e.setUserId("u1");
-        e.setSource(source);
-        e.setState(EntitlementState.ACTIVE);
-        e.setExpiresAt(Instant.now().plus(Duration.ofDays(20)));
-        e.setMonobankCardToken("card-1");
-        return e;
+        UserEntitlement ent = new UserEntitlement();
+        ent.setId(UUID.randomUUID().toString());
+        ent.setUserId("u1");
+        ent.setSource(source);
+        ent.setState(EntitlementState.ACTIVE);
+        ent.setExpiresAt(Instant.now().plus(Duration.ofDays(20)));
+        ent.setMonobankCardToken("card-1");
+        return ent;
     }
 }

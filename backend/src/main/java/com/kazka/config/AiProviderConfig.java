@@ -1,5 +1,6 @@
 package com.kazka.config;
 
+import com.kazka.moderation.ModerationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -35,7 +36,7 @@ public class AiProviderConfig {
     @Bean
     public WebClient judgeWebClient(WebClient.Builder builder,
                                     AiProviderProperties aiProps,
-                                    com.kazka.moderation.ModerationProperties modProps) {
+                                    ModerationProperties modProps) {
         return builder.clone()
                 .baseUrl(modProps.getJudgeBaseUrl())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, bearer(aiProps.getApiToken()))

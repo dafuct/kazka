@@ -62,8 +62,8 @@ class BedtimeWorkerHolidayIT extends AbstractIT {
     void should_inject_holiday_theme_when_active_and_opted_in() throws Exception {
         when(holidayCalendar.activeFor(any(), any())).thenReturn(Optional.of(Holiday.CHRISTMAS));
 
-        BedtimeSchedule s = enabledSchedule(profileId, true);
-        schedules.save(s);
+        BedtimeSchedule schedule = enabledSchedule(profileId, true);
+        schedules.save(schedule);
 
         worker.enqueueAsync(profileId).get();
 
@@ -76,9 +76,9 @@ class BedtimeWorkerHolidayIT extends AbstractIT {
     void should_use_normal_theme_when_holiday_active_but_opted_out() throws Exception {
         when(holidayCalendar.activeFor(any(), any())).thenReturn(Optional.of(Holiday.CHRISTMAS));
 
-        BedtimeSchedule s = enabledSchedule(profileId, false);
-        s.setThemes(List.of("dragons"));
-        schedules.save(s);
+        BedtimeSchedule schedule = enabledSchedule(profileId, false);
+        schedule.setThemes(List.of("dragons"));
+        schedules.save(schedule);
 
         worker.enqueueAsync(profileId).get();
 
@@ -92,9 +92,9 @@ class BedtimeWorkerHolidayIT extends AbstractIT {
     void should_use_normal_theme_when_no_holiday_active() throws Exception {
         when(holidayCalendar.activeFor(any(), any())).thenReturn(Optional.empty());
 
-        BedtimeSchedule s = enabledSchedule(profileId, true);
-        s.setThemes(List.of("космос"));
-        schedules.save(s);
+        BedtimeSchedule schedule = enabledSchedule(profileId, true);
+        schedule.setThemes(List.of("космос"));
+        schedules.save(schedule);
 
         worker.enqueueAsync(profileId).get();
 
@@ -104,32 +104,32 @@ class BedtimeWorkerHolidayIT extends AbstractIT {
     }
 
     private BedtimeSchedule enabledSchedule(String childProfileId, boolean holidayThemes) {
-        BedtimeSchedule s = new BedtimeSchedule();
-        s.setChildProfileId(childProfileId);
-        s.setEnabled(true);
-        s.setLocalTime("20:30");
-        s.setTimezone("Europe/Kyiv");
-        s.setThemes(List.of());
-        s.setHolidayThemesEnabled(holidayThemes);
-        s.setNextRunAt(Instant.now().minusSeconds(60));
-        return s;
+        BedtimeSchedule schedule = new BedtimeSchedule();
+        schedule.setChildProfileId(childProfileId);
+        schedule.setEnabled(true);
+        schedule.setLocalTime("20:30");
+        schedule.setTimezone("Europe/Kyiv");
+        schedule.setThemes(List.of());
+        schedule.setHolidayThemesEnabled(holidayThemes);
+        schedule.setNextRunAt(Instant.now().minusSeconds(60));
+        return schedule;
     }
 
     private String seedUser(String email) {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id); u.setEmail(email); u.setDisplayName("Parent");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER); u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id); user.setEmail(email); user.setDisplayName("Parent");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER); user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
     private String seedProfile(String userId) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId); p.setName("Test"); p.setAvatarSeed("s"); p.setPreferredLanguage("uk");
-        p.setInterests(List.of());
-        return profiles.save(p).getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId); profile.setName("Test"); profile.setAvatarSeed("s"); profile.setPreferredLanguage("uk");
+        profile.setInterests(List.of());
+        return profiles.save(profile).getId();
     }
 }

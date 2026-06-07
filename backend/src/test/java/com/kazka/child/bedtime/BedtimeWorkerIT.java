@@ -75,9 +75,9 @@ class BedtimeWorkerIT extends AbstractIT {
 
     @Test
     void should_dedup_when_already_sent_today() throws Exception {
-        BedtimeSchedule s = enabledSchedule(profileId);
-        s.setLastSentAt(Instant.now());
-        schedules.save(s);
+        BedtimeSchedule schedule = enabledSchedule(profileId);
+        schedule.setLastSentAt(Instant.now());
+        schedules.save(schedule);
 
         worker.enqueueAsync(profileId).get();
 
@@ -103,9 +103,9 @@ class BedtimeWorkerIT extends AbstractIT {
     @Test
     void should_mark_failed_after_three_retries() throws Exception {
         when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.error(new RuntimeException("LLM down")));
-        BedtimeSchedule s = enabledSchedule(profileId);
-        s.setRetryCount(2);
-        schedules.save(s);
+        BedtimeSchedule schedule = enabledSchedule(profileId);
+        schedule.setRetryCount(2);
+        schedules.save(schedule);
 
         worker.enqueueAsync(profileId).get();
 
@@ -127,34 +127,34 @@ class BedtimeWorkerIT extends AbstractIT {
     }
 
     private BedtimeSchedule enabledSchedule(String childProfileId) {
-        BedtimeSchedule s = new BedtimeSchedule();
-        s.setChildProfileId(childProfileId);
-        s.setEnabled(true);
-        s.setLocalTime("20:30");
-        s.setTimezone("Europe/Kyiv");
-        s.setThemes(List.of("dragons"));
-        s.setNextRunAt(Instant.now().minusSeconds(60));
-        return s;
+        BedtimeSchedule schedule = new BedtimeSchedule();
+        schedule.setChildProfileId(childProfileId);
+        schedule.setEnabled(true);
+        schedule.setLocalTime("20:30");
+        schedule.setTimezone("Europe/Kyiv");
+        schedule.setThemes(List.of("dragons"));
+        schedule.setNextRunAt(Instant.now().minusSeconds(60));
+        return schedule;
     }
 
     private String seedUser(String email) {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(email);
-        u.setDisplayName("Parent");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(email);
+        user.setDisplayName("Parent");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
     private String seedProfile(String userId) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId); p.setName("Test"); p.setAvatarSeed("s"); p.setPreferredLanguage("uk");
-        p.setInterests(List.of("dragons"));
-        return profiles.save(p).getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId); profile.setName("Test"); profile.setAvatarSeed("s"); profile.setPreferredLanguage("uk");
+        profile.setInterests(List.of("dragons"));
+        return profiles.save(profile).getId();
     }
 }

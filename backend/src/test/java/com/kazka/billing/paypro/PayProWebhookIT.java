@@ -43,13 +43,13 @@ class PayProWebhookIT extends AbstractIT {
         processedEvents.deleteAll();
         users.deleteAll();
 
-        User u = newUser("paypro-it@example.com");
-        userId = u.getId();
+        User user = newUser("paypro-it@example.com");
+        userId = user.getId();
 
-        SubscriptionProduct p = products.findByAppleProductId("kazka_pro_monthly").orElseThrow();
-        p.setPayproProductId("44009");
-        products.save(p);
-        productId = p.getId();
+        SubscriptionProduct product = products.findByAppleProductId("kazka_pro_monthly").orElseThrow();
+        product.setPayproProductId("44009");
+        products.save(product);
+        productId = product.getId();
     }
 
     @Test
@@ -63,11 +63,11 @@ class PayProWebhookIT extends AbstractIT {
                 .exchange()
                 .expectStatus().isOk();
 
-        UserEntitlement e = entitlements.findByOriginalTransactionId("sub-42").orElseThrow();
-        assertThat(e.getState()).isEqualTo(EntitlementState.ACTIVE);
-        assertThat(e.getSource()).isEqualTo(EntitlementSource.PAYPRO);
-        assertThat(e.getUserId()).isEqualTo(userId);
-        assertThat(e.getProductId()).isEqualTo(productId);
+        UserEntitlement entitlement = entitlements.findByOriginalTransactionId("sub-42").orElseThrow();
+        assertThat(entitlement.getState()).isEqualTo(EntitlementState.ACTIVE);
+        assertThat(entitlement.getSource()).isEqualTo(EntitlementSource.PAYPRO);
+        assertThat(entitlement.getUserId()).isEqualTo(userId);
+        assertThat(entitlement.getProductId()).isEqualTo(productId);
     }
 
     @Test
@@ -100,8 +100,8 @@ class PayProWebhookIT extends AbstractIT {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue(term).exchange().expectStatus().isOk();
 
-        UserEntitlement e = entitlements.findByOriginalTransactionId("sub-42").orElseThrow();
-        assertThat(e.getState()).isEqualTo(EntitlementState.REVOKED);
+        UserEntitlement entitlement = entitlements.findByOriginalTransactionId("sub-42").orElseThrow();
+        assertThat(entitlement.getState()).isEqualTo(EntitlementState.REVOKED);
     }
 
     @Test
@@ -117,21 +117,21 @@ class PayProWebhookIT extends AbstractIT {
     }
 
     private MultiValueMap<String, String> baseIpn(String typeName, String typeId) {
-        MultiValueMap<String, String> m = new LinkedMultiValueMap<>();
-        m.set("ORDER_ID", "order-1");
-        m.set("ORDER_STATUS", "Processed");
-        m.set("ORDER_TOTAL_AMOUNT", "9.99");
-        m.set("ORDER_CURRENCY_CODE", "USD");
-        m.set("CUSTOMER_EMAIL", "paypro-it@example.com");
-        m.set("CUSTOMER_ID", "cust-7");
-        m.set("PRODUCT_ID", "44009");
-        m.set("SUBSCRIPTION_ID", "sub-42");
-        m.set("SUBSCRIPTION_NEXT_CHARGE_DATE", "2026-07-05T00:00:00Z");
-        m.set("ORDER_CUSTOM_FIELDS", "x-kazka_user_id=" + userId + "&x-kazka_product_id=" + productId);
-        m.set("TEST_MODE", "1");
-        m.set("IPN_TYPE_ID", typeId);
-        m.set("IPN_TYPE_NAME", typeName);
-        return m;
+        MultiValueMap<String, String> ipn = new LinkedMultiValueMap<>();
+        ipn.set("ORDER_ID", "order-1");
+        ipn.set("ORDER_STATUS", "Processed");
+        ipn.set("ORDER_TOTAL_AMOUNT", "9.99");
+        ipn.set("ORDER_CURRENCY_CODE", "USD");
+        ipn.set("CUSTOMER_EMAIL", "paypro-it@example.com");
+        ipn.set("CUSTOMER_ID", "cust-7");
+        ipn.set("PRODUCT_ID", "44009");
+        ipn.set("SUBSCRIPTION_ID", "sub-42");
+        ipn.set("SUBSCRIPTION_NEXT_CHARGE_DATE", "2026-07-05T00:00:00Z");
+        ipn.set("ORDER_CUSTOM_FIELDS", "x-kazka_user_id=" + userId + "&x-kazka_product_id=" + productId);
+        ipn.set("TEST_MODE", "1");
+        ipn.set("IPN_TYPE_ID", typeId);
+        ipn.set("IPN_TYPE_NAME", typeName);
+        return ipn;
     }
 
     private void sign(MultiValueMap<String, String> ipn) {
@@ -143,20 +143,20 @@ class PayProWebhookIT extends AbstractIT {
                     + validationKey
                     + ipn.getFirst("TEST_MODE")
                     + ipn.getFirst("IPN_TYPE_NAME");
-            byte[] h = MessageDigest.getInstance("SHA-256")
+            byte[] digest = MessageDigest.getInstance("SHA-256")
                     .digest(input.getBytes(StandardCharsets.UTF_8));
-            ipn.set("SIGNATURE", HexFormat.of().formatHex(h));
+            ipn.set("SIGNATURE", HexFormat.of().formatHex(digest));
         } catch (Exception ex) { throw new RuntimeException(ex); }
     }
 
     private User newUser(String email) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setDisplayName("u");
-        u.setPasswordHash("x");
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        return users.save(u);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setDisplayName("u");
+        user.setPasswordHash("x");
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        return users.save(user);
     }
 }

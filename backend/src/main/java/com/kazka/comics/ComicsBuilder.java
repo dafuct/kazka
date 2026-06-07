@@ -76,8 +76,8 @@ public class ComicsBuilder {
                         // Only build a story that is still PENDING and has no page yet — guards
                         // against a stray second trigger (e.g. a manual POST /illustrate racing
                         // the server-side trigger) re-running the pipeline.
-                        .filter(s -> s.getIllustrationStatus() == IllustrationStatus.PENDING
-                                && panelRepository.countByStoryId(s.getId()) == 0)
+                        .filter(story -> story.getIllustrationStatus() == IllustrationStatus.PENDING
+                                && panelRepository.countByStoryId(story.getId()) == 0)
                         .map(Mono::just).orElse(Mono.empty()))
                 .flatMap(this::pipeline)
                 .timeout(pipelineTimeout)
@@ -139,8 +139,8 @@ public class ComicsBuilder {
         try {
             pushNotifier.notifyStoryReady(story.getUserId(), story.getId(),
                     story.getTitle() == null ? "" : story.getTitle());
-        } catch (Exception e) {
-            log.warn("Push hook failed after comics for story={}: {}", story.getId(), e.getMessage());
+        } catch (Exception exception) {
+            log.warn("Push hook failed after comics for story={}: {}", story.getId(), exception.getMessage());
         }
     }
 
@@ -152,7 +152,7 @@ public class ComicsBuilder {
         List<StoryPanel> existing = panelRepository.findByStoryIdOrderByPanelIndexAsc(storyId);
         existing.forEach(p -> {
             try { imageStorage.deleteByKey(p.getImagePath()); }
-            catch (Exception e) { log.warn("Failed to delete panel image {}: {}", p.getImagePath(), e.getMessage()); }
+            catch (Exception exception) { log.warn("Failed to delete panel image {}: {}", p.getImagePath(), exception.getMessage()); }
         });
         panelRepository.deleteByStoryId(storyId);
     }

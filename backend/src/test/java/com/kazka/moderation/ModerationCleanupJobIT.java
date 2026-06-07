@@ -30,14 +30,14 @@ class ModerationCleanupJobIT extends AbstractIT {
         flags.deleteAll();
         entitlementRepo.deleteAll();
         users.deleteAll();
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail("janitor@example.com");
-        u.setDisplayName("J");
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
-        userId = u.getId();
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail("janitor@example.com");
+        user.setDisplayName("J");
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
+        userId = user.getId();
     }
 
     @Test

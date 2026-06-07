@@ -42,11 +42,11 @@ public class WebhookIdempotencyService {
             return false;
         }
         try {
-            ProcessedWebhookEvent e = new ProcessedWebhookEvent();
-            e.setId(UUID.randomUUID().toString());
-            e.setProvider(provider);
-            e.setEventId(eventId);
-            repo.save(e);
+            ProcessedWebhookEvent event = new ProcessedWebhookEvent();
+            event.setId(UUID.randomUUID().toString());
+            event.setProvider(provider);
+            event.setEventId(eventId);
+            repo.save(event);
             return true;
         } catch (DataIntegrityViolationException race) {
             // Concurrent delivery of the same event — the other thread won.

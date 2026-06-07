@@ -70,8 +70,8 @@ class BedtimeSweepJobIT extends AbstractIT {
 
         // Wait for the async worker to land the lastSentAt update (no Thread.sleep — Awaitility).
         Awaitility.await().atMost(Duration.ofSeconds(8)).untilAsserted(() -> {
-            BedtimeSchedule r = schedules.findByChildProfileId(dueId).orElseThrow();
-            assertThat(r.getLastSentAt()).isNotNull();
+            BedtimeSchedule result = schedules.findByChildProfileId(dueId).orElseThrow();
+            assertThat(result.getLastSentAt()).isNotNull();
         });
 
         BedtimeSchedule untouched = schedules.findByChildProfileId(notYetId).orElseThrow();
@@ -82,11 +82,11 @@ class BedtimeSweepJobIT extends AbstractIT {
     void should_skip_outside_one_hour_horizon() {
         String userId = seedUser();
         String stale = seedProfile(userId);
-        BedtimeSchedule s = new BedtimeSchedule();
-        s.setChildProfileId(stale); s.setEnabled(true); s.setThemes(List.of());
-        s.setLocalTime("20:30"); s.setTimezone("Europe/Kyiv");
-        s.setNextRunAt(Instant.now().minus(Duration.ofHours(2)));  // older than horizon
-        schedules.save(s);
+        BedtimeSchedule staleSchedule = new BedtimeSchedule();
+        staleSchedule.setChildProfileId(stale); staleSchedule.setEnabled(true); staleSchedule.setThemes(List.of());
+        staleSchedule.setLocalTime("20:30"); staleSchedule.setTimezone("Europe/Kyiv");
+        staleSchedule.setNextRunAt(Instant.now().minus(Duration.ofHours(2)));  // older than horizon
+        schedules.save(staleSchedule);
 
         int picked = job.runOnce();
         assertThat(picked).isZero();
@@ -96,11 +96,11 @@ class BedtimeSweepJobIT extends AbstractIT {
     void should_skip_schedules_for_suspended_users() {
         String userId = seedSuspendedUser();
         String profileId = seedProfile(userId);
-        BedtimeSchedule s = new BedtimeSchedule();
-        s.setChildProfileId(profileId); s.setEnabled(true); s.setThemes(List.of());
-        s.setLocalTime("20:30"); s.setTimezone("Europe/Kyiv");
-        s.setNextRunAt(Instant.now().minusSeconds(60));
-        schedules.save(s);
+        BedtimeSchedule suspendedSchedule = new BedtimeSchedule();
+        suspendedSchedule.setChildProfileId(profileId); suspendedSchedule.setEnabled(true); suspendedSchedule.setThemes(List.of());
+        suspendedSchedule.setLocalTime("20:30"); suspendedSchedule.setTimezone("Europe/Kyiv");
+        suspendedSchedule.setNextRunAt(Instant.now().minusSeconds(60));
+        schedules.save(suspendedSchedule);
 
         int picked = job.runOnce();
         assertThat(picked).isZero();
@@ -116,22 +116,22 @@ class BedtimeSweepJobIT extends AbstractIT {
 
     private String seedUserInternal(boolean suspended) {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test");
-        u.setDisplayName("Parent");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        if (suspended) u.setSuspendedAt(Instant.now());
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test");
+        user.setDisplayName("Parent");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        if (suspended) user.setSuspendedAt(Instant.now());
+        users.save(user);
         return id;
     }
 
     private String seedProfile(String userId) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId); p.setName("T"); p.setAvatarSeed("s"); p.setPreferredLanguage("uk");
-        return profiles.save(p).getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId); profile.setName("T"); profile.setAvatarSeed("s"); profile.setPreferredLanguage("uk");
+        return profiles.save(profile).getId();
     }
 }

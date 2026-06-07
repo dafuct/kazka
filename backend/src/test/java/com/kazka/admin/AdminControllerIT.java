@@ -57,25 +57,25 @@ class AdminControllerIT extends AbstractIT {
     }
 
     private void seed(String email, String password, UserRole role) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setDisplayName(email);
-        u.setPasswordHash(passwordEncoder.encode(password));
-        u.setRole(role);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setDisplayName(email);
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.setRole(role);
+        user.setEmailVerified(true);
+        users.save(user);
     }
 
     private String login(String email, String password) {
-        var r = client().post().uri("/api/auth/login")
+        var response = client().post().uri("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("email", email, "password", password))
                 .exchange()
                 .expectStatus().isOk()
                 .returnResult(Void.class);
-        ResponseCookie c = r.getResponseCookies().getFirst("SESSION");
-        assertThat(c).isNotNull();
-        return "SESSION=" + c.getValue();
+        ResponseCookie sessionCookie = response.getResponseCookies().getFirst("SESSION");
+        assertThat(sessionCookie).isNotNull();
+        return "SESSION=" + sessionCookie.getValue();
     }
 }

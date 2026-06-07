@@ -7,6 +7,11 @@ import com.kazka.auth.exception.InvalidCredentialsException;
 import com.kazka.auth.exception.InvalidRefreshTokenException;
 import com.kazka.auth.exception.InvalidTokenException;
 import com.kazka.auth.exception.MailDeliveryException;
+import com.kazka.auth.google.GoogleIdTokenVerifier;
+import com.kazka.billing.AppleManagedSubscriptionException;
+import com.kazka.child.ChildRateLimiter;
+import com.kazka.moderation.AccountSuspendedException;
+import com.kazka.story.exception.PaywallRequiredException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -66,14 +71,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AppleIdentityTokenVerifier.InvalidAppleTokenException.class)
-    public ResponseEntity<Map<String, String>> invalidApple(AppleIdentityTokenVerifier.InvalidAppleTokenException e) {
+    public ResponseEntity<Map<String, String>> invalidApple(AppleIdentityTokenVerifier.InvalidAppleTokenException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "INVALID_APPLE_TOKEN"));
     }
 
-    @ExceptionHandler(com.kazka.auth.google.GoogleIdTokenVerifier.InvalidGoogleTokenException.class)
+    @ExceptionHandler(GoogleIdTokenVerifier.InvalidGoogleTokenException.class)
     public ResponseEntity<Map<String, String>> invalidGoogle(
-            com.kazka.auth.google.GoogleIdTokenVerifier.InvalidGoogleTokenException e) {
+            GoogleIdTokenVerifier.InvalidGoogleTokenException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", "INVALID_GOOGLE_TOKEN"));
     }
@@ -84,8 +89,8 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "MAIL_SEND_FAILED"));
     }
 
-    @ExceptionHandler(com.kazka.moderation.AccountSuspendedException.class)
-    public ResponseEntity<Map<String, Object>> handleSuspended(com.kazka.moderation.AccountSuspendedException ex) {
+    @ExceptionHandler(AccountSuspendedException.class)
+    public ResponseEntity<Map<String, Object>> handleSuspended(AccountSuspendedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Map.of("error", "ACCOUNT_SUSPENDED"));
     }
@@ -100,22 +105,22 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> badArgument(IllegalArgumentException e) {
+    public ResponseEntity<Map<String, String>> badArgument(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", "INVALID_ARGUMENT"));
     }
 
-    @ExceptionHandler(com.kazka.story.exception.PaywallRequiredException.class)
-    public ResponseEntity<Map<String, Object>> handlePaywall(com.kazka.story.exception.PaywallRequiredException ex) {
+    @ExceptionHandler(PaywallRequiredException.class)
+    public ResponseEntity<Map<String, Object>> handlePaywall(PaywallRequiredException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("error", "PAYWALL_REQUIRED");
         if (ex.getMessage() != null) body.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(body);
     }
 
-    @ExceptionHandler(com.kazka.billing.AppleManagedSubscriptionException.class)
+    @ExceptionHandler(AppleManagedSubscriptionException.class)
     public ResponseEntity<Map<String, Object>> handleAppleManaged(
-            com.kazka.billing.AppleManagedSubscriptionException ex) {
+            AppleManagedSubscriptionException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", "APPLE_MANAGED"));
     }
@@ -127,18 +132,18 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "INVALID_SIGNATURE"));
     }
 
-    @ExceptionHandler(com.kazka.child.ChildRateLimiter.TooManyChildCreatesException.class)
+    @ExceptionHandler(ChildRateLimiter.TooManyChildCreatesException.class)
     public ResponseEntity<Map<String, Object>> handleChildRateLimit(
-            com.kazka.child.ChildRateLimiter.TooManyChildCreatesException ex) {
+            ChildRateLimiter.TooManyChildCreatesException ex) {
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .body(Map.of("error", "RATE_LIMITED", "message", ex.getMessage()));
     }
 
     private static String codeFor(ResponseStatusException ex) {
-        int s = ex.getStatusCode().value();
-        if (s == 404) return "NOT_FOUND";
-        if (s == 401) return "UNAUTHENTICATED";
-        if (s == 403) return "FORBIDDEN";
+        int statusCode = ex.getStatusCode().value();
+        if (statusCode == 404) return "NOT_FOUND";
+        if (statusCode == 401) return "UNAUTHENTICATED";
+        if (statusCode == 403) return "FORBIDDEN";
         return "ERROR";
     }
 }

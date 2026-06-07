@@ -31,10 +31,10 @@ class EntitlementDowngradeListenerIT extends AbstractIT {
     @Test
     void should_archive_all_but_most_recently_used_profile() {
         String userId = seedUser();
-        ChildProfile a = makeProfile(userId, "A");
-        ChildProfile b = makeProfile(userId, "B");
-        ChildProfile c = makeProfile(userId, "C");
-        profiles.saveAll(List.of(a, b, c));
+        ChildProfile profileA = makeProfile(userId, "A");
+        ChildProfile profileB = makeProfile(userId, "B");
+        ChildProfile profileC = makeProfile(userId, "C");
+        profiles.saveAll(List.of(profileA, profileB, profileC));
 
         when(entitlements.isPro(userId)).thenReturn(false);
 
@@ -45,25 +45,25 @@ class EntitlementDowngradeListenerIT extends AbstractIT {
     }
 
     private ChildProfile makeProfile(String userId, String name) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId);
-        p.setName(name);
-        p.setAvatarSeed("s");
-        p.setPreferredLanguage("uk");
-        return p;
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId);
+        profile.setName(name);
+        profile.setAvatarSeed("s");
+        profile.setPreferredLanguage("uk");
+        return profile;
     }
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test");
-        u.setDisplayName("T");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test");
+        user.setDisplayName("T");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 }

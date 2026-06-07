@@ -133,8 +133,8 @@ public class ModerationJudgeClient {
             JsonNode response = MAPPER.readTree(responseBody);
             String content = response.path("choices").path(0).path("message").path("content").asText("").trim();
             return parseGuardResponse(content);
-        } catch (Exception e) {
-            log.warn("Moderation judge classification failed: {}", e.getMessage());
+        } catch (Exception exception) {
+            log.warn("Moderation judge classification failed: {}", exception.getMessage());
             return ModerationResult.Refused.of(ModerationCategory.JUDGE_UNAVAILABLE);
         }
     }
@@ -149,17 +149,17 @@ public class ModerationJudgeClient {
         String[] lines = content.split("\\r?\\n");
         int verdictIdx = -1;
         String verdict = null;
-        for (int i = 0; i < lines.length; i++) {
-            String cleaned = lines[i].toLowerCase()
+        for (int index = 0; index < lines.length; index++) {
+            String cleaned = lines[index].toLowerCase()
                     .replaceAll("[`*_#>\"']", "")
                     .replaceAll("[.,:;!?]", " ")
                     .trim();
             if (cleaned.isEmpty()) continue;
             if (cleaned.matches(".*\\bunsafe\\b.*")) {
-                verdictIdx = i; verdict = "unsafe"; break;
+                verdictIdx = index; verdict = "unsafe"; break;
             }
             if (cleaned.matches(".*\\bsafe\\b.*")) {
-                verdictIdx = i; verdict = "safe"; break;
+                verdictIdx = index; verdict = "safe"; break;
             }
         }
         if (verdict == null) {
@@ -170,8 +170,8 @@ public class ModerationJudgeClient {
         if ("safe".equals(verdict)) return ModerationResult.Allowed.INSTANCE;
         // unsafe — find the next non-blank line for category codes
         String codeLine = null;
-        for (int i = verdictIdx + 1; i < lines.length; i++) {
-            String trimmed = lines[i].trim();
+        for (int index = verdictIdx + 1; index < lines.length; index++) {
+            String trimmed = lines[index].trim();
             if (!trimmed.isEmpty()) { codeLine = trimmed; break; }
         }
         if (codeLine == null) return ModerationResult.Refused.of(ModerationCategory.JUDGE_UNAVAILABLE);

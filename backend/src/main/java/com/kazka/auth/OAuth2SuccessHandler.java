@@ -59,13 +59,13 @@ public class OAuth2SuccessHandler implements ServerAuthenticationSuccessHandler 
         if (normalized != null) {
             var byEmail = users.findByEmail(normalized);
             if (byEmail.isPresent()) {
-                User u = byEmail.get();
-                if (u.getGoogleSubject() == null) {
-                    u.setGoogleSubject(subject);
-                    u.setEmailVerified(true);
-                    return users.save(u);
+                User existingUser = byEmail.get();
+                if (existingUser.getGoogleSubject() == null) {
+                    existingUser.setGoogleSubject(subject);
+                    existingUser.setEmailVerified(true);
+                    return users.save(existingUser);
                 }
-                return u;
+                return existingUser;
             }
         }
 

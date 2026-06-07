@@ -61,28 +61,28 @@ class StoryRepositoryTest extends AbstractIT {
     }
 
     private Story story(String title) {
-        Story s = new Story();
-        s.setId(UUID.randomUUID().toString());
-        s.setUserId(seedUser());
-        s.setTitle(title);
-        s.setTheme("theme");
-        s.setCharacters(List.of("Мія", "лисичка"));
-        s.setAgeGroup("6-8");
-        s.setLength("medium");
-        s.setLanguage("uk");
-        s.setContent("content");
-        s.setIllustrationStatus(IllustrationStatus.PENDING);
-        return s;
+        Story story = new Story();
+        story.setId(UUID.randomUUID().toString());
+        story.setUserId(seedUser());
+        story.setTitle(title);
+        story.setTheme("theme");
+        story.setCharacters(List.of("Мія", "лисичка"));
+        story.setAgeGroup("6-8");
+        story.setLength("medium");
+        story.setLanguage("uk");
+        story.setContent("content");
+        story.setIllustrationStatus(IllustrationStatus.PENDING);
+        return story;
     }
 
     private String seedUser() {
-        com.kazka.user.User u = new com.kazka.user.User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(u.getId() + "@example.com");
-        u.setDisplayName("Test");
-        u.setRole(com.kazka.user.UserRole.USER);
-        u.setEmailVerified(true);
-        userRepository.save(u);
-        return u.getId();
+        com.kazka.user.User user = new com.kazka.user.User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(user.getId() + "@example.com");
+        user.setDisplayName("Test");
+        user.setRole(com.kazka.user.UserRole.USER);
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        return user.getId();
     }
 }

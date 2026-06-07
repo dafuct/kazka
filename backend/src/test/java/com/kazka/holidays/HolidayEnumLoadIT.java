@@ -22,14 +22,14 @@ class HolidayEnumLoadIT {
 
     @Test
     void bilingual_language_resolves_to_uk_for_labels_and_contexts() {
-        Holiday h = Holiday.CHRISTMAS;
-        assertThat(h.label("bilingual")).isEqualTo(h.label("uk"));
-        assertThat(h.culturalContext("bilingual")).isEqualTo(h.culturalContext("uk"));
+        Holiday christmas = Holiday.CHRISTMAS;
+        assertThat(christmas.label("bilingual")).isEqualTo(christmas.label("uk"));
+        assertThat(christmas.culturalContext("bilingual")).isEqualTo(christmas.culturalContext("uk"));
     }
 
     @Test
     void unknown_language_falls_back_to_uk() {
-        Holiday h = Holiday.EASTER;
-        assertThat(h.label("xx")).isEqualTo(h.label("uk"));
+        Holiday easter = Holiday.EASTER;
+        assertThat(easter.label("xx")).isEqualTo(easter.label("uk"));
     }
 }

@@ -2,9 +2,12 @@ package com.kazka.auth.google;
 
 import com.kazka.user.User;
 import com.kazka.user.UserRepository;
+import com.kazka.user.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -21,10 +24,10 @@ public class GoogleOAuthService {
         if (normalizedEmail != null) {
             var byEmail = users.findByEmail(normalizedEmail);
             if (byEmail.isPresent()) {
-                User u = byEmail.get();
-                u.setGoogleSubject(googleSubject);
-                u.setEmailVerified(emailVerified || u.isEmailVerified());
-                return users.save(u);
+                User existingUser = byEmail.get();
+                existingUser.setGoogleSubject(googleSubject);
+                existingUser.setEmailVerified(emailVerified || existingUser.isEmailVerified());
+                return users.save(existingUser);
             }
         }
 
@@ -33,13 +36,13 @@ public class GoogleOAuthService {
         }
 
         User user = new User();
-        user.setId(java.util.UUID.randomUUID().toString());
+        user.setId(UUID.randomUUID().toString());
         user.setEmail(normalizedEmail);
         user.setGoogleSubject(googleSubject);
         user.setDisplayName(displayName == null || displayName.isBlank()
                 ? "Google user"
                 : displayName.trim());
-        user.setRole(com.kazka.user.UserRole.USER);
+        user.setRole(UserRole.USER);
         user.setEmailVerified(emailVerified);
         return users.save(user);
     }

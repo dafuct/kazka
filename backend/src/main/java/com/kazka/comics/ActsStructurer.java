@@ -43,8 +43,8 @@ public class ActsStructurer {
         JsonNode root;
         try {
             root = mapper.readTree(json);
-        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
-            throw new IllegalStateException("Acts structurer returned invalid JSON: " + e.getMessage(), e);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException jsonException) {
+            throw new IllegalStateException("Acts structurer returned invalid JSON: " + jsonException.getMessage(), jsonException);
         }
         if (!root.isArray()) {
             throw new IllegalStateException("Acts structurer: expected JSON array of beats, got "
@@ -54,24 +54,24 @@ public class ActsStructurer {
             throw new IllegalStateException("Acts structurer: expected " + BEATS + " beats, got " + root.size());
         }
         List<Act> result = new ArrayList<>(BEATS);
-        for (int i = 0; i < BEATS; i++) {
+        for (int index = 0; index < BEATS; index++) {
             try {
-                result.add(mapper.treeToValue(root.get(i), Act.class));
-            } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
-                throw new IllegalStateException("Acts structurer: beat " + (i + 1) + " malformed: "
-                        + e.getMessage(), e);
+                result.add(mapper.treeToValue(root.get(index), Act.class));
+            } catch (com.fasterxml.jackson.core.JsonProcessingException jsonException) {
+                throw new IllegalStateException("Acts structurer: beat " + (index + 1) + " malformed: "
+                        + jsonException.getMessage(), jsonException);
             }
         }
         return result;
     }
 
-    private static String unwrapFences(String s) {
-        Matcher m = JSON_FENCE.matcher(s);
-        return m.find() ? m.group(1) : s;
+    private static String unwrapFences(String raw) {
+        Matcher matcher = JSON_FENCE.matcher(raw);
+        return matcher.find() ? matcher.group(1) : raw;
     }
 
-    private static String truncate(String s) {
-        return s.length() > 200 ? s.substring(0, 200) + "…" : s;
+    private static String truncate(String text) {
+        return text.length() > 200 ? text.substring(0, 200) + "…" : text;
     }
 
     private static String systemPrompt(String language) {

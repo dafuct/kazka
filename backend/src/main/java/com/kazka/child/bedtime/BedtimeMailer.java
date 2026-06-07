@@ -39,8 +39,8 @@ public class BedtimeMailer {
         mail.sendHtml(user.getEmail(), subject, body);
     }
 
-    private boolean isUkrainian(ChildProfile c) {
-        String lang = c.getPreferredLanguage();
+    private boolean isUkrainian(ChildProfile child) {
+        String lang = child.getPreferredLanguage();
         return lang == null || "uk".equals(lang) || "bilingual".equals(lang);
     }
 
@@ -51,9 +51,9 @@ public class BedtimeMailer {
         return first.length() > 280 ? first.substring(0, 280) + "…" : first;
     }
 
-    private String escape(String s) {
-        if (s == null) return "";
-        return s.replace("&", "&amp;")
+    private String escape(String text) {
+        if (text == null) return "";
+        return text.replace("&", "&amp;")
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;");

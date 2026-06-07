@@ -112,25 +112,25 @@ class BranchingControllerIT extends AbstractIT {
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test.example");
-        u.setDisplayName("Tester");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test.example");
+        user.setDisplayName("Tester");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
     private String seedProfile(String userId) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId);
-        p.setName("Лія");
-        p.setAvatarSeed("s");
-        p.setPreferredLanguage("uk");
-        return profiles.save(p).getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId);
+        profile.setName("Лія");
+        profile.setAvatarSeed("s");
+        profile.setPreferredLanguage("uk");
+        return profiles.save(profile).getId();
     }
 
     private WebTestClient authedClient(String userId) {

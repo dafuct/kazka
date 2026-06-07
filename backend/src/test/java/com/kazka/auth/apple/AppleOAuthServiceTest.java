@@ -77,11 +77,11 @@ class AppleOAuthServiceTest {
     }
 
     private User newUser() {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setRole(UserRole.USER);
-        u.setDisplayName("Test");
-        return u;
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setRole(UserRole.USER);
+        user.setDisplayName("Test");
+        return user;
     }
 
     @Test

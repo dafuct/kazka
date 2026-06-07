@@ -29,11 +29,11 @@ public class ExtractionController {
                                                         @RequestParam(required = false) String lang) {
         return currentUserResolver.requireUser()
                 .flatMap(cu -> Mono.fromCallable(() -> {
-                    Story s = stories.findByIdAndUserId(id, cu.userId())
+                    Story story = stories.findByIdAndUserId(id, cu.userId())
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-                    return s;
+                    return story;
                 }).subscribeOn(Schedulers.boundedElastic()))
-                .flatMap(s -> extraction.extract(s.getContent(),
-                        lang != null && !lang.isBlank() ? lang : s.getLanguage()));
+                .flatMap(story -> extraction.extract(story.getContent(),
+                        lang != null && !lang.isBlank() ? lang : story.getLanguage()));
     }
 }

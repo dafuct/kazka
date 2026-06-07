@@ -55,22 +55,22 @@ class CharacterRepositoryIT extends AbstractIT {
 
     private String seedProfile() {
         String userId = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(userId);
-        u.setEmail(userId + "@test");
-        u.setDisplayName("T");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(userId);
+        user.setEmail(userId + "@test");
+        user.setDisplayName("T");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
 
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId);
-        p.setName("Test");
-        p.setAvatarSeed("seed");
-        p.setPreferredLanguage("uk");
-        profiles.save(p);
-        return p.getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId);
+        profile.setName("Test");
+        profile.setAvatarSeed("seed");
+        profile.setPreferredLanguage("uk");
+        profiles.save(profile);
+        return profile.getId();
     }
 }

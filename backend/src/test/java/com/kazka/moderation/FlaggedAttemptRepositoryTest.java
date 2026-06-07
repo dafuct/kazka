@@ -28,14 +28,14 @@ class FlaggedAttemptRepositoryTest extends AbstractIT {
         repo.deleteAll();
         entitlementRepo.deleteAll();
         users.deleteAll();
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail("flag-test@example.com");
-        u.setDisplayName("Flag Tester");
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
-        userId = u.getId();
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail("flag-test@example.com");
+        user.setDisplayName("Flag Tester");
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
+        userId = user.getId();
     }
 
     @Test

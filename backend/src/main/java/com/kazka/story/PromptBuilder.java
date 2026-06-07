@@ -1,5 +1,7 @@
 package com.kazka.story;
 
+import com.kazka.child.Character;
+import com.kazka.child.ChildProfile;
 import com.kazka.story.dto.GenerationRequest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -7,6 +9,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Year;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -68,11 +72,11 @@ public class PromptBuilder {
     }
 
     public String buildStoryUserMessage(GenerationRequest req,
-                                        com.kazka.child.ChildProfile child,
-                                        java.util.List<com.kazka.child.Character> recurringCast) {
+                                        ChildProfile child,
+                                        List<Character> recurringCast) {
         int words = LENGTH_WORDS.getOrDefault(req.length(), 600);
         String characters = String.join(", ", req.characters());
-        int currentYear = java.time.Year.now().getValue();
+        int currentYear = Year.now().getValue();
         Integer approxAge = (child != null && child.getBirthYear() != null)
                 ? (currentYear - child.getBirthYear())
                 : null;
@@ -109,7 +113,7 @@ public class PromptBuilder {
     }
 
     /** Resolves the language for generation. 'bilingual' is accepted for storage but treated as 'uk' until Spec H. */
-    public String resolveLanguage(com.kazka.child.ChildProfile child, String requestedLanguage) {
+    public String resolveLanguage(ChildProfile child, String requestedLanguage) {
         if (requestedLanguage != null && !requestedLanguage.isBlank() && !"bilingual".equals(requestedLanguage)) {
             return requestedLanguage;
         }
@@ -145,8 +149,8 @@ public class PromptBuilder {
     private static String readResource(String path) {
         try {
             return new ClassPathResource(path).getContentAsString(StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Cannot read prompt file: " + path, e);
+        } catch (IOException ioException) {
+            throw new UncheckedIOException("Cannot read prompt file: " + path, ioException);
         }
     }
 }

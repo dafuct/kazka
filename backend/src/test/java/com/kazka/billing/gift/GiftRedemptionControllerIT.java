@@ -85,23 +85,23 @@ class GiftRedemptionControllerIT extends AbstractIT {
     }
 
     private void seedCode(String code, int days, GiftCodeStatus status) {
-        GiftCode g = new GiftCode();
-        g.setCode(code);
-        g.setDurationDays(days);
-        g.setStatus(status);
-        codes.save(g);
+        GiftCode giftCode = new GiftCode();
+        giftCode.setCode(code);
+        giftCode.setDurationDays(days);
+        giftCode.setStatus(status);
+        codes.save(giftCode);
     }
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test.example");
-        u.setDisplayName("Tester");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test.example");
+        user.setDisplayName("Tester");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 

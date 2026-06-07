@@ -1,5 +1,9 @@
 package com.kazka.story;
 
+import com.kazka.child.ExtractionStatus;
+import com.kazka.child.ExtractionStatusConverter;
+import com.kazka.story.branching.BranchingChoicesConverter;
+import com.kazka.story.branching.dto.BranchingChoice;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -52,9 +56,9 @@ public class Story {
     @Column(name = "child_profile_id", length = 36)
     private String childProfileId;
 
-    @Convert(converter = com.kazka.child.ExtractionStatusConverter.class)
+    @Convert(converter = ExtractionStatusConverter.class)
     @Column(name = "extraction_status", length = 20, nullable = false)
-    private com.kazka.child.ExtractionStatus extractionStatus = com.kazka.child.ExtractionStatus.PENDING;
+    private ExtractionStatus extractionStatus = ExtractionStatus.PENDING;
 
     @Column(name = "is_branching", nullable = false)
     private boolean isBranching = false;
@@ -62,9 +66,9 @@ public class Story {
     @Column(name = "branching_state", nullable = false, length = 20)
     private String branchingState = "complete";
 
-    @Convert(converter = com.kazka.story.branching.BranchingChoicesConverter.class)
+    @Convert(converter = BranchingChoicesConverter.class)
     @Column(name = "pending_choices", columnDefinition = "JSON")
-    private java.util.List<com.kazka.story.branching.dto.BranchingChoice> pendingChoices;
+    private List<BranchingChoice> pendingChoices;
 
     @Column(name = "translated_content", columnDefinition = "TEXT")
     private String translatedContent;

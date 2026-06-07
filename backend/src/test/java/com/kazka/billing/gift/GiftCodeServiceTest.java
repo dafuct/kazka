@@ -39,11 +39,11 @@ class GiftCodeServiceTest {
     }
 
     private GiftCode available(String code, int days) {
-        GiftCode g = new GiftCode();
-        g.setCode(code);
-        g.setDurationDays(days);
-        g.setStatus(GiftCodeStatus.AVAILABLE);
-        return g;
+        GiftCode giftCode = new GiftCode();
+        giftCode.setCode(code);
+        giftCode.setDurationDays(days);
+        giftCode.setStatus(GiftCodeStatus.AVAILABLE);
+        return giftCode;
     }
 
     @Test
@@ -58,9 +58,9 @@ class GiftCodeServiceTest {
 
     @Test
     void redeem_410_when_already_redeemed() {
-        GiftCode g = available("X", 30);
-        g.setStatus(GiftCodeStatus.REDEEMED);
-        when(codes.findByCodeForUpdate("X")).thenReturn(Optional.of(g));
+        GiftCode giftCode = available("X", 30);
+        giftCode.setStatus(GiftCodeStatus.REDEEMED);
+        when(codes.findByCodeForUpdate("X")).thenReturn(Optional.of(giftCode));
 
         assertThatThrownBy(() -> svc.redeem("X", user()))
                 .isInstanceOf(ResponseStatusException.class)
@@ -70,9 +70,9 @@ class GiftCodeServiceTest {
 
     @Test
     void redeem_410_when_expired() {
-        GiftCode g = available("X", 30);
-        g.setExpiresAt(Instant.now().minusSeconds(60));
-        when(codes.findByCodeForUpdate("X")).thenReturn(Optional.of(g));
+        GiftCode giftCode = available("X", 30);
+        giftCode.setExpiresAt(Instant.now().minusSeconds(60));
+        when(codes.findByCodeForUpdate("X")).thenReturn(Optional.of(giftCode));
 
         assertThatThrownBy(() -> svc.redeem("X", user()))
                 .isInstanceOf(ResponseStatusException.class)
@@ -82,8 +82,8 @@ class GiftCodeServiceTest {
 
     @Test
     void redeem_happy_path_creates_new_entitlement() {
-        GiftCode g = available("CODE1234", 30);
-        when(codes.findByCodeForUpdate("CODE1234")).thenReturn(Optional.of(g));
+        GiftCode giftCode = available("CODE1234", 30);
+        when(codes.findByCodeForUpdate("CODE1234")).thenReturn(Optional.of(giftCode));
         when(entitlements.findActiveByUserId("u1")).thenReturn(Optional.empty());
         when(entitlements.save(any(UserEntitlement.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -91,8 +91,8 @@ class GiftCodeServiceTest {
 
         assertThat(result.durationDays()).isEqualTo(30);
         assertThat(result.expiresAt()).isAfter(Instant.now());
-        assertThat(g.getStatus()).isEqualTo(GiftCodeStatus.REDEEMED);
-        assertThat(g.getRedeemedBy()).isEqualTo("u1");
+        assertThat(giftCode.getStatus()).isEqualTo(GiftCodeStatus.REDEEMED);
+        assertThat(giftCode.getRedeemedBy()).isEqualTo("u1");
 
         ArgumentCaptor<UserEntitlement> captor = ArgumentCaptor.forClass(UserEntitlement.class);
         verify(entitlements).save(captor.capture());
@@ -104,8 +104,8 @@ class GiftCodeServiceTest {
 
     @Test
     void redeem_extends_existing_active_entitlement() {
-        GiftCode g = available("EXTEND", 30);
-        when(codes.findByCodeForUpdate("EXTEND")).thenReturn(Optional.of(g));
+        GiftCode giftCode = available("EXTEND", 30);
+        when(codes.findByCodeForUpdate("EXTEND")).thenReturn(Optional.of(giftCode));
 
         UserEntitlement existing = new UserEntitlement();
         existing.setId("e1");

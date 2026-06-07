@@ -17,9 +17,9 @@ public record ChildProfileDto(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) long characterCount,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant createdAt
 ) {
-    public static ChildProfileDto from(ChildProfile p, long characterCount) {
-        return new ChildProfileDto(p.getId(), p.getName(), p.getBirthYear(), p.getGender(),
-                p.getPreferredLanguage(), p.getInterests(), p.getAvatarSeed(),
-                characterCount, p.getCreatedAt());
+    public static ChildProfileDto from(ChildProfile profile, long characterCount) {
+        return new ChildProfileDto(profile.getId(), profile.getName(), profile.getBirthYear(), profile.getGender(),
+                profile.getPreferredLanguage(), profile.getInterests(), profile.getAvatarSeed(),
+                characterCount, profile.getCreatedAt());
     }
 }

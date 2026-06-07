@@ -80,8 +80,8 @@ class EntitlementResolverTest {
     }
 
     private static User user(UserRole role) {
-        User u = new User();
-        u.setRole(role);
-        return u;
+        User user = new User();
+        user.setRole(role);
+        return user;
     }
 }

@@ -41,10 +41,10 @@ public class StoryCharacter {
             this.characterId = characterId;
         }
 
-        @Override public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Id i)) return false;
-            return Objects.equals(storyId, i.storyId) && Objects.equals(characterId, i.characterId);
+        @Override public boolean equals(Object other) {
+            if (this == other) return true;
+            if (!(other instanceof Id otherId)) return false;
+            return Objects.equals(storyId, otherId.storyId) && Objects.equals(characterId, otherId.characterId);
         }
         @Override public int hashCode() { return Objects.hash(storyId, characterId); }
     }

@@ -28,7 +28,7 @@ public interface StoryRepository extends JpaRepository<Story, String> {
     Page<Story> findAllByUserIdAndChildProfileIdIsNullOrderByCreatedAtDesc(
             String userId, Pageable pageable);
 
-    java.util.Optional<Story> findFirstByChildProfileIdOrderByCreatedAtDesc(String childProfileId);
+    Optional<Story> findFirstByChildProfileIdOrderByCreatedAtDesc(String childProfileId);
 
     @Query("SELECT s FROM Story s WHERE s.userId = :userId " +
            "AND (:createdAt IS NULL OR (s.createdAt < :createdAt OR (s.createdAt = :createdAt AND s.id < :id))) " +

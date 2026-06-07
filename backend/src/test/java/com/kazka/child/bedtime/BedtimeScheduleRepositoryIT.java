@@ -29,12 +29,12 @@ class BedtimeScheduleRepositoryIT extends AbstractIT {
     @Test
     void should_round_trip_themes_json() {
         String profileId = seedProfile();
-        BedtimeSchedule s = new BedtimeSchedule();
-        s.setChildProfileId(profileId);
-        s.setEnabled(true);
-        s.setThemes(List.of("dragons", "коти"));
-        s.setNextRunAt(Instant.now().plusSeconds(60));
-        repo.save(s);
+        BedtimeSchedule schedule = new BedtimeSchedule();
+        schedule.setChildProfileId(profileId);
+        schedule.setEnabled(true);
+        schedule.setThemes(List.of("dragons", "коти"));
+        schedule.setNextRunAt(Instant.now().plusSeconds(60));
+        repo.save(schedule);
 
         BedtimeSchedule loaded = repo.findByChildProfileId(profileId).orElseThrow();
         assertThat(loaded.getThemes()).containsExactly("dragons", "коти");
@@ -43,12 +43,12 @@ class BedtimeScheduleRepositoryIT extends AbstractIT {
     @Test
     void should_find_due_schedules_within_window() {
         String profileId = seedProfile();
-        BedtimeSchedule s = new BedtimeSchedule();
-        s.setChildProfileId(profileId);
-        s.setEnabled(true);
-        s.setThemes(List.of());
-        s.setNextRunAt(Instant.now().minusSeconds(60));
-        repo.save(s);
+        BedtimeSchedule schedule = new BedtimeSchedule();
+        schedule.setChildProfileId(profileId);
+        schedule.setEnabled(true);
+        schedule.setThemes(List.of());
+        schedule.setNextRunAt(Instant.now().minusSeconds(60));
+        repo.save(schedule);
 
         Instant now = Instant.now();
         Instant horizon = now.minus(Duration.ofHours(1));
@@ -59,12 +59,12 @@ class BedtimeScheduleRepositoryIT extends AbstractIT {
     @Test
     void should_skip_disabled_schedules() {
         String profileId = seedProfile();
-        BedtimeSchedule s = new BedtimeSchedule();
-        s.setChildProfileId(profileId);
-        s.setEnabled(false);
-        s.setThemes(List.of());
-        s.setNextRunAt(Instant.now().minusSeconds(60));
-        repo.save(s);
+        BedtimeSchedule schedule = new BedtimeSchedule();
+        schedule.setChildProfileId(profileId);
+        schedule.setEnabled(false);
+        schedule.setThemes(List.of());
+        schedule.setNextRunAt(Instant.now().minusSeconds(60));
+        repo.save(schedule);
 
         List<BedtimeSchedule> due = repo.findDueForSweep(Instant.now(), Instant.now().minus(Duration.ofHours(1)));
         assertThat(due).extracting(BedtimeSchedule::getChildProfileId).doesNotContain(profileId);
@@ -73,12 +73,12 @@ class BedtimeScheduleRepositoryIT extends AbstractIT {
     @Test
     void should_skip_when_outside_one_hour_horizon() {
         String profileId = seedProfile();
-        BedtimeSchedule s = new BedtimeSchedule();
-        s.setChildProfileId(profileId);
-        s.setEnabled(true);
-        s.setThemes(List.of());
-        s.setNextRunAt(Instant.now().minus(Duration.ofHours(2)));
-        repo.save(s);
+        BedtimeSchedule schedule = new BedtimeSchedule();
+        schedule.setChildProfileId(profileId);
+        schedule.setEnabled(true);
+        schedule.setThemes(List.of());
+        schedule.setNextRunAt(Instant.now().minus(Duration.ofHours(2)));
+        repo.save(schedule);
 
         List<BedtimeSchedule> due = repo.findDueForSweep(Instant.now(), Instant.now().minus(Duration.ofHours(1)));
         assertThat(due).extracting(BedtimeSchedule::getChildProfileId).doesNotContain(profileId);
@@ -99,23 +99,23 @@ class BedtimeScheduleRepositoryIT extends AbstractIT {
     }
 
     private BedtimeSchedule enabledSchedule(String profileId) {
-        BedtimeSchedule s = new BedtimeSchedule();
-        s.setChildProfileId(profileId);
-        s.setEnabled(true);
-        s.setThemes(List.of());
-        return s;
+        BedtimeSchedule schedule = new BedtimeSchedule();
+        schedule.setChildProfileId(profileId);
+        schedule.setEnabled(true);
+        schedule.setThemes(List.of());
+        return schedule;
     }
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test");
-        u.setDisplayName("T");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test");
+        user.setDisplayName("T");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
@@ -124,12 +124,12 @@ class BedtimeScheduleRepositoryIT extends AbstractIT {
     }
 
     private String seedProfile(String userId) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId);
-        p.setName("T");
-        p.setAvatarSeed("s");
-        p.setPreferredLanguage("uk");
-        return profiles.save(p).getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId);
+        profile.setName("T");
+        profile.setAvatarSeed("s");
+        profile.setPreferredLanguage("uk");
+        return profiles.save(profile).getId();
     }
 }

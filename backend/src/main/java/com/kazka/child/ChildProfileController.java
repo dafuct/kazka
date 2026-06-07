@@ -27,8 +27,8 @@ public class ChildProfileController {
         return currentUserResolver.requireUser()
                 .flatMap(cu -> Mono.fromCallable(() -> {
                     rateLimiter.assertAndIncrement(cu.userId());
-                    ChildProfile p = svc.create(cu.userId(), req);
-                    return ChildProfileDto.from(p, svc.countCharacters(p.getId()));
+                    ChildProfile profile = svc.create(cu.userId(), req);
+                    return ChildProfileDto.from(profile, svc.countCharacters(profile.getId()));
                 }).subscribeOn(Schedulers.boundedElastic()));
     }
 
@@ -36,7 +36,7 @@ public class ChildProfileController {
     public Mono<List<ChildProfileDto>> list() {
         return currentUserResolver.requireUser()
                 .flatMap(cu -> Mono.fromCallable(() -> svc.listActive(cu.userId()).stream()
-                        .map(p -> ChildProfileDto.from(p, svc.countCharacters(p.getId())))
+                        .map(profile -> ChildProfileDto.from(profile, svc.countCharacters(profile.getId())))
                         .toList()
                 ).subscribeOn(Schedulers.boundedElastic()));
     }
@@ -45,8 +45,8 @@ public class ChildProfileController {
     public Mono<ChildProfileDto> findById(@PathVariable String id) {
         return currentUserResolver.requireUser()
                 .flatMap(cu -> Mono.fromCallable(() -> {
-                    ChildProfile p = svc.requireOwned(id, cu.userId());
-                    return ChildProfileDto.from(p, svc.countCharacters(p.getId()));
+                    ChildProfile profile = svc.requireOwned(id, cu.userId());
+                    return ChildProfileDto.from(profile, svc.countCharacters(profile.getId()));
                 }).subscribeOn(Schedulers.boundedElastic()));
     }
 
@@ -54,8 +54,8 @@ public class ChildProfileController {
     public Mono<ChildProfileDto> update(@PathVariable String id, @Valid @RequestBody UpdateChildProfileRequest req) {
         return currentUserResolver.requireUser()
                 .flatMap(cu -> Mono.fromCallable(() -> {
-                    ChildProfile p = svc.update(id, cu.userId(), req);
-                    return ChildProfileDto.from(p, svc.countCharacters(p.getId()));
+                    ChildProfile profile = svc.update(id, cu.userId(), req);
+                    return ChildProfileDto.from(profile, svc.countCharacters(profile.getId()));
                 }).subscribeOn(Schedulers.boundedElastic()));
     }
 

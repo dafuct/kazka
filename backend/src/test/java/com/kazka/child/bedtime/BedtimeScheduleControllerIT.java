@@ -49,8 +49,8 @@ class BedtimeScheduleControllerIT extends AbstractIT {
 
     @Test
     void should_return_empty_schedule_when_never_configured() {
-        var c = authedClient(userA);
-        c.get().uri("/api/children/" + profileA + "/bedtime").exchange()
+        var client = authedClient(userA);
+        client.get().uri("/api/children/" + profileA + "/bedtime").exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.enabled").isEqualTo(false)
@@ -60,12 +60,12 @@ class BedtimeScheduleControllerIT extends AbstractIT {
 
     @Test
     void should_upsert_and_then_return_persisted_values() {
-        var c = authedClient(userA);
-        c.put().uri("/api/children/" + profileA + "/bedtime")
+        var client = authedClient(userA);
+        client.put().uri("/api/children/" + profileA + "/bedtime")
                 .bodyValue(new BedtimeUpdateRequest(true, "21:00", "Europe/Warsaw", List.of("dragons"), true))
                 .exchange().expectStatus().isOk();
 
-        c.get().uri("/api/children/" + profileA + "/bedtime").exchange()
+        client.get().uri("/api/children/" + profileA + "/bedtime").exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.enabled").isEqualTo(true)
@@ -78,48 +78,48 @@ class BedtimeScheduleControllerIT extends AbstractIT {
     @Test
     void should_return402_when_freeTier_enables() {
         when(entitlements.isPro(userA)).thenReturn(false);
-        var c = authedClient(userA);
-        c.put().uri("/api/children/" + profileA + "/bedtime")
+        var client = authedClient(userA);
+        client.put().uri("/api/children/" + profileA + "/bedtime")
                 .bodyValue(new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of(), true))
                 .exchange().expectStatus().isEqualTo(402);
     }
 
     @Test
     void should_return400_on_bad_timezone() {
-        var c = authedClient(userA);
-        c.put().uri("/api/children/" + profileA + "/bedtime")
+        var client = authedClient(userA);
+        client.put().uri("/api/children/" + profileA + "/bedtime")
                 .bodyValue(new BedtimeUpdateRequest(true, "20:30", "Mars/Olympus", List.of(), true))
                 .exchange().expectStatus().isBadRequest();
     }
 
     @Test
     void should_return404_when_accessing_another_users_profile() {
-        var cB = authedClient(userB);
-        cB.get().uri("/api/children/" + profileA + "/bedtime")
+        var clientB = authedClient(userB);
+        clientB.get().uri("/api/children/" + profileA + "/bedtime")
                 .exchange().expectStatus().isNotFound();
-        cB.put().uri("/api/children/" + profileA + "/bedtime")
+        clientB.put().uri("/api/children/" + profileA + "/bedtime")
                 .bodyValue(new BedtimeUpdateRequest(false, "20:30", "Europe/Kyiv", List.of(), true))
                 .exchange().expectStatus().isNotFound();
     }
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test");
-        u.setDisplayName("T");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test");
+        user.setDisplayName("T");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
     private String seedProfile(String userId) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId); p.setName("T"); p.setAvatarSeed("s"); p.setPreferredLanguage("uk");
-        return profiles.save(p).getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId); profile.setName("T"); profile.setAvatarSeed("s"); profile.setPreferredLanguage("uk");
+        return profiles.save(profile).getId();
     }
 
     /**

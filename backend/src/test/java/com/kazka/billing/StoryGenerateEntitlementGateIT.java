@@ -67,25 +67,25 @@ class StoryGenerateEntitlementGateIT extends AbstractIT {
                 .expectStatus().isOk()
                 .expectBody().returnResult();
         MultiValueMap<String, ResponseCookie> cookies = r.getResponseCookies();
-        ResponseCookie c = cookies.getFirst("XSRF-TOKEN");
-        if (c == null) {
+        ResponseCookie xsrfCookie = cookies.getFirst("XSRF-TOKEN");
+        if (xsrfCookie == null) {
             throw new IllegalStateException("No XSRF-TOKEN cookie issued by server");
         }
-        return new Csrf(c.getValue());
+        return new Csrf(xsrfCookie.getValue());
     }
 
     private record Csrf(String token) {}
 
     private User seedUserAtLimit(String email) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setPasswordHash(encoder.encode("password123"));
-        u.setDisplayName("Tester");
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        u.setStoriesThisMonth(5); // at default free limit
-        return users.save(u);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setPasswordHash(encoder.encode("password123"));
+        user.setDisplayName("Tester");
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        user.setStoriesThisMonth(5); // at default free limit
+        return users.save(user);
     }
 
     private String loginBearer(String email) {

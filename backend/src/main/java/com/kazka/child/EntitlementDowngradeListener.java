@@ -2,6 +2,9 @@ package com.kazka.child;
 
 import com.kazka.billing.EntitlementDowngradedEvent;
 import com.kazka.billing.EntitlementResolver;
+import com.kazka.child.bedtime.BedtimeScheduleRepository;
+import com.kazka.story.Story;
+import com.kazka.story.StoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -19,8 +22,8 @@ public class EntitlementDowngradeListener {
 
     private final ChildProfileRepository profiles;
     private final EntitlementResolver entitlements;
-    private final com.kazka.story.StoryRepository stories;
-    private final com.kazka.child.bedtime.BedtimeScheduleRepository bedtimeRepo;
+    private final StoryRepository stories;
+    private final BedtimeScheduleRepository bedtimeRepo;
 
     @EventListener
     @Transactional
@@ -55,7 +58,7 @@ public class EntitlementDowngradeListener {
 
     private Instant mostRecentStoryAt(String childProfileId) {
         return stories.findFirstByChildProfileIdOrderByCreatedAtDesc(childProfileId)
-                .map(com.kazka.story.Story::getCreatedAt)
+                .map(Story::getCreatedAt)
                 .orElse(Instant.EPOCH);
     }
 }

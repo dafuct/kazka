@@ -66,10 +66,10 @@ class GoogleOAuthControllerIT extends AbstractIT {
     static void stopWiremock() { wiremock.stop(); }
 
     @DynamicPropertySource
-    static void googleProps(DynamicPropertyRegistry r) {
-        r.add("kazka.auth.google.jwks-uri", () -> wiremock.baseUrl() + "/oauth2/v3/certs");
-        r.add("kazka.auth.google.ios-client-id", () -> iosClientId);
-        r.add("kazka.auth.google.issuer", () -> "https://accounts.google.com");
+    static void googleProps(DynamicPropertyRegistry registry) {
+        registry.add("kazka.auth.google.jwks-uri", () -> wiremock.baseUrl() + "/oauth2/v3/certs");
+        registry.add("kazka.auth.google.ios-client-id", () -> iosClientId);
+        registry.add("kazka.auth.google.issuer", () -> "https://accounts.google.com");
     }
 
     @BeforeEach

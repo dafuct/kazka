@@ -36,7 +36,7 @@ class StoryCursorPaginationIT extends AbstractIT {
 
     @Test
     void should_pageThrough15Stories_when_cursorWalkedToEnd() {
-        for (int i = 0; i < 15; i++) seedStory(me, "title-" + i);
+        for (int index = 0; index < 15; index++) seedStory(me, "title-" + index);
 
         @SuppressWarnings("rawtypes")
         Map page1 = client().get().uri("/api/stories/cursor?limit=5")
@@ -67,7 +67,7 @@ class StoryCursorPaginationIT extends AbstractIT {
 
     @Test
     void should_returnAllItemsAndNullCursor_when_libraryFitsInOnePage() {
-        for (int i = 0; i < 3; i++) seedStory(me, "only-" + i);
+        for (int index = 0; index < 3; index++) seedStory(me, "only-" + index);
 
         @SuppressWarnings("rawtypes")
         Map only = client().get().uri("/api/stories/cursor?limit=20")
@@ -86,29 +86,29 @@ class StoryCursorPaginationIT extends AbstractIT {
     }
 
     private User seedUser(String email) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setPasswordHash(encoder.encode("password123"));
-        u.setDisplayName("Tester");
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        return users.save(u);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setPasswordHash(encoder.encode("password123"));
+        user.setDisplayName("Tester");
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        return users.save(user);
     }
 
-    private Story seedStory(User user, String title) {
-        Story s = new Story();
-        s.setId(UUID.randomUUID().toString());
-        s.setUserId(user.getId());
-        s.setTitle(title);
-        s.setTheme("test theme");
-        s.setCharacters(java.util.List.of("Friend"));
-        s.setAgeGroup("3-5");
-        s.setLength("short");
-        s.setLanguage("uk");
-        s.setContent("content body");
-        s.setIllustrationStatus(IllustrationStatus.READY);
-        return stories.save(s);
+    private Story seedStory(User owner, String title) {
+        Story story = new Story();
+        story.setId(UUID.randomUUID().toString());
+        story.setUserId(owner.getId());
+        story.setTitle(title);
+        story.setTheme("test theme");
+        story.setCharacters(java.util.List.of("Friend"));
+        story.setAgeGroup("3-5");
+        story.setLength("short");
+        story.setLanguage("uk");
+        story.setContent("content body");
+        story.setIllustrationStatus(IllustrationStatus.READY);
+        return stories.save(story);
     }
 
     private String loginBearer(String email) {

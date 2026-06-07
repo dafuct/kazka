@@ -24,7 +24,7 @@ public class HolidayCalendar {
             for (int year : candidateYears) {
                 LocalDate hday;
                 try { hday = h.dateRule().computeFor(year); }
-                catch (Exception e) { continue; }  // skip non-leap-year Feb 29 etc.
+                catch (Exception exception) { continue; }  // skip non-leap-year Feb 29 etc.
                 LocalDate start = hday.minusDays(h.daysBefore());
                 LocalDate end   = hday.plusDays(h.daysAfter());
                 if (!today.isBefore(start) && !today.isAfter(end)) {

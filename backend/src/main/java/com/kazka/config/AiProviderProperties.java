@@ -2,6 +2,9 @@ package com.kazka.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+import java.util.List;
+
 /**
  * Config slot for LLM + image providers. Text/editor/scene/judge use Google Gemini 2.5 Flash
  * via the OpenAI-compatible endpoint; comics panels use Google's native Nano Banana endpoint
@@ -96,23 +99,23 @@ public class AiProviderProperties {
 
     public static class Comics {
         private int panelsPerTale = 4;
-        private java.util.List<PanelAspectName> panelAspects =
-            java.util.List.of(PanelAspectName.LANDSCAPE, PanelAspectName.SQUARE,
+        private List<PanelAspectName> panelAspects =
+            List.of(PanelAspectName.LANDSCAPE, PanelAspectName.SQUARE,
                               PanelAspectName.SQUARE, PanelAspectName.LANDSCAPE);
-        private java.time.Duration pipelineTimeout = java.time.Duration.ofSeconds(60);
+        private Duration pipelineTimeout = Duration.ofSeconds(60);
         private int maxConcurrentPerUser = 1;
 
         public int getPanelsPerTale() { return panelsPerTale; }
-        public void setPanelsPerTale(int v) { this.panelsPerTale = v; }
+        public void setPanelsPerTale(int value) { this.panelsPerTale = value; }
 
-        public java.util.List<PanelAspectName> getPanelAspects() { return panelAspects; }
-        public void setPanelAspects(java.util.List<PanelAspectName> v) { this.panelAspects = v; }
+        public List<PanelAspectName> getPanelAspects() { return panelAspects; }
+        public void setPanelAspects(List<PanelAspectName> value) { this.panelAspects = value; }
 
-        public java.time.Duration getPipelineTimeout() { return pipelineTimeout; }
-        public void setPipelineTimeout(java.time.Duration v) { this.pipelineTimeout = v; }
+        public Duration getPipelineTimeout() { return pipelineTimeout; }
+        public void setPipelineTimeout(Duration value) { this.pipelineTimeout = value; }
 
         public int getMaxConcurrentPerUser() { return maxConcurrentPerUser; }
-        public void setMaxConcurrentPerUser(int v) { this.maxConcurrentPerUser = v; }
+        public void setMaxConcurrentPerUser(int value) { this.maxConcurrentPerUser = value; }
     }
 
     /** Lower-cased mirror of com.kazka.comics.PanelAspect for property binding. */

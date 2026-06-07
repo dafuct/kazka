@@ -51,9 +51,9 @@ class TranslationControllerIT extends AbstractIT {
     @Test
     void paid_user_translates_uk_to_en_and_persists() {
         when(entitlements.isPro(userId)).thenReturn(true);
-        Story s = seedStory(userId, "uk", "Жив-був дракон.");
+        Story story = seedStory(userId, "uk", "Жив-був дракон.");
 
-        authedClient(userId).post().uri("/api/stories/" + s.getId() + "/translate")
+        authedClient(userId).post().uri("/api/stories/" + story.getId() + "/translate")
                 .bodyValue(new TranslateRequest("en"))
                 .exchange()
                 .expectStatus().isOk()
@@ -61,7 +61,7 @@ class TranslationControllerIT extends AbstractIT {
                 .jsonPath("$.translatedLanguage").isEqualTo("en")
                 .jsonPath("$.translatedContent").isEqualTo("Once upon a time, a dragon lived.");
 
-        var saved = stories.findById(s.getId()).orElseThrow();
+        var saved = stories.findById(story.getId()).orElseThrow();
         assertThat(saved.getTranslatedLanguage()).isEqualTo("en");
         assertThat(saved.getTranslatedContent()).isEqualTo("Once upon a time, a dragon lived.");
     }
@@ -69,9 +69,9 @@ class TranslationControllerIT extends AbstractIT {
     @Test
     void free_user_gets_402() {
         when(entitlements.isPro(userId)).thenReturn(false);
-        Story s = seedStory(userId, "uk", "Жив-був дракон.");
+        Story story = seedStory(userId, "uk", "Жив-був дракон.");
 
-        authedClient(userId).post().uri("/api/stories/" + s.getId() + "/translate")
+        authedClient(userId).post().uri("/api/stories/" + story.getId() + "/translate")
                 .bodyValue(new TranslateRequest("en"))
                 .exchange()
                 .expectStatus().isEqualTo(402);
@@ -80,9 +80,9 @@ class TranslationControllerIT extends AbstractIT {
     @Test
     void same_language_gets_400() {
         when(entitlements.isPro(userId)).thenReturn(true);
-        Story s = seedStory(userId, "uk", "Жив-був дракон.");
+        Story story = seedStory(userId, "uk", "Жив-був дракон.");
 
-        authedClient(userId).post().uri("/api/stories/" + s.getId() + "/translate")
+        authedClient(userId).post().uri("/api/stories/" + story.getId() + "/translate")
                 .bodyValue(new TranslateRequest("uk"))
                 .exchange()
                 .expectStatus().isBadRequest();
@@ -92,34 +92,34 @@ class TranslationControllerIT extends AbstractIT {
     void other_users_story_gets_404() {
         when(entitlements.isPro(userId)).thenReturn(true);
         String otherUser = seedUser();
-        Story s = seedStory(otherUser, "uk", "Жив-був дракон.");
+        Story story = seedStory(otherUser, "uk", "Жив-був дракон.");
 
-        authedClient(userId).post().uri("/api/stories/" + s.getId() + "/translate")
+        authedClient(userId).post().uri("/api/stories/" + story.getId() + "/translate")
                 .bodyValue(new TranslateRequest("en"))
                 .exchange()
                 .expectStatus().isNotFound();
     }
 
     private Story seedStory(String ownerId, String language, String content) {
-        Story s = new Story();
-        s.setId(UUID.randomUUID().toString());
-        s.setUserId(ownerId); s.setTitle("t"); s.setTheme("th");
-        s.setCharacters(List.of("дракон"));
-        s.setAgeGroup("6-8"); s.setLength("short"); s.setLanguage(language);
-        s.setContent(content);
-        return stories.save(s);
+        Story story = new Story();
+        story.setId(UUID.randomUUID().toString());
+        story.setUserId(ownerId); story.setTitle("t"); story.setTheme("th");
+        story.setCharacters(List.of("дракон"));
+        story.setAgeGroup("6-8"); story.setLength("short"); story.setLanguage(language);
+        story.setContent(content);
+        return stories.save(story);
     }
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test.example");
-        u.setDisplayName("Tester");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test.example");
+        user.setDisplayName("Tester");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 

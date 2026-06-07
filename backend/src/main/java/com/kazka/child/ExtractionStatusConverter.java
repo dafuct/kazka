@@ -11,7 +11,7 @@ public class ExtractionStatusConverter implements AttributeConverter<ExtractionS
     }
 
     @Override
-    public ExtractionStatus convertToEntityAttribute(String s) {
-        return s == null ? null : ExtractionStatus.valueOf(s.toUpperCase());
+    public ExtractionStatus convertToEntityAttribute(String dbValue) {
+        return dbValue == null ? null : ExtractionStatus.valueOf(dbValue.toUpperCase());
     }
 }

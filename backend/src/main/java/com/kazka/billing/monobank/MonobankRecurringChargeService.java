@@ -59,20 +59,20 @@ public class MonobankRecurringChargeService {
         List<UserEntitlement> due = entitlements.findDueForRenewal(now, PageRequest.of(0, BATCH_SIZE));
         if (due.isEmpty()) return;
         log.info("Monobank recurring tick: {} entitlements due", due.size());
-        for (UserEntitlement e : due) {
-            chargeOne(e);
+        for (UserEntitlement entitlement : due) {
+            chargeOne(entitlement);
         }
     }
 
-    private void chargeOne(UserEntitlement e) {
-        SubscriptionProduct product = products.findById(e.getProductId()).orElse(null);
+    private void chargeOne(UserEntitlement entitlement) {
+        SubscriptionProduct product = products.findById(entitlement.getProductId()).orElse(null);
         if (product == null) {
-            log.warn("Recurring charge: no product for entitlement {}", e.getId());
+            log.warn("Recurring charge: no product for entitlement {}", entitlement.getId());
             return;
         }
-        String key = idempotencyKey(e.getUserId());
+        String key = idempotencyKey(entitlement.getUserId());
         MonobankChargeResult result = monobank.chargeToken(
-                e.getMonobankWalletId(), e.getMonobankCardToken(),
+                entitlement.getMonobankWalletId(), entitlement.getMonobankCardToken(),
                 product.getPriceMicro(), product.getCurrency(),
                 key, key).block();
         if (result instanceof MonobankChargeResult.Accepted) {
@@ -82,18 +82,18 @@ public class MonobankRecurringChargeService {
             failureCounter.increment();
             int max = props.monobank().recurring() != null
                     ? props.monobank().recurring().graceMaxRetries() : 3;
-            int retries = e.getRenewalRetryCount() + 1;
-            e.setRenewalRetryCount(retries);
+            int retries = entitlement.getRenewalRetryCount() + 1;
+            entitlement.setRenewalRetryCount(retries);
             if (retries < max) {
-                e.setNextRenewalAt(Instant.now().plus(Duration.ofDays(1)));
+                entitlement.setNextRenewalAt(Instant.now().plus(Duration.ofDays(1)));
             } else {
-                e.setNextRenewalAt(null);
+                entitlement.setNextRenewalAt(null);
             }
             // State stays ACTIVE — user keeps Pro until expires_at.
-            entitlements.save(e);
-        } else if (result instanceof MonobankChargeResult.Transient t) {
+            entitlements.save(entitlement);
+        } else if (result instanceof MonobankChargeResult.Transient transientResult) {
             transientCounter.increment();
-            log.warn("Recurring charge transient failure for entitlement {}: {}", e.getId(), t.reason());
+            log.warn("Recurring charge transient failure for entitlement {}: {}", entitlement.getId(), transientResult.reason());
         }
     }
 

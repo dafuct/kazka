@@ -14,6 +14,7 @@ import org.springframework.security.web.server.context.WebSessionServerSecurityC
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.util.Map;
 import java.util.Objects;
 
 class JsonLoginSuccessHandler implements ServerAuthenticationSuccessHandler {
@@ -44,10 +45,10 @@ class JsonLoginSuccessHandler implements ServerAuthenticationSuccessHandler {
         resp.setStatusCode(HttpStatus.OK);
         resp.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         try {
-            byte[] body = mapper.writeValueAsBytes(java.util.Map.of("user", dto));
+            byte[] body = mapper.writeValueAsBytes(Map.of("user", dto));
             return resp.writeWith(Mono.just(resp.bufferFactory().wrap(body)));
-        } catch (Exception e) {
-            return Mono.error(e);
+        } catch (Exception exception) {
+            return Mono.error(exception);
         }
     }
 }

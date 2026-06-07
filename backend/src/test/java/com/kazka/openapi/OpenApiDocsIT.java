@@ -15,7 +15,7 @@ class OpenApiDocsIT extends AbstractIT {
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
-                .jsonPath("$.openapi").value((String s) -> assertThat(s).startsWith("3."))
+                .jsonPath("$.openapi").value((String version) -> assertThat(version).startsWith("3."))
                 .jsonPath("$.info.title").exists();
     }
 

@@ -75,10 +75,10 @@ public class GoogleIdTokenVerifier {
                     claims.get("email", String.class),
                     emailVerifiedClaim != null && emailVerifiedClaim,
                     claims.get("name", String.class));
-        } catch (InvalidGoogleTokenException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new InvalidGoogleTokenException(e.getMessage());
+        } catch (InvalidGoogleTokenException invalidGoogleTokenException) {
+            throw invalidGoogleTokenException;
+        } catch (Exception exception) {
+            throw new InvalidGoogleTokenException(exception.getMessage());
         }
     }
 
@@ -86,9 +86,9 @@ public class GoogleIdTokenVerifier {
         if (!"RSA".equals(jwk.get("kty").asText())) {
             return null;
         }
-        BigInteger n = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("n").asText()));
-        BigInteger e = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("e").asText()));
-        return KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(n, e));
+        BigInteger modulus = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("n").asText()));
+        BigInteger publicExponent = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("e").asText()));
+        return KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(modulus, publicExponent));
     }
 
     public record Verified(String subject, String email, boolean emailVerified, String name) {}

@@ -106,22 +106,22 @@ public class PayProWebhookController {
                 return;
             }
 
-            UserEntitlement e = entitlements.findByOriginalTransactionId(subscriptionId).orElseGet(() -> {
-                UserEntitlement n = new UserEntitlement();
-                n.setId(UUID.randomUUID().toString());
-                n.setUserId(userId);
-                n.setProductId(product.getId());
-                n.setOriginalTransactionId(subscriptionId);
-                n.setSource(EntitlementSource.PAYPRO);
-                return n;
+            UserEntitlement entitlement = entitlements.findByOriginalTransactionId(subscriptionId).orElseGet(() -> {
+                UserEntitlement newEntitlement = new UserEntitlement();
+                newEntitlement.setId(UUID.randomUUID().toString());
+                newEntitlement.setUserId(userId);
+                newEntitlement.setProductId(product.getId());
+                newEntitlement.setOriginalTransactionId(subscriptionId);
+                newEntitlement.setSource(EntitlementSource.PAYPRO);
+                return newEntitlement;
             });
-            e.setState(state);
+            entitlement.setState(state);
             Instant expires = parseExpires(ipn.get("SUBSCRIPTION_NEXT_CHARGE_DATE"));
-            if (expires != null) e.setExpiresAt(expires);
+            if (expires != null) entitlement.setExpiresAt(expires);
             else if (state == EntitlementState.REVOKED || state == EntitlementState.EXPIRED) {
-                e.setExpiresAt(Instant.now());
+                entitlement.setExpiresAt(Instant.now());
             }
-            entitlements.save(e);
+            entitlements.save(entitlement);
             log.info("PayPro IPN processed: type={} sub={} userId={} state={}", typeName, subscriptionId, userId, state);
         } catch (Exception ex) {
             log.warn("PayPro IPN processing failed: {}", ex.getMessage(), ex);
@@ -144,16 +144,16 @@ public class PayProWebhookController {
         for (String pair : raw.split("&")) {
             int eq = pair.indexOf('=');
             if (eq < 0) continue;
-            String k = URLDecoder.decode(pair.substring(0, eq), StandardCharsets.UTF_8);
-            String v = URLDecoder.decode(pair.substring(eq + 1), StandardCharsets.UTF_8);
-            out.put(k, v);
+            String key = URLDecoder.decode(pair.substring(0, eq), StandardCharsets.UTF_8);
+            String value = URLDecoder.decode(pair.substring(eq + 1), StandardCharsets.UTF_8);
+            out.put(key, value);
         }
         return out;
     }
 
-    private static Instant parseExpires(String s) {
-        if (s == null || s.isBlank()) return null;
-        try { return Instant.parse(s); }
-        catch (DateTimeParseException e) { return null; }
+    private static Instant parseExpires(String dateString) {
+        if (dateString == null || dateString.isBlank()) return null;
+        try { return Instant.parse(dateString); }
+        catch (DateTimeParseException dateTimeParseException) { return null; }
     }
 }

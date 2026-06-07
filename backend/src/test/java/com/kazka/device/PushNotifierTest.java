@@ -85,7 +85,7 @@ class PushNotifierTest {
         verify(apnsClient, org.mockito.Mockito.times(2)).sendNotification(captor.capture());
         assertThat(captor.getAllValues()).extracting(SimpleApnsPushNotification::getToken)
                 .containsExactlyInAnyOrder(tokenA, tokenB);
-        assertThat(captor.getAllValues()).allMatch(n -> n.getPayload().contains("story-1"));
+        assertThat(captor.getAllValues()).allMatch(notification -> notification.getPayload().contains("story-1"));
     }
 
     private DeviceToken deviceToken(String token) {

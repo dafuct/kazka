@@ -33,31 +33,31 @@ class StoryChildExtractionPersistenceIT extends AbstractIT {
 
     @Test
     void should_round_trip_extractionStatus_and_childProfileId() {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(u.getId() + "@test");
-        u.setDisplayName("T");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(user.getId() + "@test");
+        user.setDisplayName("T");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
 
-        Story s = new Story();
-        s.setId(UUID.randomUUID().toString());
-        s.setUserId(u.getId());
-        s.setTitle("t");
-        s.setTheme("th");
-        s.setCharacters(List.of("c"));
-        s.setAgeGroup("6-8");
-        s.setLength("short");
-        s.setLanguage("uk");
-        s.setContent("body");
-        s.setExtractionStatus(ExtractionStatus.RUNNING);
+        Story story = new Story();
+        story.setId(UUID.randomUUID().toString());
+        story.setUserId(user.getId());
+        story.setTitle("t");
+        story.setTheme("th");
+        story.setCharacters(List.of("c"));
+        story.setAgeGroup("6-8");
+        story.setLength("short");
+        story.setLanguage("uk");
+        story.setContent("body");
+        story.setExtractionStatus(ExtractionStatus.RUNNING);
         // child_profile_id stays null — column is nullable
 
-        repo.save(s);
+        repo.save(story);
 
-        Story loaded = repo.findById(s.getId()).orElseThrow();
+        Story loaded = repo.findById(story.getId()).orElseThrow();
         assertThat(loaded.getExtractionStatus()).isEqualTo(ExtractionStatus.RUNNING);
         assertThat(loaded.getChildProfileId()).isNull();
     }

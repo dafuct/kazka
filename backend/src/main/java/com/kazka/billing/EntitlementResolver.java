@@ -18,15 +18,15 @@ public class EntitlementResolver {
     @Transactional(readOnly = true)
     public boolean isPro(String userId) {
         // Admins implicitly have Pro access across every gate that calls isPro().
-        if (users.findById(userId).map(u -> u.getRole() == UserRole.ADMIN).orElse(false)) {
+        if (users.findById(userId).map(user -> user.getRole() == UserRole.ADMIN).orElse(false)) {
             return true;
         }
         return entitlements.findSummariesByUserId(userId).stream().anyMatch(this::isActiveOrInGrace);
     }
 
-    private boolean isActiveOrInGrace(UserEntitlementRepository.EntitlementSummary e) {
-        if (e.getState() == EntitlementState.GRACE) return true;
-        if (e.getState() != EntitlementState.ACTIVE) return false;
-        return e.getExpiresAt() == null || e.getExpiresAt().isAfter(Instant.now());
+    private boolean isActiveOrInGrace(UserEntitlementRepository.EntitlementSummary summary) {
+        if (summary.getState() == EntitlementState.GRACE) return true;
+        if (summary.getState() != EntitlementState.ACTIVE) return false;
+        return summary.getExpiresAt() == null || summary.getExpiresAt().isAfter(Instant.now());
     }
 }

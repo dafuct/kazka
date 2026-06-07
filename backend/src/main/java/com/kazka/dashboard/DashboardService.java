@@ -4,6 +4,7 @@ import com.kazka.auth.CurrentUserResolver.CurrentUser;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
+import com.kazka.child.bedtime.BedtimeSchedule;
 import com.kazka.child.bedtime.BedtimeScheduleRepository;
 import com.kazka.comics.StoryPanel;
 import com.kazka.comics.StoryPanelRepository;
@@ -71,15 +72,15 @@ public class DashboardService {
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
-    private DashboardDto.ChildSummary summarize(ChildProfile c) {
-        long count = stories.countByChildProfileId(c.getId());
-        StoryDto latest = stories.findFirstByChildProfileIdOrderByCreatedAtDesc(c.getId())
-                .map(s -> StoryDto.from(s, panelRepository.findByStoryIdOrderByPanelIndexAsc(s.getId()), images))
+    private DashboardDto.ChildSummary summarize(ChildProfile profile) {
+        long count = stories.countByChildProfileId(profile.getId());
+        StoryDto latest = stories.findFirstByChildProfileIdOrderByCreatedAtDesc(profile.getId())
+                .map(story -> StoryDto.from(story, panelRepository.findByStoryIdOrderByPanelIndexAsc(story.getId()), images))
                 .orElse(null);
-        Instant lastBedtimeAt = bedtimeSchedules.findByChildProfileId(c.getId())
-                .map(b -> b.getLastSentAt())
+        Instant lastBedtimeAt = bedtimeSchedules.findByChildProfileId(profile.getId())
+                .map(BedtimeSchedule::getLastSentAt)
                 .orElse(null);
-        return new DashboardDto.ChildSummary(c.getId(), c.getName(), count, latest, lastBedtimeAt);
+        return new DashboardDto.ChildSummary(profile.getId(), profile.getName(), count, latest, lastBedtimeAt);
     }
 
     private Map<String, List<StoryPanel>> fetchPanelsByStory(List<Story> stories) {
@@ -87,8 +88,8 @@ public class DashboardService {
         List<String> ids = stories.stream().map(Story::getId).toList();
         List<StoryPanel> all = panelRepository.findByStoryIdInOrderByStoryIdAscPanelIndexAsc(ids);
         Map<String, List<StoryPanel>> grouped = new LinkedHashMap<>();
-        for (StoryPanel p : all) {
-            grouped.computeIfAbsent(p.getStoryId(), k -> new ArrayList<>()).add(p);
+        for (StoryPanel panel : all) {
+            grouped.computeIfAbsent(panel.getStoryId(), k -> new ArrayList<>()).add(panel);
         }
         return grouped;
     }

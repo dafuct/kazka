@@ -45,13 +45,13 @@ class MonobankRecurringChargeIT extends AbstractIT {
 
     @Test
     void should_chargeDueEntitlement_endToEnd() {
-        User u = newUser("e2e@example.com");
-        SubscriptionProduct p = products.findByAppleProductId("kazka_pro_monthly").orElseThrow();
-        p.setMonobankPlanId("mono_monthly_test");
-        products.save(p);
+        User user = newUser("e2e@example.com");
+        SubscriptionProduct product = products.findByAppleProductId("kazka_pro_monthly").orElseThrow();
+        product.setMonobankPlanId("mono_monthly_test");
+        products.save(product);
 
-        UserEntitlement e = newMonobankEntitlement(u, p.getId(), 0);
-        entitlements.save(e);
+        UserEntitlement entitlement = newMonobankEntitlement(user, product.getId(), 0);
+        entitlements.save(entitlement);
 
         when(monobankClient.chargeToken(anyString(), anyString(), anyLong(), anyString(), anyString(), anyString()))
                 .thenReturn(Mono.just(new MonobankChargeResult.Accepted("inv_e2e")));
@@ -60,20 +60,20 @@ class MonobankRecurringChargeIT extends AbstractIT {
 
         verify(monobankClient, times(1)).chargeToken(
                 any(), any(), anyLong(), any(), any(), any());
-        UserEntitlement after = entitlements.findById(e.getId()).orElseThrow();
+        UserEntitlement after = entitlements.findById(entitlement.getId()).orElseThrow();
         assertThat(after.getRenewalRetryCount()).isZero();
         assertThat(after.getState()).isEqualTo(EntitlementState.ACTIVE);
     }
 
     @Test
     void should_beIdempotent_when_schedulerTicksTwice() {
-        User u = newUser("idem@example.com");
-        SubscriptionProduct p = products.findByAppleProductId("kazka_pro_monthly").orElseThrow();
-        p.setMonobankPlanId("mono_monthly_test");
-        products.save(p);
+        User idemUser = newUser("idem@example.com");
+        SubscriptionProduct idemProduct = products.findByAppleProductId("kazka_pro_monthly").orElseThrow();
+        idemProduct.setMonobankPlanId("mono_monthly_test");
+        products.save(idemProduct);
 
-        UserEntitlement e = newMonobankEntitlement(u, p.getId(), 0);
-        entitlements.save(e);
+        UserEntitlement idemEntitlement = newMonobankEntitlement(idemUser, idemProduct.getId(), 0);
+        entitlements.save(idemEntitlement);
 
         ArgumentCaptor<String> keyCaptor = ArgumentCaptor.forClass(String.class);
         when(monobankClient.chargeToken(anyString(), anyString(), anyLong(), anyString(),
@@ -87,33 +87,33 @@ class MonobankRecurringChargeIT extends AbstractIT {
         // same key. Monobank dedupes on its side; we only assert our local state stays sane.
         assertThat(keyCaptor.getAllValues()).hasSize(2);
         assertThat(keyCaptor.getAllValues().get(0)).isEqualTo(keyCaptor.getAllValues().get(1));
-        UserEntitlement after = entitlements.findById(e.getId()).orElseThrow();
+        UserEntitlement after = entitlements.findById(idemEntitlement.getId()).orElseThrow();
         assertThat(after.getRenewalRetryCount()).isZero();
     }
 
-    private UserEntitlement newMonobankEntitlement(User u, String productId, int retries) {
-        UserEntitlement e = new UserEntitlement();
-        e.setId(UUID.randomUUID().toString());
-        e.setUserId(u.getId());
-        e.setProductId(productId);
-        e.setSource(EntitlementSource.MONOBANK);
-        e.setState(EntitlementState.ACTIVE);
-        e.setExpiresAt(Instant.now().plus(Duration.ofDays(2)));
-        e.setNextRenewalAt(Instant.now().minusSeconds(60));
-        e.setMonobankWalletId("wallet-it");
-        e.setMonobankCardToken("card-it");
-        e.setRenewalRetryCount(retries);
-        return e;
+    private UserEntitlement newMonobankEntitlement(User user, String productId, int retries) {
+        UserEntitlement entitlement = new UserEntitlement();
+        entitlement.setId(UUID.randomUUID().toString());
+        entitlement.setUserId(user.getId());
+        entitlement.setProductId(productId);
+        entitlement.setSource(EntitlementSource.MONOBANK);
+        entitlement.setState(EntitlementState.ACTIVE);
+        entitlement.setExpiresAt(Instant.now().plus(Duration.ofDays(2)));
+        entitlement.setNextRenewalAt(Instant.now().minusSeconds(60));
+        entitlement.setMonobankWalletId("wallet-it");
+        entitlement.setMonobankCardToken("card-it");
+        entitlement.setRenewalRetryCount(retries);
+        return entitlement;
     }
 
     private User newUser(String email) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setDisplayName("u");
-        u.setPasswordHash("x");
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        return users.save(u);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setDisplayName("u");
+        user.setPasswordHash("x");
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        return users.save(user);
     }
 }

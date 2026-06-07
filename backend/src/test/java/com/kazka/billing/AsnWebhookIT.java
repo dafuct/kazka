@@ -39,9 +39,9 @@ class AsnWebhookIT extends AbstractIT {
 
     @Test
     void should_markEntitlementRefunded_when_REFUND_notificationArrives() throws Exception {
-        User u = seedUser("asn-it@example.com");
+        User user = seedUser("asn-it@example.com");
         SubscriptionProduct product = products.findByAppleProductId("kazka_pro_monthly").orElseThrow();
-        UserEntitlement e = seedActiveEntitlement(u, product, "123456789");
+        UserEntitlement entitlement = seedActiveEntitlement(user, product, "123456789");
 
         ResponseBodyV2DecodedPayload notif = new ResponseBodyV2DecodedPayload();
         notif.setNotificationType(NotificationTypeV2.REFUND);
@@ -61,28 +61,28 @@ class AsnWebhookIT extends AbstractIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful();
 
-        UserEntitlement reloaded = entitlements.findById(e.getId()).orElseThrow();
+        UserEntitlement reloaded = entitlements.findById(entitlement.getId()).orElseThrow();
         assertThat(reloaded.getState()).isEqualTo(EntitlementState.REFUNDED);
     }
 
     private User seedUser(String email) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setPasswordHash(encoder.encode("password123"));
-        u.setDisplayName("Tester");
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        return users.save(u);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setPasswordHash(encoder.encode("password123"));
+        user.setDisplayName("Tester");
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        return users.save(user);
     }
 
-    private UserEntitlement seedActiveEntitlement(User u, SubscriptionProduct p, String origTxn) {
-        UserEntitlement e = new UserEntitlement();
-        e.setId(UUID.randomUUID().toString());
-        e.setUserId(u.getId());
-        e.setProductId(p.getId());
-        e.setState(EntitlementState.ACTIVE);
-        e.setOriginalTransactionId(origTxn);
-        return entitlements.save(e);
+    private UserEntitlement seedActiveEntitlement(User user, SubscriptionProduct product, String origTxn) {
+        UserEntitlement entitlement = new UserEntitlement();
+        entitlement.setId(UUID.randomUUID().toString());
+        entitlement.setUserId(user.getId());
+        entitlement.setProductId(product.getId());
+        entitlement.setState(EntitlementState.ACTIVE);
+        entitlement.setOriginalTransactionId(origTxn);
+        return entitlements.save(entitlement);
     }
 }

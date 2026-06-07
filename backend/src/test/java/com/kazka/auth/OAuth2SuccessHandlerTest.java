@@ -63,14 +63,14 @@ class OAuth2SuccessHandlerTest {
     }
 
     private User userOf(String email, String sub, String hash) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setGoogleSubject(sub);
-        u.setPasswordHash(hash);
-        u.setDisplayName(email);
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        return u;
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setGoogleSubject(sub);
+        user.setPasswordHash(hash);
+        user.setDisplayName(email);
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        return user;
     }
 }

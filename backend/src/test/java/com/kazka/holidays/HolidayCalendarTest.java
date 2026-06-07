@@ -19,55 +19,55 @@ class HolidayCalendarTest {
 
     @Test
     void should_return_christmas_on_dec_25() {
-        Optional<Holiday> h = calc.activeFor(
+        Optional<Holiday> activeHoliday = calc.activeFor(
                 localMidnight(LocalDate.of(2026, 12, 25), ZoneId.of("Europe/Kyiv")),
                 ZoneId.of("Europe/Kyiv"));
-        assertThat(h).contains(Holiday.CHRISTMAS);
+        assertThat(activeHoliday).contains(Holiday.CHRISTMAS);
     }
 
     @Test
     void should_return_christmas_on_dec_24_eve() {
         // Christmas window: daysBefore=1, daysAfter=1 → Dec 24, 25, 26
-        Optional<Holiday> h = calc.activeFor(
+        Optional<Holiday> activeHoliday = calc.activeFor(
                 localMidnight(LocalDate.of(2026, 12, 24), ZoneId.of("Europe/Kyiv")),
                 ZoneId.of("Europe/Kyiv"));
-        assertThat(h).contains(Holiday.CHRISTMAS);
+        assertThat(activeHoliday).contains(Holiday.CHRISTMAS);
     }
 
     @Test
     void should_return_empty_on_dec_23() {
         // One day before window-start — should NOT match
-        Optional<Holiday> h = calc.activeFor(
+        Optional<Holiday> activeHoliday = calc.activeFor(
                 localMidnight(LocalDate.of(2026, 12, 23), ZoneId.of("Europe/Kyiv")),
                 ZoneId.of("Europe/Kyiv"));
-        assertThat(h).isEmpty();
+        assertThat(activeHoliday).isEmpty();
     }
 
     @Test
     void should_return_empty_on_dec_27() {
         // One day after window-end
-        Optional<Holiday> h = calc.activeFor(
+        Optional<Holiday> activeHoliday = calc.activeFor(
                 localMidnight(LocalDate.of(2026, 12, 27), ZoneId.of("Europe/Kyiv")),
                 ZoneId.of("Europe/Kyiv"));
-        assertThat(h).isEmpty();
+        assertThat(activeHoliday).isEmpty();
     }
 
     @Test
     void should_return_st_nicholas_on_dec_5_eve() {
         // St Nicholas window: daysBefore=1, daysAfter=0 → Dec 5 and Dec 6 only
-        Optional<Holiday> h = calc.activeFor(
+        Optional<Holiday> activeHoliday = calc.activeFor(
                 localMidnight(LocalDate.of(2026, 12, 5), ZoneId.of("Europe/Kyiv")),
                 ZoneId.of("Europe/Kyiv"));
-        assertThat(h).contains(Holiday.ST_NICHOLAS);
+        assertThat(activeHoliday).contains(Holiday.ST_NICHOLAS);
     }
 
     @Test
     void should_return_empty_on_dec_7() {
         // One day after St Nicholas (no daysAfter)
-        Optional<Holiday> h = calc.activeFor(
+        Optional<Holiday> activeHoliday = calc.activeFor(
                 localMidnight(LocalDate.of(2026, 12, 7), ZoneId.of("Europe/Kyiv")),
                 ZoneId.of("Europe/Kyiv"));
-        assertThat(h).isEmpty();
+        assertThat(activeHoliday).isEmpty();
     }
 
     @Test

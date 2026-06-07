@@ -35,11 +35,11 @@ class MonobankWebhookIT extends AbstractIT {
     private static final KeyPair KEYS;
     static {
         try {
-            KeyPairGenerator g = KeyPairGenerator.getInstance("EC");
-            g.initialize(new ECGenParameterSpec("secp256r1"));
-            KEYS = g.generateKeyPair();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+            KeyPairGenerator gen = KeyPairGenerator.getInstance("EC");
+            gen.initialize(new ECGenParameterSpec("secp256r1"));
+            KEYS = gen.generateKeyPair();
+        } catch (Exception exception) {
+            throw new IllegalStateException(exception);
         }
     }
 
@@ -53,20 +53,20 @@ class MonobankWebhookIT extends AbstractIT {
         entitlements.deleteAll();
         users.deleteAll();
         when(pubKeyService.publicKey()).thenReturn(Mono.just(KEYS.getPublic()));
-        SubscriptionProduct p = products.findByAppleProductId("kazka_pro_monthly").orElseThrow();
-        p.setMonobankPlanId("mono_monthly_test");
-        products.save(p);
+        SubscriptionProduct product = products.findByAppleProductId("kazka_pro_monthly").orElseThrow();
+        product.setMonobankPlanId("mono_monthly_test");
+        products.save(product);
     }
 
     @Test
     void should_provisionEntitlementWithWalletAndToken_when_firstPaymentSuccess() {
-        User u = newUser("mono1@example.com");
+        User user1 = newUser("mono1@example.com");
 
         String body = """
             {"invoiceId":"inv_1","status":"success",
              "reference":"mono_monthly_test:%s",
              "walletData":{"walletId":"wallet-xyz","cardToken":"card-abc","status":"created"}}
-            """.formatted(u.getId()).replaceAll("\\s+", " ");
+            """.formatted(user1.getId()).replaceAll("\\s+", " ");
 
         client().post().uri("/api/billing/webhook/monobank")
                 .header("X-Sign", sign(body))
@@ -75,30 +75,30 @@ class MonobankWebhookIT extends AbstractIT {
                 .exchange()
                 .expectStatus().isOk();
 
-        var rows = entitlements.findByUserId(u.getId());
+        var rows = entitlements.findByUserId(user1.getId());
         assertThat(rows).hasSize(1);
-        UserEntitlement e = rows.get(0);
-        assertThat(e.getState()).isEqualTo(EntitlementState.ACTIVE);
-        assertThat(e.getSource()).isEqualTo(EntitlementSource.MONOBANK);
-        assertThat(e.getMonobankWalletId()).isEqualTo("wallet-xyz");
-        assertThat(e.getMonobankCardToken()).isEqualTo("card-abc");
-        assertThat(e.getExpiresAt()).isNotNull().isAfter(Instant.now().plus(Duration.ofDays(29)));
-        assertThat(e.getNextRenewalAt()).isNotNull().isBefore(e.getExpiresAt());
-        assertThat(e.getRenewalRetryCount()).isZero();
+        UserEntitlement entitlement1 = rows.get(0);
+        assertThat(entitlement1.getState()).isEqualTo(EntitlementState.ACTIVE);
+        assertThat(entitlement1.getSource()).isEqualTo(EntitlementSource.MONOBANK);
+        assertThat(entitlement1.getMonobankWalletId()).isEqualTo("wallet-xyz");
+        assertThat(entitlement1.getMonobankCardToken()).isEqualTo("card-abc");
+        assertThat(entitlement1.getExpiresAt()).isNotNull().isAfter(Instant.now().plus(Duration.ofDays(29)));
+        assertThat(entitlement1.getNextRenewalAt()).isNotNull().isBefore(entitlement1.getExpiresAt());
+        assertThat(entitlement1.getRenewalRetryCount()).isZero();
     }
 
     @Test
     void should_extendExpiresAt_when_renewalWebhookSuccess() {
-        User u = newUser("mono2@example.com");
+        User user2 = newUser("mono2@example.com");
         Instant originalExpires = Instant.now().plus(Duration.ofDays(1));
-        UserEntitlement existing = newMonobankEntitlement(u, 0);
+        UserEntitlement existing = newMonobankEntitlement(user2, 0);
         existing.setExpiresAt(originalExpires);
         entitlements.save(existing);
 
         String body = """
             {"invoiceId":"inv_2","status":"success",
              "reference":"renew-%s-202606"}
-            """.formatted(u.getId()).replaceAll("\\s+", " ");
+            """.formatted(user2.getId()).replaceAll("\\s+", " ");
 
         client().post().uri("/api/billing/webhook/monobank")
                 .header("X-Sign", sign(body))
@@ -115,14 +115,14 @@ class MonobankWebhookIT extends AbstractIT {
 
     @Test
     void should_enterGrace_when_renewalWebhookFailure_andRetriesAvailable() {
-        User u = newUser("mono3@example.com");
-        UserEntitlement existing = newMonobankEntitlement(u, 0);
+        User user3 = newUser("mono3@example.com");
+        UserEntitlement existing = newMonobankEntitlement(user3, 0);
         entitlements.save(existing);
 
         String body = """
             {"invoiceId":"inv_3","status":"failure",
              "reference":"renew-%s-202606"}
-            """.formatted(u.getId()).replaceAll("\\s+", " ");
+            """.formatted(user3.getId()).replaceAll("\\s+", " ");
 
         client().post().uri("/api/billing/webhook/monobank")
                 .header("X-Sign", sign(body))
@@ -139,14 +139,14 @@ class MonobankWebhookIT extends AbstractIT {
 
     @Test
     void should_giveUpAndNullRenewal_when_renewalWebhookFailureAndRetriesExhausted() {
-        User u = newUser("mono4@example.com");
-        UserEntitlement existing = newMonobankEntitlement(u, 2);  // already retried twice
+        User user4 = newUser("mono4@example.com");
+        UserEntitlement existing = newMonobankEntitlement(user4, 2);  // already retried twice
         entitlements.save(existing);
 
         String body = """
             {"invoiceId":"inv_4","status":"failure",
              "reference":"renew-%s-202606"}
-            """.formatted(u.getId()).replaceAll("\\s+", " ");
+            """.formatted(user4.getId()).replaceAll("\\s+", " ");
 
         client().post().uri("/api/billing/webhook/monobank")
                 .header("X-Sign", sign(body))
@@ -173,11 +173,11 @@ class MonobankWebhookIT extends AbstractIT {
 
     @Test
     void should_returnOkButNotPersist_when_xSignDoesNotMatchBody() {
-        User u = newUser("mono5@example.com");
+        User user5 = newUser("mono5@example.com");
         String body = """
             {"invoiceId":"inv_5","status":"success",
              "reference":"mono_monthly_test:%s"}
-            """.formatted(u.getId()).replaceAll("\\s+", " ");
+            """.formatted(user5.getId()).replaceAll("\\s+", " ");
         String badSign = sign("{\"different\":\"body\"}");
 
         client().post().uri("/api/billing/webhook/monobank")
@@ -186,43 +186,43 @@ class MonobankWebhookIT extends AbstractIT {
                 .bodyValue(body)
                 .exchange()
                 .expectStatus().isOk();
-        assertThat(entitlements.findByUserId(u.getId())).isEmpty();
+        assertThat(entitlements.findByUserId(user5.getId())).isEmpty();
     }
 
     private static String sign(String body) {
         try {
-            Signature s = Signature.getInstance("SHA256withECDSA");
-            s.initSign(KEYS.getPrivate());
-            s.update(body.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(s.sign());
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
+            Signature sig = Signature.getInstance("SHA256withECDSA");
+            sig.initSign(KEYS.getPrivate());
+            sig.update(body.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(sig.sign());
+        } catch (Exception exception) {
+            throw new IllegalStateException(exception);
         }
     }
 
-    private UserEntitlement newMonobankEntitlement(User u, int retries) {
-        UserEntitlement e = new UserEntitlement();
-        e.setId(UUID.randomUUID().toString());
-        e.setUserId(u.getId());
-        e.setProductId(products.findByAppleProductId("kazka_pro_monthly").orElseThrow().getId());
-        e.setSource(EntitlementSource.MONOBANK);
-        e.setState(EntitlementState.ACTIVE);
-        e.setExpiresAt(Instant.now().plus(Duration.ofDays(2)));
-        e.setNextRenewalAt(Instant.now().minusSeconds(60));
-        e.setMonobankWalletId("wallet-xyz");
-        e.setMonobankCardToken("card-abc");
-        e.setRenewalRetryCount(retries);
-        return e;
+    private UserEntitlement newMonobankEntitlement(User user, int retries) {
+        UserEntitlement entitlement = new UserEntitlement();
+        entitlement.setId(UUID.randomUUID().toString());
+        entitlement.setUserId(user.getId());
+        entitlement.setProductId(products.findByAppleProductId("kazka_pro_monthly").orElseThrow().getId());
+        entitlement.setSource(EntitlementSource.MONOBANK);
+        entitlement.setState(EntitlementState.ACTIVE);
+        entitlement.setExpiresAt(Instant.now().plus(Duration.ofDays(2)));
+        entitlement.setNextRenewalAt(Instant.now().minusSeconds(60));
+        entitlement.setMonobankWalletId("wallet-xyz");
+        entitlement.setMonobankCardToken("card-abc");
+        entitlement.setRenewalRetryCount(retries);
+        return entitlement;
     }
 
     private User newUser(String email) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setDisplayName("u");
-        u.setPasswordHash("x");
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        return users.save(u);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setDisplayName("u");
+        user.setPasswordHash("x");
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        return users.save(user);
     }
 }

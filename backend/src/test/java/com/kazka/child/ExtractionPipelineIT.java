@@ -45,8 +45,8 @@ class ExtractionPipelineIT extends AbstractIT {
         worker.enqueueAsync(storyId).join();
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-            Story s = stories.findById(storyId).orElseThrow();
-            assertThat(s.getExtractionStatus()).isEqualTo(ExtractionStatus.DONE);
+            Story story = stories.findById(storyId).orElseThrow();
+            assertThat(story.getExtractionStatus()).isEqualTo(ExtractionStatus.DONE);
         });
     }
 
@@ -61,8 +61,8 @@ class ExtractionPipelineIT extends AbstractIT {
         worker.enqueueAsync(storyId).join();
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-            Story s = stories.findById(storyId).orElseThrow();
-            assertThat(s.getExtractionStatus()).isEqualTo(ExtractionStatus.DONE);
+            Story story = stories.findById(storyId).orElseThrow();
+            assertThat(story.getExtractionStatus()).isEqualTo(ExtractionStatus.DONE);
         });
     }
 
@@ -75,40 +75,40 @@ class ExtractionPipelineIT extends AbstractIT {
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test");
-        u.setDisplayName("T");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test");
+        user.setDisplayName("T");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
     private String seedProfile(String userId) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId);
-        p.setName("T");
-        p.setAvatarSeed("s");
-        p.setPreferredLanguage("uk");
-        return profiles.save(p).getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId);
+        profile.setName("T");
+        profile.setAvatarSeed("s");
+        profile.setPreferredLanguage("uk");
+        return profiles.save(profile).getId();
     }
 
     private String seedStory(String userId, String profileId) {
-        Story s = new Story();
-        s.setId(UUID.randomUUID().toString());
-        s.setUserId(userId);
-        s.setTitle("t");
-        s.setTheme("th");
-        s.setCharacters(List.of("c"));
-        s.setAgeGroup("6-8");
-        s.setLength("short");
-        s.setLanguage("uk");
-        s.setContent("Once upon a time there was a cat named Мурка.");
-        s.setChildProfileId(profileId);
-        s.setExtractionStatus(ExtractionStatus.PENDING);
-        return stories.save(s).getId();
+        Story story = new Story();
+        story.setId(UUID.randomUUID().toString());
+        story.setUserId(userId);
+        story.setTitle("t");
+        story.setTheme("th");
+        story.setCharacters(List.of("c"));
+        story.setAgeGroup("6-8");
+        story.setLength("short");
+        story.setLanguage("uk");
+        story.setContent("Once upon a time there was a cat named Мурка.");
+        story.setChildProfileId(profileId);
+        story.setExtractionStatus(ExtractionStatus.PENDING);
+        return stories.save(story).getId();
     }
 }

@@ -25,13 +25,13 @@ class ChildProfileRepositoryIT extends AbstractIT {
     @Test
     void should_persist_and_load_child_profile() {
         String userId = seedUser();
-        ChildProfile p = newProfile(userId, "Лія");
-        p.setBirthYear((short) 2020);
-        p.setGender("girl");
-        p.setInterests(List.of("dragons", "коти"));
+        ChildProfile profile = newProfile(userId, "Лія");
+        profile.setBirthYear((short) 2020);
+        profile.setGender("girl");
+        profile.setInterests(List.of("dragons", "коти"));
 
-        repo.save(p);
-        ChildProfile loaded = repo.findById(p.getId()).orElseThrow();
+        repo.save(profile);
+        ChildProfile loaded = repo.findById(profile.getId()).orElseThrow();
 
         assertThat(loaded.getName()).isEqualTo("Лія");
         assertThat(loaded.getInterests()).containsExactly("dragons", "коти");
@@ -51,25 +51,25 @@ class ChildProfileRepositoryIT extends AbstractIT {
     }
 
     private ChildProfile newProfile(String userId, String name) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId);
-        p.setName(name);
-        p.setAvatarSeed("seed-" + name);
-        p.setPreferredLanguage("uk");
-        return p;
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId);
+        profile.setName(name);
+        profile.setAvatarSeed("seed-" + name);
+        profile.setPreferredLanguage("uk");
+        return profile;
     }
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test");
-        u.setDisplayName("T");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test");
+        user.setDisplayName("T");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 }

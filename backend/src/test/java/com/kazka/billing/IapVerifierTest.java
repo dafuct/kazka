@@ -15,8 +15,8 @@ class IapVerifierTest {
         BillingProperties disabled = new BillingProperties(
                 "app.kazka.ios", "n/a", 0L, "Sandbox", "i", "k", "", false, 3,
                 null, null, null, null);
-        IapVerifier v = new IapVerifier(disabled);
-        assertThatThrownBy(() -> v.verifyTransaction("any"))
+        IapVerifier verifier = new IapVerifier(disabled);
+        assertThatThrownBy(() -> verifier.verifyTransaction("any"))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("not initialised");
     }
@@ -26,9 +26,9 @@ class IapVerifierTest {
         BillingProperties enabled = new BillingProperties(
                 "app.kazka.ios", "n/a", 1234567890L, "Sandbox", "i", "k", "", true, 3,
                 null, null, null, null);
-        IapVerifier v = new IapVerifier(enabled);
-        v.init();
-        assertThatThrownBy(() -> v.verifyTransaction("not.a.real.jws"))
+        IapVerifier verifier = new IapVerifier(enabled);
+        verifier.init();
+        assertThatThrownBy(() -> verifier.verifyTransaction("not.a.real.jws"))
                 .isInstanceOf(VerificationException.class);
     }
 }

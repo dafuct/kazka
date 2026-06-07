@@ -43,7 +43,7 @@ class EmailVerificationIT extends AbstractIT {
                 .expectHeader().valueMatches("Location", ".*ok=1");
 
         assertThat(users.findByEmail("eva@example.com")).get()
-                .matches(u -> u.isEmailVerified());
+                .matches(user -> user.isEmailVerified());
     }
 
     @Test
@@ -81,11 +81,11 @@ class EmailVerificationIT extends AbstractIT {
         MimeMessage[] received = greenMail.getReceivedMessages();
         try {
             String body = received[0].getContent().toString();
-            Matcher m = Pattern.compile("token=([A-Za-z0-9_-]+)").matcher(body);
-            assertThat(m.find()).isTrue();
-            return m.group(1);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            Matcher matcher = Pattern.compile("token=([A-Za-z0-9_-]+)").matcher(body);
+            assertThat(matcher.find()).isTrue();
+            return matcher.group(1);
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
         }
     }
 }

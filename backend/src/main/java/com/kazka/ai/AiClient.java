@@ -86,7 +86,7 @@ public class AiClient {
         try {
             JsonNode node = MAPPER.readTree(body);
             return node.path("choices").path(0).path("message").path("content").asText("");
-        } catch (Exception e) {
+        } catch (Exception exception) {
             log.warn("Could not parse chat response body (first 200 chars): {}",
                     body.substring(0, Math.min(200, body.length())));
             return "";
@@ -133,7 +133,7 @@ public class AiClient {
                         String token = node.path("choices").path(0)
                                 .path("delta").path("content").asText("");
                         return token.isEmpty() ? Flux.empty() : Flux.just(token);
-                    } catch (Exception e) {
+                    } catch (Exception exception) {
                         log.warn("SSE chunk parse failed (first 200 chars): {}",
                                 data.substring(0, Math.min(200, data.length())));
                         return Flux.empty();

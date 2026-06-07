@@ -18,13 +18,13 @@ public class BranchingChoicesConverter implements AttributeConverter<List<Branch
     public String convertToDatabaseColumn(List<BranchingChoice> attribute) {
         if (attribute == null) return null;
         try { return MAPPER.writeValueAsString(attribute); }
-        catch (JsonProcessingException e) { throw new IllegalArgumentException("Cannot serialize choices", e); }
+        catch (JsonProcessingException jsonException) { throw new IllegalArgumentException("Cannot serialize choices", jsonException); }
     }
 
     @Override
     public List<BranchingChoice> convertToEntityAttribute(String dbData) {
         if (dbData == null || dbData.isBlank()) return null;
         try { return MAPPER.readValue(dbData, new TypeReference<>() {}); }
-        catch (JsonProcessingException e) { throw new IllegalArgumentException("Cannot deserialize choices", e); }
+        catch (JsonProcessingException jsonException) { throw new IllegalArgumentException("Cannot deserialize choices", jsonException); }
     }
 }

@@ -29,7 +29,7 @@ public class HolidayController {
                                                   @RequestParam(defaultValue = "uk") String lang) {
         ZoneId zone;
         try { zone = ZoneId.of(tz); }
-        catch (Exception e) {
+        catch (Exception exception) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid_timezone");
         }
 
@@ -38,17 +38,17 @@ public class HolidayController {
         if (active.isEmpty()) {
             return Mono.just(ResponseEntity.noContent().build());
         }
-        Holiday h = active.get();
+        Holiday holiday = active.get();
         LocalDate today = now.atZone(zone).toLocalDate();
         LocalDate hday;
-        try { hday = h.dateRule().computeFor(today.getYear()); }
+        try { hday = holiday.dateRule().computeFor(today.getYear()); }
         catch (Exception ex) { hday = today; }
         Instant date = hday.atStartOfDay(zone).toInstant();
 
         HolidayDto dto = new HolidayDto(
-                h.id(),
-                h.label(lang),
-                h.label(lang),
+                holiday.id(),
+                holiday.label(lang),
+                holiday.label(lang),
                 date);
         return Mono.just(ResponseEntity.ok(dto));
     }

@@ -30,8 +30,8 @@ class DialogConverter implements AttributeConverter<List<StoryPanel.Dialog>, Str
         }
         try {
             return MAPPER.writeValueAsString(attribute);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Cannot serialize panel dialog", e);
+        } catch (JsonProcessingException jsonException) {
+            throw new IllegalArgumentException("Cannot serialize panel dialog", jsonException);
         }
     }
 
@@ -42,8 +42,8 @@ class DialogConverter implements AttributeConverter<List<StoryPanel.Dialog>, Str
         }
         try {
             return MAPPER.readValue(dbData, TYPE);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Cannot deserialize panel dialog", e);
+        } catch (JsonProcessingException jsonException) {
+            throw new IllegalArgumentException("Cannot deserialize panel dialog", jsonException);
         }
     }
 }

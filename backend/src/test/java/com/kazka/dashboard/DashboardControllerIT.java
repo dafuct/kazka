@@ -94,32 +94,32 @@ class DashboardControllerIT extends AbstractIT {
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test.example");
-        u.setDisplayName("Tester");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test.example");
+        user.setDisplayName("Tester");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
     private String seedProfile(String userId, String name) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId); p.setName(name); p.setAvatarSeed("s"); p.setPreferredLanguage("uk");
-        return profiles.save(p).getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId); profile.setName(name); profile.setAvatarSeed("s"); profile.setPreferredLanguage("uk");
+        return profiles.save(profile).getId();
     }
 
     private Story seedStory(String userId, String profileId, String title) {
-        Story s = new Story();
-        s.setId(UUID.randomUUID().toString());
-        s.setUserId(userId); s.setChildProfileId(profileId);
-        s.setTitle(title); s.setTheme("th"); s.setCharacters(List.of("c"));
-        s.setAgeGroup("6-8"); s.setLength("short"); s.setLanguage("uk");
-        s.setContent("body");
-        return stories.save(s);
+        Story story = new Story();
+        story.setId(UUID.randomUUID().toString());
+        story.setUserId(userId); story.setChildProfileId(profileId);
+        story.setTitle(title); story.setTheme("th"); story.setCharacters(List.of("c"));
+        story.setAgeGroup("6-8"); story.setLength("short"); story.setLanguage("uk");
+        story.setContent("body");
+        return stories.save(story);
     }
 
     private WebTestClient authedClient(String userId) {

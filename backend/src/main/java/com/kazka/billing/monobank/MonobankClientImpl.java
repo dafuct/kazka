@@ -51,7 +51,7 @@ public class MonobankClientImpl implements MonobankClient {
                 .retrieve()
                 .bodyToMono(String.class)
                 .map(MonobankClientImpl::parseJson)
-                .map(j -> j.path("pageUrl").asText());
+                .map(json -> json.path("pageUrl").asText());
     }
 
     @Override
@@ -75,18 +75,18 @@ public class MonobankClientImpl implements MonobankClient {
                 .header("X-Request-Id", idempotencyKey)
                 .bodyValue(body)
                 .exchangeToMono(resp -> {
-                    HttpStatusCode s = resp.statusCode();
-                    if (s.is2xxSuccessful()) {
+                    HttpStatusCode statusCode = resp.statusCode();
+                    if (statusCode.is2xxSuccessful()) {
                         return resp.bodyToMono(String.class).defaultIfEmpty("{}")
-                                .map(b -> (MonobankChargeResult) new MonobankChargeResult.Accepted(
-                                        parseJson(b).path("invoiceId").asText("")));
+                                .map(responseBody -> (MonobankChargeResult) new MonobankChargeResult.Accepted(
+                                        parseJson(responseBody).path("invoiceId").asText("")));
                     }
-                    if (s.is4xxClientError()) {
+                    if (statusCode.is4xxClientError()) {
                         return resp.bodyToMono(String.class).defaultIfEmpty("")
-                                .map(b -> (MonobankChargeResult) new MonobankChargeResult.CardFailure("4xx: " + s.value() + " " + b));
+                                .map(responseBody -> (MonobankChargeResult) new MonobankChargeResult.CardFailure("4xx: " + statusCode.value() + " " + responseBody));
                     }
                     return resp.bodyToMono(String.class).defaultIfEmpty("")
-                            .map(b -> (MonobankChargeResult) new MonobankChargeResult.Transient("5xx: " + s.value() + " " + b));
+                            .map(responseBody -> (MonobankChargeResult) new MonobankChargeResult.Transient("5xx: " + statusCode.value() + " " + responseBody));
                 })
                 .onErrorResume(ex -> Mono.just(new MonobankChargeResult.Transient(ex.getMessage())));
     }
@@ -101,16 +101,16 @@ public class MonobankClientImpl implements MonobankClient {
     }
 
     private String deriveWebhookUrl() {
-        String s = props.successUrl();
-        int idx = s.indexOf("/", 8);
-        String origin = idx > 0 ? s.substring(0, idx) : s;
+        String successUrl = props.successUrl();
+        int idx = successUrl.indexOf("/", 8);
+        String origin = idx > 0 ? successUrl.substring(0, idx) : successUrl;
         return origin + "/api/billing/webhook/monobank";
     }
 
     private static JsonNode parseJson(String body) {
         try {
             return JSON.readTree(body == null || body.isEmpty() ? "{}" : body);
-        } catch (Exception e) {
+        } catch (Exception exception) {
             return JSON.createObjectNode();
         }
     }

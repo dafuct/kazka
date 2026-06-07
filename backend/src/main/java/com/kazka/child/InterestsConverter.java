@@ -17,13 +17,13 @@ public class InterestsConverter implements AttributeConverter<List<String>, Stri
     public String convertToDatabaseColumn(List<String> attribute) {
         if (attribute == null) return "[]";
         try { return MAPPER.writeValueAsString(attribute); }
-        catch (JsonProcessingException e) { throw new IllegalArgumentException("Cannot serialize interests", e); }
+        catch (JsonProcessingException jsonException) { throw new IllegalArgumentException("Cannot serialize interests", jsonException); }
     }
 
     @Override
     public List<String> convertToEntityAttribute(String dbData) {
         if (dbData == null || dbData.isBlank()) return List.of();
         try { return MAPPER.readValue(dbData, new TypeReference<>() {}); }
-        catch (JsonProcessingException e) { throw new IllegalArgumentException("Cannot deserialize interests", e); }
+        catch (JsonProcessingException jsonException) { throw new IllegalArgumentException("Cannot deserialize interests", jsonException); }
     }
 }

@@ -77,11 +77,11 @@ public class MonobankWebhookController {
 
     private static boolean verify(PublicKey pk, String body, String signBase64) {
         try {
-            Signature s = Signature.getInstance("SHA256withECDSA");
-            s.initVerify(pk);
-            s.update(body.getBytes(StandardCharsets.UTF_8));
-            return s.verify(Base64.getDecoder().decode(signBase64));
-        } catch (Exception e) {
+            Signature sig = Signature.getInstance("SHA256withECDSA");
+            sig.initVerify(pk);
+            sig.update(body.getBytes(StandardCharsets.UTF_8));
+            return sig.verify(Base64.getDecoder().decode(signBase64));
+        } catch (Exception exception) {
             return false;
         }
     }
@@ -136,23 +136,23 @@ public class MonobankWebhookController {
             log.info("Monobank status={} ignored", status);
             return;
         }
-        UserEntitlement e = invoiceId == null
+        UserEntitlement entitlement = invoiceId == null
                 ? newEntitlement(userId, product.getId(), null)
                 : entitlements.findByOriginalTransactionId(invoiceId)
                         .orElseGet(() -> newEntitlement(userId, product.getId(), invoiceId));
-        e.setState(state);
+        entitlement.setState(state);
         if (state == EntitlementState.ACTIVE) {
             Instant expires = Instant.now().plus(PERIOD);
-            e.setExpiresAt(expires);
-            e.setNextRenewalAt(expires.minus(RENEW_LEAD));
-            e.setRenewalRetryCount(0);
+            entitlement.setExpiresAt(expires);
+            entitlement.setNextRenewalAt(expires.minus(RENEW_LEAD));
+            entitlement.setRenewalRetryCount(0);
             JsonNode walletData = root.path("walletData");
             String walletId = walletData.path("walletId").asText(null);
             String cardToken = walletData.path("cardToken").asText(null);
-            if (walletId != null && !walletId.isBlank()) e.setMonobankWalletId(walletId);
-            if (cardToken != null && !cardToken.isBlank()) e.setMonobankCardToken(cardToken);
+            if (walletId != null && !walletId.isBlank()) entitlement.setMonobankWalletId(walletId);
+            if (cardToken != null && !cardToken.isBlank()) entitlement.setMonobankCardToken(cardToken);
         }
-        entitlements.save(e);
+        entitlements.save(entitlement);
     }
 
     private void handleRenewal(String reference, String status) {
@@ -206,7 +206,7 @@ public class MonobankWebhookController {
                 log.warn("Monobank webhook stale/future modifiedDate={} (now={}); ignoring", ts, now);
                 return false;
             }
-        } catch (DateTimeParseException e) {
+        } catch (DateTimeParseException dateTimeParseException) {
             log.warn("Monobank webhook unparseable modifiedDate={}; processing anyway", modifiedDate);
         }
         return true;
@@ -221,12 +221,12 @@ public class MonobankWebhookController {
     }
 
     private UserEntitlement newEntitlement(String userId, String productId, String invoiceId) {
-        UserEntitlement e = new UserEntitlement();
-        e.setId(UUID.randomUUID().toString());
-        e.setUserId(userId);
-        e.setProductId(productId);
-        e.setOriginalTransactionId(invoiceId);
-        e.setSource(EntitlementSource.MONOBANK);
-        return e;
+        UserEntitlement entitlement = new UserEntitlement();
+        entitlement.setId(UUID.randomUUID().toString());
+        entitlement.setUserId(userId);
+        entitlement.setProductId(productId);
+        entitlement.setOriginalTransactionId(invoiceId);
+        entitlement.setSource(EntitlementSource.MONOBANK);
+        return entitlement;
     }
 }

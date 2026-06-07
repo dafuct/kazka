@@ -86,7 +86,7 @@ class ModerationFlowIT extends AbstractIT {
                 .thenReturn(ModerationResult.Refused.of(ModerationCategory.SEXUAL));
 
         Session session = login("repeat@example.com");
-        for (int i = 0; i < 3; i++) {
+        for (int index = 0; index < 3; index++) {
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("theme", "bad");
             requestBody.put("characters", List.of("x"));
@@ -108,9 +108,9 @@ class ModerationFlowIT extends AbstractIT {
         }
 
         Awaitility.await().atMost(Duration.ofSeconds(5)).untilAsserted(() -> {
-            var u = users.findByEmail("repeat@example.com").orElseThrow();
-            assertThat(u.isSuspended()).isTrue();
-            assertThat(u.getSuspendedReason()).isEqualTo("CONTENT_POLICY");
+            var user = users.findByEmail("repeat@example.com").orElseThrow();
+            assertThat(user.isSuspended()).isTrue();
+            assertThat(user.getSuspendedReason()).isEqualTo("CONTENT_POLICY");
             assertThat(greenMail.getReceivedMessages().length).isGreaterThanOrEqualTo(1);
         });
     }
@@ -118,10 +118,10 @@ class ModerationFlowIT extends AbstractIT {
     @Test
     void should_return403_when_suspendedUserAttemptsGenerate() {
         signupAndVerify("blocked@example.com");
-        var u = users.findByEmail("blocked@example.com").orElseThrow();
-        u.setSuspendedAt(java.time.Instant.now());
-        u.setSuspendedReason("CONTENT_POLICY");
-        users.save(u);
+        var user = users.findByEmail("blocked@example.com").orElseThrow();
+        user.setSuspendedAt(java.time.Instant.now());
+        user.setSuspendedReason("CONTENT_POLICY");
+        users.save(user);
 
         Session session = login("blocked@example.com");
         var body = client().post().uri("/api/stories/generate")
@@ -154,9 +154,9 @@ class ModerationFlowIT extends AbstractIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(Map.of("email", email, "password", "password123", "displayName", "Tester"))
                 .exchange().expectStatus().isCreated();
-        var u = users.findByEmail(email).orElseThrow();
-        u.setEmailVerified(true);
-        users.save(u);
+        var user = users.findByEmail(email).orElseThrow();
+        user.setEmailVerified(true);
+        users.save(user);
     }
 
     /**

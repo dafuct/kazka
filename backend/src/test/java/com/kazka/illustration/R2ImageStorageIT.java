@@ -134,7 +134,7 @@ class R2ImageStorageIT {
         try {
             s3.getObjectAsBytes(GetObjectRequest.builder().bucket(BUCKET).key(key).build());
             return true;
-        } catch (software.amazon.awssdk.services.s3.model.NoSuchKeyException e) {
+        } catch (software.amazon.awssdk.services.s3.model.NoSuchKeyException noSuchKeyException) {
             return false;
         }
     }

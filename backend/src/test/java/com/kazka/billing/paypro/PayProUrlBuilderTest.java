@@ -93,13 +93,13 @@ class PayProUrlBuilderTest {
     }
 
     private Map<String, String> parseQuery(String url) {
-        String q = URI.create(url).getRawQuery();
+        String rawQuery = URI.create(url).getRawQuery();
         Map<String, String> out = new HashMap<>();
-        for (String pair : q.split("&")) {
+        for (String pair : rawQuery.split("&")) {
             int eq = pair.indexOf('=');
-            String k = URLDecoder.decode(pair.substring(0, eq), StandardCharsets.UTF_8);
-            String v = URLDecoder.decode(pair.substring(eq + 1), StandardCharsets.UTF_8);
-            out.put(k, v);
+            String key = URLDecoder.decode(pair.substring(0, eq), StandardCharsets.UTF_8);
+            String value = URLDecoder.decode(pair.substring(eq + 1), StandardCharsets.UTF_8);
+            out.put(key, value);
         }
         return out;
     }

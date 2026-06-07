@@ -57,8 +57,8 @@ public class CharacterExtractionWorker {
             // The candidate list is re-derived on demand via GET /api/stories/{id}/extraction-candidates.
             story.setExtractionStatus(ExtractionStatus.DONE);
             stories.save(story);
-        } catch (Exception e) {
-            log.warn("Extraction failed for story {}: {}", storyId, e.getMessage());
+        } catch (Exception exception) {
+            log.warn("Extraction failed for story {}: {}", storyId, exception.getMessage());
             story.setExtractionStatus(ExtractionStatus.FAILED);
             stories.save(story);
         }

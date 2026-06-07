@@ -56,8 +56,8 @@ public final class JwksKeyStore {
                     parsed.put(jwk.get("kid").asText(), key);
                 }
             }
-        } catch (Exception e) {
-            throw new JwksException("Failed to parse JWKs: " + e.getMessage());
+        } catch (Exception exception) {
+            throw new JwksException("Failed to parse JWKs: " + exception.getMessage());
         }
         cache.set(new Cache(parsed, Instant.now()));
         return parsed;

@@ -89,14 +89,14 @@ class DevicesControllerIT extends AbstractIT {
     }
 
     private void seedUser(String email) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setPasswordHash(encoder.encode("password123"));
-        u.setDisplayName("Tester");
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setPasswordHash(encoder.encode("password123"));
+        user.setDisplayName("Tester");
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
     }
 
     private String loginBearer(String email) {

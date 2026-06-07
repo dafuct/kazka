@@ -17,12 +17,12 @@ class StoryDtoTest {
 
     @Test
     void from_mapsBasicFields() {
-        Story s = new Story();
-        s.setId("s1");
-        s.setTitle("The Fox");
-        s.setIllustrationStatus(IllustrationStatus.PENDING);
+        Story story = new Story();
+        story.setId("s1");
+        story.setTitle("The Fox");
+        story.setIllustrationStatus(IllustrationStatus.PENDING);
 
-        StoryDto dto = StoryDto.from(s, List.of(), RESOLVER);
+        StoryDto dto = StoryDto.from(story, List.of(), RESOLVER);
 
         assertThat(dto.id()).isEqualTo("s1");
         assertThat(dto.title()).isEqualTo("The Fox");

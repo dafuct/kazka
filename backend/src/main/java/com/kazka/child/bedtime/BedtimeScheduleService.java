@@ -27,17 +27,17 @@ public class BedtimeScheduleService {
 
     @Transactional(readOnly = true)
     public BedtimeSchedule getOrEmpty(String childProfileId, String userId) {
-        ChildProfile p = profiles.requireOwned(childProfileId, userId);
-        return repo.findByChildProfileId(p.getId()).orElseGet(() -> {
+        ChildProfile profile = profiles.requireOwned(childProfileId, userId);
+        return repo.findByChildProfileId(profile.getId()).orElseGet(() -> {
             BedtimeSchedule blank = new BedtimeSchedule();
-            blank.setChildProfileId(p.getId());
+            blank.setChildProfileId(profile.getId());
             return blank;
         });
     }
 
     @Transactional
     public BedtimeSchedule upsert(String childProfileId, String userId, BedtimeUpdateRequest req) {
-        ChildProfile p = profiles.requireOwned(childProfileId, userId);
+        ChildProfile profile = profiles.requireOwned(childProfileId, userId);
 
         if (req.enabled() && !entitlements.isPro(userId)) {
             throw new PaywallRequiredException("Bedtime ritual requires a paid plan");
@@ -45,15 +45,15 @@ public class BedtimeScheduleService {
 
         ZoneId tz;
         try { tz = ZoneId.of(req.timezone()); }
-        catch (Exception e) {
+        catch (Exception exception) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid_timezone");
         }
         LocalTime localTime = LocalTime.parse(req.localTime());
 
-        BedtimeSchedule bedtimeSchedule = repo.findByChildProfileId(p.getId())
+        BedtimeSchedule bedtimeSchedule = repo.findByChildProfileId(profile.getId())
                 .orElseGet(() -> {
                     BedtimeSchedule fresh = new BedtimeSchedule();
-                    fresh.setChildProfileId(p.getId());
+                    fresh.setChildProfileId(profile.getId());
                     return fresh;
                 });
 

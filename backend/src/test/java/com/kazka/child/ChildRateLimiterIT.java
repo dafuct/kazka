@@ -16,8 +16,8 @@ class ChildRateLimiterIT extends AbstractIT {
     @Test
     void should_allow_up_to_five_creates_then_block_sixth() {
         String userId = "rl-user-" + System.nanoTime();
-        for (int i = 0; i < 5; i++) {
-            int call = i + 1;
+        for (int index = 0; index < 5; index++) {
+            int call = index + 1;
             assertThatNoException()
                     .as("call " + call)
                     .isThrownBy(() -> limiter.assertAndIncrement(userId));

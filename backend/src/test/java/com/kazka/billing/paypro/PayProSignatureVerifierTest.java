@@ -72,18 +72,18 @@ class PayProSignatureVerifierTest {
     }
 
     private Map<String, String> sampleIpn() {
-        Map<String, String> m = new HashMap<>();
-        m.put("ORDER_ID", "12345");
-        m.put("ORDER_STATUS", "Processed");
-        m.put("ORDER_TOTAL_AMOUNT", "9.99");
-        m.put("CUSTOMER_EMAIL", "user@example.com");
-        m.put("TEST_MODE", "0");
-        m.put("IPN_TYPE_NAME", "OrderCharged");
-        return m;
+        Map<String, String> ipn = new HashMap<>();
+        ipn.put("ORDER_ID", "12345");
+        ipn.put("ORDER_STATUS", "Processed");
+        ipn.put("ORDER_TOTAL_AMOUNT", "9.99");
+        ipn.put("CUSTOMER_EMAIL", "user@example.com");
+        ipn.put("TEST_MODE", "0");
+        ipn.put("IPN_TYPE_NAME", "OrderCharged");
+        return ipn;
     }
 
-    private static String sha256Hex(String s) throws Exception {
-        byte[] h = MessageDigest.getInstance("SHA-256").digest(s.getBytes(StandardCharsets.UTF_8));
-        return HexFormat.of().formatHex(h);
+    private static String sha256Hex(String input) throws Exception {
+        byte[] digest = MessageDigest.getInstance("SHA-256").digest(input.getBytes(StandardCharsets.UTF_8));
+        return HexFormat.of().formatHex(digest);
     }
 }

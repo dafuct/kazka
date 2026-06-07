@@ -28,8 +28,8 @@ class CharacterServiceTest {
 
     @Test
     void should_mergeTraitsAsUnion_on_upsert() {
-        ChildProfile p = new ChildProfile(); p.setId("p1"); p.setUserId("u");
-        when(profiles.requireOwned("p1", "u")).thenReturn(p);
+        ChildProfile profile = new ChildProfile(); profile.setId("p1"); profile.setUserId("u");
+        when(profiles.requireOwned("p1", "u")).thenReturn(profile);
         when(tier.maxSavedCharacters("u")).thenReturn(Integer.MAX_VALUE);
 
         com.kazka.child.Character existing = new com.kazka.child.Character();
@@ -56,8 +56,8 @@ class CharacterServiceTest {
 
     @Test
     void should_throw_PaywallRequired_when_confirmingAtFreeLimit() {
-        ChildProfile p = new ChildProfile(); p.setId("p1"); p.setUserId("u");
-        when(profiles.requireOwned("p1", "u")).thenReturn(p);
+        ChildProfile profile = new ChildProfile(); profile.setId("p1"); profile.setUserId("u");
+        when(profiles.requireOwned("p1", "u")).thenReturn(profile);
         when(tier.maxSavedCharacters("u")).thenReturn(0);
         when(repo.countByChildProfileIdAndArchivedAtIsNull("p1")).thenReturn(0L);
         when(repo.findByChildProfileIdAndName(eq("p1"), any())).thenReturn(Optional.empty());
@@ -70,8 +70,8 @@ class CharacterServiceTest {
 
     @Test
     void should_createNewCharacter_when_nameNotSeenBefore() {
-        ChildProfile p = new ChildProfile(); p.setId("p1"); p.setUserId("u");
-        when(profiles.requireOwned("p1", "u")).thenReturn(p);
+        ChildProfile profile = new ChildProfile(); profile.setId("p1"); profile.setUserId("u");
+        when(profiles.requireOwned("p1", "u")).thenReturn(profile);
         when(tier.maxSavedCharacters("u")).thenReturn(Integer.MAX_VALUE);
         when(repo.findByChildProfileIdAndName("p1", "Олег")).thenReturn(Optional.empty());
         when(repo.save(any())).thenAnswer(i -> i.getArgument(0));

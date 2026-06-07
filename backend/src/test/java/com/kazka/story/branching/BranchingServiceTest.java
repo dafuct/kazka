@@ -41,9 +41,9 @@ class BranchingServiceTest {
     @InjectMocks BranchingService svc;
 
     private ChildProfile profile() {
-        ChildProfile p = new ChildProfile();
-        p.setId("p1"); p.setUserId("u1"); p.setName("Лія"); p.setPreferredLanguage("uk");
-        return p;
+        ChildProfile profile = new ChildProfile();
+        profile.setId("p1"); profile.setUserId("u1"); profile.setName("Лія"); profile.setPreferredLanguage("uk");
+        return profile;
     }
 
     private com.kazka.auth.CurrentUserResolver.CurrentUser user(String id) {
@@ -85,46 +85,46 @@ class BranchingServiceTest {
 
     @Test
     void choose_rejects_unknown_choice_id_with_400() {
-        Story s = new Story();
-        s.setId("s1"); s.setUserId("u1");
-        s.setBranching(true);
-        s.setBranchingState("awaiting_choice_1");
-        s.setPendingChoices(List.of(
+        Story story = new Story();
+        story.setId("s1"); story.setUserId("u1");
+        story.setBranching(true);
+        story.setBranchingState("awaiting_choice_1");
+        story.setPendingChoices(List.of(
                 new BranchingChoice("A", "Option A"),
                 new BranchingChoice("B", "Option B")));
-        when(stories.findById("s1")).thenReturn(Optional.of(s));
+        when(stories.findById("s1")).thenReturn(Optional.of(story));
 
         assertThatThrownBy(() -> svc.choose("s1", "C", user("u1")).block())
                 .isInstanceOf(ResponseStatusException.class)
-                .satisfies(e -> assertThat(((ResponseStatusException) e).getStatusCode())
+                .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
                         .isEqualTo(HttpStatus.BAD_REQUEST));
     }
 
     @Test
     void choose_rejects_when_story_already_complete_with_400() {
-        Story s = new Story();
-        s.setId("s1"); s.setUserId("u1");
-        s.setBranching(true);
-        s.setBranchingState("complete");
-        when(stories.findById("s1")).thenReturn(Optional.of(s));
+        Story story = new Story();
+        story.setId("s1"); story.setUserId("u1");
+        story.setBranching(true);
+        story.setBranchingState("complete");
+        when(stories.findById("s1")).thenReturn(Optional.of(story));
 
         assertThatThrownBy(() -> svc.choose("s1", "A", user("u1")).block())
                 .isInstanceOf(ResponseStatusException.class)
-                .satisfies(e -> assertThat(((ResponseStatusException) e).getStatusCode())
+                .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
                         .isEqualTo(HttpStatus.BAD_REQUEST));
     }
 
     @Test
     void choose_returns_404_when_story_not_owned() {
-        Story s = new Story();
-        s.setId("s1"); s.setUserId("other-user");
-        s.setBranching(true);
-        s.setBranchingState("awaiting_choice_1");
-        when(stories.findById("s1")).thenReturn(Optional.of(s));
+        Story story = new Story();
+        story.setId("s1"); story.setUserId("other-user");
+        story.setBranching(true);
+        story.setBranchingState("awaiting_choice_1");
+        when(stories.findById("s1")).thenReturn(Optional.of(story));
 
         assertThatThrownBy(() -> svc.choose("s1", "A", user("u1")).block())
                 .isInstanceOf(ResponseStatusException.class)
-                .satisfies(e -> assertThat(((ResponseStatusException) e).getStatusCode())
+                .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
                         .isEqualTo(HttpStatus.NOT_FOUND));
     }
 }

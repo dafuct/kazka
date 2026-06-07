@@ -103,11 +103,11 @@ class PasswordResetIT extends AbstractIT {
         try {
             MimeMessage[] msgs = greenMail.getReceivedMessages();
             String body = msgs[msgs.length - 1].getContent().toString();
-            Matcher m = Pattern.compile("token=([A-Za-z0-9_-]+)").matcher(body);
-            assertThat(m.find()).isTrue();
-            return m.group(1);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            Matcher matcher = Pattern.compile("token=([A-Za-z0-9_-]+)").matcher(body);
+            assertThat(matcher.find()).isTrue();
+            return matcher.group(1);
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
         }
     }
 }

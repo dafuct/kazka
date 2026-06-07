@@ -47,20 +47,20 @@ class StoryGenerationWithChildIT extends AbstractIT {
     static class MockConfig {
         @Bean @Primary
         AiClient mockAi() {
-            AiClient m = mock(AiClient.class);
-            when(m.streamText(anyString(), anyString()))
+            AiClient aiClient = mock(AiClient.class);
+            when(aiClient.streamText(anyString(), anyString()))
                     .thenReturn(Flux.just("Пригода\n\nЖив-був дракон."));
-            when(m.streamEdit(anyString(), anyString()))
+            when(aiClient.streamEdit(anyString(), anyString()))
                     .thenReturn(Flux.just("Пригода\n\nЖив-був дракон."));
-            return m;
+            return aiClient;
         }
 
         @Bean @Primary
         ModerationService mockModeration() {
-            ModerationService m = mock(ModerationService.class);
-            when(m.checkInput(anyString(), anyString(), any()))
+            ModerationService moderation = mock(ModerationService.class);
+            when(moderation.checkInput(anyString(), anyString(), any()))
                     .thenReturn(ModerationResult.Allowed.INSTANCE);
-            return m;
+            return moderation;
         }
     }
 
@@ -132,27 +132,27 @@ class StoryGenerationWithChildIT extends AbstractIT {
 
     private String createUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test.example");
-        u.setDisplayName("Tester");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test.example");
+        user.setDisplayName("Tester");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
     private String createProfile(String userId) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId);
-        p.setName("Тест");
-        p.setPreferredLanguage("uk");
-        p.setInterests(List.of());
-        p.setAvatarSeed("abc123");
-        profiles.save(p);
-        return p.getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId);
+        profile.setName("Тест");
+        profile.setPreferredLanguage("uk");
+        profile.setInterests(List.of());
+        profile.setAvatarSeed("abc123");
+        profiles.save(profile);
+        return profile.getId();
     }
 
     private WebTestClient authedClient(String userId) {

@@ -79,10 +79,10 @@ public class AppleIdentityTokenVerifier {
             return new Verified(
                     claims.getSubject(),
                     claims.get("email", String.class));
-        } catch (InvalidAppleTokenException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new InvalidAppleTokenException(e.getMessage());
+        } catch (InvalidAppleTokenException invalidAppleTokenException) {
+            throw invalidAppleTokenException;
+        } catch (Exception exception) {
+            throw new InvalidAppleTokenException(exception.getMessage());
         }
     }
 
@@ -90,10 +90,10 @@ public class AppleIdentityTokenVerifier {
         if (!"EC".equals(jwk.get("kty").asText())) {
             return null;
         }
-        BigInteger x = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("x").asText()));
-        BigInteger y = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("y").asText()));
+        BigInteger pointX = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("x").asText()));
+        BigInteger pointY = new BigInteger(1, Base64.getUrlDecoder().decode(jwk.get("y").asText()));
         return KeyFactory.getInstance("EC")
-                .generatePublic(new ECPublicKeySpec(new ECPoint(x, y), secp256r1Spec()));
+                .generatePublic(new ECPublicKeySpec(new ECPoint(pointX, pointY), secp256r1Spec()));
     }
 
     private static ECParameterSpec secp256r1Spec() throws Exception {

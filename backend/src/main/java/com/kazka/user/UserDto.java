@@ -11,14 +11,14 @@ public record UserDto(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) boolean googleLinked,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) boolean suspended
 ) {
-    public static UserDto from(User u) {
+    public static UserDto from(User user) {
         return new UserDto(
-                u.getId(),
-                u.getEmail(),
-                u.getDisplayName(),
-                u.getRole(),
-                u.isEmailVerified(),
-                u.getGoogleSubject() != null,
-                u.isSuspended());
+                user.getId(),
+                user.getEmail(),
+                user.getDisplayName(),
+                user.getRole(),
+                user.isEmailVerified(),
+                user.getGoogleSubject() != null,
+                user.isSuspended());
     }
 }

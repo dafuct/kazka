@@ -5,6 +5,7 @@ import com.kazka.child.ChildProfile;
 import com.kazka.story.dto.GenerationRequest;
 import org.springframework.stereotype.Component;
 
+import java.time.Year;
 import java.util.List;
 
 @Component
@@ -21,7 +22,7 @@ public class BranchingPromptBuilder {
         if (child != null && child.getName() != null && !child.getName().isBlank()) {
             sb.append("Child name: ").append(child.getName()).append('\n');
             if (child.getBirthYear() != null) {
-                int age = java.time.Year.now().getValue() - child.getBirthYear();
+                int age = Year.now().getValue() - child.getBirthYear();
                 sb.append("Approximate age: ").append(age).append('\n');
             }
         }

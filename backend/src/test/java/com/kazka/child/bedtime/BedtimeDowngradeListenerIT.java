@@ -52,11 +52,11 @@ class BedtimeDowngradeListenerIT extends AbstractIT {
     void should_preserve_local_time_and_timezone_on_disable() {
         String userId = seedUser();
         String profileId = seedProfile(userId);
-        BedtimeSchedule s = enabledSchedule(profileId);
-        s.setLocalTime("19:45");
-        s.setTimezone("Europe/Warsaw");
-        s.setThemes(List.of("dragons"));
-        schedules.save(s);
+        BedtimeSchedule schedule = enabledSchedule(profileId);
+        schedule.setLocalTime("19:45");
+        schedule.setTimezone("Europe/Warsaw");
+        schedule.setThemes(List.of("dragons"));
+        schedules.save(schedule);
 
         when(entitlements.isPro(userId)).thenReturn(false);
         events.publishEvent(new EntitlementDowngradedEvent(userId));
@@ -69,33 +69,33 @@ class BedtimeDowngradeListenerIT extends AbstractIT {
     }
 
     private BedtimeSchedule enabledSchedule(String profileId) {
-        BedtimeSchedule s = new BedtimeSchedule();
-        s.setChildProfileId(profileId);
-        s.setEnabled(true);
-        s.setLocalTime("20:30");
-        s.setTimezone("Europe/Kyiv");
-        s.setThemes(List.of());
-        s.setNextRunAt(Instant.now().plusSeconds(3600));
-        return s;
+        BedtimeSchedule schedule = new BedtimeSchedule();
+        schedule.setChildProfileId(profileId);
+        schedule.setEnabled(true);
+        schedule.setLocalTime("20:30");
+        schedule.setTimezone("Europe/Kyiv");
+        schedule.setThemes(List.of());
+        schedule.setNextRunAt(Instant.now().plusSeconds(3600));
+        return schedule;
     }
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test");
-        u.setDisplayName("T");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test");
+        user.setDisplayName("T");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
     private String seedProfile(String userId) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId); p.setName("T"); p.setAvatarSeed("s"); p.setPreferredLanguage("uk");
-        return profiles.save(p).getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId); profile.setName("T"); profile.setAvatarSeed("s"); profile.setPreferredLanguage("uk");
+        return profiles.save(profile).getId();
     }
 }

@@ -105,8 +105,8 @@ public class NanoBananaClient {
             }
             String snippet = responseBody.length() > 200 ? responseBody.substring(0, 200) : responseBody;
             throw new IllegalStateException("Nano Banana response had no inline image part. Body head: " + snippet);
-        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
-            throw new IllegalStateException("Nano Banana returned invalid JSON: " + e.getMessage(), e);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException jsonException) {
+            throw new IllegalStateException("Nano Banana returned invalid JSON: " + jsonException.getMessage(), jsonException);
         }
     }
 }

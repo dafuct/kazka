@@ -34,11 +34,11 @@ public abstract class AbstractIT {
     }
 
     @DynamicPropertySource
-    static void redisProps(DynamicPropertyRegistry r) {
-        r.add("spring.data.redis.host", REDIS::getHost);
-        r.add("spring.data.redis.port", () -> REDIS.getMappedPort(6379));
-        r.add("spring.mail.host", () -> "localhost");
-        r.add("spring.mail.port", () -> ServerSetupTest.SMTP.getPort());
+    static void redisProps(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.redis.host", REDIS::getHost);
+        registry.add("spring.data.redis.port", () -> REDIS.getMappedPort(6379));
+        registry.add("spring.mail.host", () -> "localhost");
+        registry.add("spring.mail.port", () -> ServerSetupTest.SMTP.getPort());
     }
 
     @LocalServerPort

@@ -3,6 +3,8 @@ package com.kazka.child.bedtime;
 import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
+import com.kazka.holidays.Holiday;
+import com.kazka.holidays.HolidayCalendar;
 import com.kazka.story.Story;
 import com.kazka.story.StoryService;
 import com.kazka.user.User;
@@ -19,6 +21,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -36,7 +39,7 @@ public class BedtimeWorker {
     private final StoryService storyService;
     private final BedtimeMailer mailer;
     private final NextRunCalculator nextRunCalc;
-    private final com.kazka.holidays.HolidayCalendar holidayCalendar;
+    private final HolidayCalendar holidayCalendar;
 
     @Async
     public CompletableFuture<Void> enqueueAsync(String childProfileId) {
@@ -46,8 +49,8 @@ public class BedtimeWorker {
 
     @Transactional
     public void run(String childProfileId) {
-        BedtimeSchedule s = scheduleRepo.findByChildProfileId(childProfileId).orElse(null);
-        if (s == null || !s.isEnabled() || s.getFailedAt() != null) {
+        BedtimeSchedule schedule = scheduleRepo.findByChildProfileId(childProfileId).orElse(null);
+        if (schedule == null || !schedule.isEnabled() || schedule.getFailedAt() != null) {
             log.debug("Bedtime skipped: schedule missing/disabled/failed for {}", childProfileId);
             return;
         }
@@ -63,58 +66,60 @@ public class BedtimeWorker {
         }
         if (!entitlements.isPro(user.getId())) {
             log.info("Bedtime user {} no longer Pro — disabling schedule", user.getId());
-            s.setEnabled(false);
-            scheduleRepo.save(s);
+            schedule.setEnabled(false);
+            scheduleRepo.save(schedule);
             return;
         }
-        if (alreadySentToday(s)) {
+        if (alreadySentToday(schedule)) {
             log.debug("Bedtime dedup hit: schedule {} already sent today", childProfileId);
             return;
         }
 
         try {
-            java.util.Optional<com.kazka.holidays.Holiday> holiday =
-                    holidayCalendar.activeFor(java.time.Instant.now(), java.time.ZoneId.of(s.getTimezone()));
+            Optional<Holiday> holiday =
+                    holidayCalendar.activeFor(Instant.now(), ZoneId.of(schedule.getTimezone()));
 
             String themeOverride = null;
-            if (holiday.isPresent() && s.isHolidayThemesEnabled()) {
-                com.kazka.holidays.Holiday h = holiday.get();
+            if (holiday.isPresent() && schedule.isHolidayThemesEnabled()) {
+                Holiday activeHoliday = holiday.get();
                 String lang = child.getPreferredLanguage();
-                themeOverride = h.label(lang) + "\n\n" + h.culturalContext(lang);
-                log.info("Bedtime holiday active: {} for child {}", h.id(), child.getId());
+                themeOverride = activeHoliday.label(lang) + "\n\n" + activeHoliday.culturalContext(lang);
+                log.info("Bedtime holiday active: {} for child {}", activeHoliday.id(), child.getId());
             }
 
-            Story story = storyService.generateForBedtime(child, s, user, themeOverride).block();
+            Story story = storyService.generateForBedtime(child, schedule, user, themeOverride).block();
             mailer.send(Objects.requireNonNull(story), child, user);
-            s.setLastSentAt(Instant.now());
-            s.setRetryCount(0);
-            s.setFailedAt(null);
-            s.setNextRunAt(nextRunCalc.nextRun(
-                    LocalTime.parse(s.getLocalTime()),
-                    ZoneId.of(s.getTimezone()),
+            schedule.setLastSentAt(Instant.now());
+            schedule.setRetryCount(0);
+            schedule.setFailedAt(null);
+            schedule.setNextRunAt(nextRunCalc.nextRun(
+                    LocalTime.parse(schedule.getLocalTime()),
+                    ZoneId.of(schedule.getTimezone()),
                     Instant.now()));
-            scheduleRepo.save(s);
-        } catch (Exception e) {
-            log.warn("Bedtime generation/send failed for {}: {}", childProfileId, e.getMessage());
-            int retries = s.getRetryCount() + 1;
-            s.setRetryCount(retries);
+            scheduleRepo.save(schedule);
+        } catch (Exception exception) {
+            log.warn("Bedtime generation/send failed for {}: {}", childProfileId, exception.getMessage());
+            int retries = schedule.getRetryCount() + 1;
+            schedule.setRetryCount(retries);
             if (retries >= MAX_RETRIES) {
-                s.setFailedAt(Instant.now());
-                s.setNextRunAt(nextRunCalc.nextRun(
-                        LocalTime.parse(s.getLocalTime()),
-                        ZoneId.of(s.getTimezone()),
-                        Instant.now()));
+                schedule.setFailedAt(Instant.now());
+                // Advance to tomorrow's bedtime so a permanent failure doesn't re-schedule
+                // for the same bedtime window that just failed (which may be only minutes away).
+                schedule.setNextRunAt(nextRunCalc.nextRun(
+                        LocalTime.parse(schedule.getLocalTime()),
+                        ZoneId.of(schedule.getTimezone()),
+                        Instant.now().plus(Duration.ofDays(1))));
             } else {
-                s.setNextRunAt(Instant.now().plus(RETRY_BACKOFF));
+                schedule.setNextRunAt(Instant.now().plus(RETRY_BACKOFF));
             }
-            scheduleRepo.save(s);
+            scheduleRepo.save(schedule);
         }
     }
 
-    private boolean alreadySentToday(BedtimeSchedule s) {
-        if (s.getLastSentAt() == null) return false;
-        ZoneId tz = ZoneId.of(s.getTimezone());
-        ZonedDateTime sentLocal = s.getLastSentAt().atZone(tz);
+    private boolean alreadySentToday(BedtimeSchedule schedule) {
+        if (schedule.getLastSentAt() == null) return false;
+        ZoneId tz = ZoneId.of(schedule.getTimezone());
+        ZonedDateTime sentLocal = schedule.getLastSentAt().atZone(tz);
         ZonedDateTime nowLocal = Instant.now().atZone(tz);
         return sentLocal.toLocalDate().equals(nowLocal.toLocalDate());
     }

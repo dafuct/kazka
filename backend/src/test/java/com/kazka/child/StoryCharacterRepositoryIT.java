@@ -43,53 +43,53 @@ class StoryCharacterRepositoryIT extends AbstractIT {
 
     private String seedUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test");
-        u.setDisplayName("T");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test");
+        user.setDisplayName("T");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
     private String seedProfile(String userId) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(userId);
-        p.setName("Test");
-        p.setAvatarSeed("seed");
-        p.setPreferredLanguage("uk");
-        profiles.save(p);
-        return p.getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(userId);
+        profile.setName("Test");
+        profile.setAvatarSeed("seed");
+        profile.setPreferredLanguage("uk");
+        profiles.save(profile);
+        return profile.getId();
     }
 
     private String seedStory(String userId, String profileId) {
-        Story s = new Story();
-        s.setId(UUID.randomUUID().toString());
-        s.setUserId(userId);
-        s.setChildProfileId(profileId);
-        s.setTitle("Test Story");
-        s.setTheme("adventure");
-        s.setCharacters(List.of());
-        s.setAgeGroup("3-5");
-        s.setLength("short");
-        s.setLanguage("uk");
-        s.setContent("Once upon a time...");
-        stories.save(s);
-        return s.getId();
+        Story story = new Story();
+        story.setId(UUID.randomUUID().toString());
+        story.setUserId(userId);
+        story.setChildProfileId(profileId);
+        story.setTitle("Test Story");
+        story.setTheme("adventure");
+        story.setCharacters(List.of());
+        story.setAgeGroup("3-5");
+        story.setLength("short");
+        story.setLanguage("uk");
+        story.setContent("Once upon a time...");
+        stories.save(story);
+        return story.getId();
     }
 
     private String seedCharacter(String profileId) {
-        Character c = new Character();
-        c.setId(UUID.randomUUID().toString());
-        c.setChildProfileId(profileId);
-        c.setName("Мурка-" + UUID.randomUUID());
-        c.setKind("animal");
-        c.setDescription("a tortoiseshell cat with green eyes");
-        c.setTraits(List.of("curious", "brave"));
-        characters.save(c);
-        return c.getId();
+        Character character = new Character();
+        character.setId(UUID.randomUUID().toString());
+        character.setChildProfileId(profileId);
+        character.setName("Мурка-" + UUID.randomUUID());
+        character.setKind("animal");
+        character.setDescription("a tortoiseshell cat with green eyes");
+        character.setTraits(List.of("curious", "brave"));
+        characters.save(character);
+        return character.getId();
     }
 }

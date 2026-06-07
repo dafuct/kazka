@@ -29,9 +29,9 @@ final class ComicPagePrompt {
         sb.append("Lay the page out as ").append(beats.size())
           .append(" panels of varied sizes — one wide establishing panel at the top, ")
           .append("smaller panels below — read left-to-right, top-to-bottom.\n\n");
-        for (int i = 0; i < beats.size(); i++) {
-            Act b = beats.get(i);
-            sb.append("Panel ").append(i + 1).append(": ").append(b.scene().strip()).append("\n");
+        for (int index = 0; index < beats.size(); index++) {
+            Act beat = beats.get(index);
+            sb.append("Panel ").append(index + 1).append(": ").append(beat.scene().strip()).append("\n");
         }
         sb.append("\nThe whole page must be 100% wordless: no speech bubbles, no captions, ")
           .append("no signs, no labels, no letters or numbers anywhere — emotions and story ")

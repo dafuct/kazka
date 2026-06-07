@@ -64,9 +64,9 @@ class ChildProfileServiceTest {
 
     @Test
     void should_archiveOnDelete_notHardDelete() {
-        ChildProfile p = new ChildProfile();
-        p.setId("p1"); p.setUserId("u");
-        when(repo.findByIdAndUserId("p1", "u")).thenReturn(Optional.of(p));
+        ChildProfile profile = new ChildProfile();
+        profile.setId("p1"); profile.setUserId("u");
+        when(repo.findByIdAndUserId("p1", "u")).thenReturn(Optional.of(profile));
 
         svc.archive("p1", "u");
 
@@ -77,9 +77,9 @@ class ChildProfileServiceTest {
 
     @Test
     void should_updateMutableFields() {
-        ChildProfile p = new ChildProfile();
-        p.setId("p1"); p.setUserId("u"); p.setName("Old"); p.setPreferredLanguage("uk");
-        when(repo.findByIdAndUserId("p1", "u")).thenReturn(Optional.of(p));
+        ChildProfile profile = new ChildProfile();
+        profile.setId("p1"); profile.setUserId("u"); profile.setName("Old"); profile.setPreferredLanguage("uk");
+        when(repo.findByIdAndUserId("p1", "u")).thenReturn(Optional.of(profile));
         when(repo.save(any())).thenAnswer(i -> i.getArgument(0));
 
         ChildProfile updated = svc.update("p1", "u",

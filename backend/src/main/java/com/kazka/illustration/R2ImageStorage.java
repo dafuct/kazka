@@ -60,8 +60,8 @@ public class R2ImageStorage implements ImageStorage {
         if (key == null || key.isBlank()) return;
         try {
             s3.deleteObject(DeleteObjectRequest.builder().bucket(bucket).key(key).build());
-        } catch (Exception e) {
-            log.warn("Could not delete R2 object {}: {}", key, e.getMessage());
+        } catch (Exception exception) {
+            log.warn("Could not delete R2 object {}: {}", key, exception.getMessage());
         }
     }
 }

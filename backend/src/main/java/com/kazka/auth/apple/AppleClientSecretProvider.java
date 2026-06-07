@@ -59,8 +59,8 @@ public class AppleClientSecretProvider {
         byte[] der = Base64.getDecoder().decode(body);
         try {
             return KeyFactory.getInstance("EC").generatePrivate(new PKCS8EncodedKeySpec(der));
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed to parse Apple .p8 key", e);
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to parse Apple .p8 key", exception);
         }
     }
 

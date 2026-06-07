@@ -16,13 +16,13 @@ public class TraitsConverter implements AttributeConverter<List<String>, String>
     public String convertToDatabaseColumn(List<String> attribute) {
         if (attribute == null) return "[]";
         try { return MAPPER.writeValueAsString(attribute); }
-        catch (JsonProcessingException e) { throw new IllegalArgumentException("Cannot serialize traits", e); }
+        catch (JsonProcessingException jsonException) { throw new IllegalArgumentException("Cannot serialize traits", jsonException); }
     }
 
     @Override
     public List<String> convertToEntityAttribute(String dbData) {
         if (dbData == null || dbData.isBlank()) return List.of();
         try { return MAPPER.readValue(dbData, new TypeReference<>() {}); }
-        catch (JsonProcessingException e) { throw new IllegalArgumentException("Cannot deserialize traits", e); }
+        catch (JsonProcessingException jsonException) { throw new IllegalArgumentException("Cannot deserialize traits", jsonException); }
     }
 }

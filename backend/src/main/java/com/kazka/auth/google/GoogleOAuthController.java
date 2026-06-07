@@ -57,12 +57,12 @@ public class GoogleOAuthController {
         return contextRepo.save(exchange, new SecurityContextImpl(token));
     }
 
-    private Mono<TokenResponse> issueTokens(User u) {
-        String access = tokenIssuer.issueAccessToken(u.getId(), u.getRole());
-        return refreshTokens.issue(u.getId())
+    private Mono<TokenResponse> issueTokens(User user) {
+        String access = tokenIssuer.issueAccessToken(user.getId(), user.getRole());
+        return refreshTokens.issue(user.getId())
                 .map(refresh -> new TokenResponse(
                         access, refresh,
                         props.jwt().accessTtl().toSeconds(),
-                        UserDto.from(u)));
+                        UserDto.from(user)));
     }
 }

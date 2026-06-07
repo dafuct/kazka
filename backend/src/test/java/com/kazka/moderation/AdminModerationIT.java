@@ -58,10 +58,10 @@ class AdminModerationIT extends AbstractIT {
     @Test
     void should_listSuspendedUsers_when_adminCallsModerationSuspended() {
         seedAdmin();
-        var u = seedUser("paused@example.com");
-        u.setSuspendedAt(Instant.now());
-        u.setSuspendedReason("CONTENT_POLICY");
-        users.save(u);
+        var user = seedUser("paused@example.com");
+        user.setSuspendedAt(Instant.now());
+        user.setSuspendedReason("CONTENT_POLICY");
+        users.save(user);
 
         client().get().uri("/api/admin/moderation/suspended")
                 .cookie("SESSION", login("admin@example.com").sessionId())
@@ -75,47 +75,47 @@ class AdminModerationIT extends AbstractIT {
     @Test
     void should_clearSuspensionColumns_when_adminUnsuspends() {
         seedAdmin();
-        var u = seedUser("paused@example.com");
-        u.setSuspendedAt(Instant.now());
-        u.setSuspendedReason("CONTENT_POLICY");
-        users.save(u);
+        var user = seedUser("paused@example.com");
+        user.setSuspendedAt(Instant.now());
+        user.setSuspendedReason("CONTENT_POLICY");
+        users.save(user);
 
         Session session = login("admin@example.com");
-        client().post().uri("/api/admin/users/" + u.getId() + "/unsuspend")
+        client().post().uri("/api/admin/users/" + user.getId() + "/unsuspend")
                 .cookie("SESSION", session.sessionId())
                 .cookie("XSRF-TOKEN", session.csrfToken())
                 .header("X-XSRF-TOKEN", session.csrfToken())
                 .exchange()
                 .expectStatus().isNoContent();
 
-        var fresh = users.findById(u.getId()).orElseThrow();
+        var fresh = users.findById(user.getId()).orElseThrow();
         assertThat(fresh.isSuspended()).isFalse();
         assertThat(fresh.getSuspendedReason()).isNull();
     }
 
     private User seedUser(String email) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setDisplayName("U");
-        u.setRole(UserRole.USER);
-        u.setPasswordHash(org.springframework.security.crypto.bcrypt.BCrypt.hashpw("password123", org.springframework.security.crypto.bcrypt.BCrypt.gensalt()));
-        u.setEmailVerified(true);
-        users.save(u);
-        return u;
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setDisplayName("U");
+        user.setRole(UserRole.USER);
+        user.setPasswordHash(org.springframework.security.crypto.bcrypt.BCrypt.hashpw("password123", org.springframework.security.crypto.bcrypt.BCrypt.gensalt()));
+        user.setEmailVerified(true);
+        users.save(user);
+        return user;
     }
 
     private void seedAdmin() {
-        User u = seedUser("admin@example.com");
-        u.setRole(UserRole.ADMIN);
-        users.save(u);
+        User user = seedUser("admin@example.com");
+        user.setRole(UserRole.ADMIN);
+        users.save(user);
     }
 
     private void seedUserWithFlag(String email, ModerationCategory cat) {
-        User u = seedUser(email);
+        User user = seedUser(email);
         FlaggedAttempt fa = new FlaggedAttempt();
         fa.setId(UUID.randomUUID().toString());
-        fa.setUserId(u.getId());
+        fa.setUserId(user.getId());
         fa.setPipeline(ModerationPipeline.TEXT_INPUT);
         fa.setCategory(cat);
         fa.setLanguage("uk");

@@ -43,23 +43,23 @@ class ModerationServiceTest {
     @Test
     void should_returnAllowed_when_judgeReturnsAllowed() {
         when(guard.classify(anyString(), anyString(), any())).thenReturn(ModerationResult.Allowed.INSTANCE);
-        ModerationResult r = service.checkInput("uk", "happy bears", List.of("Sofia"));
-        assertThat(r).isInstanceOf(ModerationResult.Allowed.class);
+        ModerationResult result = service.checkInput("uk", "happy bears", List.of("Sofia"));
+        assertThat(result).isInstanceOf(ModerationResult.Allowed.class);
     }
 
     @Test
     void should_returnRefused_when_judgeReturnsRefused() {
         when(guard.classify(anyString(), anyString(), any()))
                 .thenReturn(ModerationResult.Refused.of(ModerationCategory.SEXUAL));
-        ModerationResult r = service.checkInput("uk", "naked princess", List.of());
-        assertThat(((ModerationResult.Refused) r).category()).isEqualTo(ModerationCategory.SEXUAL);
+        ModerationResult result = service.checkInput("uk", "naked princess", List.of());
+        assertThat(((ModerationResult.Refused) result).category()).isEqualTo(ModerationCategory.SEXUAL);
     }
 
     @Test
     void should_useCachedResult_when_sameNormalizedPromptSeenAgain() {
         when(ops.get(anyString())).thenReturn(Mono.just("ALLOWED"));
-        ModerationResult r = service.checkInput("uk", " Happy   Bears ", List.of("Sofia"));
-        assertThat(r).isInstanceOf(ModerationResult.Allowed.class);
+        ModerationResult result = service.checkInput("uk", " Happy   Bears ", List.of("Sofia"));
+        assertThat(result).isInstanceOf(ModerationResult.Allowed.class);
         verifyNoInteractions(guard);
     }
 
@@ -73,8 +73,8 @@ class ModerationServiceTest {
     @Test
     void should_returnJudgeUnavailable_when_clientThrows() {
         when(guard.classify(anyString(), anyString(), any())).thenThrow(new RuntimeException("boom"));
-        ModerationResult r = service.checkInput("uk", "x", List.of());
-        assertThat(((ModerationResult.Refused) r).category()).isEqualTo(ModerationCategory.JUDGE_UNAVAILABLE);
+        ModerationResult result = service.checkInput("uk", "x", List.of());
+        assertThat(((ModerationResult.Refused) result).category()).isEqualTo(ModerationCategory.JUDGE_UNAVAILABLE);
     }
 
     @Test

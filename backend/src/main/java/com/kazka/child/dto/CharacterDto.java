@@ -18,9 +18,9 @@ public record CharacterDto(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) int usageCount,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Instant createdAt
 ) {
-    public static CharacterDto from(Character c) {
-        return new CharacterDto(c.getId(), c.getChildProfileId(), c.getName(), c.getKind(),
-                c.getDescription(), c.getTraits(), c.getFirstStoryId(), c.getLastUsedAt(),
-                c.getUsageCount(), c.getCreatedAt());
+    public static CharacterDto from(Character character) {
+        return new CharacterDto(character.getId(), character.getChildProfileId(), character.getName(), character.getKind(),
+                character.getDescription(), character.getTraits(), character.getFirstStoryId(), character.getLastUsedAt(),
+                character.getUsageCount(), character.getCreatedAt());
     }
 }

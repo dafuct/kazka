@@ -13,6 +13,7 @@ import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Map;
 
 @Slf4j
@@ -51,11 +52,11 @@ public class MailService {
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
             mailSender.send(msg);
-        } catch (jakarta.mail.MessagingException e) {
-            throw new IllegalStateException("Failed to build HTML mail to " + to, e);
-        } catch (org.springframework.mail.MailException e) {
-            log.warn("Failed to send HTML mail to {}: {}", to, e.getMessage());
-            throw new MailDeliveryException(e);
+        } catch (jakarta.mail.MessagingException messagingException) {
+            throw new IllegalStateException("Failed to build HTML mail to " + to, messagingException);
+        } catch (org.springframework.mail.MailException mailException) {
+            log.warn("Failed to send HTML mail to {}: {}", to, mailException.getMessage());
+            throw new MailDeliveryException(mailException);
         }
     }
 
@@ -64,7 +65,7 @@ public class MailService {
              "mail/admin-suspension-notice-subject.txt",
              "mail/admin-suspension-notice-body.txt",
              Map.of("userEmail", userEmail,
-                    "suspendedAt", java.time.Instant.now().toString(),
+                    "suspendedAt", Instant.now().toString(),
                     "baseUrl", props.appBaseUrl()));
     }
 
@@ -78,11 +79,11 @@ public class MailService {
             msg.setSubject(subject);
             msg.setText(body);
             mailSender.send(msg);
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot read mail template " + subjectPath, e);
-        } catch (org.springframework.mail.MailException e) {
-            log.warn("Failed to send mail to {}: {}", to, e.getMessage());
-            throw new MailDeliveryException(e);
+        } catch (IOException ioException) {
+            throw new IllegalStateException("Cannot read mail template " + subjectPath, ioException);
+        } catch (org.springframework.mail.MailException mailException) {
+            log.warn("Failed to send mail to {}: {}", to, mailException.getMessage());
+            throw new MailDeliveryException(mailException);
         }
     }
 

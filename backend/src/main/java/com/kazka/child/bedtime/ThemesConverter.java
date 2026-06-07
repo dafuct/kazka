@@ -17,13 +17,13 @@ public class ThemesConverter implements AttributeConverter<List<String>, String>
     public String convertToDatabaseColumn(List<String> attribute) {
         if (attribute == null) return "[]";
         try { return MAPPER.writeValueAsString(attribute); }
-        catch (JsonProcessingException e) { throw new IllegalArgumentException("Cannot serialize themes", e); }
+        catch (JsonProcessingException jsonException) { throw new IllegalArgumentException("Cannot serialize themes", jsonException); }
     }
 
     @Override
     public List<String> convertToEntityAttribute(String dbData) {
         if (dbData == null || dbData.isBlank()) return List.of();
         try { return MAPPER.readValue(dbData, new TypeReference<>() {}); }
-        catch (JsonProcessingException e) { throw new IllegalArgumentException("Cannot deserialize themes", e); }
+        catch (JsonProcessingException jsonException) { throw new IllegalArgumentException("Cannot deserialize themes", jsonException); }
     }
 }

@@ -34,7 +34,7 @@ class JsonLoginConverter implements ServerAuthenticationConverter {
                         String email = node.path("email").asText("").trim().toLowerCase();
                         String password = node.path("password").asText("");
                         return (Authentication) new UsernamePasswordAuthenticationToken(email, password);
-                    } catch (Exception e) {
+                    } catch (Exception exception) {
                         throw new IllegalArgumentException("invalid login body");
                     }
                 });

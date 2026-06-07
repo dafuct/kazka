@@ -95,42 +95,42 @@ class CharacterControllerIT extends AbstractIT {
 
     private String createUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test.example");
-        u.setDisplayName("Tester");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test.example");
+        user.setDisplayName("Tester");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
     private String createProfile(String ownerId) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(ownerId);
-        p.setName("TestChild");
-        p.setPreferredLanguage("uk");
-        p.setAvatarSeed("seed");
-        p.setInterests(List.of());
-        profiles.save(p);
-        return p.getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(ownerId);
+        profile.setName("TestChild");
+        profile.setPreferredLanguage("uk");
+        profile.setAvatarSeed("seed");
+        profile.setInterests(List.of());
+        profiles.save(profile);
+        return profile.getId();
     }
 
     private String createStory(String ownerId, String childProfileId) {
-        Story s = new Story();
-        s.setId(UUID.randomUUID().toString());
-        s.setUserId(ownerId);
-        s.setChildProfileId(childProfileId);
-        s.setTitle("Test story");
-        s.setTheme("adventure");
-        s.setCharacters(List.of());
-        s.setAgeGroup("3-5");
-        s.setLength("short");
-        s.setContent("Once upon a time...");
-        stories.save(s);
-        return s.getId();
+        Story story = new Story();
+        story.setId(UUID.randomUUID().toString());
+        story.setUserId(ownerId);
+        story.setChildProfileId(childProfileId);
+        story.setTitle("Test story");
+        story.setTheme("adventure");
+        story.setCharacters(List.of());
+        story.setAgeGroup("3-5");
+        story.setLength("short");
+        story.setContent("Once upon a time...");
+        stories.save(story);
+        return story.getId();
     }
 
     /**

@@ -88,44 +88,44 @@ class StoryChildFilterIT extends AbstractIT {
 
     private String createUser() {
         String id = UUID.randomUUID().toString();
-        User u = new User();
-        u.setId(id);
-        u.setEmail(id + "@test.example");
-        u.setDisplayName("Tester");
-        u.setPasswordHash(passwordEncoder.encode("password123"));
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        users.save(u);
+        User user = new User();
+        user.setId(id);
+        user.setEmail(id + "@test.example");
+        user.setDisplayName("Tester");
+        user.setPasswordHash(passwordEncoder.encode("password123"));
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        users.save(user);
         return id;
     }
 
     private String createProfile(String ownerId, String name) {
-        ChildProfile p = new ChildProfile();
-        p.setId(UUID.randomUUID().toString());
-        p.setUserId(ownerId);
-        p.setName(name);
-        p.setPreferredLanguage("uk");
-        p.setInterests(List.of());
-        p.setAvatarSeed("seed-" + name.toLowerCase());
-        profiles.save(p);
-        return p.getId();
+        ChildProfile profile = new ChildProfile();
+        profile.setId(UUID.randomUUID().toString());
+        profile.setUserId(ownerId);
+        profile.setName(name);
+        profile.setPreferredLanguage("uk");
+        profile.setInterests(List.of());
+        profile.setAvatarSeed("seed-" + name.toLowerCase());
+        profiles.save(profile);
+        return profile.getId();
     }
 
     private String createStory(String ownerId, String childProfileId) {
-        Story s = new Story();
-        s.setId(UUID.randomUUID().toString());
-        s.setUserId(ownerId);
-        s.setTitle("Story for " + (childProfileId == null ? "none" : childProfileId));
-        s.setTheme("theme");
-        s.setCharacters(List.of("hero"));
-        s.setAgeGroup("6-8");
-        s.setLength("short");
-        s.setLanguage("uk");
-        s.setContent("content");
-        s.setIllustrationStatus(IllustrationStatus.PENDING);
-        s.setChildProfileId(childProfileId);
-        stories.save(s);
-        return s.getId();
+        Story story = new Story();
+        story.setId(UUID.randomUUID().toString());
+        story.setUserId(ownerId);
+        story.setTitle("Story for " + (childProfileId == null ? "none" : childProfileId));
+        story.setTheme("theme");
+        story.setCharacters(List.of("hero"));
+        story.setAgeGroup("6-8");
+        story.setLength("short");
+        story.setLanguage("uk");
+        story.setContent("content");
+        story.setIllustrationStatus(IllustrationStatus.PENDING);
+        story.setChildProfileId(childProfileId);
+        stories.save(story);
+        return story.getId();
     }
 
     private WebTestClient authedClient(String userId) {

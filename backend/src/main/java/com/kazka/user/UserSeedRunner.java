@@ -35,14 +35,14 @@ public class UserSeedRunner implements ApplicationRunner {
             log.info("Admin user {} already present — skipping seed", normalized);
             return;
         }
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(normalized);
-        u.setPasswordHash(passwordEncoder.encode(password));
-        u.setDisplayName("Admin");
-        u.setRole(UserRole.ADMIN);
-        u.setEmailVerified(true);
-        users.save(u);
+        User adminUser = new User();
+        adminUser.setId(UUID.randomUUID().toString());
+        adminUser.setEmail(normalized);
+        adminUser.setPasswordHash(passwordEncoder.encode(password));
+        adminUser.setDisplayName("Admin");
+        adminUser.setRole(UserRole.ADMIN);
+        adminUser.setEmailVerified(true);
+        users.save(adminUser);
         log.info("Seeded admin user {}", normalized);
     }
 }

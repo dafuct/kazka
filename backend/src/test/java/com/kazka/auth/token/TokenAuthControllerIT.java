@@ -29,19 +29,19 @@ class TokenAuthControllerIT extends AbstractIT {
     }
 
     private User seedUser(String email, String password) {
-        User u = new User();
-        u.setId(UUID.randomUUID().toString());
-        u.setEmail(email);
-        u.setPasswordHash(encoder.encode(password));
-        u.setDisplayName("Test");
-        u.setRole(UserRole.USER);
-        u.setEmailVerified(true);
-        return users.save(u);
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(email);
+        user.setPasswordHash(encoder.encode(password));
+        user.setDisplayName("Test");
+        user.setRole(UserRole.USER);
+        user.setEmailVerified(true);
+        return users.save(user);
     }
 
     @Test
     void should_returnAccessAndRefreshTokens_when_loginWithValidCredentials() {
-        User u = seedUser("alice@example.com", "password123");
+        User seededUser = seedUser("alice@example.com", "password123");
 
         var body = client().post().uri("/api/auth/token/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -51,7 +51,7 @@ class TokenAuthControllerIT extends AbstractIT {
                 .expectBody()
                 .jsonPath("$.accessToken").isNotEmpty()
                 .jsonPath("$.refreshToken").isNotEmpty()
-                .jsonPath("$.user.id").isEqualTo(u.getId())
+                .jsonPath("$.user.id").isEqualTo(seededUser.getId())
                 .jsonPath("$.user.email").isEqualTo("alice@example.com")
                 .returnResult().getResponseBody();
 
@@ -82,7 +82,7 @@ class TokenAuthControllerIT extends AbstractIT {
 
     @Test
     void should_acceptBearerToken_when_accessTokenUsedOnMeEndpoint() {
-        User u = seedUser("carol@example.com", "password123");
+        User carolUser = seedUser("carol@example.com", "password123");
 
         @SuppressWarnings("rawtypes")
         Map loginBody = client().post().uri("/api/auth/token/login")
