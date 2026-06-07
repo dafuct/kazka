@@ -112,6 +112,11 @@ public class AiClient {
         body.put("top_p", topP);
         if (frequencyPenalty != 0.0) body.put("frequency_penalty", frequencyPenalty);
         if (presencePenalty != 0.0) body.put("presence_penalty", presencePenalty);
+        // Disable Gemini 2.5 chain-of-thought. With thinking on it consumes most of the
+        // max_tokens budget, so the visible tale is truncated mid-stream (comes out short,
+        // with no ending). Same reliability fix as generateText(); creative quality comes
+        // from the prompt + sampling, not from thinking on this open-ended writing task.
+        body.put("reasoning_effort", "none");
         // Use Spring's ServerSentEvent codec rather than `bodyToFlux(String.class)`. The latter
         // emits one String per network buffer, which can carry multiple SSE events glued together
         // or a partial event split across buffers — both of which cause silent token drops on the
