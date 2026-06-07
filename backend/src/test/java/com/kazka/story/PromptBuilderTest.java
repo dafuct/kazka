@@ -20,8 +20,8 @@ class PromptBuilderTest {
         assertThat(system).contains("Opening");
         assertThat(system).contains("Challenge");
         assertThat(system).contains("Resolution");
-        assertThat(system).contains("STYLE EXAMPLES (Ukrainian)");
-        assertThat(system).contains("Тимко");
+        assertThat(system).contains("STYLE EXAMPLES (Ukrainian folk tale");
+        assertThat(system).contains("Калинка");
     }
 
     @Test
@@ -30,8 +30,22 @@ class PromptBuilderTest {
 
         assertThat(system).contains("Opening");
         assertThat(system).contains("Resolution");
-        assertThat(system).contains("STYLE EXAMPLES (English)");
-        assertThat(system).contains("Pippin");
+        assertThat(system).contains("STYLE EXAMPLES (English folk tale)");
+        assertThat(system).contains("Rowan");
+    }
+
+    @Test
+    void should_include_folk_tale_style_when_building_uk_system_prompt() {
+        String system = new PromptBuilder().buildStorySystem("uk");
+        assertThat(system).contains("народна казка");
+        assertThat(system).contains("Жили собі");
+    }
+
+    @Test
+    void should_include_folk_tale_style_when_building_en_system_prompt() {
+        String system = new PromptBuilder().buildStorySystem("en");
+        assertThat(system.toLowerCase()).contains("folk tale");
+        assertThat(system).contains("Long ago");
     }
 
     @Test

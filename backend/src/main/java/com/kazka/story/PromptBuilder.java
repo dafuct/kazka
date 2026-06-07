@@ -31,22 +31,22 @@ public class PromptBuilder {
     private final Map<String, Map<Theme, String>> imageStyleByAge;
 
     public PromptBuilder() {
-        this.storySystem = readResource("prompts/story-system.txt");
-        this.storyFewshotUk = readResource("prompts/story-fewshot-uk.txt");
-        this.storyFewshotEn = readResource("prompts/story-fewshot-en.txt");
-        this.editorUk = readResource("prompts/editor-uk.txt");
-        this.editorEn = readResource("prompts/editor-en.txt");
-        this.sceneExtractionSystem = readResource("prompts/scene-extraction-system.txt");
+        this.storySystem = readResource("prompts/story-system.md");
+        this.storyFewshotUk = readResource("prompts/story-fewshot-uk.md");
+        this.storyFewshotEn = readResource("prompts/story-fewshot-en.md");
+        this.editorUk = readResource("prompts/editor-uk.md");
+        this.editorEn = readResource("prompts/editor-en.md");
+        this.sceneExtractionSystem = readResource("prompts/scene-extraction-system.md");
         this.imageStyleByAge = Map.of(
                 "3-5",  Map.of(
-                        Theme.LIGHT, readResource("prompts/image-style-3-5-light.txt"),
-                        Theme.DARK,  readResource("prompts/image-style-3-5-dark.txt")),
+                        Theme.LIGHT, readResource("prompts/image-style-3-5-light.md"),
+                        Theme.DARK,  readResource("prompts/image-style-3-5-dark.md")),
                 "6-8",  Map.of(
-                        Theme.LIGHT, readResource("prompts/image-style-6-8-light.txt"),
-                        Theme.DARK,  readResource("prompts/image-style-6-8-dark.txt")),
+                        Theme.LIGHT, readResource("prompts/image-style-6-8-light.md"),
+                        Theme.DARK,  readResource("prompts/image-style-6-8-dark.md")),
                 "9-12", Map.of(
-                        Theme.LIGHT, readResource("prompts/image-style-9-12-light.txt"),
-                        Theme.DARK,  readResource("prompts/image-style-9-12-dark.txt"))
+                        Theme.LIGHT, readResource("prompts/image-style-9-12-light.md"),
+                        Theme.DARK,  readResource("prompts/image-style-9-12-dark.md"))
         );
     }
 

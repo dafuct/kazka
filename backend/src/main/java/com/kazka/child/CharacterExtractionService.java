@@ -30,9 +30,9 @@ public class CharacterExtractionService {
 
     private static String loadPrompt() {
         try {
-            String sys = new ClassPathResource("prompts/character-extraction-system.txt")
+            String sys = new ClassPathResource("prompts/character-extraction-system.md")
                     .getContentAsString(StandardCharsets.UTF_8);
-            String fewshot = new ClassPathResource("prompts/character-extraction-fewshot.txt")
+            String fewshot = new ClassPathResource("prompts/character-extraction-fewshot.md")
                     .getContentAsString(StandardCharsets.UTF_8);
             return sys.strip() + "\n\n---\n\n" + fewshot.strip();
         } catch (IOException ioException) {

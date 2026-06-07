@@ -58,7 +58,7 @@ public enum Holiday {
 
     private static String loadContext(String id, String lang) {
         try {
-            return new ClassPathResource("prompts/holidays/" + id + "." + lang + ".txt")
+            return new ClassPathResource("prompts/holidays/" + id + "." + lang + ".md")
                     .getContentAsString(StandardCharsets.UTF_8).strip();
         } catch (IOException ioException) {
             throw new UncheckedIOException("Missing holiday context: " + id + "." + lang, ioException);
