@@ -22,12 +22,10 @@ class StoryChildExtractionPersistenceIT extends AbstractIT {
     @Autowired StoryRepository repo;
     @Autowired UserRepository users;
     @Autowired PasswordEncoder passwordEncoder;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
     void clean() {
         repo.deleteAll();
-        entitlementRepo.deleteAll();
         users.deleteAll();
     }
 

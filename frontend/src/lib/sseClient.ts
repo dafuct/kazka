@@ -15,7 +15,7 @@ export interface SseDoneEvent {
 }
 export interface SseErrorEvent {
   type: 'error'
-  data: { code?: ModerationErrorCode; category?: ModerationCategory; message?: string }
+  data: { code?: ModerationErrorCode | 'MONTHLY_LIMIT'; category?: ModerationCategory; message?: string }
 }
 
 export type SseEvent = SseMetaEvent | SseTokenEvent | SseDoneEvent | SseErrorEvent
@@ -41,10 +41,8 @@ export async function streamStory(
 
   if (!res.ok) {
     if (res.status === 402) {
-      const currentPath = window.location.pathname + window.location.search
-      if (!currentPath.startsWith('/pricing')) {
-        window.location.href = `/pricing?redirect=${encodeURIComponent(currentPath)}`
-      }
+      // Monthly tale cap reached — surface a friendly message, no paywall/redirect.
+      handlers.onError?.({ code: 'MONTHLY_LIMIT' })
       return
     }
     const text = await res.text().catch(() => '')

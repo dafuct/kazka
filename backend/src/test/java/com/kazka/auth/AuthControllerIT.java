@@ -17,11 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AuthControllerIT extends AbstractIT {
 
     @Autowired UserRepository users;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
     void clean() {
-        entitlementRepo.deleteAll();
         users.deleteAll();
     }
 

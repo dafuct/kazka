@@ -20,11 +20,9 @@ class TokenAuthControllerIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired PasswordEncoder encoder;
     @Autowired TokenIssuer issuer;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
     void clean() {
-        entitlementRepo.deleteAll();
         users.deleteAll();
     }
 

@@ -1,7 +1,6 @@
 package com.kazka.child;
 
 import com.kazka.AbstractIT;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.dto.ChildProfileDto;
 import com.kazka.child.dto.CreateChildProfileRequest;
 import com.kazka.child.dto.CreateChildProfilesBatchRequest;
@@ -33,11 +32,9 @@ class ChildProfileControllerIT extends AbstractIT {
 
     @Autowired UserRepository users;
     @Autowired PasswordEncoder passwordEncoder;
-    @MockitoBean EntitlementResolver entitlements;
 
     @BeforeEach
     void setup() {
-        when(entitlements.isPro(any())).thenReturn(true);
     }
 
     @Test
@@ -62,7 +59,6 @@ class ChildProfileControllerIT extends AbstractIT {
     @Test
     void should_allow_freeTier_to_create_multiple_profiles() {
         String userA = seedUser();
-        when(entitlements.isPro(userA)).thenReturn(false);
         WebTestClient clientA = authedClient(userA);
         clientA.post().uri("/api/children")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -176,7 +172,7 @@ class ChildProfileControllerIT extends AbstractIT {
 
         // Fetch CSRF token from any safe GET endpoint
         EntityExchangeResult<byte[]> csrf = client()
-                .get().uri("/api/billing/products")
+                .get().uri("/api/public/showcase")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().returnResult();

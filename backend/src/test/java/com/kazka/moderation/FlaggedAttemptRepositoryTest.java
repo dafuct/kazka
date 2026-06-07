@@ -19,14 +19,12 @@ class FlaggedAttemptRepositoryTest extends AbstractIT {
 
     @Autowired FlaggedAttemptRepository repo;
     @Autowired UserRepository users;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     private String userId;
 
     @BeforeEach
     void setUp() {
         repo.deleteAll();
-        entitlementRepo.deleteAll();
         users.deleteAll();
         User user = new User();
         user.setId(UUID.randomUUID().toString());

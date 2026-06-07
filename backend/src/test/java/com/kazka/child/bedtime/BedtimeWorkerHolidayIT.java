@@ -1,7 +1,6 @@
 package com.kazka.child.bedtime;
 
 import com.kazka.AbstractIT;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.ai.AiClient;
@@ -40,7 +39,6 @@ class BedtimeWorkerHolidayIT extends AbstractIT {
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder passwordEncoder;
     @MockitoBean AiClient aiClient;
-    @MockitoBean EntitlementResolver entitlements;
     @MockitoBean HolidayCalendar holidayCalendar;
 
     String userId;
@@ -48,7 +46,6 @@ class BedtimeWorkerHolidayIT extends AbstractIT {
 
     @BeforeEach
     void setup() {
-        when(entitlements.isPro(anyString())).thenReturn(true);
         when(aiClient.streamText(anyString(), anyString())).thenReturn(
                 Flux.just("Bedtime Title\n\nOnce upon a time, a child named Test went to sleep peacefully."));
         when(aiClient.streamEdit(anyString(), anyString())).thenReturn(

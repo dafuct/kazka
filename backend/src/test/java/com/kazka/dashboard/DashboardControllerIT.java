@@ -1,7 +1,6 @@
 package com.kazka.dashboard;
 
 import com.kazka.AbstractIT;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.story.Story;
@@ -35,12 +34,6 @@ class DashboardControllerIT extends AbstractIT {
     @Autowired ChildProfileRepository profiles;
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder passwordEncoder;
-    @MockitoBean EntitlementResolver entitlements;
-
-    @BeforeEach
-    void setup() {
-        when(entitlements.isPro(any())).thenReturn(true);
-    }
 
     @Test
     void returns_dashboard_for_authed_user() {
@@ -52,7 +45,6 @@ class DashboardControllerIT extends AbstractIT {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.isPro").isEqualTo(true)
                 .jsonPath("$.aggregates.talesTotal").isEqualTo(1)
                 .jsonPath("$.children.length()").isEqualTo(1)
                 .jsonPath("$.children[0].name").isEqualTo("Лія")
@@ -134,7 +126,7 @@ class DashboardControllerIT extends AbstractIT {
         String bearer = body.get("accessToken").toString();
 
         EntityExchangeResult<byte[]> csrf = client()
-                .get().uri("/api/billing/products")
+                .get().uri("/api/public/showcase")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().returnResult();

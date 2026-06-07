@@ -1,7 +1,6 @@
 package com.kazka.dashboard;
 
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.child.bedtime.BedtimeSchedule;
@@ -34,7 +33,6 @@ class DashboardServiceTest {
     @Mock StoryRepository stories;
     @Mock ChildProfileRepository childProfiles;
     @Mock BedtimeScheduleRepository bedtimeSchedules;
-    @Mock EntitlementResolver entitlements;
     @Mock ImageUrlResolver images;
     @Mock StoryPanelRepository panelRepository;
     @InjectMocks DashboardService svc;
@@ -64,7 +62,6 @@ class DashboardServiceTest {
         when(stories.countByUserIdAndCreatedAtAfter(eq("u1"), any())).thenReturn(0L);
         when(childProfiles.findByUserIdAndArchivedAtIsNullOrderByCreatedAtAsc("u1")).thenReturn(List.of());
         when(stories.findTop5ByUserIdOrderByCreatedAtDesc("u1")).thenReturn(List.of());
-        when(entitlements.isPro("u1")).thenReturn(false);
 
         DashboardDto dto = svc.getDashboard(user()).block();
 
@@ -74,7 +71,6 @@ class DashboardServiceTest {
         assertThat(dto.aggregates().talesThisMonth()).isEqualTo(0);
         assertThat(dto.children()).isEmpty();
         assertThat(dto.recentTales()).isEmpty();
-        assertThat(dto.isPro()).isFalse();
     }
 
     @Test
@@ -83,12 +79,10 @@ class DashboardServiceTest {
         when(stories.countByUserIdAndCreatedAtAfter(eq("u1"), any())).thenReturn(11L);
         when(childProfiles.findByUserIdAndArchivedAtIsNullOrderByCreatedAtAsc("u1")).thenReturn(List.of());
         when(stories.findTop5ByUserIdOrderByCreatedAtDesc("u1")).thenReturn(List.of());
-        when(entitlements.isPro("u1")).thenReturn(true);
 
         DashboardDto dto = svc.getDashboard(user()).block();
 
         assertThat(dto.aggregates().talesTotal()).isEqualTo(54);
-        assertThat(dto.isPro()).isTrue();
     }
 
     @Test
@@ -108,7 +102,6 @@ class DashboardServiceTest {
         when(stories.findFirstByChildProfileIdOrderByCreatedAtDesc("p1")).thenReturn(Optional.of(childStory));
         when(bedtimeSchedules.findByChildProfileId("p1")).thenReturn(Optional.of(bed));
         when(stories.findTop5ByUserIdOrderByCreatedAtDesc("u1")).thenReturn(List.of(childStory));
-        when(entitlements.isPro("u1")).thenReturn(true);
 
         DashboardDto dto = svc.getDashboard(user()).block();
 
@@ -133,7 +126,6 @@ class DashboardServiceTest {
         when(stories.findFirstByChildProfileIdOrderByCreatedAtDesc("p1")).thenReturn(Optional.empty());
         when(bedtimeSchedules.findByChildProfileId("p1")).thenReturn(Optional.empty());
         when(stories.findTop5ByUserIdOrderByCreatedAtDesc("u1")).thenReturn(List.of());
-        when(entitlements.isPro("u1")).thenReturn(false);
 
         DashboardDto dto = svc.getDashboard(user()).block();
 
@@ -152,7 +144,6 @@ class DashboardServiceTest {
         when(stories.countByUserIdAndCreatedAtAfter(anyString(), any())).thenReturn(1L);
         when(childProfiles.findByUserIdAndArchivedAtIsNullOrderByCreatedAtAsc("u1")).thenReturn(List.of());
         when(stories.findTop5ByUserIdOrderByCreatedAtDesc("u1")).thenReturn(List.of(recentStory));
-        when(entitlements.isPro("u1")).thenReturn(true);
 
         DashboardDto dto = svc.getDashboard(user()).block();
 

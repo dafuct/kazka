@@ -21,11 +21,9 @@ class AdminControllerIT extends AbstractIT {
 
     @Autowired UserRepository users;
     @Autowired PasswordEncoder passwordEncoder;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
     void clean() {
-        entitlementRepo.deleteAll();
         users.deleteAll();
     }
 

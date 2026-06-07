@@ -23,12 +23,10 @@ class StoryAccessIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder passwordEncoder;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
     void clean() {
         stories.deleteAll();
-        entitlementRepo.deleteAll();
         users.deleteAll();
     }
 

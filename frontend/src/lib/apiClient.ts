@@ -3,7 +3,6 @@ import { ApiError } from './types'
 import type { components } from '@kazka/shared'
 import type {
   Story, PageResponse, UpdateStoryRequest, User, ApiErrorBody,
-  Product, Entitlement, GeoResponse, CheckoutSessionResponse, ProviderName,
   ChildProfileDto, CharacterDto, CreateChildProfileRequest, UpdateChildProfileRequest,
   ConfirmCharactersRequest, UpdateCharacterRequest, ExtractedCandidateDto,
   BedtimeScheduleDto, BedtimeUpdateRequest,
@@ -11,7 +10,6 @@ import type {
   BranchingStartRequest, BranchingChoiceRequest, BranchingResponse,
   TranslateRequest,
   Dashboard,
-  RedeemGiftRequest, RedemptionResult,
 } from './types'
 
 const STORIES = '/api/stories'
@@ -23,11 +21,7 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
     ...init,
   }))
   if (res.status === 402) {
-    const currentPath = window.location.pathname + window.location.search
-    if (!currentPath.startsWith('/pricing') && !url.startsWith('/api/billing/')) {
-      window.location.href = `/pricing?redirect=${encodeURIComponent(currentPath)}`
-    }
-    throw new ApiError(402, { error: 'PAYWALL_REQUIRED' })
+    throw new ApiError(402, { error: 'MONTHLY_LIMIT' })
   }
   if (!res.ok) {
     let body: ApiErrorBody
@@ -143,30 +137,6 @@ export const adminModeration = {
   },
 }
 
-const BILLING = '/api/billing'
-
-export const billing = {
-  listProducts(): Promise<Product[]> {
-    return request(`${BILLING}/products`)
-  },
-  entitlements(): Promise<Entitlement[]> {
-    return request(`${BILLING}/entitlements`)
-  },
-  geo(countryHint?: string): Promise<GeoResponse> {
-    const q = countryHint ? `?country=${encodeURIComponent(countryHint)}` : ''
-    return request(`${BILLING}/geo${q}`)
-  },
-  createCheckoutSession(planId: string, provider: ProviderName, countryHint?: string): Promise<CheckoutSessionResponse> {
-    return request(`${BILLING}/checkout-session`, {
-      method: 'POST',
-      body: JSON.stringify({ planId, provider, countryHint }),
-    })
-  },
-  cancelSubscription(): Promise<Entitlement[]> {
-    return request(`${BILLING}/subscription/cancel`, { method: 'POST' })
-  },
-}
-
 const CHILDREN = '/api/children'
 const CHARACTERS = '/api/characters'
 
@@ -271,15 +241,6 @@ export const dashboard = {
   },
 }
 
-export const gift = {
-  redeem(code: string): Promise<RedemptionResult> {
-    return request<RedemptionResult>('/api/billing/gift/redeem', {
-      method: 'POST',
-      body: JSON.stringify({ code } satisfies RedeemGiftRequest),
-    })
-  },
-}
-
 // The OpenAPI-generated @kazka/shared types weren't regenerated for the public
 // showcase endpoints, but the backend returns the same StoryDto shape. Alias it
 // locally so the read-only reader can reuse ComicsReader (which expects StoryDto).
@@ -289,8 +250,8 @@ const PUBLIC_SHOWCASE = '/api/public/showcase'
 
 // Public, unauthenticated read-only access to curated sample tales. These hit
 // permitAll backend routes, so no Authorization/session is required. The shared
-// request() helper only redirects on 402 (paywall) — never on 401 — so a logged
-// -out visitor calling these will never be bounced into the auth/redirect flow.
+// request() helper never redirects on 401/402, so a logged-out visitor calling
+// these will never be bounced into the auth/redirect flow.
 export const showcase = {
   list(): Promise<ShowcaseStoryDto[]> {
     return request<ShowcaseStoryDto[]>(PUBLIC_SHOWCASE)

@@ -8,7 +8,6 @@ import com.kazka.auth.exception.InvalidRefreshTokenException;
 import com.kazka.auth.exception.InvalidTokenException;
 import com.kazka.auth.exception.MailDeliveryException;
 import com.kazka.auth.google.GoogleIdTokenVerifier;
-import com.kazka.billing.AppleManagedSubscriptionException;
 import com.kazka.child.ChildRateLimiter;
 import com.kazka.moderation.AccountSuspendedException;
 import com.kazka.story.exception.PaywallRequiredException;
@@ -116,20 +115,6 @@ public class GlobalExceptionHandler {
         body.put("error", "PAYWALL_REQUIRED");
         if (ex.getMessage() != null) body.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(body);
-    }
-
-    @ExceptionHandler(AppleManagedSubscriptionException.class)
-    public ResponseEntity<Map<String, Object>> handleAppleManaged(
-            AppleManagedSubscriptionException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("error", "APPLE_MANAGED"));
-    }
-
-    @ExceptionHandler(com.apple.itunes.storekit.verification.VerificationException.class)
-    public ResponseEntity<Map<String, Object>> handleAppleVerification(
-            com.apple.itunes.storekit.verification.VerificationException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", "INVALID_SIGNATURE"));
     }
 
     @ExceptionHandler(ChildRateLimiter.TooManyChildCreatesException.class)

@@ -24,11 +24,9 @@ class PasswordResetIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired PasswordResetTokenRepository resetTokens;
     @Autowired PasswordEncoder passwordEncoder;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
     void clean() throws Exception {
-        entitlementRepo.deleteAll();
         users.deleteAll();
         greenMail.purgeEmailFromAllMailboxes();
     }

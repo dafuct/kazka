@@ -1,7 +1,6 @@
 package com.kazka.child.bedtime;
 
 import com.kazka.AbstractIT;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.child.bedtime.dto.BedtimeUpdateRequest;
@@ -33,7 +32,6 @@ class BedtimeScheduleControllerIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired ChildProfileRepository profiles;
     @Autowired PasswordEncoder passwordEncoder;
-    @MockitoBean EntitlementResolver entitlements;
 
     String userA;
     String userB;
@@ -41,7 +39,6 @@ class BedtimeScheduleControllerIT extends AbstractIT {
 
     @BeforeEach
     void seed() {
-        when(entitlements.isPro(any())).thenReturn(true);
         userA = seedUser();
         userB = seedUser();
         profileA = seedProfile(userA);
@@ -77,7 +74,6 @@ class BedtimeScheduleControllerIT extends AbstractIT {
 
     @Test
     void should_allow_freeTier_to_enable() {
-        when(entitlements.isPro(userA)).thenReturn(false);
         var client = authedClient(userA);
         client.put().uri("/api/children/" + profileA + "/bedtime")
                 .bodyValue(new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of(), true))
@@ -141,7 +137,7 @@ class BedtimeScheduleControllerIT extends AbstractIT {
 
         // Fetch CSRF token from any safe GET endpoint
         EntityExchangeResult<byte[]> csrf = client()
-                .get().uri("/api/billing/products")
+                .get().uri("/api/public/showcase")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().returnResult();

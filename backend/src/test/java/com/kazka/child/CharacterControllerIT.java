@@ -1,7 +1,6 @@
 package com.kazka.child;
 
 import com.kazka.AbstractIT;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.dto.CharacterDto;
 import com.kazka.child.dto.ConfirmCharactersRequest;
 import com.kazka.child.dto.ExtractedCandidateDto;
@@ -36,7 +35,6 @@ class CharacterControllerIT extends AbstractIT {
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired ChildProfileRepository profiles;
     @Autowired StoryRepository stories;
-    @MockitoBean EntitlementResolver entitlements;
 
     String userId;
     String profileId;
@@ -44,7 +42,6 @@ class CharacterControllerIT extends AbstractIT {
 
     @BeforeEach
     void seed() {
-        when(entitlements.isPro(any())).thenReturn(true);
         userId = createUser();
         profileId = createProfile(userId);
         storyId = createStory(userId, profileId);
@@ -67,7 +64,6 @@ class CharacterControllerIT extends AbstractIT {
 
     @Test
     void should_allow_freeTier_to_confirm_characters() {
-        when(entitlements.isPro(userId)).thenReturn(false);
         WebTestClient cli = authedClient(userId);
         var req = new ConfirmCharactersRequest(storyId, List.of(
                 new ExtractedCandidateDto("Олег", "boy", "kind", List.of(), "protagonist")));
@@ -157,7 +153,7 @@ class CharacterControllerIT extends AbstractIT {
 
         // Fetch CSRF token from any safe GET endpoint
         EntityExchangeResult<byte[]> csrf = client()
-                .get().uri("/api/billing/products")
+                .get().uri("/api/public/showcase")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().returnResult();

@@ -20,13 +20,10 @@ class StoryRepositoryTest extends AbstractIT {
     @Autowired
     com.kazka.user.UserRepository userRepository;
 
-    @Autowired
-    com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
     void clean() {
         repository.deleteAll();
-        entitlementRepo.deleteAll();
         userRepository.deleteAll();
     }
 

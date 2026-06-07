@@ -21,14 +21,12 @@ class ModerationCleanupJobIT extends AbstractIT {
     @Autowired ModerationCleanupJob job;
     @Autowired FlaggedAttemptRepository flags;
     @Autowired UserRepository users;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     private String userId;
 
     @BeforeEach
     void clean() {
         flags.deleteAll();
-        entitlementRepo.deleteAll();
         users.deleteAll();
         User user = new User();
         user.setId(UUID.randomUUID().toString());

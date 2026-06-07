@@ -18,7 +18,6 @@ class StoryFeaturedIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder encoder;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     User me;
     String bearer;
@@ -26,7 +25,6 @@ class StoryFeaturedIT extends AbstractIT {
     @BeforeEach
     void clean() {
         stories.deleteAll();
-        entitlementRepo.deleteAll();
         users.deleteAll();
         me = seedUser("featured@example.com");
         bearer = loginBearer("featured@example.com");

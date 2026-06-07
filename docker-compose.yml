@@ -40,7 +40,7 @@ services:
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: "6379"
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
-      UPLOADS_DIR: /uploads
+      UPLOADS_DIR: /app/uploads
       APP_BASE_URL: ${APP_BASE_URL:-http://localhost}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-not-configured}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-not-configured}
@@ -52,13 +52,15 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
-      MONOBANK_TOKEN: ${MONOBANK_TOKEN:-}
-      BILLING_SUCCESS_URL: ${BILLING_SUCCESS_URL:-http://localhost:5173/subscription/success}
-      BILLING_CANCEL_URL: ${BILLING_CANCEL_URL:-http://localhost:5173/pricing?cancelled=1}
+      MONTHLY_TALE_LIMIT: ${MONTHLY_TALE_LIMIT:-30}
     ports:
       - "8080:8080"
     volumes:
-      - uploads:/uploads
+      # Mount at the Dockerfile's chowned VOLUME path (/app/uploads), matching prod.
+      # A fresh named volume inherits ownership from the image dir at the mount path;
+      # mounting at an un-prepared path (e.g. /uploads) makes it root-owned and the
+      # non-root backend (uid 1001) cannot write PNGs. See wiki lesson.
+      - uploads:/app/uploads
     depends_on:
       mysql:
         condition: service_healthy

@@ -7,6 +7,7 @@ import { useLocale } from '../../lib/LocaleContext'
 import { useAuth } from '../../lib/AuthContext'
 import { useChildren } from '../../lib/ChildrenContext'
 import type { GenerationRequest } from '../../lib/types'
+import { ApiError } from '../../lib/types'
 import { branching } from '../../lib/apiClient'
 import styles from './StoryForm.module.css'
 
@@ -33,6 +34,7 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
   const [language, setLanguage] = useState<'uk' | 'en'>(lang)
   const [includeCharacterIds, setIncludeCharacterIds] = useState<string[]>([])
   const [isBranching, setIsBranching] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Prefill language from the active child's preference; bilingual → 'uk'
   useEffect(() => {
@@ -44,6 +46,7 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!theme.trim() || characters.length === 0 || !active) return
+    setError(null)
 
     if (isBranching) {
       try {
@@ -58,8 +61,12 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
         })
         navigate(`/stories/${resp.storyId}`)
       } catch (err: any) {
-        // 402 → /pricing redirect is handled automatically by apiClient
-        console.error('Could not start branching tale', err)
+        // 402 (MONTHLY_LIMIT) → friendly cap message, not a paywall.
+        if (err instanceof ApiError && err.status === 402) {
+          setError(t.story.monthlyLimit)
+        } else {
+          console.error('Could not start branching tale', err)
+        }
       }
       return
     }
@@ -162,6 +169,8 @@ export function StoryForm({ onSubmit, loading, inModal }: StoryFormProps) {
           {(t as any).branching?.formToggle ?? 'Branching tale'}
         </span>
       </label>
+
+      {error && <p className={styles.error}>{error}</p>}
 
       <button
         type="submit"

@@ -426,8 +426,8 @@ public class StoryService {
      *   2. child.interests (general profile-level preference)
      *   3. language-aware default ("магічна казка" / "a magical bedtime tale")
      *
-     * Does NOT call freeTier.recordUsage — bedtime is paid-only and doesn't count
-     * against the free-tier monthly limit.
+     * Does NOT call freeTier.recordUsage — automatic bedtime tales are exempt from
+     * the monthly tale cap (they shouldn't consume the user's manual quota).
      */
     public Mono<Story> generateForBedtime(ChildProfile child,
                                           BedtimeSchedule schedule,

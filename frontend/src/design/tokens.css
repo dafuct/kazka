@@ -65,6 +65,10 @@
 
   /* Dark-mode override for the aliases — surface/muted/accent inherit via var() */
   --border: rgba(192, 168, 224, 0.18);
+  /* Soft "magic" panel tint — must be overridden for dark, else the light :root
+     lavender (#EDE9FE) renders light-on-light behind cream text (showcase CTA,
+     TagInput, global). See lesson undefined-css-var-fallback-masks-dark-mode-failure. */
+  --color-magic-soft: rgba(124, 58, 237, 0.22);
 }
 
 /* Fraunces handles Cyrillic + Latin uniformly — no language override needed */

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useLocale } from '../../lib/LocaleContext'
+import { DONATE_URL } from '../../lib/config'
 import styles from './Footer.module.css'
 
 export function Footer() {
@@ -18,6 +19,7 @@ export function Footer() {
         <Link to="/legal/terms" className={styles.link}>{t.footer.terms}</Link>
         <Link to="/legal/privacy" className={styles.link}>{t.footer.privacy}</Link>
         <Link to="/legal/support" className={styles.link}>{t.footer.support}</Link>
+        <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" className={styles.link}>{t.footer.donate}</a>
       </div>
       <div className={styles.bottom}>{t.footer.copyright}</div>
     </footer>

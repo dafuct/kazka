@@ -30,9 +30,7 @@ export function DashboardPage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.title}>{td.title ?? 'Dashboard'}</h1>
-        <span className={isAdmin ? styles.pillPro : (data.isPro ? styles.pillPro : styles.pillFree)}>
-          {isAdmin ? 'Admin' : (data.isPro ? (td.pillPro ?? '⭐ Pro') : (td.pillFree ?? 'Free'))}
-        </span>
+        {isAdmin && <span className={styles.pillPro}>Admin</span>}
       </header>
       <section className={styles.statsRow}>
         <StatCard label={td.thisWeek ?? 'This week'} value={data.aggregates.talesThisWeek} />

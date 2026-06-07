@@ -1,7 +1,6 @@
 package com.kazka.story;
 
 import com.kazka.AbstractIT;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.user.User;
@@ -33,7 +32,6 @@ class StoryChildFilterIT extends AbstractIT {
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired ChildProfileRepository profiles;
     @Autowired StoryRepository stories;
-    @MockitoBean EntitlementResolver entitlements;
 
     String userId;
     String profileA;
@@ -48,7 +46,6 @@ class StoryChildFilterIT extends AbstractIT {
         profiles.deleteAll();
         users.deleteAll();
 
-        when(entitlements.isPro(any())).thenReturn(true);
         userId = createUser();
         profileA = createProfile(userId, "A");
         profileB = createProfile(userId, "B");
@@ -140,7 +137,7 @@ class StoryChildFilterIT extends AbstractIT {
         String bearer = body.get("accessToken").toString();
 
         EntityExchangeResult<byte[]> csrf = client()
-                .get().uri("/api/billing/products")
+                .get().uri("/api/public/showcase")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().returnResult();

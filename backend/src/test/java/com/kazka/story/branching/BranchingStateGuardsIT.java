@@ -1,7 +1,6 @@
 package com.kazka.story.branching;
 
 import com.kazka.AbstractIT;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.ai.AiClient;
@@ -38,7 +37,6 @@ class BranchingStateGuardsIT extends AbstractIT {
     @Autowired ChildProfileRepository profiles;
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder passwordEncoder;
-    @MockitoBean EntitlementResolver entitlements;
     @MockitoBean AiClient aiClient;
 
     String userA;
@@ -47,7 +45,6 @@ class BranchingStateGuardsIT extends AbstractIT {
 
     @BeforeEach
     void setup() {
-        when(entitlements.isPro(any())).thenReturn(true);
         userA = seedUser();
         userB = seedUser();
         profileA = seedProfile(userA);
@@ -135,7 +132,7 @@ class BranchingStateGuardsIT extends AbstractIT {
         String bearer = body.get("accessToken").toString();
 
         EntityExchangeResult<byte[]> csrf = client()
-                .get().uri("/api/billing/products")
+                .get().uri("/api/public/showcase")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().returnResult();

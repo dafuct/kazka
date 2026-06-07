@@ -39,7 +39,6 @@ class GoogleOAuthControllerIT extends AbstractIT {
     static String iosClientId = "ios.client.it.googleusercontent.com";
 
     @Autowired UserRepository users;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeAll
     static void startWiremock() throws Exception {
@@ -74,7 +73,6 @@ class GoogleOAuthControllerIT extends AbstractIT {
 
     @BeforeEach
     void clean() {
-        entitlementRepo.deleteAll();
         users.deleteAll();
     }
 

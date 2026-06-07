@@ -1,7 +1,6 @@
 package com.kazka.dashboard;
 
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.child.bedtime.BedtimeSchedule;
@@ -36,7 +35,6 @@ public class DashboardService {
     private final StoryRepository stories;
     private final ChildProfileRepository childProfiles;
     private final BedtimeScheduleRepository bedtimeSchedules;
-    private final EntitlementResolver entitlements;
     private final ImageUrlResolver images;
     private final StoryPanelRepository panelRepository;
 
@@ -62,13 +60,10 @@ public class DashboardService {
                     .map(s -> StoryDto.from(s, panelsByStory.getOrDefault(s.getId(), List.of()), images))
                     .toList();
 
-            boolean isPro = entitlements.isPro(userId);
-
             return new DashboardDto(
                     new DashboardDto.Aggregates(total, thisWeek, thisMonth),
                     childSummaries,
-                    recent,
-                    isPro);
+                    recent);
         }).subscribeOn(Schedulers.boundedElastic());
     }
 

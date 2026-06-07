@@ -152,21 +152,5 @@ kazka:
       bundle-id: ${APNS_BUNDLE_ID:app.kazka.ios}
       apns-host: ${APNS_HOST:api.sandbox.push.apple.com}
       enabled: ${APNS_ENABLED:false}
-  billing:
-    bundle-id: ${BILLING_BUNDLE_ID:app.kazka.ios}
-    app-apple-id: ${BILLING_APP_APPLE_ID:not-configured}
-    apple-id: ${BILLING_APPLE_ID:0}
-    environment: ${BILLING_ENVIRONMENT:Sandbox}
-    issuer-id: ${BILLING_ISSUER_ID:}
-    key-id: ${BILLING_KEY_ID:}
-    private-key-pem: ${BILLING_PRIVATE_KEY_PEM:}
-    enabled: ${BILLING_ENABLED:false}
-    free-monthly-story-limit: ${BILLING_FREE_LIMIT:5}
-    monobank:
-      token: ${MONOBANK_TOKEN:}
-      recurring:
-        tick-interval: ${MONOBANK_RECURRING_TICK:PT1H}
-        grace-max-retries: ${MONOBANK_RECURRING_RETRIES:3}
-        idempotency-prefix: ${MONOBANK_RECURRING_PREFIX:renew-}
-    success-url: ${BILLING_SUCCESS_URL:http://localhost:5173/subscription/success}
-    cancel-url:  ${BILLING_CANCEL_URL:http://localhost:5173/pricing?cancelled=1}
+  usage:
+    monthly-tale-limit: ${MONTHLY_TALE_LIMIT:30}

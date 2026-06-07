@@ -1,7 +1,6 @@
 package com.kazka.story;
 
 import com.kazka.AbstractIT;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.ai.AiClient;
@@ -68,9 +67,7 @@ class StoryGenerationWithChildIT extends AbstractIT {
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired ChildProfileRepository profiles;
     @Autowired StoryRepository stories;
-    @MockitoBean EntitlementResolver entitlements;
     @Autowired com.kazka.child.StoryCharacterRepository storyCharacters;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     String userId;
     String profileId;
@@ -82,7 +79,6 @@ class StoryGenerationWithChildIT extends AbstractIT {
         storyCharacters.deleteAll();
         stories.deleteAll();
         profiles.deleteAll();
-        entitlementRepo.deleteAll();
         users.deleteAll();
     }
 
@@ -92,10 +88,8 @@ class StoryGenerationWithChildIT extends AbstractIT {
         storyCharacters.deleteAll();
         stories.deleteAll();
         profiles.deleteAll();
-        entitlementRepo.deleteAll();
         users.deleteAll();
 
-        when(entitlements.isPro(any())).thenReturn(true);
 
         userId = createUser();
         profileId = createProfile(userId);
@@ -167,7 +161,7 @@ class StoryGenerationWithChildIT extends AbstractIT {
         String bearer = body.get("accessToken").toString();
 
         EntityExchangeResult<byte[]> csrf = client()
-                .get().uri("/api/billing/products")
+                .get().uri("/api/public/showcase")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().returnResult();

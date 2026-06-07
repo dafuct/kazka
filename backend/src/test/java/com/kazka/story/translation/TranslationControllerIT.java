@@ -1,7 +1,6 @@
 package com.kazka.story.translation;
 
 import com.kazka.AbstractIT;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.ai.AiClient;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
@@ -36,7 +35,6 @@ class TranslationControllerIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder passwordEncoder;
-    @MockitoBean EntitlementResolver entitlements;
     @MockitoBean AiClient aiClient;
 
     String userId;
@@ -50,7 +48,6 @@ class TranslationControllerIT extends AbstractIT {
 
     @Test
     void paid_user_translates_uk_to_en_and_persists() {
-        when(entitlements.isPro(userId)).thenReturn(true);
         Story story = seedStory(userId, "uk", "Жив-був дракон.");
 
         authedClient(userId).post().uri("/api/stories/" + story.getId() + "/translate")
@@ -68,7 +65,6 @@ class TranslationControllerIT extends AbstractIT {
 
     @Test
     void free_user_translates_uk_to_en_and_persists() {
-        when(entitlements.isPro(userId)).thenReturn(false);
         Story story = seedStory(userId, "uk", "Жив-був дракон.");
 
         authedClient(userId).post().uri("/api/stories/" + story.getId() + "/translate")
@@ -86,7 +82,6 @@ class TranslationControllerIT extends AbstractIT {
 
     @Test
     void same_language_gets_400() {
-        when(entitlements.isPro(userId)).thenReturn(true);
         Story story = seedStory(userId, "uk", "Жив-був дракон.");
 
         authedClient(userId).post().uri("/api/stories/" + story.getId() + "/translate")
@@ -97,7 +92,6 @@ class TranslationControllerIT extends AbstractIT {
 
     @Test
     void other_users_story_gets_404() {
-        when(entitlements.isPro(userId)).thenReturn(true);
         String otherUser = seedUser();
         Story story = seedStory(otherUser, "uk", "Жив-був дракон.");
 
@@ -142,7 +136,7 @@ class TranslationControllerIT extends AbstractIT {
         String bearer = body.get("accessToken").toString();
 
         EntityExchangeResult<byte[]> csrf = client()
-                .get().uri("/api/billing/products")
+                .get().uri("/api/public/showcase")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody().returnResult();

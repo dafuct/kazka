@@ -91,15 +91,7 @@ public class SecurityConfig {
                                                 "/api/auth/password-reset/**",
                                                 "/api/auth/token/**",
                                                 "/api/auth/oauth/**",
-                                                "/api/devices/**",
-                                                // Webhook endpoints use signed payloads from payment
-                                                // providers (no browser session / no CSRF token).
-                                                // IAP endpoints are called by iOS native clients
-                                                // (Bearer-token only, no cookie session).
-                                                // /api/billing/checkout-session is deliberately
-                                                // excluded here so it keeps CSRF protection.
-                                                "/api/billing/webhook/**",
-                                                "/api/billing/iap/**")))))
+                                                "/api/devices/**")))))
                 .authorizeExchange(auth -> auth
                         // Illustrations are linked to specific stories. We gate uploads behind
                         // auth so unauth users can't enumerate `/uploads/{storyId}-{theme}.png`.
@@ -119,16 +111,12 @@ public class SecurityConfig {
                                 "/api/auth/oauth/apple",
                                 "/api/auth/oauth/google").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/auth/me", "/api/auth/verify-email").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/billing/products", "/api/billing/geo").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/holidays/**").permitAll()
                         // Public sample-tale showcase: read-only, exposed to unregistered
                         // visitors. Image streaming for showcase tales lives under this prefix
                         // (ShowcaseImageController) and is intentionally public, while the
                         // general /uploads/** route above stays auth-gated.
                         .pathMatchers(HttpMethod.GET, "/api/public/**").permitAll()
-                        .pathMatchers(HttpMethod.POST,
-                                "/api/billing/iap/webhook",
-                                "/api/billing/webhook/**").permitAll()
                         .pathMatchers("/api/admin/**").hasRole("ADMIN")
                         .pathMatchers("/api/**").authenticated()
                         .anyExchange().permitAll())

@@ -37,12 +37,10 @@ class ModerationFlowIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired FlaggedAttemptRepository flags;
     @Autowired ModerationJudgeClient guard;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
     void clean() throws Exception {
         flags.deleteAll();
-        entitlementRepo.deleteAll();
         users.deleteAll();
         greenMail.purgeEmailFromAllMailboxes();
         clearInvocations(guard);

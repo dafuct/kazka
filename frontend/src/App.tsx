@@ -4,7 +4,6 @@ import { ThemeProvider } from './lib/ThemeContext'
 import { LocaleProvider } from './lib/LocaleContext'
 import { StoryModalProvider } from './lib/StoryModalContext'
 import { AuthProvider, useAuth } from './lib/AuthContext'
-import { BillingProvider } from './lib/BillingContext'
 import { ChildrenProvider } from './lib/ChildrenContext'
 import { AuthModalProvider } from './lib/AuthModalContext'
 import { ActiveStoryProvider, useActiveStory } from './lib/ActiveStoryContext'
@@ -26,14 +25,11 @@ import { EmailVerifiedPage } from './pages/EmailVerifiedPage'
 import { PasswordResetPage } from './pages/PasswordResetPage'
 import { AdminUsersPage } from './pages/AdminUsersPage'
 import { AdminModerationPage } from './pages/AdminModerationPage'
-import { PricingPage } from './pages/PricingPage'
-import { SubscriptionSuccessPage } from './pages/SubscriptionSuccessPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { ChildProfileEditPage } from './pages/ChildProfileEditPage'
 import { ChildrenListPage } from './pages/ChildrenListPage'
 import { CharacterLibraryPage } from './pages/CharacterLibraryPage'
 import { DashboardPage } from './pages/DashboardPage'
-import { RedeemPage } from './pages/RedeemPage'
 import { LegalPage } from './pages/legal/LegalPage'
 
 function ScrollProgress() {
@@ -101,14 +97,13 @@ function ActiveStoryProgressWidget() {
   return <ProgressWidget storyId={activeStoryId} onClear={() => setActiveStoryId(null)} />
 }
 
-// Logged-out visitors at "/" see the public sample-tale showcase (no auth, no
-// redirect). Logged-in users keep the original RequireChild><HomePage behavior
-// unchanged. ShowcasePage carries no RequireAuth/RequireChild guard, so a
-// logged-out visitor can never enter a redirect loop here.
+// Logged-out visitors at "/" see the marketing HomePage (its hero CTA opens the
+// auth modal). Logged-in users keep the original RequireChild><HomePage behavior
+// unchanged. The public sample-tale showcase lives at /showcase.
 function HomeOrShowcase() {
   const { user, loading } = useAuth()
   if (loading) return <p style={{ padding: 32, textAlign: 'center' }}>...</p>
-  if (!user) return <ShowcasePage />
+  if (!user) return <HomePage />
   return (
     <RequireChild>
       <HomePage />
@@ -127,6 +122,7 @@ function AppShell() {
       <main>
         <Routes>
           <Route path="/" element={<HomeOrShowcase />} />
+          <Route path="/showcase" element={<ShowcasePage />} />
           <Route path="/showcase/:id" element={<ShowcaseDetailPage />} />
           <Route path="/stories" element={<RequireAuth><RequireChild><ArchivePage /></RequireChild></RequireAuth>} />
           <Route path="/stories/:id" element={<RequireAuth><RequireChild><StoryDetailPage /></RequireChild></RequireAuth>} />
@@ -134,15 +130,12 @@ function AppShell() {
           <Route path="/reset-password" element={<PasswordResetPage />} />
           <Route path="/admin/users" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
           <Route path="/admin/moderation" element={<RequireAdmin><AdminModerationPage /></RequireAdmin>} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/subscription/success" element={<RequireAuth><SubscriptionSuccessPage /></RequireAuth>} />
           <Route path="/settings" element={<RequireAuth><SettingsPage /></RequireAuth>} />
           <Route path="/settings/children" element={<RequireAuth><ChildrenListPage /></RequireAuth>} />
           <Route path="/settings/children/new" element={<RequireAuth><ChildProfileEditPage /></RequireAuth>} />
           <Route path="/settings/children/:id" element={<RequireAuth><ChildProfileEditPage /></RequireAuth>} />
           <Route path="/settings/children/:id/characters" element={<RequireAuth><CharacterLibraryPage /></RequireAuth>} />
           <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
-          <Route path="/redeem" element={<RequireAuth><RedeemPage /></RequireAuth>} />
           <Route path="/legal/terms"   element={<LegalPage slug="terms" />} />
           <Route path="/legal/privacy" element={<LegalPage slug="privacy" />} />
           <Route path="/legal/support" element={<LegalPage slug="support" />} />
@@ -162,17 +155,15 @@ export default function App() {
       <LocaleProvider>
         <BrowserRouter>
           <AuthProvider>
-            <BillingProvider>
-              <ChildrenProvider>
-                <AuthModalProvider>
-                  <StoryModalProvider>
-                    <ActiveStoryProvider>
-                      <AppShell />
-                    </ActiveStoryProvider>
-                  </StoryModalProvider>
-                </AuthModalProvider>
-              </ChildrenProvider>
-            </BillingProvider>
+            <ChildrenProvider>
+              <AuthModalProvider>
+                <StoryModalProvider>
+                  <ActiveStoryProvider>
+                    <AppShell />
+                  </ActiveStoryProvider>
+                </StoryModalProvider>
+              </AuthModalProvider>
+            </ChildrenProvider>
           </AuthProvider>
         </BrowserRouter>
       </LocaleProvider>

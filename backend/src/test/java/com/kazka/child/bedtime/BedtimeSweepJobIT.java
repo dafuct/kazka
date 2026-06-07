@@ -1,7 +1,6 @@
 package com.kazka.child.bedtime;
 
 import com.kazka.AbstractIT;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.ai.AiClient;
@@ -35,14 +34,12 @@ class BedtimeSweepJobIT extends AbstractIT {
     @Autowired UserRepository users;
     @Autowired PasswordEncoder passwordEncoder;
     @MockitoBean AiClient aiClient;
-    @MockitoBean EntitlementResolver entitlements;
 
     @BeforeEach
     void setup() {
         // runOnce() sweeps the whole table, so leftover schedules from other ITs would
         // be counted here; clear them so the zero-count assertions reflect only this test.
         schedules.deleteAll();
-        when(entitlements.isPro(anyString())).thenReturn(true);
         when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just("Title\n\nOnce upon a time..."));
         when(aiClient.streamEdit(anyString(), anyString())).thenReturn(Flux.just("Title\n\nOnce upon a time..."));
     }

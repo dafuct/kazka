@@ -23,12 +23,10 @@ class AdminModerationIT extends AbstractIT {
 
     @Autowired UserRepository users;
     @Autowired FlaggedAttemptRepository flags;
-    @Autowired com.kazka.billing.UserEntitlementRepository entitlementRepo;
 
     @BeforeEach
     void clean() {
         flags.deleteAll();
-        entitlementRepo.deleteAll();
         users.deleteAll();
     }
 

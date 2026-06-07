@@ -9,8 +9,7 @@ import java.util.List;
 public record DashboardDto(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) Aggregates aggregates,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED) List<ChildSummary> children,
-        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) List<StoryDto> recentTales,
-        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) boolean isPro
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED) List<StoryDto> recentTales
 ) {
     public record Aggregates(
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED) long talesTotal,

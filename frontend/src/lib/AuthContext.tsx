@@ -41,8 +41,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signOut = useCallback(async () => {
-    await authApi.logout()
-    setUser(null)
+    // Always clear local auth state, even if the server call fails (e.g. an
+    // expired/missing CSRF token → 403). A failed logout request must never
+    // trap the user signed in.
+    try {
+      await authApi.logout()
+    } catch {
+      // ignore — local state is cleared in finally regardless
+    } finally {
+      setUser(null)
+    }
   }, [])
 
   const value: AuthCtx = {

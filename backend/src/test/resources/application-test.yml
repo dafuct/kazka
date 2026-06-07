@@ -80,21 +80,5 @@ kazka:
       bundle-id: app.kazka.ios.test
       apns-host: http://localhost:0
       enabled: false
-  billing:
-    bundle-id: app.kazka.ios.test
-    app-apple-id: ""
-    apple-id: 0
-    environment: Sandbox
-    issuer-id: ""
-    key-id: ""
-    private-key-pem: ""
-    enabled: false
-    free-monthly-story-limit: 5
-    monobank:
-      token: ""
-      recurring:
-        tick-interval: PT24H
-        grace-max-retries: 3
-        idempotency-prefix: renew-
-    success-url: http://localhost:5173/subscription/success
-    cancel-url: http://localhost:5173/pricing?cancelled=1
+  usage:
+    monthly-tale-limit: 30

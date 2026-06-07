@@ -38,6 +38,16 @@
   letter-spacing: 0.05em;
 }
 
+.error {
+  margin: 0;
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-md);
+  background: var(--color-magic-soft);
+  color: var(--color-text);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
 .input,
 .select {
   padding: var(--spacing-3) var(--spacing-4);

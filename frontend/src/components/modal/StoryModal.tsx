@@ -93,7 +93,9 @@ export function StoryModal() {
         },
         onError: ({ code, category, message }) => {
           if (ctrl.signal.aborted) return
-          if (code && (MODERATION_CODES as readonly string[]).includes(code)) {
+          if (code === 'MONTHLY_LIMIT') {
+            setError(t.story.monthlyLimit)
+          } else if (code && (MODERATION_CODES as readonly string[]).includes(code)) {
             const perCategory = code === 'BLOCKED_INPUT' && category
               ? t.moderation.byCategory?.[category]
               : undefined

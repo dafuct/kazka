@@ -5,7 +5,7 @@ import { useTheme } from '../../lib/ThemeContext'
 import { useStoryModal } from '../../lib/StoryModalContext'
 import { useAuth } from '../../lib/AuthContext'
 import { useAuthModal } from '../../lib/AuthModalContext'
-import { useBilling } from '../../lib/BillingContext'
+import { DONATE_URL } from '../../lib/config'
 import { ActiveChildPicker } from '../children/ActiveChildPicker'
 import styles from './Nav.module.css'
 
@@ -15,7 +15,6 @@ export function Nav() {
   const { openModal } = useStoryModal()
   const { user, signOut } = useAuth()
   const { openAuth } = useAuthModal()
-  const { isPro } = useBilling()
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [scrolled, setScrolled] = useState(false)
@@ -59,20 +58,19 @@ export function Nav() {
       </Link>
 
       <ul className={styles.links}>
-        {!user && (
-          <>
-            <li><a href="/#how" className={styles.link}>{t.nav.howItWorks}</a></li>
-            <li><a href="/#features" className={styles.link}>{t.nav.features}</a></li>
-          </>
-        )}
-        {!isPro && (
-          <li>
-            <Link to="/pricing"
-                  className={pathname.startsWith('/pricing') ? `${styles.link} ${styles.active}` : styles.link}>
-              {t.nav.pricing}
-            </Link>
-          </li>
-        )}
+        <li><a href="/#how" className={styles.link}>{t.nav.howItWorks}</a></li>
+        <li><a href="/#features" className={styles.link}>{t.nav.features}</a></li>
+        <li>
+          <Link to="/showcase"
+                className={pathname.startsWith('/showcase') ? `${styles.link} ${styles.active}` : styles.link}>
+            {t.nav.sampleTales}
+          </Link>
+        </li>
+        <li>
+          <a href={DONATE_URL} target="_blank" rel="noopener noreferrer" className={styles.donateBtn}>
+            {t.nav.donate}
+          </a>
+        </li>
         {user && (
           <li>
             <Link to="/stories"
@@ -125,9 +123,7 @@ export function Nav() {
             <li className={styles.userWrap} ref={menuRef}>
               <button className={styles.userBtn} onClick={() => setMenuOpen(o => !o)}>
                 <span>{user.displayName}</span>
-                {user.role === 'ADMIN'
-                  ? <span className={styles.proBadge}>Admin</span>
-                  : isPro && <span className={styles.proBadge}>Pro</span>}
+                {user.role === 'ADMIN' && <span className={styles.proBadge}>Admin</span>}
                 <span aria-hidden="true">▾</span>
               </button>
               {menuOpen && (
