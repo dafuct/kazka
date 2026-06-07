@@ -180,6 +180,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/children/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createBatch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/characters/confirm": {
         parameters: {
             query?: never;
@@ -190,102 +206,6 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["confirm"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/billing/webhook/monobank": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["handle"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/billing/subscription/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["cancelSubscription"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/billing/iap/webhook": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["webhook"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/billing/iap/verify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["verify"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/billing/gift/redeem": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["redeem"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/billing/checkout-session": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["create_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -452,6 +372,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/stories/{id}/showcase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["setShowcase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/children/{id}": {
         parameters: {
             query?: never;
@@ -580,6 +516,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/showcase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/showcase/{storyId}/image/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["image"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/showcase/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/holidays/today": {
         parameters: {
             query?: never;
@@ -603,7 +587,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["get_1"];
+        get: operations["get_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -619,55 +603,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["list_2"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/billing/products": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["products"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/billing/geo": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["geo"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/billing/entitlements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["entitlements"];
+        get: operations["list_3"];
         put?: never;
         post?: never;
         delete?: never;
@@ -895,6 +831,9 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        CreateChildProfilesBatchRequest: {
+            children: components["schemas"]["CreateChildProfileRequest"][];
+        };
         ConfirmCharactersRequest: {
             storyId: string;
             candidates: components["schemas"]["ExtractedCandidateDto"][];
@@ -921,35 +860,6 @@ export interface components {
             usageCount: number;
             /** Format: date-time */
             createdAt: string;
-        };
-        EntitlementDto: {
-            productAppleId?: string;
-            state?: string;
-            /** Format: date-time */
-            expiresAt?: string;
-            source?: string;
-        };
-        IapVerifyRequest: {
-            signedTransaction: string;
-        };
-        RedeemGiftRequest: {
-            code: string;
-        };
-        RedemptionResultDto: {
-            /** Format: date-time */
-            expiresAt: string;
-            /** Format: int32 */
-            durationDays: number;
-        };
-        CheckoutSessionRequest: {
-            planId: string;
-            provider: string;
-            countryHint?: string;
-        };
-        CheckoutSessionResponse: {
-            provider?: string;
-            checkoutUrl?: string;
-            providerReference?: string;
         };
         TokenRefreshRequest: {
             refreshToken: string;
@@ -1040,6 +950,19 @@ export interface components {
             items: components["schemas"]["StoryDto"][];
             nextCursor?: string | null;
         };
+        ShowcaseStoryDto: {
+            id: string;
+            title: string;
+            theme: string;
+            characters: string[];
+            ageGroup: string;
+            length: string;
+            language: string;
+            content: string;
+            panels: components["schemas"]["StoryPanelDto"][];
+            /** Format: date-time */
+            createdAt: string;
+        };
         HolidayDto: {
             id: string;
             name: string;
@@ -1068,21 +991,6 @@ export interface components {
             aggregates: components["schemas"]["Aggregates"];
             children: components["schemas"]["ChildSummary"][];
             recentTales: components["schemas"]["StoryDto"][];
-            isPro: boolean;
-        };
-        ProductDto: {
-            id?: string;
-            appleProductId?: string;
-            name?: string;
-            /** Format: int64 */
-            priceMicro?: number;
-            currency?: string;
-            period?: string;
-            tier?: string;
-        };
-        GeoResponse: {
-            country?: string;
-            isUkraine?: boolean;
         };
         AdminUserDto: {
             id?: string;
@@ -1153,15 +1061,10 @@ export type SchemaBranchingStartRequest = components['schemas']['BranchingStartR
 export type SchemaDeviceRegisterRequest = components['schemas']['DeviceRegisterRequest'];
 export type SchemaCreateChildProfileRequest = components['schemas']['CreateChildProfileRequest'];
 export type SchemaChildProfileDto = components['schemas']['ChildProfileDto'];
+export type SchemaCreateChildProfilesBatchRequest = components['schemas']['CreateChildProfilesBatchRequest'];
 export type SchemaConfirmCharactersRequest = components['schemas']['ConfirmCharactersRequest'];
 export type SchemaExtractedCandidateDto = components['schemas']['ExtractedCandidateDto'];
 export type SchemaCharacterDto = components['schemas']['CharacterDto'];
-export type SchemaEntitlementDto = components['schemas']['EntitlementDto'];
-export type SchemaIapVerifyRequest = components['schemas']['IapVerifyRequest'];
-export type SchemaRedeemGiftRequest = components['schemas']['RedeemGiftRequest'];
-export type SchemaRedemptionResultDto = components['schemas']['RedemptionResultDto'];
-export type SchemaCheckoutSessionRequest = components['schemas']['CheckoutSessionRequest'];
-export type SchemaCheckoutSessionResponse = components['schemas']['CheckoutSessionResponse'];
 export type SchemaTokenRefreshRequest = components['schemas']['TokenRefreshRequest'];
 export type SchemaTokenResponse = components['schemas']['TokenResponse'];
 export type SchemaUserDto = components['schemas']['UserDto'];
@@ -1179,12 +1082,11 @@ export type SchemaAuthResponse = components['schemas']['AuthResponse'];
 export type SchemaPageResponseStoryDto = components['schemas']['PageResponseStoryDto'];
 export type SchemaStoryStatusDto = components['schemas']['StoryStatusDto'];
 export type SchemaCursorPageResponseStoryDto = components['schemas']['CursorPageResponseStoryDto'];
+export type SchemaShowcaseStoryDto = components['schemas']['ShowcaseStoryDto'];
 export type SchemaHolidayDto = components['schemas']['HolidayDto'];
 export type SchemaAggregates = components['schemas']['Aggregates'];
 export type SchemaChildSummary = components['schemas']['ChildSummary'];
 export type SchemaDashboardDto = components['schemas']['DashboardDto'];
-export type SchemaProductDto = components['schemas']['ProductDto'];
-export type SchemaGeoResponse = components['schemas']['GeoResponse'];
 export type SchemaAdminUserDto = components['schemas']['AdminUserDto'];
 export type SchemaSuspendedUserDto = components['schemas']['SuspendedUserDto'];
 export type SchemaFlaggedAttemptDto = components['schemas']['FlaggedAttemptDto'];
@@ -1533,6 +1435,30 @@ export interface operations {
             };
         };
     };
+    createBatch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateChildProfilesBatchRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ChildProfileDto"][];
+                };
+            };
+        };
+    };
     confirm: {
         parameters: {
             query: {
@@ -1555,146 +1481,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CharacterDto"][];
-                };
-            };
-        };
-    };
-    handle: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Sign"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": string;
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    cancelSubscription: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EntitlementDto"][];
-                };
-            };
-        };
-    };
-    webhook: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    [key: string]: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    verify: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["IapVerifyRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EntitlementDto"][];
-                };
-            };
-        };
-    };
-    redeem: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RedeemGiftRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RedemptionResultDto"];
-                };
-            };
-        };
-    };
-    create_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CheckoutSessionRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["CheckoutSessionResponse"];
                 };
             };
         };
@@ -1906,6 +1692,28 @@ export interface operations {
     unsuspend: {
         parameters: {
             query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    setShowcase: {
+        parameters: {
+            query?: {
+                on?: boolean;
+            };
             header?: never;
             path: {
                 id: string;
@@ -2194,6 +2002,71 @@ export interface operations {
             };
         };
     };
+    list_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ShowcaseStoryDto"][];
+                };
+            };
+        };
+    };
+    image: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                storyId: string;
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": string;
+                };
+            };
+        };
+    };
+    get_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ShowcaseStoryDto"];
+                };
+            };
+        };
+    };
     today: {
         parameters: {
             query: {
@@ -2217,7 +2090,7 @@ export interface operations {
             };
         };
     };
-    get_1: {
+    get_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -2237,7 +2110,7 @@ export interface operations {
             };
         };
     };
-    list_2: {
+    list_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -2255,68 +2128,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CharacterDto"][];
-                };
-            };
-        };
-    };
-    products: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProductDto"][];
-                };
-            };
-        };
-    };
-    geo: {
-        parameters: {
-            query?: {
-                country?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["GeoResponse"];
-                };
-            };
-        };
-    };
-    entitlements: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["EntitlementDto"][];
                 };
             };
         };

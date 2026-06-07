@@ -36,8 +36,6 @@ export type {
   SchemaDashboardDto as Dashboard,
   SchemaAggregates as DashboardAggregates,
   SchemaChildSummary as ChildSummary,
-  SchemaRedeemGiftRequest as RedeemGiftRequest,
-  SchemaRedemptionResultDto as RedemptionResult,
 } from './api-types';
 
 // PageResponse<T> is generic on the Java side. openapi-typescript emits
