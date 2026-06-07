@@ -3,7 +3,9 @@ package com.kazka.story.showcase;
 import com.kazka.comics.PanelAspect;
 import com.kazka.comics.StoryPanel;
 import com.kazka.comics.StoryPanelRepository;
+import com.kazka.config.StorageProperties;
 import com.kazka.config.UploadsProperties;
+import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,8 @@ class ShowcaseServiceTest {
     @Mock StoryRepository stories;
     @Mock StoryPanelRepository panels;
     @Mock UploadsProperties uploads;
+    @Mock ImageUrlResolver imageUrlResolver;
+    @Mock StorageProperties storage;
     @InjectMocks ShowcaseService service;
 
     private Story showcaseStory(String id) {
@@ -81,6 +85,26 @@ class ShowcaseServiceTest {
         assertThat(dto.panels()).hasSize(1);
         assertThat(dto.panels().getFirst().imageUrl())
                 .isEqualTo("/api/public/showcase/s1/image/story-s1-page.png");
+    }
+
+    @Test
+    void should_use_real_presigned_url_for_r2_storage() {
+        StoryPanel panel = new StoryPanel();
+        panel.setPanelIndex(1);
+        panel.setImagePath("panels/s1/p1.png");
+        panel.setNarration("n");
+        panel.setAspect(PanelAspect.PAGE);
+        when(storage.getProvider()).thenReturn("r2");
+        when(imageUrlResolver.urlFor("panels/s1/p1.png"))
+                .thenReturn("https://r2.example/panels/s1/p1.png?sig=abc");
+        when(stories.findAllByShowcaseTrueOrderByCreatedAtDesc())
+                .thenReturn(List.of(showcaseStory("s1")));
+        when(panels.findByStoryIdOrderByPanelIndexAsc("s1")).thenReturn(List.of(panel));
+
+        ShowcaseStoryDto dto = service.list().getFirst();
+
+        assertThat(dto.panels().getFirst().imageUrl())
+                .isEqualTo("https://r2.example/panels/s1/p1.png?sig=abc");
     }
 
     @Test

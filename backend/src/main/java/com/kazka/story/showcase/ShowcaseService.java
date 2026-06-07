@@ -1,7 +1,9 @@
 package com.kazka.story.showcase;
 
 import com.kazka.comics.StoryPanelRepository;
+import com.kazka.config.StorageProperties;
 import com.kazka.config.UploadsProperties;
+import com.kazka.illustration.ImageUrlResolver;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ public class ShowcaseService {
     private final StoryRepository stories;
     private final StoryPanelRepository panels;
     private final UploadsProperties uploads;
+    private final ImageUrlResolver imageUrlResolver;
+    private final StorageProperties storage;
 
     @Transactional(readOnly = true)
     public List<ShowcaseStoryDto> list() {
@@ -69,8 +73,14 @@ public class ShowcaseService {
     }
 
     private ShowcaseStoryDto toPublicDto(Story story) {
+        // R2 stores images privately and hands out presigned URLs that are directly
+        // public-fetchable, so use the real resolver. Filesystem URLs (/uploads/**) are
+        // auth-gated, so route those through the public showcase image proxy instead.
+        ImageUrlResolver resolver = "r2".equalsIgnoreCase(storage.getProvider())
+                ? imageUrlResolver
+                : new PublicImageUrlResolver(story.getId());
         return ShowcaseStoryDto.from(story,
                 panels.findByStoryIdOrderByPanelIndexAsc(story.getId()),
-                new PublicImageUrlResolver(story.getId()));
+                resolver);
     }
 }
