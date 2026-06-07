@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 import reactor.test.StepVerifier;
 
 import java.time.Duration;
@@ -26,13 +25,12 @@ class BillingServiceRevokeTest {
     @Mock SubscriptionProductRepository products;
     @Mock UserEntitlementRepository entitlements;
     @Mock WebhookIdempotencyService idempotency;
-    @Mock ApplicationEventPublisher events;
 
     private BillingService service;
 
     @BeforeEach
     void setUp() {
-        service = new BillingService(verifier, products, entitlements, idempotency, events);
+        service = new BillingService(verifier, products, entitlements, idempotency);
     }
 
     @Test

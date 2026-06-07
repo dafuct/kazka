@@ -66,13 +66,19 @@ class CharacterControllerIT extends AbstractIT {
     }
 
     @Test
-    void should_return402_when_freeTier_confirms_characters() {
+    void should_allow_freeTier_to_confirm_characters() {
         when(entitlements.isPro(userId)).thenReturn(false);
         WebTestClient cli = authedClient(userId);
         var req = new ConfirmCharactersRequest(storyId, List.of(
                 new ExtractedCandidateDto("Олег", "boy", "kind", List.of(), "protagonist")));
         cli.post().uri("/api/characters/confirm?childProfileId=" + profileId)
-                .bodyValue(req).exchange().expectStatus().isEqualTo(402);
+                .bodyValue(req).exchange().expectStatus().isOk();
+
+        cli.get().uri("/api/children/" + profileId + "/characters").exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(1)
+                .jsonPath("$[0].name").isEqualTo("Олег");
     }
 
     @Test

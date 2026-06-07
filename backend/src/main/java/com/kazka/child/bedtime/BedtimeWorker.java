@@ -1,6 +1,5 @@
 package com.kazka.child.bedtime;
 
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileRepository;
 import com.kazka.holidays.Holiday;
@@ -35,7 +34,6 @@ public class BedtimeWorker {
     private final BedtimeScheduleRepository scheduleRepo;
     private final ChildProfileRepository profiles;
     private final UserRepository users;
-    private final EntitlementResolver entitlements;
     private final StoryService storyService;
     private final BedtimeMailer mailer;
     private final NextRunCalculator nextRunCalc;
@@ -62,12 +60,6 @@ public class BedtimeWorker {
         User user = users.findById(child.getUserId()).orElse(null);
         if (user == null || user.getSuspendedAt() != null || !user.isEmailVerified()) {
             log.debug("Bedtime skipped: user unavailable for {}", childProfileId);
-            return;
-        }
-        if (!entitlements.isPro(user.getId())) {
-            log.info("Bedtime user {} no longer Pro — disabling schedule", user.getId());
-            schedule.setEnabled(false);
-            scheduleRepo.save(schedule);
             return;
         }
         if (alreadySentToday(schedule)) {

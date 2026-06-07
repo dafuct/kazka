@@ -1,7 +1,6 @@
 package com.kazka.child;
 
 import com.kazka.child.dto.ExtractedCandidateDto;
-import com.kazka.story.exception.PaywallRequiredException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ public class CharacterService {
 
     private final CharacterRepository repo;
     private final ChildProfileService profiles;
-    private final ChildEntitlementResolver tier;
     private final StoryCharacterRepository joinRepo;
 
     @Transactional(readOnly = true)
@@ -30,12 +28,6 @@ public class CharacterService {
     public List<Character> upsertConfirmed(String childProfileId, String userId,
                                            String storyId, List<ExtractedCandidateDto> candidates) {
         profiles.requireOwned(childProfileId, userId);
-        int limit = tier.maxSavedCharacters(userId);
-        long existingCount = repo.countByChildProfileIdAndArchivedAtIsNull(childProfileId);
-        long newOnes = countNew(childProfileId, candidates);
-        if (existingCount + newOnes > limit) {
-            throw new PaywallRequiredException("Saved character limit reached for free tier");
-        }
         List<Character> result = new ArrayList<>(candidates.size());
         Instant now = Instant.now();
         for (ExtractedCandidateDto cand : candidates) {
@@ -84,12 +76,6 @@ public class CharacterService {
         if (traits != null) character.setTraits(traits);
         character.setLastUsedAt(Instant.now());
         return repo.save(character);
-    }
-
-    private long countNew(String childProfileId, List<ExtractedCandidateDto> candidates) {
-        return candidates.stream()
-                .filter(c -> repo.findByChildProfileIdAndName(childProfileId, c.name()).isEmpty())
-                .count();
     }
 
     private Character newCharacter(String childProfileId, ExtractedCandidateDto cand, String storyId) {

@@ -41,7 +41,6 @@ class StoryServiceRetryTest {
     @Mock com.kazka.child.ChildProfileService childProfiles;
     @Mock com.kazka.child.CharacterRepository characters;
     @Mock com.kazka.child.StoryCharacterRepository storyCharacters;
-    @Mock com.kazka.child.ChildEntitlementResolver childTier;
     @Mock com.kazka.child.CharacterExtractionWorker extractionWorker;
     @Mock ImageUrlResolver images;
     @Mock ComicsBuilder comicsBuilder;

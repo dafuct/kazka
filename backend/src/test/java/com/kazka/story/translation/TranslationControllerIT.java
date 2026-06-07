@@ -67,14 +67,21 @@ class TranslationControllerIT extends AbstractIT {
     }
 
     @Test
-    void free_user_gets_402() {
+    void free_user_translates_uk_to_en_and_persists() {
         when(entitlements.isPro(userId)).thenReturn(false);
         Story story = seedStory(userId, "uk", "Жив-був дракон.");
 
         authedClient(userId).post().uri("/api/stories/" + story.getId() + "/translate")
                 .bodyValue(new TranslateRequest("en"))
                 .exchange()
-                .expectStatus().isEqualTo(402);
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.translatedLanguage").isEqualTo("en")
+                .jsonPath("$.translatedContent").isEqualTo("Once upon a time, a dragon lived.");
+
+        var saved = stories.findById(story.getId()).orElseThrow();
+        assertThat(saved.getTranslatedLanguage()).isEqualTo("en");
+        assertThat(saved.getTranslatedContent()).isEqualTo("Once upon a time, a dragon lived.");
     }
 
     @Test

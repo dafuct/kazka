@@ -1,7 +1,6 @@
 package com.kazka.story.translation;
 
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.ai.AiClient;
 import com.kazka.comics.StoryPanelRepository;
 import com.kazka.illustration.ImageUrlResolver;
@@ -9,7 +8,6 @@ import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
 import com.kazka.story.dto.StoryDto;
-import com.kazka.story.exception.PaywallRequiredException;
 import com.kazka.user.UserRole;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +32,6 @@ import static org.mockito.Mockito.when;
 class TranslationServiceTest {
 
     @Mock StoryRepository stories;
-    @Mock EntitlementResolver entitlements;
     @Mock AiClient aiClient;
     @Mock TranslationPromptBuilder promptBuilder;
     @Mock PromptBuilder systemPromptBuilder;
@@ -57,12 +54,18 @@ class TranslationServiceTest {
     }
 
     @Test
-    void translate_throws_PaywallRequired_when_free_tier() {
+    void translate_succeeds_for_any_user() {
         when(stories.findById("s1")).thenReturn(Optional.of(story("s1", "u1", "uk")));
-        when(entitlements.isPro("u1")).thenReturn(false);
+        when(systemPromptBuilder.buildStorySystem("en")).thenReturn("system");
+        when(promptBuilder.buildUserMessage("uk", "en", "Жив-був дракон.")).thenReturn("user");
+        when(aiClient.streamText("system", "user")).thenReturn(Flux.just("Once upon a time, a dragon lived."));
+        when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
 
-        assertThatThrownBy(() -> svc.translate("s1", "en", user()).block())
-                .isInstanceOf(PaywallRequiredException.class);
+        StoryDto dto = svc.translate("s1", "en", user()).block();
+
+        assertThat(dto).isNotNull();
+        assertThat(dto.translatedContent()).isEqualTo("Once upon a time, a dragon lived.");
+        assertThat(dto.translatedLanguage()).isEqualTo("en");
     }
 
     @Test
@@ -81,7 +84,6 @@ class TranslationServiceTest {
         incompleteStory.setBranching(true);
         incompleteStory.setBranchingState("awaiting_choice_1");
         when(stories.findById("s1")).thenReturn(Optional.of(incompleteStory));
-        when(entitlements.isPro("u1")).thenReturn(true);
 
         assertThatThrownBy(() -> svc.translate("s1", "en", user()).block())
                 .isInstanceOf(ResponseStatusException.class)
@@ -92,7 +94,6 @@ class TranslationServiceTest {
     @Test
     void translate_returns_400_when_target_equals_source() {
         when(stories.findById("s1")).thenReturn(Optional.of(story("s1", "u1", "uk")));
-        when(entitlements.isPro("u1")).thenReturn(true);
 
         assertThatThrownBy(() -> svc.translate("s1", "uk", user()).block())
                 .isInstanceOf(ResponseStatusException.class)
@@ -106,7 +107,6 @@ class TranslationServiceTest {
         alreadyTranslated.setTranslatedContent("Once upon a time…");
         alreadyTranslated.setTranslatedLanguage("en");
         when(stories.findById("s1")).thenReturn(Optional.of(alreadyTranslated));
-        when(entitlements.isPro("u1")).thenReturn(true);
 
         StoryDto dto = svc.translate("s1", "en", user()).block();
 
@@ -118,7 +118,6 @@ class TranslationServiceTest {
     @Test
     void translate_happy_path_persists_translation() {
         when(stories.findById("s1")).thenReturn(Optional.of(story("s1", "u1", "uk")));
-        when(entitlements.isPro("u1")).thenReturn(true);
         when(systemPromptBuilder.buildStorySystem("en")).thenReturn("system");
         when(promptBuilder.buildUserMessage("uk", "en", "Жив-був дракон.")).thenReturn("user");
         when(aiClient.streamText("system", "user")).thenReturn(Flux.just("Once upon a time, a dragon lived."));

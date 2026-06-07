@@ -59,7 +59,7 @@ class ChildProfileControllerIT extends AbstractIT {
     }
 
     @Test
-    void should_return402_when_freeTier_atProfileLimit() {
+    void should_allow_freeTier_to_create_multiple_profiles() {
         String userA = seedUser();
         when(entitlements.isPro(userA)).thenReturn(false);
         WebTestClient clientA = authedClient(userA);
@@ -70,7 +70,12 @@ class ChildProfileControllerIT extends AbstractIT {
         clientA.post().uri("/api/children")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new CreateChildProfileRequest("Second", null, null, "uk", List.of()))
-                .exchange().expectStatus().isEqualTo(402);
+                .exchange().expectStatus().isOk();
+
+        clientA.get().uri("/api/children").exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()").isEqualTo(2);
     }
 
     @Test

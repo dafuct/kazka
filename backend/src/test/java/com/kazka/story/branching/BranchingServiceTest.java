@@ -1,6 +1,5 @@
 package com.kazka.story.branching;
 
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileService;
 import com.kazka.story.Story;
@@ -8,7 +7,6 @@ import com.kazka.story.StoryRepository;
 import com.kazka.story.branching.dto.BranchingChoice;
 import com.kazka.story.branching.dto.BranchingResponse;
 import com.kazka.story.branching.dto.BranchingStartRequest;
-import com.kazka.story.exception.PaywallRequiredException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,7 +31,6 @@ class BranchingServiceTest {
     @Mock StoryRepository stories;
     @Mock ChildProfileService childProfiles;
     @Mock com.kazka.child.CharacterRepository characters;
-    @Mock EntitlementResolver entitlements;
     @Mock com.kazka.ai.AiClient aiClient;
     @Mock BranchingPromptBuilder promptBuilder;
     @Mock com.kazka.child.CharacterExtractionWorker extractionWorker;
@@ -51,21 +48,29 @@ class BranchingServiceTest {
     }
 
     @Test
-    void start_throws_PaywallRequired_when_free_tier() {
+    void start_creates_story_for_any_user() {
         when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
-        when(entitlements.isPro("u1")).thenReturn(false);
+        when(systemPromptBuilder.buildStorySystem(anyString())).thenReturn("system prompt");
+        when(promptBuilder.buildOpeningUserMessage(any(), any(), any())).thenReturn("opening prompt");
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
+                "Opening body.\n\n---\n\nCHOICE_A: Option A\nCHOICE_B: Option B"));
+        when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
 
-        BranchingStartRequest req = new BranchingStartRequest(
-                "адвенчер", List.of("дракон"), "6-8", "short", "uk", "p1", List.of());
+        BranchingResponse resp = svc.start(
+                new BranchingStartRequest("адвенчер", List.of("дракон"), "6-8", "short", "uk", "p1", List.of()),
+                user("u1")).block();
 
-        assertThatThrownBy(() -> svc.start(req, user("u1")))
-                .isInstanceOf(PaywallRequiredException.class);
+        assertThat(resp).isNotNull();
+        assertThat(resp.segmentNumber()).isEqualTo(1);
+        assertThat(resp.branchingState()).isEqualTo("awaiting_choice_1");
+        assertThat(resp.isFinal()).isFalse();
+        assertThat(resp.choices()).hasSize(2);
+        assertThat(resp.content()).isEqualTo("Opening body.");
     }
 
     @Test
     void start_creates_story_in_awaiting_choice_1_state() {
         when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
-        when(entitlements.isPro("u1")).thenReturn(true);
         when(systemPromptBuilder.buildStorySystem(anyString())).thenReturn("system prompt");
         when(promptBuilder.buildOpeningUserMessage(any(), any(), any())).thenReturn("opening prompt");
         when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(

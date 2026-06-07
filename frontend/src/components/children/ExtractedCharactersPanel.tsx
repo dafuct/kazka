@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useBilling } from '../../lib/BillingContext'
 import { useLocale } from '../../lib/LocaleContext'
 import { charactersApi, extraction } from '../../lib/apiClient'
 import type { ExtractedCandidateDto } from '@kazka/shared'
@@ -18,7 +17,6 @@ export interface ExtractedCharactersPanelProps {
 export function ExtractedCharactersPanel(props: ExtractedCharactersPanelProps) {
   const { t } = useLocale()
   const tc = (t as any).children ?? {}
-  const { isPro } = useBilling()
   const [candidates, setCandidates] = useState<ExtractedCandidateDto[]>([])
   const [picked, setPicked] = useState<Set<number>>(new Set())
   const [busy, setBusy] = useState(false)
@@ -63,12 +61,11 @@ export function ExtractedCharactersPanel(props: ExtractedCharactersPanelProps) {
   return (
     <section className={styles.panel}>
       <h3>{tc.saveTheseTitle ?? 'Save these characters?'}</h3>
-      {!isPro && <p className={styles.upgradeNote}>{tc.upgradeToSave ?? 'Upgrade to save characters to your library.'}</p>}
       <ul className={styles.list}>
         {candidates.map((c, i) => (
           <li key={i}>
             <label>
-              <input type="checkbox" disabled={!isPro}
+              <input type="checkbox"
                      checked={picked.has(i)}
                      onChange={() => {
                        const n = new Set(picked)
@@ -80,7 +77,7 @@ export function ExtractedCharactersPanel(props: ExtractedCharactersPanelProps) {
           </li>
         ))}
       </ul>
-      <button onClick={confirm} disabled={!isPro || busy || picked.size === 0}>
+      <button onClick={confirm} disabled={busy || picked.size === 0}>
         {tc.saveSelected ?? 'Save selected'}
       </button>
     </section>

@@ -76,12 +76,12 @@ class BedtimeScheduleControllerIT extends AbstractIT {
     }
 
     @Test
-    void should_return402_when_freeTier_enables() {
+    void should_allow_freeTier_to_enable() {
         when(entitlements.isPro(userA)).thenReturn(false);
         var client = authedClient(userA);
         client.put().uri("/api/children/" + profileA + "/bedtime")
                 .bodyValue(new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of(), true))
-                .exchange().expectStatus().isEqualTo(402);
+                .exchange().expectStatus().isOk();
     }
 
     @Test

@@ -116,14 +116,18 @@ class BedtimeWorkerIT extends AbstractIT {
     }
 
     @Test
-    void should_disable_when_user_no_longer_pro() throws Exception {
+    void should_keep_schedule_enabled_when_user_not_pro() throws Exception {
         when(entitlements.isPro(userId)).thenReturn(false);
         schedules.save(enabledSchedule(profileId));
 
         worker.enqueueAsync(profileId).get();
 
         BedtimeSchedule reloaded = schedules.findByChildProfileId(profileId).orElseThrow();
-        assertThat(reloaded.isEnabled()).isFalse();
+        assertThat(reloaded.isEnabled()).isTrue();
+        assertThat(reloaded.getLastSentAt()).isNotNull();
+
+        MimeMessage[] received = greenMail.getReceivedMessages();
+        assertThat(received).hasSize(1);
     }
 
     private BedtimeSchedule enabledSchedule(String childProfileId) {

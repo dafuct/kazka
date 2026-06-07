@@ -1,10 +1,8 @@
 package com.kazka.child.bedtime;
 
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileService;
 import com.kazka.child.bedtime.dto.BedtimeUpdateRequest;
-import com.kazka.story.exception.PaywallRequiredException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,7 +20,6 @@ public class BedtimeScheduleService {
 
     private final BedtimeScheduleRepository repo;
     private final ChildProfileService profiles;
-    private final EntitlementResolver entitlements;
     private final NextRunCalculator nextRun;
 
     @Transactional(readOnly = true)
@@ -38,10 +35,6 @@ public class BedtimeScheduleService {
     @Transactional
     public BedtimeSchedule upsert(String childProfileId, String userId, BedtimeUpdateRequest req) {
         ChildProfile profile = profiles.requireOwned(childProfileId, userId);
-
-        if (req.enabled() && !entitlements.isPro(userId)) {
-            throw new PaywallRequiredException("Bedtime ritual requires a paid plan");
-        }
 
         ZoneId tz;
         try { tz = ZoneId.of(req.timezone()); }

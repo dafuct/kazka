@@ -6,7 +6,6 @@ import com.kazka.ai.AiClient;
 import com.kazka.billing.FreeTierGate;
 import com.kazka.child.CharacterExtractionWorker;
 import com.kazka.child.CharacterRepository;
-import com.kazka.child.ChildEntitlementResolver;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileService;
 import com.kazka.child.Character;
@@ -61,7 +60,6 @@ public class StoryService {
     private final ChildProfileService childProfiles;
     private final CharacterRepository characters;
     private final StoryCharacterRepository storyCharacters;
-    private final ChildEntitlementResolver childTier;
     private final CharacterExtractionWorker extractionWorker;
     private final ImageUrlResolver images;
     private final ComicsBuilder comicsBuilder;
@@ -110,9 +108,7 @@ public class StoryService {
         String effectiveLang = promptBuilder.resolveLanguage(child, req.language());
 
         List<Character> recurringCast;
-        if (!childTier.canIncludeCharacters(userId)) {
-            recurringCast = List.of();   // silently strip for free tier
-        } else if (req.includeCharacterIds() == null || req.includeCharacterIds().isEmpty()) {
+        if (req.includeCharacterIds() == null || req.includeCharacterIds().isEmpty()) {
             recurringCast = List.of();
         } else {
             recurringCast = req.includeCharacterIds().stream()

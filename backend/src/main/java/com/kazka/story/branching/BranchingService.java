@@ -1,7 +1,6 @@
 package com.kazka.story.branching;
 
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.child.Character;
 import com.kazka.child.CharacterExtractionWorker;
 import com.kazka.child.CharacterRepository;
@@ -17,7 +16,6 @@ import com.kazka.story.branching.dto.BranchingChoice;
 import com.kazka.story.branching.dto.BranchingResponse;
 import com.kazka.story.branching.dto.BranchingStartRequest;
 import com.kazka.story.dto.GenerationRequest;
-import com.kazka.story.exception.PaywallRequiredException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,7 +37,6 @@ public class BranchingService {
     private final StoryRepository stories;
     private final ChildProfileService childProfiles;
     private final CharacterRepository characters;
-    private final EntitlementResolver entitlements;
     private final AiClient aiClient;
     private final BranchingPromptBuilder promptBuilder;
     private final BranchingResponseParser parser = new BranchingResponseParser();
@@ -48,9 +45,6 @@ public class BranchingService {
 
     public Mono<BranchingResponse> start(BranchingStartRequest req, CurrentUser cu) {
         ChildProfile child = childProfiles.requireOwned(req.childProfileId(), cu.userId());
-        if (!entitlements.isPro(cu.userId())) {
-            throw new PaywallRequiredException("Branching tales require a paid plan");
-        }
 
         List<Character> recurringCast = resolveRecurringCast(req.includeCharacterIds(), child);
         GenerationRequest genReq = new GenerationRequest(

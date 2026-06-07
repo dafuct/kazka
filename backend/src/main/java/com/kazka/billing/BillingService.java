@@ -8,7 +8,6 @@ import com.apple.itunes.storekit.model.Subtype;
 import com.kazka.billing.webhook.WebhookIdempotencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -29,7 +28,6 @@ public class BillingService {
     private final SubscriptionProductRepository products;
     private final UserEntitlementRepository entitlements;
     private final WebhookIdempotencyService idempotency;
-    private final ApplicationEventPublisher events;
 
     @Transactional
     public Mono<UserEntitlement> verifyAndPersist(String userId, String signedTransaction) {
@@ -116,9 +114,6 @@ public class BillingService {
             }
             entitlement.setLatestJws(signedTxn);
             entitlements.save(entitlement);
-            if (newState != EntitlementState.ACTIVE && newState != EntitlementState.GRACE) {
-                events.publishEvent(new EntitlementDowngradedEvent(entitlement.getUserId()));
-            }
             return null;
         }).subscribeOn(Schedulers.boundedElastic());
     }
@@ -150,7 +145,6 @@ public class BillingService {
             if (appleManaged) {
                 throw new AppleManagedSubscriptionException();
             }
-            boolean anyDowngraded = false;
             for (UserEntitlement entitlement : active) {
                 switch (entitlement.getSource()) {
                     case MONOBANK -> {
@@ -163,13 +157,9 @@ public class BillingService {
                         entitlement.setState(EntitlementState.REVOKED);
                         entitlement.setExpiresAt(Instant.now());
                         entitlements.save(entitlement);
-                        anyDowngraded = true;
                     }
                     case APPLE -> { /* unreachable — handled above */ }
                 }
-            }
-            if (anyDowngraded) {
-                events.publishEvent(new EntitlementDowngradedEvent(userId));
             }
             return active;
         }).subscribeOn(Schedulers.boundedElastic());

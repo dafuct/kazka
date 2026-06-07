@@ -1,7 +1,6 @@
 package com.kazka.story.translation;
 
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
-import com.kazka.billing.EntitlementResolver;
 import com.kazka.ai.AiClient;
 import com.kazka.comics.StoryPanelRepository;
 import com.kazka.illustration.ImageUrlResolver;
@@ -9,7 +8,6 @@ import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
 import com.kazka.story.dto.StoryDto;
-import com.kazka.story.exception.PaywallRequiredException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,7 +23,6 @@ import reactor.core.scheduler.Schedulers;
 public class TranslationService {
 
     private final StoryRepository stories;
-    private final EntitlementResolver entitlements;
     private final AiClient aiClient;
     private final TranslationPromptBuilder promptBuilder;
     private final PromptBuilder systemPromptBuilder;
@@ -38,9 +35,6 @@ public class TranslationService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         if (!story.getUserId().equals(cu.userId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        if (!entitlements.isPro(cu.userId())) {
-            throw new PaywallRequiredException("Translation requires a paid plan");
         }
         if (story.isBranching() && !"complete".equals(story.getBranchingState())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "story_in_progress");

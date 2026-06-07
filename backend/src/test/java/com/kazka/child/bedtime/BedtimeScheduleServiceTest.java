@@ -3,7 +3,6 @@ package com.kazka.child.bedtime;
 import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileService;
 import com.kazka.child.bedtime.dto.BedtimeUpdateRequest;
-import com.kazka.story.exception.PaywallRequiredException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -26,7 +25,6 @@ class BedtimeScheduleServiceTest {
 
     @Mock BedtimeScheduleRepository repo;
     @Mock ChildProfileService profiles;
-    @Mock com.kazka.billing.EntitlementResolver entitlements;
     @Mock NextRunCalculator nextRun;
     @InjectMocks BedtimeScheduleService svc;
 
@@ -39,7 +37,6 @@ class BedtimeScheduleServiceTest {
     @Test
     void should_create_schedule_on_first_save() {
         when(profiles.requireOwned("p1", "u")).thenReturn(owned());
-        when(entitlements.isPro("u")).thenReturn(true);
         when(repo.findByChildProfileId("p1")).thenReturn(Optional.empty());
         when(repo.save(any(BedtimeSchedule.class))).thenAnswer(i -> i.getArgument(0));
         when(nextRun.nextRun(any(), any(), any())).thenReturn(java.time.Instant.parse("2026-06-15T17:30:00Z"));
@@ -55,20 +52,23 @@ class BedtimeScheduleServiceTest {
     }
 
     @Test
-    void should_return402_when_freeTier_enables() {
+    void should_allow_any_user_to_enable() {
         when(profiles.requireOwned("p1", "u")).thenReturn(owned());
-        when(entitlements.isPro("u")).thenReturn(false);
+        when(repo.findByChildProfileId("p1")).thenReturn(Optional.empty());
+        when(repo.save(any(BedtimeSchedule.class))).thenAnswer(i -> i.getArgument(0));
+        when(nextRun.nextRun(any(), any(), any())).thenReturn(java.time.Instant.parse("2026-06-15T17:30:00Z"));
 
-        assertThatThrownBy(() -> svc.upsert("p1", "u",
-                new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of(), true)))
-                .isInstanceOf(PaywallRequiredException.class);
-        verify(repo, never()).save(any());
+        BedtimeSchedule saved = svc.upsert("p1", "u",
+                new BedtimeUpdateRequest(true, "20:30", "Europe/Kyiv", List.of(), true));
+
+        assertThat(saved.isEnabled()).isTrue();
+        assertThat(saved.getNextRunAt()).isNotNull();
+        verify(repo).save(any());
     }
 
     @Test
-    void should_allow_freeTier_to_disable() {
+    void should_allow_disable() {
         when(profiles.requireOwned("p1", "u")).thenReturn(owned());
-        // entitlements.isPro is NOT called when enabled=false — no stub needed
         when(repo.findByChildProfileId("p1")).thenReturn(Optional.empty());
         when(repo.save(any(BedtimeSchedule.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -82,7 +82,6 @@ class BedtimeScheduleServiceTest {
     @Test
     void should_reject_invalid_timezone() {
         when(profiles.requireOwned("p1", "u")).thenReturn(owned());
-        when(entitlements.isPro("u")).thenReturn(true);
 
         assertThatThrownBy(() -> svc.upsert("p1", "u",
                 new BedtimeUpdateRequest(true, "20:30", "Mars/Olympus", List.of(), true)))
@@ -101,7 +100,6 @@ class BedtimeScheduleServiceTest {
         existing.setTimezone("Europe/Kyiv");
         existing.setThemes(List.of());
         when(profiles.requireOwned("p1", "u")).thenReturn(owned());
-        when(entitlements.isPro("u")).thenReturn(true);
         when(repo.findByChildProfileId("p1")).thenReturn(Optional.of(existing));
         when(repo.save(any(BedtimeSchedule.class))).thenAnswer(i -> i.getArgument(0));
         when(nextRun.nextRun(any(), any(), any())).thenReturn(java.time.Instant.parse("2026-06-15T18:00:00Z"));
@@ -125,7 +123,6 @@ class BedtimeScheduleServiceTest {
         existing.setThemes(List.of());
         existing.setNextRunAt(java.time.Instant.now().plusSeconds(60));
         when(profiles.requireOwned("p1", "u")).thenReturn(owned());
-        // entitlements.isPro is NOT called when enabled=false — no stub needed
         when(repo.findByChildProfileId("p1")).thenReturn(Optional.of(existing));
         when(repo.save(any(BedtimeSchedule.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -139,7 +136,6 @@ class BedtimeScheduleServiceTest {
     @Test
     void should_persist_holidayThemesEnabled_false_when_user_opts_out() {
         when(profiles.requireOwned("p1", "u")).thenReturn(owned());
-        when(entitlements.isPro("u")).thenReturn(true);
         when(repo.findByChildProfileId("p1")).thenReturn(Optional.empty());
         when(repo.save(any(BedtimeSchedule.class))).thenAnswer(i -> i.getArgument(0));
         when(nextRun.nextRun(any(), any(), any())).thenReturn(java.time.Instant.now().plusSeconds(3600));

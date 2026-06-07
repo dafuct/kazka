@@ -240,12 +240,20 @@ export const en: Locale = {
     free: {
       name: 'Free',
       price: 'Free',
-      bullets: ['5 stories per month'],
+      bullets: [
+        '5 stories per month',
+        'Child profiles',
+        'Saved characters',
+        'Translation',
+        'Choose-your-path tales',
+        'Bedtime ritual',
+      ],
     },
     pro: {
       name: 'Pro',
       bullets: [
-        'Unlimited story generations',
+        'Unlimited stories every month',
+        'Everything in Free',
         'Early access to new features',
       ],
     },
@@ -317,10 +325,8 @@ export const en: Locale = {
     saveError: 'Could not save. Please try again.',
     pickUpTo3: 'Pick up to 3 characters who will appear in this tale.',
     noCharactersYet: 'No saved characters yet — generate your first tale.',
-    charactersPaywall: 'Save recurring characters with a paid plan.',
     saveTheseTitle: 'Save these characters?',
     saveSelected: 'Save selected',
-    upgradeToSave: 'Upgrade to save characters to your library.',
     charactersSaved: 'Saved to library 🎉',
     extractionStatus: {
       PENDING: 'Preparing character analysis…',
@@ -343,9 +349,6 @@ export const en: Locale = {
       saveCta: 'Save',
       savedToast: 'Saved 🌙',
       saveError: 'Could not save. Please try again.',
-      upgradeTitle: 'Nightly bedtime tales',
-      upgradeBody: 'Get a fresh tale emailed every night at your chosen bedtime. Paid feature.',
-      upgradeCta: 'Upgrade',
       helperWeWillEmail: (args: { email: string; time: string; tz: string }) =>
         `We'll email a fresh tale to ${args.email} each night at ${args.time} ${args.tz}.`,
       failedNoticeTitle: "Last night's tale didn't generate.",
@@ -393,7 +396,7 @@ export const en: Locale = {
     dismiss: 'Dismiss',
   },
   branching: {
-    formToggle: 'Branching tale (Pro)',
+    formToggle: 'Branching tale',
     choicePrompt: 'What happens next?',
     loading: 'Generating the next part…',
     errorRetry: 'Something went wrong. Please refresh.',
@@ -403,7 +406,6 @@ export const en: Locale = {
   translate: {
     translating: 'Translating…',
     error: 'Could not translate. Please try again.',
-    proRequired: 'Translation is available on Pro.',
   },
   redeem: {
     title: 'Redeem gift code',

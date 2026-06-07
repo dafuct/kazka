@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useBilling } from '../../lib/BillingContext'
 import { useChildren } from '../../lib/ChildrenContext'
 import { useLocale } from '../../lib/LocaleContext'
 import { children as childrenApi } from '../../lib/apiClient'
@@ -11,10 +9,8 @@ export function CharacterPicker({
   selected, onChange,
 }: { selected: string[]; onChange: (ids: string[]) => void }) {
   const { active } = useChildren()
-  const { isPro } = useBilling()
   const { t } = useLocale()
   const tc = (t as any).children ?? {}
-  const navigate = useNavigate()
   const [list, setList] = useState<CharacterDto[]>([])
 
   useEffect(() => {
@@ -23,17 +19,6 @@ export function CharacterPicker({
   }, [active])
 
   if (!active) return null
-
-  if (!isPro) {
-    return (
-      <div className={styles.paywall}>
-        <p>{tc.charactersPaywall ?? 'Save recurring characters with a paid plan.'}</p>
-        <button type="button" onClick={() => navigate('/pricing')}>
-          {(t as any).common?.upgrade ?? 'Upgrade'}
-        </button>
-      </div>
-    )
-  }
 
   if (list.length === 0) {
     return <p className={styles.empty}>{tc.noCharactersYet ?? 'No saved characters yet — generate your first tale.'}</p>

@@ -3,7 +3,6 @@ package com.kazka.billing.monobank;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kazka.billing.BillingProperties;
-import com.kazka.billing.EntitlementDowngradedEvent;
 import com.kazka.billing.EntitlementSource;
 import com.kazka.billing.EntitlementState;
 import com.kazka.billing.SubscriptionProductRepository;
@@ -12,7 +11,6 @@ import com.kazka.billing.UserEntitlementRepository;
 import com.kazka.billing.webhook.WebhookIdempotencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +45,6 @@ public class MonobankWebhookController {
     private final SubscriptionProductRepository products;
     private final UserEntitlementRepository entitlements;
     private final WebhookIdempotencyService idempotency;
-    private final ApplicationEventPublisher events;
     private final MonobankPubKeyService pubKeyService;
     private final ObjectMapper json = new ObjectMapper();
 
@@ -190,7 +187,6 @@ public class MonobankWebhookController {
                 ent.setNextRenewalAt(Instant.now().plus(Duration.ofDays(1)));
             } else {
                 ent.setNextRenewalAt(null);
-                events.publishEvent(new EntitlementDowngradedEvent(ent.getUserId()));
             }
             entitlements.save(ent);
         }

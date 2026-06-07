@@ -56,11 +56,11 @@ class BranchingTierIT extends AbstractIT {
     }
 
     @Test
-    void free_tier_gets_402() {
+    void free_tier_gets_200() {
         authedClient(freeUserId).post().uri("/api/stories/branching")
                 .bodyValue(new BranchingStartRequest("a", List.of("c"), "6-8", "short", "uk", freeProfileId, List.of()))
                 .exchange()
-                .expectStatus().isEqualTo(402);
+                .expectStatus().isOk();
     }
 
     @Test
