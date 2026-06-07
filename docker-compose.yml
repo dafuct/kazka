@@ -66,7 +66,10 @@ services:
         condition: service_healthy
 
   frontend:
-    build: ./frontend
+    build:
+      # Repo-root context (not ./frontend) so the npm workspace lockfile + @kazka/shared resolve.
+      context: .
+      dockerfile: frontend/Dockerfile
     ports:
       - "80:80"
     depends_on:
