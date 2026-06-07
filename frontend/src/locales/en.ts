@@ -488,4 +488,9 @@ export const en: Locale = {
       button: 'Sign up to create your own tale',
     },
   },
+  comics: {
+    failed: 'Could not generate the comic.',
+    retry: 'Try again',
+    drawing: 'Drawing the comic…',
+  },
 }

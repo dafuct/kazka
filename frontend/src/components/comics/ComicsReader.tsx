@@ -1,4 +1,5 @@
 import type { components } from '@kazka/shared'
+import { useLocale } from '../../lib/LocaleContext'
 import styles from './ComicsReader.module.css'
 
 type Story = components['schemas']['StoryDto']
@@ -9,13 +10,14 @@ export interface ComicsReaderProps {
 }
 
 export function ComicsReader({ story, onRetry }: ComicsReaderProps) {
+  const { t } = useLocale()
   if (story.illustrationStatus === 'FAILED') {
     return (
       <div className={styles.failed}>
-        <p>Не вдалося згенерувати комікс.</p>
+        <p>{t.comics.failed}</p>
         {onRetry ? (
           <button className={styles.retryButton} onClick={onRetry} type="button">
-            Спробувати ще раз
+            {t.comics.retry}
           </button>
         ) : null}
       </div>
@@ -24,7 +26,7 @@ export function ComicsReader({ story, onRetry }: ComicsReaderProps) {
 
   const page = story.panels[0]
   if (!page) {
-    return <div className={styles.skeleton} aria-label="Малюємо комікс…" />
+    return <div className={styles.skeleton} aria-label={t.comics.drawing} />
   }
   return (
     <div className={styles.pageWrap}>

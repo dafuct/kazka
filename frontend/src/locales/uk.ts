@@ -486,6 +486,11 @@ export const uk = {
       button: 'Створити свою казку',
     },
   },
+  comics: {
+    failed: 'Не вдалося згенерувати комікс.',
+    retry: 'Спробувати ще раз',
+    drawing: 'Малюємо комікс…',
+  },
 }
 
 export type Locale = typeof uk

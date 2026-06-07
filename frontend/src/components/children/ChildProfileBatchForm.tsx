@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useLocale } from '../../lib/LocaleContext'
 import type { CreateChildProfileRequest } from '../../lib/types'
 import { ChildProfileFields, emptyChildFormValues } from './ChildProfileForm'
@@ -7,6 +7,9 @@ import formStyles from './ChildProfileForm.module.css'
 import styles from './ChildProfileBatchForm.module.css'
 
 const MAX_ROWS = 20
+
+/** A draft row carries a stable id so React reconciles by identity, not list position. */
+type Row = { id: string; value: ChildFormValues }
 
 function toRequest(v: ChildFormValues): CreateChildProfileRequest {
   return {
@@ -33,30 +36,35 @@ export interface ChildProfileBatchFormProps {
 export function ChildProfileBatchForm({ onSubmit, submitLabel }: ChildProfileBatchFormProps) {
   const { t } = useLocale()
   const tc = (t as any).children ?? {}
-  const [rows, setRows] = useState<ChildFormValues[]>([emptyChildFormValues()])
+  const nextId = useRef(1)
+  const [rows, setRows] = useState<Row[]>(() => [{ id: 'row-0', value: emptyChildFormValues() }])
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
 
-  function updateRow(index: number, value: ChildFormValues) {
-    setRows(prev => prev.map((r, i) => (i === index ? value : r)))
+  function makeRow(): Row {
+    return { id: `row-${nextId.current++}`, value: emptyChildFormValues() }
+  }
+
+  function updateRow(id: string, value: ChildFormValues) {
+    setRows(prev => prev.map(r => (r.id === id ? { ...r, value } : r)))
   }
 
   function addRow() {
-    setRows(prev => (prev.length >= MAX_ROWS ? prev : [...prev, emptyChildFormValues()]))
+    setRows(prev => (prev.length >= MAX_ROWS ? prev : [...prev, makeRow()]))
   }
 
-  function removeRow(index: number) {
-    setRows(prev => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== index)))
+  function removeRow(id: string) {
+    setRows(prev => (prev.length <= 1 ? prev : prev.filter(r => r.id !== id)))
   }
 
-  const allNamed = rows.every(r => r.name.trim().length > 0)
+  const allNamed = rows.every(r => r.value.name.trim().length > 0)
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     if (!allNamed) return
     setBusy(true); setErr(null)
     try {
-      await onSubmit(rows.map(toRequest))
+      await onSubmit(rows.map(r => toRequest(r.value)))
     } catch (e: any) {
       setErr(e?.message ?? tc.saveError ?? 'Could not save')
     } finally {
@@ -67,21 +75,21 @@ export function ChildProfileBatchForm({ onSubmit, submitLabel }: ChildProfileBat
   return (
     <form onSubmit={submit} className={styles.batch}>
       {rows.map((row, i) => (
-        <fieldset key={i} className={styles.row}>
+        <fieldset key={row.id} className={styles.row}>
           <legend className={styles.legend}>
             <span>{(tc.childN ?? ((n: number) => `Child ${n}`))(i + 1)}</span>
             {rows.length > 1 && (
               <button
                 type="button"
                 className={styles.removeBtn}
-                onClick={() => removeRow(i)}
+                onClick={() => removeRow(row.id)}
               >
                 {tc.removeChild ?? 'Remove'}
               </button>
             )}
           </legend>
           <div className={formStyles.form}>
-            <ChildProfileFields value={row} onChange={v => updateRow(i, v)} />
+            <ChildProfileFields value={row.value} onChange={v => updateRow(row.id, v)} />
           </div>
         </fieldset>
       ))}
