@@ -47,6 +47,10 @@ class BranchingServiceTest {
         return new com.kazka.auth.CurrentUserResolver.CurrentUser(id, com.kazka.user.UserRole.USER);
     }
 
+    private com.kazka.auth.CurrentUserResolver.CurrentUser admin(String id) {
+        return new com.kazka.auth.CurrentUserResolver.CurrentUser(id, com.kazka.user.UserRole.ADMIN);
+    }
+
     @Test
     void start_creates_story_for_any_user() {
         when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
@@ -97,7 +101,7 @@ class BranchingServiceTest {
         story.setPendingChoices(List.of(
                 new BranchingChoice("A", "Option A"),
                 new BranchingChoice("B", "Option B")));
-        when(stories.findById("s1")).thenReturn(Optional.of(story));
+        when(stories.findByIdAndUserId("s1", "u1")).thenReturn(Optional.of(story));
 
         assertThatThrownBy(() -> svc.choose("s1", "C", user("u1")).block())
                 .isInstanceOf(ResponseStatusException.class)
@@ -111,7 +115,7 @@ class BranchingServiceTest {
         story.setId("s1"); story.setUserId("u1");
         story.setBranching(true);
         story.setBranchingState("complete");
-        when(stories.findById("s1")).thenReturn(Optional.of(story));
+        when(stories.findByIdAndUserId("s1", "u1")).thenReturn(Optional.of(story));
 
         assertThatThrownBy(() -> svc.choose("s1", "A", user("u1")).block())
                 .isInstanceOf(ResponseStatusException.class)
@@ -120,16 +124,44 @@ class BranchingServiceTest {
     }
 
     @Test
-    void choose_returns_404_when_story_not_owned() {
-        Story story = new Story();
-        story.setId("s1"); story.setUserId("other-user");
-        story.setBranching(true);
-        story.setBranchingState("awaiting_choice_1");
-        when(stories.findById("s1")).thenReturn(Optional.of(story));
+    void choose_returns_404_when_regular_user_does_not_own_story() {
+        // A non-admin only ever sees their own rows: findByIdAndUserId yields nothing.
+        when(stories.findByIdAndUserId("s1", "u1")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> svc.choose("s1", "A", user("u1")).block())
                 .isInstanceOf(ResponseStatusException.class)
                 .satisfies(ex -> assertThat(((ResponseStatusException) ex).getStatusCode())
                         .isEqualTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void choose_allows_admin_to_advance_a_non_owned_story() {
+        // Regression: an admin opening another user's in-progress branching tale
+        // could read it (admin read-bypass) but choosing 404'd. Admins drive any tale.
+        Story story = new Story();
+        story.setId("s1"); story.setUserId("owner"); story.setChildProfileId("p1");
+        story.setLanguage("uk"); story.setContent("Opening body.");
+        story.setBranching(true);
+        story.setBranchingState("awaiting_choice_1");
+        story.setPendingChoices(List.of(
+                new BranchingChoice("A", "Option A"),
+                new BranchingChoice("B", "Option B")));
+        when(stories.findById("s1")).thenReturn(Optional.of(story));
+        // child is resolved by the STORY owner, not the admin caller
+        when(childProfiles.requireOwned("p1", "owner")).thenReturn(profile());
+        when(promptBuilder.transitionLine(any(), anyString())).thenReturn(" …і ось ");
+        when(systemPromptBuilder.buildStorySystem(anyString())).thenReturn("system prompt");
+        when(promptBuilder.buildMiddleUserMessage(anyString(), anyString())).thenReturn("middle prompt");
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
+                "Middle body.\n\n---\n\nCHOICE_A: A2\nCHOICE_B: B2"));
+        when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
+
+        BranchingResponse resp = svc.choose("s1", "A", admin("admin-1")).block();
+
+        assertThat(resp).isNotNull();
+        assertThat(resp.segmentNumber()).isEqualTo(2);
+        assertThat(resp.branchingState()).isEqualTo("awaiting_choice_2");
+        assertThat(resp.isFinal()).isFalse();
+        assertThat(resp.choices()).hasSize(2);
     }
 }

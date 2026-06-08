@@ -83,11 +83,12 @@ public class BranchingService {
     @Transactional
     public Mono<BranchingResponse> choose(String storyId, String choiceId, CurrentUser cu) {
         return Mono.fromCallable(() -> {
-            Story story = stories.findById(storyId)
+            // Mirror StoryService.findOwned: admins may drive any story, regular
+            // users only their own. A non-owner non-admin gets no row → NOT_FOUND.
+            Story story = (cu.isAdmin()
+                    ? stories.findById(storyId)
+                    : stories.findByIdAndUserId(storyId, cu.userId()))
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-            if (!story.getUserId().equals(cu.userId())) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-            }
             if (!story.isBranching() || "complete".equals(story.getBranchingState())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid_state");
             }
@@ -105,7 +106,9 @@ public class BranchingService {
         .flatMap(arr -> {
             Story story = (Story) ((Object[]) arr)[0];
             BranchingChoice chosen = (BranchingChoice) ((Object[]) arr)[1];
-            ChildProfile child = childProfiles.requireOwned(story.getChildProfileId(), cu.userId());
+            // The child belongs to whoever owns the story, not the caller (an
+            // admin advancing another user's tale is resolved by story.userId).
+            ChildProfile child = childProfiles.requireOwned(story.getChildProfileId(), story.getUserId());
 
             // Append transition line to existing content
             String contentWithTransition = story.getContent() + promptBuilder.transitionLine(child, chosen.text());
