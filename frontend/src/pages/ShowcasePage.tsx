@@ -1,21 +1,30 @@
 import { useEffect, useState } from 'react'
+import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { Link } from 'react-router-dom'
 import { useLocale } from '../lib/LocaleContext'
 import { useAuthModal } from '../lib/AuthModalContext'
+import { useAuth } from '../lib/AuthContext'
+import { useStoryModal } from '../lib/StoryModalContext'
 import { showcase } from '../lib/apiClient'
 import type { ShowcaseStoryDto } from '../lib/apiClient'
 import styles from './ShowcasePage.module.css'
 
-/** Repeated, prominent "sign up to create your own tale" CTA. */
+/** Prominent CTA: logged-out → sign up; logged-in → open the create-tale modal. */
 export function ShowcaseCta() {
   const { t } = useLocale()
   const { openAuth } = useAuthModal()
+  const { user } = useAuth()
+  const { openModal } = useStoryModal()
   const ts = t.showcase
+  const handleClick = () => {
+    if (!user) openAuth('signUp')
+    else openModal()
+  }
   return (
     <section className={styles.cta}>
       <h2 className={styles.ctaTitle}>{ts.cta.title}</h2>
       <p className={styles.ctaSub}>{ts.cta.subtitle}</p>
-      <button type="button" className={styles.ctaButton} onClick={() => openAuth('signUp')}>
+      <button type="button" className={styles.ctaButton} onClick={handleClick}>
         {ts.cta.button}
       </button>
     </section>
@@ -39,7 +48,7 @@ export function ShowcasePage() {
   }, [])
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
       <div className={styles.inner}>
         <div className={styles.pageHeader}>
           <div className={styles.label}>{ts.label}</div>

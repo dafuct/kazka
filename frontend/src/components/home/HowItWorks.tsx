@@ -82,7 +82,7 @@ export function HowItWorks() {
           <circle cx="180" cy="260" r="2.5" fill="#EDD9A3" opacity="0.45">
             <animate attributeName="opacity" values="0.45;0.1;0.45" dur="4s" repeatCount="indefinite"/>
           </circle>
-          <path d="M250 40L251 36L255 38L251 35L250 31L249 35L245 33L249 36Z" fill="#C4B5FD" opacity="0.5">
+          <path d="M250 40L251 36L255 38L251 35L250 31L249 35L245 33L249 36Z" fill="#E6C77A" opacity="0.5">
             <animate attributeName="opacity" values="0.5;0.2;0.5" dur="4s" repeatCount="indefinite"/>
           </path>
           <defs>

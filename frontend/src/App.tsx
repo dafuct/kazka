@@ -50,13 +50,14 @@ function ScrollProgress() {
 
 function CursorTrail() {
   useEffect(() => {
-    const colors = ['#C4B5FD', '#EDD9A3', '#D97706', '#7C3AED', '#F59E0B']
+    // Carpathian thread tones, sparser than the old purple trail
+    const colors = ['#C0402C', '#D6A23A', '#2F6B43', '#2E6E82', '#9C2F4A']
     let lastX = 0, lastY = 0, lastTime = 0
     const onMove = (e: MouseEvent) => {
       const now = Date.now()
       const dx = e.clientX - lastX
       const dy = e.clientY - lastY
-      if (now - lastTime < 40 || Math.sqrt(dx * dx + dy * dy) < 20) return
+      if (now - lastTime < 70 || Math.sqrt(dx * dx + dy * dy) < 32) return
       lastX = e.clientX
       lastY = e.clientY
       lastTime = now

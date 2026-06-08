@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ChildProfileForm } from '../components/children/ChildProfileForm'
 import { ChildProfileBatchForm } from '../components/children/ChildProfileBatchForm'
@@ -28,7 +29,7 @@ export function ChildProfileEditPage() {
   if (loading) return <p className={styles.loading}>{(t as any).common?.loading ?? 'Loading…'}</p>
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
       <h1>{isNew ? (tc.newTitle ?? 'Add a child') : (tc.editTitle ?? 'Edit child')}</h1>
       {isNew ? (
         <ChildProfileBatchForm

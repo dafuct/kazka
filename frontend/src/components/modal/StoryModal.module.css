@@ -14,15 +14,15 @@
 
 .panel {
   background: var(--color-surface);
-  border-radius: var(--radius-xl);
   width: 100%;
   max-width: 680px;
   max-height: 90vh;
   overflow-y: auto;
+  /* Hutsul framed panel: maroon border + gold inset pinline */
+  border: 5px solid var(--kz-maroon);
   box-shadow:
-    0 40px 100px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(196, 181, 253, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    inset 0 0 0 3px var(--kz-gold),
+    0 40px 100px rgba(0, 0, 0, 0.5);
   animation: panelIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   scrollbar-width: thin;
@@ -30,9 +30,8 @@
 }
 
 .topBorder {
-  height: 4px;
-  background: linear-gradient(90deg, var(--color-ember), var(--color-magic), var(--color-gold));
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  height: 6px;
+  background: var(--kz-gold);
 }
 
 .header {

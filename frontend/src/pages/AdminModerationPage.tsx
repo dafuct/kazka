@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { adminModeration } from '../lib/apiClient'
 import type { FlaggedAttemptDto, SuspendedUserDto } from '../lib/apiClient'
 import type { PageResponse } from '../lib/types'
@@ -40,7 +41,7 @@ export function AdminModerationPage() {
   if (!flagged || !suspended) return <p className={styles.msg}>{tm.loading}</p>
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
       <h1 className={styles.heading}>{tm.title}</h1>
 
       <SuspendedSection tm={tm} users={suspended} onUnsuspend={unsuspend} />

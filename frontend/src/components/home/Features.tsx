@@ -5,9 +5,9 @@ import { SectionParticles } from './SectionParticles'
 import styles from './Features.module.css'
 
 function MagicBookSvg({ dark }: { dark: boolean }) {
-  const bookSpine  = dark ? '#4C1D95' : '#7C3006'
+  const bookSpine  = dark ? '#5A1F28' : '#7C3006'
   const pageColor  = dark ? '#1C1838' : '#FFFBF0'
-  const pageLine   = dark ? '#4C1D95' : '#C4A882'
+  const pageLine   = dark ? '#5A1F28' : '#C4A882'
   const textLine   = dark ? '#5B3A8A' : '#A0835E'
 
   return (
@@ -15,7 +15,7 @@ function MagicBookSvg({ dark }: { dark: boolean }) {
       style={{ width: '100%', height: '100%', maxHeight: '260px' }} aria-hidden="true">
 
       {/* Ambient glow */}
-      <ellipse cx="180" cy="155" rx="135" ry="75" fill={dark ? '#7C3AED' : '#D97706'} opacity="0.09"/>
+      <ellipse cx="180" cy="155" rx="135" ry="75" fill={dark ? '#7E2A33' : '#D97706'} opacity="0.09"/>
 
       {/* Book shadow */}
       <ellipse cx="180" cy="210" rx="105" ry="11" fill={dark ? '#000' : '#2C1810'} opacity="0.18"/>
@@ -33,8 +33,8 @@ function MagicBookSvg({ dark }: { dark: boolean }) {
 
       {/* ── Spine ── */}
       <rect x="163" y="72" width="34" height="126" rx="4" fill={bookSpine}/>
-      <rect x="165" y="74" width="5" height="122" rx="2" fill={dark ? '#8B5CF6' : '#B45309'} opacity="0.45"/>
-      <rect x="185" y="74" width="2" height="122" rx="1" fill={dark ? '#7C3AED' : '#92400E'} opacity="0.3"/>
+      <rect x="165" y="74" width="5" height="122" rx="2" fill={dark ? '#B5763A' : '#B45309'} opacity="0.45"/>
+      <rect x="185" y="74" width="2" height="122" rx="1" fill={dark ? '#7E2A33' : '#92400E'} opacity="0.3"/>
 
       {/* ── Right page ── */}
       <path d="M197 74 Q267 77 297 83 L299 196 Q267 193 197 196Z" fill={pageColor}/>
@@ -80,13 +80,13 @@ function MagicBookSvg({ dark }: { dark: boolean }) {
       {/* ── Sparkles floating up ── */}
       {([
         [115, 62, 3.5, '#F59E0B', 0],
-        [148, 46, 2.8, '#C4B5FD', 0.5],
+        [148, 46, 2.8, '#E6C77A', 0.5],
         [168, 54, 4.2, '#F59E0B', 0.9],
-        [194, 42, 3, '#C4B5FD', 0.25],
+        [194, 42, 3, '#E6C77A', 0.25],
         [218, 56, 3.8, '#F59E0B', 1.1],
-        [244, 44, 2.5, '#C4B5FD', 0.65],
+        [244, 44, 2.5, '#E6C77A', 0.65],
         [158, 33, 2.2, '#F59E0B', 1.4],
-        [202, 34, 2.8, '#C4B5FD', 0.85],
+        [202, 34, 2.8, '#E6C77A', 0.85],
       ] as [number,number,number,string,number][]).map(([x,y,s,color,delay], i) => (
         <path key={i}
           d={`M${x} ${y-s} L${x+s*.38} ${y-s*.38} L${x+s} ${y} L${x+s*.38} ${y+s*.38} L${x} ${y+s} L${x-s*.38} ${y+s*.38} L${x-s} ${y} L${x-s*.38} ${y-s*.38}Z`}
@@ -99,7 +99,7 @@ function MagicBookSvg({ dark }: { dark: boolean }) {
       {/* Rising dust particles */}
       {([145,163,180,198,216] as number[]).map((x, i) => (
         <circle key={i} cx={x} cy={66} r="1.8"
-          fill={i % 2 === 0 ? '#F59E0B' : '#C4B5FD'} opacity="0.35">
+          fill={i % 2 === 0 ? '#F59E0B' : '#E6C77A'} opacity="0.35">
           <animate attributeName="cy" values="66;28;66"
             dur={`${3.2+i*0.4}s`} begin={`${i*0.28}s`} repeatCount="indefinite"/>
           <animate attributeName="opacity" values="0.35;0;0.35"
@@ -138,13 +138,13 @@ function DayCycleSvg({ dark }: { dark: boolean }) {
 
       {/* ── Horizon line ── */}
       <path d="M0 108 Q28 104 55 108 Q82 112 110 108 L110 111 Q82 115 55 111 Q28 107 0 111Z"
-        fill={dark ? '#C4B5FD' : '#7C3AED'} opacity="0.18"/>
+        fill={dark ? '#E6C77A' : '#7E2A33'} opacity="0.18"/>
 
       {/* ── Moon (bottom half) ── */}
-      <circle cx="55" cy="162" r="18" fill={dark ? '#E4ECFF' : '#C4B5FD'}/>
-      <circle cx="63" cy="155" r="14" fill={dark ? '#060C14' : '#EDE9FE'}/>
+      <circle cx="55" cy="162" r="18" fill={dark ? '#E4ECFF' : '#E6C77A'}/>
+      <circle cx="63" cy="155" r="14" fill={dark ? '#060C14' : '#F2E8D2'}/>
       {/* moon crescent glow */}
-      <circle cx="55" cy="162" r="22" fill={dark ? '#E4ECFF' : '#C4B5FD'} opacity="0.07">
+      <circle cx="55" cy="162" r="22" fill={dark ? '#E4ECFF' : '#E6C77A'} opacity="0.07">
         <animate attributeName="opacity" values="0.07;0.18;0.07" dur="4s" repeatCount="indefinite"/>
       </circle>
 
@@ -156,7 +156,7 @@ function DayCycleSvg({ dark }: { dark: boolean }) {
         [80,184,1.7,0.2],
       ] as [number,number,number,number][]).map(([x,y,r,delay],i) => (
         <circle key={i} cx={x} cy={y} r={r}
-          fill={dark ? '#CCD8FF' : '#7C3AED'} opacity="0.6">
+          fill={dark ? '#CCD8FF' : '#7E2A33'} opacity="0.6">
           <animate attributeName="opacity" values="0.6;0.08;0.6"
             dur={`${2.4+i*0.28}s`} begin={`${delay}s`} repeatCount="indefinite"/>
         </circle>
@@ -186,11 +186,11 @@ function DayCycleHorizontalSvg({ dark }: { dark: boolean }) {
       <circle cx="49" cy="44" r="5" fill="#FFFAA0" opacity="0.45"/>
 
       {/* Moon (right) */}
-      <circle cx="165" cy="50" r="22" fill={dark ? '#E4ECFF' : '#C4B5FD'} opacity="0.07">
+      <circle cx="165" cy="50" r="22" fill={dark ? '#E4ECFF' : '#E6C77A'} opacity="0.07">
         <animate attributeName="opacity" values="0.07;0.18;0.07" dur="4s" repeatCount="indefinite"/>
       </circle>
-      <circle cx="165" cy="50" r="18" fill={dark ? '#E4ECFF' : '#C4B5FD'}/>
-      <circle cx="173" cy="43" r="14" fill={dark ? '#060C14' : '#EDE9FE'}/>
+      <circle cx="165" cy="50" r="18" fill={dark ? '#E4ECFF' : '#E6C77A'}/>
+      <circle cx="173" cy="43" r="14" fill={dark ? '#060C14' : '#F2E8D2'}/>
 
       {/* Stars between */}
       {([
@@ -198,7 +198,7 @@ function DayCycleHorizontalSvg({ dark }: { dark: boolean }) {
         [130,42,1.5,0.4], [196,30,1.4,0.9], [200,72,1.3,1.3],
       ] as [number,number,number,number][]).map(([x,y,r,delay],i) => (
         <circle key={i} cx={x} cy={y} r={r}
-          fill={dark ? '#CCD8FF' : '#7C3AED'} opacity="0.6">
+          fill={dark ? '#CCD8FF' : '#7E2A33'} opacity="0.6">
           <animate attributeName="opacity" values="0.6;0.08;0.6"
             dur={`${2.4+i*0.28}s`} begin={`${delay}s`} repeatCount="indefinite"/>
         </circle>
@@ -210,7 +210,7 @@ function DayCycleHorizontalSvg({ dark }: { dark: boolean }) {
 function NarratorsSvg({ dark }: { dark: boolean }) {
   const sage = dark ? '#6EE7B7' : '#059669'
   const warm = dark ? '#FCD34D' : '#D97706'
-  const wind = dark ? '#C4B5FD' : '#7C3AED'
+  const wind = dark ? '#E6C77A' : '#7E2A33'
 
   return (
     <svg viewBox="0 0 80 200" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -290,7 +290,7 @@ function NarratorsSvg({ dark }: { dark: boolean }) {
 function NarratorsHorizontalSvg({ dark }: { dark: boolean }) {
   const sage = dark ? '#6EE7B7' : '#059669'
   const warm = dark ? '#FCD34D' : '#D97706'
-  const wind = dark ? '#C4B5FD' : '#7C3AED'
+  const wind = dark ? '#E6C77A' : '#7E2A33'
 
   return (
     <svg viewBox="0 0 240 80" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -358,19 +358,19 @@ function ArchiveSvg({ dark }: { dark: boolean }) {
       style={{ width: '100%', height: '100%', display: 'block' }} aria-hidden="true">
       <defs>
         <radialGradient id="archGlow" cx="50%" cy="65%" r="55%">
-          <stop offset="0%" stopColor={dark ? '#7C3AED' : '#F59E0B'} stopOpacity="0.32"/>
-          <stop offset="100%" stopColor={dark ? '#7C3AED' : '#F59E0B'} stopOpacity="0"/>
+          <stop offset="0%" stopColor={dark ? '#7E2A33' : '#F59E0B'} stopOpacity="0.32"/>
+          <stop offset="100%" stopColor={dark ? '#7E2A33' : '#F59E0B'} stopOpacity="0"/>
         </radialGradient>
       </defs>
       <rect width="300" height="220" fill="url(#archGlow)"/>
 
       {/* Book 1: purple — crescent moon cover */}
-      <rect x="72" y="65" width="26" height="90" rx="2" fill={dark ? '#5B21B6' : '#7C3AED'}/>
-      <rect x="72" y="65" width="4" height="90" rx="1" fill={dark ? '#7C3AED' : '#9333EA'} opacity="0.5"/>
+      <rect x="72" y="65" width="26" height="90" rx="2" fill={dark ? '#6E2530' : '#7E2A33'}/>
+      <rect x="72" y="65" width="4" height="90" rx="1" fill={dark ? '#7E2A33' : '#9C2F4A'} opacity="0.5"/>
       <rect x="76" y="92" width="16" height="2" rx="1" fill="#FFF" opacity="0.35"/>
       <rect x="78" y="97" width="12" height="2" rx="1" fill="#FFF" opacity="0.22"/>
-      <circle cx="85" cy="79" r="6.5" fill={dark ? '#C4B5FD' : '#EDE9FE'} opacity="0.6"/>
-      <circle cx="88.5" cy="76" r="5.2" fill={dark ? '#5B21B6' : '#7C3AED'} opacity="0.95"/>
+      <circle cx="85" cy="79" r="6.5" fill={dark ? '#E6C77A' : '#F2E8D2'} opacity="0.6"/>
+      <circle cx="88.5" cy="76" r="5.2" fill={dark ? '#6E2530' : '#7E2A33'} opacity="0.95"/>
 
       {/* Book 2: tall gold — sun rays cover */}
       <g transform="rotate(-2 133 100)">
@@ -414,9 +414,9 @@ function ArchiveSvg({ dark }: { dark: boolean }) {
       {/* Floating sparkles */}
       {([
         [50, 52, 2.5, '#F59E0B', 0],
-        [252, 46, 2, '#C4B5FD', 0.8],
+        [252, 46, 2, '#E6C77A', 0.8],
         [42, 105, 1.8, '#FCD34D', 1.4],
-        [264, 88, 1.5, '#C4B5FD', 0.3],
+        [264, 88, 1.5, '#E6C77A', 0.3],
         [56, 140, 1.6, '#F59E0B', 1.9],
         [248, 132, 1.8, '#F9A8D4', 1.1],
       ] as [number,number,number,string,number][]).map(([x,y,r,color,delay], i) => (
@@ -432,7 +432,7 @@ function ArchiveSvg({ dark }: { dark: boolean }) {
         <animate attributeName="opacity" values="0.55;0.08;0.55" dur="3.2s" begin="0.5s" repeatCount="indefinite"/>
       </path>
       <path d="M257 110 L258.2 106 L259.4 110 L263.4 111.2 L259.4 112.4 L258.2 116.4 L257 112.4 L253 111.2Z"
-        fill={dark ? '#C4B5FD' : '#7C3AED'} opacity="0.5">
+        fill={dark ? '#E6C77A' : '#7E2A33'} opacity="0.5">
         <animate attributeName="opacity" values="0.5;0.08;0.5" dur="4s" begin="1.6s" repeatCount="indefinite"/>
       </path>
     </svg>
@@ -462,7 +462,7 @@ export function Features() {
           <circle cx="80" cy="200" r="3" fill="#F59E0B" opacity="0.5">
             <animate attributeName="opacity" values="0.5;0.15;0.5" dur="3s" repeatCount="indefinite"/>
           </circle>
-          <path d="M250 40L251 36L255 38L251 35L250 31L249 35L245 33L249 36Z" fill="#C4B5FD" opacity="0.5">
+          <path d="M250 40L251 36L255 38L251 35L250 31L249 35L245 33L249 36Z" fill="#E6C77A" opacity="0.5">
             <animate attributeName="opacity" values="0.5;0.2;0.5" dur="4s" repeatCount="indefinite"/>
           </path>
           <defs>

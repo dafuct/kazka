@@ -8,6 +8,7 @@ import { useAuth } from '../../lib/AuthContext'
 import { streamStory } from '../../lib/sseClient'
 import { useActiveStory } from '../../lib/ActiveStoryContext'
 import type { GenerationRequest, ModerationErrorCode } from '../../lib/types'
+import { OrnamentBand } from '../stitch/OrnamentBand'
 import styles from './StoryModal.module.css'
 
 type Phase = 'form' | 'creating'
@@ -135,17 +136,8 @@ export function StoryModal() {
       <div className={panelClass} onClick={(e) => e.stopPropagation()}>
         {phase !== 'creating' && (
           <>
-            <div className={styles.topBorder} />
+            <OrnamentBand stitch={5} />
             <div className={styles.header}>
-              <div className={styles.ornament} aria-hidden="true">
-                <svg viewBox="0 0 140 20" fill="none">
-                  <path d="M10 10 Q35 3 70 10 Q105 17 130 10" stroke="currentColor" strokeWidth="1.5"/>
-                  <circle cx="70" cy="10" r="4" fill="currentColor"/>
-                  <path d="M67 10 L70 4 L73 10 L70 7Z" fill="currentColor" opacity="0.7"/>
-                  <circle cx="35" cy="8" r="2" fill="currentColor" opacity="0.5"/>
-                  <circle cx="105" cy="12" r="2" fill="currentColor" opacity="0.5"/>
-                </svg>
-              </div>
               <button className={styles.closeBtn} onClick={closeModal} aria-label="Закрити">✕</button>
             </div>
           </>

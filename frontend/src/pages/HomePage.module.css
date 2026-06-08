@@ -1,32 +1,52 @@
-/* ── HERO ── */
-.hero {
-  min-height: 100vh;
+/* Stacked blocks with a single, identical gap between every one — and the same
+   gutter below the last block before the footer */
+.home {
   display: flex;
-  align-items: center;
-  padding: 120px 48px 80px;
+  flex-direction: column;
+  gap: 22px;
+  padding-bottom: 22px;
+}
+
+/* ── HERO ── (a normal framed block like the others) */
+.hero {
+  padding-top: calc(var(--kz-nav-h) + 22px);
   position: relative;
   overflow: hidden;
 }
 
 .heroInner {
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
+  margin: 0 40px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
+  grid-template-columns: auto 1.1fr 1fr;
+  gap: 40px;
   align-items: center;
   position: relative;
   z-index: 1;
+  /* Same framing + tone as every other block */
+  background-color: var(--kz-layer-2);
+  background-image: var(--kz-grid-img);
+  border: 5px solid var(--kz-maroon);
+  box-shadow: inset 0 0 0 3px var(--kz-gold);
+  padding: 40px 44px;
+}
+
+.heroMotif {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .heroText { max-width: 540px; }
 
 .heroLabel {
+  font-family: var(--font-display);
   font-size: 14px;
-  font-weight: 600;
-  color: var(--color-magic);
-  margin-bottom: 16px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 14px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -34,10 +54,13 @@
 
 .heroHeadline {
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: clamp(34px, 4.5vw, 56px);
-  line-height: 1.2;
-  margin-bottom: 20px;
+  font-weight: 700;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.06;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--kz-maroon);
+  margin-bottom: 16px;
 }
 
 @keyframes wordReveal {
@@ -53,10 +76,11 @@
 
 .heroSub {
   font-size: 17px;
+  font-style: italic;
   color: var(--color-text-muted);
   margin-bottom: 32px;
   max-width: 440px;
-  line-height: 1.75;
+  line-height: 1.7;
 }
 
 .heroButtons {
@@ -70,29 +94,31 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--color-ember);
-  color: #fff;
-  font-family: var(--font-body);
-  font-weight: 600;
+  background: var(--kz-maroon);
+  color: var(--color-surface);
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 16px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
   padding: 14px 28px;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
   text-decoration: none;
   transition: all 0.35s;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(194,65,12,0.3);
+  box-shadow: 0 4px 16px rgba(126,42,51,0.30);
   animation: buttonPulse 2.5s ease-in-out infinite;
 }
 .btnPrimary:hover {
-  background: #A93A0A;
-  box-shadow: 0 6px 24px rgba(194,65,12,0.4);
+  filter: brightness(0.92);
+  box-shadow: 0 6px 24px rgba(126,42,51,0.42);
   transform: translateY(-1px);
   animation: none;
   text-decoration: none;
-  color: #fff;
+  color: var(--color-surface);
 }
 
 .btnSecondary {
@@ -100,20 +126,22 @@
   align-items: center;
   gap: 6px;
   background: transparent;
-  color: var(--color-text-muted);
-  font-family: var(--font-body);
-  font-weight: 600;
+  color: var(--kz-maroon);
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   padding: 14px 24px;
-  border: 1.5px solid var(--color-surface-deep);
-  border-radius: 4px;
+  border: 2px solid var(--kz-maroon);
+  border-radius: 0;
   cursor: pointer;
   text-decoration: none;
   transition: all 0.3s;
 }
 .btnSecondary:hover {
-  border-color: var(--color-text-faint);
-  color: var(--color-text);
+  background: var(--color-magic-soft);
+  color: var(--kz-maroon);
   text-decoration: none;
 }
 
@@ -121,7 +149,7 @@
   font-size: 14px;
   color: var(--color-text-faint);
 }
-.heroProof strong { color: var(--color-gold); font-weight: 600; }
+.heroProof strong { color: var(--color-gold); font-weight: 700; }
 
 .activeChildPill {
   display: inline-flex;
@@ -129,9 +157,9 @@
   gap: 8px;
   margin-top: 12px;
   padding: 6px 12px 6px 6px;
-  background: var(--color-surface-deep, rgba(255,255,255,0.06));
-  border: 1px solid var(--color-surface-edge, rgba(255,255,255,0.10));
-  border-radius: 999px;
+  background: var(--color-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 0;
   font-size: 13px;
   color: var(--color-text-muted);
 }
@@ -146,11 +174,26 @@
   width: 100%;
   max-width: 520px;
   aspect-ratio: 4/3;
-  border-radius: 16px;
-  transform: rotate(-2deg);
-  animation: magicBreath 4s ease-in-out infinite;
+  /* Framed illustration window: 6px maroon + 3px gold pinline (gold shows
+     through the padding gap), square corners */
+  border: 6px solid var(--kz-maroon);
+  background: var(--kz-gold);
+  padding: 3px;
   overflow: hidden;
-  box-shadow: 0 24px 64px rgba(13, 9, 36, 0.55);
+  box-shadow: 0 16px 40px rgba(42, 32, 24, 0.28);
+}
+
+/* Diamond-chain stitch divider band */
+.dividerBand {
+  background: var(--color-surface);
+  border-top: 5px solid var(--kz-maroon);
+  border-bottom: 5px solid var(--kz-maroon);
+  box-shadow: inset 0 3px 0 var(--kz-gold), inset 0 -3px 0 var(--kz-gold);
+  padding: 8px 0;
+  margin: 8px 0 0;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .heroSvg {
@@ -198,11 +241,16 @@
 
 
 /* ── Mobile ── */
-@media (max-width: 860px) {
-  .hero { padding: 100px 20px 60px; }
+@media (max-width: 980px) {
+  .heroMotif { display: none; }
   .heroInner { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  .home { gap: 16px; padding-bottom: 16px; }
+  .hero { padding-top: calc(var(--kz-nav-h) + 16px); }
+  .heroInner { gap: 28px; padding: 24px; margin: 0 14px; }
   .heroImageWrap { order: -1; }
-  .heroImage { max-width: 360px; transform: rotate(0deg); }
+  .heroImage { max-width: 360px; }
   .heroText { text-align: left; }
 }
 

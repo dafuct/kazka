@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { dashboard as dashboardApi } from '../lib/apiClient'
 import { useLocale } from '../lib/LocaleContext'
 import { useAuth } from '../lib/AuthContext'
@@ -23,11 +24,11 @@ export function DashboardPage() {
       .catch((e: any) => setError(e?.message ?? (td.error ?? 'Could not load dashboard')))
   }, [])
 
-  if (error) return <div className={styles.page}><p className={styles.error}>{error}</p></div>
-  if (!data) return <div className={styles.page}><p className={styles.loading}>{td.loading ?? 'Loading…'}</p></div>
+  if (error) return <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" /><p className={styles.error}>{error}</p></div>
+  if (!data) return <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" /><p className={styles.loading}>{td.loading ?? 'Loading…'}</p></div>
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
       <header className={styles.header}>
         <h1 className={styles.title}>{td.title ?? 'Dashboard'}</h1>
         {isAdmin && <span className={styles.pillPro}>Admin</span>}

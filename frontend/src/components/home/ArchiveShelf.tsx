@@ -10,11 +10,11 @@ import styles from './ArchiveShelf.module.css'
 const SPINE_COLORS = [
   'linear-gradient(160deg,#D97706,#B45309)',
   'linear-gradient(160deg,#166534,#15803D)',
-  'linear-gradient(160deg,#7C3AED,#6D28D9)',
-  'linear-gradient(160deg,#1E1B4B,#312E81)',
+  'linear-gradient(160deg,#7E2A33,#9C2F4A)',
+  'linear-gradient(160deg,#211C18,#2E6E82)',
   'linear-gradient(160deg,#C2410C,#991B1B)',
   'linear-gradient(160deg,#92400E,#78350F)',
-  'linear-gradient(160deg,#3730A3,#4338CA)',
+  'linear-gradient(160deg,#2F6B43,#2E6E82)',
   'linear-gradient(160deg,#166534,#064E3B)',
 ]
 const TILTS = ['-2deg', '1deg', '-1deg', '2deg', '-1.5deg', '0.5deg', '-2.5deg', '1.5deg']

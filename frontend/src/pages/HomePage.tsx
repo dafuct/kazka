@@ -1,4 +1,5 @@
 import { useEffect, useRef, Fragment } from 'react'
+import { ScMotif, SCM, THREAD } from '../components/stitch/StitchCanvas'
 import { IllustrationCarousel } from '../components/illustrations/IllustrationCarousel'
 import { HowItWorks } from '../components/home/HowItWorks'
 import { Features } from '../components/home/Features'
@@ -20,7 +21,7 @@ function ParticleField() {
     const field = ref.current
     if (!field) return
     const types = ['star', 'dot', 'circle', 'dash'] as const
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 28; i++) {
       const el = document.createElement('div')
       const type = types[i % 4]
       el.className = `${styles.particle} ${styles['particle_' + type]}`
@@ -88,11 +89,14 @@ export function HomePage() {
   }, [])
 
   return (
-    <div>
+    <div className={styles.home}>
       {/* ── HERO ── */}
       <section className={styles.hero}>
         <ParticleField />
         <div className={styles.heroInner}>
+          <div className={styles.heroMotif} aria-hidden="true">
+            <ScMotif rule={SCM.medallion} n={21} stitch={7} palette={THREAD} ground="var(--color-surface)" />
+          </div>
           <div className={styles.heroText}>
             <div className={styles.heroLabel}>{t.home.label}</div>
             <h1 className={styles.heroHeadline}>

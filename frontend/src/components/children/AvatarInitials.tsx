@@ -1,6 +1,7 @@
 import styles from './AvatarInitials.module.css'
 
-const PALETTE = ['#C4B5FD', '#FCD34D', '#86EFAC', '#FCA5A5', '#93C5FD', '#FBBF24', '#A78BFA']
+// Carpathian cross-stitch thread tones
+const PALETTE = ['#C0402C', '#D6A23A', '#2F6B43', '#2E6E82', '#9C2F4A', '#B5763A', '#7E2A33']
 
 function pickColor(seed: string): string {
   let h = 0

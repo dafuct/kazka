@@ -1,9 +1,15 @@
 .section {
-  padding: 140px 48px;
+  padding: 120px 48px;
+  margin: 0 40px;
+  background-color: var(--kz-layer-2);
+  background-image: var(--kz-grid-img);
+  border: 5px solid var(--kz-maroon);
+  box-shadow: inset 0 0 0 3px var(--kz-gold);
   position: relative;
   overflow: hidden;
   text-align: center;
 }
+@media (max-width: 860px) { .section { margin: 0 14px; padding: 80px 22px; } }
 
 .bg {
   position: absolute;
@@ -14,17 +20,17 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(15,10,30,0.7), rgba(15,10,30,0.92));
+  background: linear-gradient(to bottom, rgba(26,20,13,0.7), rgba(26,20,13,0.92));
 }
 
 .illustSky {
   width: 100%;
   height: 100%;
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(196,181,253,0.25) 0%, transparent 40%),
-    radial-gradient(ellipse at 20% 80%, rgba(124,58,237,0.15) 0%, transparent 40%),
-    radial-gradient(ellipse at 80% 60%, rgba(30,27,75,0.3) 0%, transparent 50%),
-    #0F0A1E;
+    radial-gradient(ellipse at 50% 30%, rgba(226,180,84,0.25) 0%, transparent 40%),
+    radial-gradient(ellipse at 20% 80%, rgba(126,42,51,0.15) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 60%, rgba(33,28,24,0.3) 0%, transparent 50%),
+    #14100B;
 }
 
 .starLayer {
@@ -51,7 +57,7 @@
   border-radius: 50%;
   pointer-events: none;
   z-index: 1;
-  background: radial-gradient(circle, rgba(196,181,253,0.2), transparent 70%);
+  background: radial-gradient(circle, rgba(226,180,84,0.2), transparent 70%);
   animation: moonPulse 6s ease-in-out infinite;
 }
 
@@ -61,7 +67,7 @@
   right: 10%;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, rgba(196,181,253,0.8), transparent);
+  background: linear-gradient(90deg, rgba(226,180,84,0.8), transparent);
   border-radius: 1px;
   transform: rotate(-45deg);
   z-index: 1;
@@ -105,12 +111,12 @@
   border-radius: 4px;
   text-decoration: none;
   transition: all 0.35s;
-  box-shadow: 0 4px 24px rgba(124,58,237,0.4), 0 0 60px rgba(124,58,237,0.12);
+  box-shadow: 0 4px 24px rgba(126,42,51,0.4), 0 0 60px rgba(126,42,51,0.12);
   margin-bottom: 16px;
 }
 .btn:hover {
-  background: #6D28D9;
-  box-shadow: 0 6px 32px rgba(124,58,237,0.5), 0 0 80px rgba(124,58,237,0.2);
+  background: #7E2A33;
+  box-shadow: 0 6px 32px rgba(126,42,51,0.5), 0 0 80px rgba(126,42,51,0.2);
   transform: translateY(-2px);
   text-decoration: none;
 }

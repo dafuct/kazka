@@ -1,8 +1,14 @@
 .section {
-  padding: 100px 48px;
+  padding: 84px 48px;
+  margin: 0 40px;
+  background-color: var(--kz-layer-2);
+  background-image: var(--kz-grid-img);
+  border: 5px solid var(--kz-maroon);
+  box-shadow: inset 0 0 0 3px var(--kz-gold);
   position: relative;
   overflow: hidden;
 }
+@media (max-width: 860px) { .section { margin: 0 14px; padding: 56px 22px; } }
 
 .inner {
   max-width: 1100px;
@@ -50,7 +56,7 @@
 
 /* Shared card base */
 .card {
-  background: var(--color-surface);
+  background: var(--kz-layer-2);
   border: 1px solid rgba(160,120,96,0.2);
   border-radius: 8px;
   overflow: hidden;
@@ -61,7 +67,7 @@
 .card:hover {
   transform: translateY(-8px);
   box-shadow: 0 8px 24px rgba(44,24,16,0.12), 0 24px 48px rgba(44,24,16,0.08);
-  border-color: rgba(124,58,237,0.2);
+  border-color: rgba(126,42,51,0.2);
 }
 
 /* ── Large card ── */
@@ -88,7 +94,7 @@
   border-radius: inherit;
 }
 [data-theme="dark"] .largeLeft::before {
-  background: linear-gradient(135deg, rgba(124,58,237,0.08) 0%, transparent 70%);
+  background: linear-gradient(135deg, rgba(126,42,51,0.08) 0%, transparent 70%);
 }
 .largeLeft h3 {
   font-family: var(--font-display);
@@ -118,7 +124,7 @@
   left: 0;
   width: 65%;
   height: 100%;
-  background: linear-gradient(to right, var(--color-surface) 0%, transparent 100%);
+  background: linear-gradient(to right, var(--kz-layer-2) 0%, transparent 100%);
   z-index: 1;
   pointer-events: none;
 }
@@ -139,7 +145,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-surface);
+  background: var(--kz-layer-2);
 }
 .mediumImg::before {
   content: '';
@@ -148,7 +154,7 @@
   left: 0;
   width: 70%;
   height: 100%;
-  background: linear-gradient(to right, var(--color-surface) 0%, transparent 100%);
+  background: linear-gradient(to right, var(--kz-layer-2) 0%, transparent 100%);
   z-index: 1;
   pointer-events: none;
 }
@@ -167,14 +173,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-surface);
+  background: var(--kz-layer-2);
 }
 .cardTextImg::before {
   content: '';
   position: absolute;
   top: 0; left: 0;
   width: 70%; height: 100%;
-  background: linear-gradient(to right, var(--color-surface) 0%, transparent 100%);
+  background: linear-gradient(to right, var(--kz-layer-2) 0%, transparent 100%);
   z-index: 1;
   pointer-events: none;
 }
@@ -205,7 +211,7 @@
   height: 100%;
   min-height: 220px;
   position: relative;
-  background: var(--color-surface);
+  background: var(--kz-layer-2);
   transition: transform 6s ease;
 }
 .card:hover .archiveIllust { transform: scale(1.05); }
@@ -214,9 +220,9 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(to right,  var(--color-surface) 0%, transparent 38%),
-    linear-gradient(to left,   var(--color-surface) 0%, transparent 38%),
-    linear-gradient(to bottom, var(--color-surface) 0%, transparent 28%);
+    linear-gradient(to right,  var(--kz-layer-2) 0%, transparent 38%),
+    linear-gradient(to left,   var(--kz-layer-2) 0%, transparent 38%),
+    linear-gradient(to bottom, var(--kz-layer-2) 0%, transparent 28%);
   z-index: 1;
   pointer-events: none;
 }

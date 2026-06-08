@@ -1,6 +1,7 @@
 .page {
   padding: calc(64px + 60px) 48px 80px;
   min-height: 100vh;
+  max-width: min(1100px, calc(100% - 80px));
 }
 
 .inner {

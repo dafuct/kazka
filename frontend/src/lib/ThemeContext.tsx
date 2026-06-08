@@ -11,7 +11,7 @@ interface ThemeCtx {
 const ThemeContext = createContext<ThemeCtx | null>(null)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const stored = (localStorage.getItem('theme') as Theme) ?? 'light'
+  const stored = (localStorage.getItem('theme') as Theme) ?? 'dark'
   const [theme, setTheme] = useState<Theme>(stored)
 
   useEffect(() => {

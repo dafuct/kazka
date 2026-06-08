@@ -1,126 +1,148 @@
+/* Hutsul nav — solid aida bar, 5px maroon bottom border + gold pinline below. */
 .nav {
   position: fixed;
-  top: 3px;
+  top: 0;
   left: 0;
   right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 48px;
-  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
-  border-bottom: 1px solid transparent;
+  gap: 20px;
+  min-height: var(--kz-nav-h);
+  padding: 8px 40px;
+  background: var(--color-surface);
+  border-bottom: 5px solid var(--kz-maroon);
+  box-shadow: 0 5px 0 var(--kz-gold);
+  transition: box-shadow 0.3s;
 }
 
 .nav.scrolled {
-  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
-  backdrop-filter: blur(12px) saturate(1.2);
-  border-bottom-color: rgba(217,119,6,0.15);
+  box-shadow: 0 5px 0 var(--kz-gold), 0 10px 22px rgba(42, 32, 24, 0.16);
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   text-decoration: none;
-  color: var(--color-text);
+  color: var(--kz-maroon);
   flex-shrink: 0;
 }
-.logo:hover { text-decoration: none; opacity: 0.85; }
+.logo:hover { text-decoration: none; opacity: 0.88; }
 
 .logoIcon {
-  width: 28px;
-  height: 28px;
+  display: inline-flex;
+  width: auto;
+  height: auto;
   transition: transform 0.4s;
 }
-.nav.scrolled .logoIcon { transform: scale(0.9); }
+.nav.scrolled .logoIcon { transform: scale(0.92); }
 
-.logo span {
+.logo span:last-child {
   font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--kz-maroon);
 }
 
 .links {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 18px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .link {
-  font-weight: 500;
-  font-size: 15px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--color-text-muted);
   text-decoration: none;
-  transition: color 0.3s;
+  padding: 6px 4px;
+  border-bottom: 3px solid transparent;
+  background: none;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s;
 }
-.link:hover { color: var(--color-text); text-decoration: none; }
-.link.active { color: var(--color-magic); }
+.link:hover { color: var(--kz-ink); text-decoration: none; }
+.link.active { color: var(--kz-maroon); border-bottom-color: var(--kz-gold); }
 
 .themeToggle {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  background: var(--color-surface-2);
-  border: 1px solid rgba(160,120,96,0.2);
-  border-radius: 6px;
-  padding: 6px 14px;
+  background: var(--color-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 0;
+  padding: 8px 14px;
   font-family: var(--font-body);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 700;
   color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.3s;
 }
-.themeToggle:hover { background: var(--color-surface-deep); }
+.themeToggle:hover { border-color: var(--kz-maroon); color: var(--kz-maroon); }
 .themeIcon { font-size: 14px; line-height: 1; }
 
 .langBtn {
-  font-family: var(--font-body);
+  font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 600;
-  padding: 5px 12px;
-  border-radius: 6px;
-  border: 1.5px solid rgba(160,120,96,0.3);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 12px;
+  border-radius: 0;
+  border: 1.5px solid var(--border);
   color: var(--color-text-muted);
   background: none;
   cursor: pointer;
   transition: all 0.3s;
 }
-.langBtn:hover { border-color: var(--color-magic); color: var(--color-magic); }
+.langBtn:hover { border-color: var(--kz-maroon); color: var(--kz-maroon); }
 
+/* Primary CTA — Oswald caps on maroon, square */
 .ctaBtn {
-  background: var(--color-ember);
-  color: #fff;
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 14px;
-  padding: 8px 20px;
-  border-radius: 4px;
+  background: var(--kz-maroon);
+  color: var(--color-surface);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 12px 24px;
+  border-radius: 0;
+  border: 0;
   text-decoration: none;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: all 0.3s;
-  box-shadow: 0 2px 8px rgba(194,65,12,0.25);
+  cursor: pointer;
+  transition: filter 0.3s;
 }
-.ctaBtn:hover { background: #A93A0A; text-decoration: none; }
+.ctaBtn:hover { filter: brightness(0.92); text-decoration: none; }
 
+/* Donate — outline maroon, square */
 .donateBtn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--font-body);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 14px;
-  padding: 7px 16px;
-  border-radius: 999px;
-  border: 1.5px solid var(--color-magic);
-  color: var(--color-magic);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 9px 16px;
+  border-radius: 0;
+  border: 2px solid var(--kz-maroon);
+  color: var(--kz-maroon);
   background: transparent;
   text-decoration: none;
   white-space: nowrap;
@@ -128,13 +150,13 @@
   transition: all 0.3s;
 }
 .donateBtn:hover {
-  background: var(--color-magic);
-  color: #fff;
+  background: var(--kz-maroon);
+  color: var(--color-surface);
   text-decoration: none;
 }
 
 @media (max-width: 860px) {
-  .nav { padding: 12px 20px; }
+  .nav { padding: 8px 20px; }
   .links .link:not(.active) { display: none; }
   .links li:nth-child(1),
   .links li:nth-child(2) { display: none; }
@@ -142,20 +164,28 @@
 }
 
 @media (max-width: 600px) {
-  .nav { padding: 10px 14px; }
+  .nav { padding: 6px 12px; min-height: 64px; gap: 10px; }
+  /* No room for nav links on phones — hide them all (incl. the active one) so the
+     CTA/sign-up never gets clipped. Logged-in users still have the ▾ user menu. */
+  .links .link { display: none; }
   .links { gap: 8px; flex-shrink: 0; }
-  .logo { min-width: 0; flex-shrink: 1; gap: 8px; }
-  .logo span {
-    font-size: 16px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  .logo { min-width: 0; flex-shrink: 0; gap: 0; }
+  /* Phone: drop the wordmark, keep just the stitch-logo mark (no "КА…" truncation) */
+  .logo span:last-child { display: none; }
   .themeToggle { padding: 6px 9px; }
   .themeLabel { display: none; }
-  .langBtn { padding: 4px 8px; font-size: 11px; }
-  .ctaBtn { padding: 6px 12px; font-size: 12px; }
-  .userBtn { padding: 5px 10px; font-size: 0.85rem; }
+  .langBtn { padding: 6px 8px; font-size: 11px; }
+  .ctaBtn { padding: 9px 13px; font-size: 13px; }
+  .donateBtn { padding: 8px 12px; font-size: 12px; }
+  .userBtn { padding: 6px 10px; font-size: 0.85rem; }
+}
+
+@media (max-width: 440px) {
+  /* Tightest phones: donate collapses to the heart only, so the sign-up CTA fits */
+  .donateBtn { padding: 8px 11px; font-size: 0; gap: 0; }
+  .donateBtn::before { content: '\2665'; font-size: 14px; }
+  .langBtn { padding: 6px 7px; }
+  .ctaBtn { padding: 9px 11px; font-size: 12px; }
 }
 
 .userWrap { position: relative; }
@@ -164,24 +194,27 @@
   align-items: center;
   gap: 8px;
   background: transparent;
-  border: 1px solid var(--color-surface-deep);
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-family: inherit;
+  border: 1.5px solid var(--border);
+  border-radius: 0;
+  padding: 8px 14px;
+  font-family: var(--font-body);
+  font-weight: 700;
   font-size: 0.9rem;
   color: var(--color-text);
   cursor: pointer;
+  transition: border-color 0.3s;
 }
+.userBtn:hover { border-color: var(--kz-maroon); }
 .proBadge {
+  font-family: var(--font-display);
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #D97706, #C2410C);
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.35);
+  padding: 3px 8px;
+  border-radius: 0;
+  background: var(--kz-maroon);
+  color: var(--color-surface);
 }
 .userMenu {
   position: absolute;
@@ -189,23 +222,24 @@
   top: 100%;
   margin-top: 8px;
   background: var(--color-surface);
-  border: 1px solid var(--color-surface-deep);
-  border-radius: 12px;
-  min-width: 180px;
+  border: 2px solid var(--kz-maroon);
+  border-radius: 0;
+  min-width: 190px;
   display: flex;
   flex-direction: column;
   z-index: 100;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 12px 32px rgba(42, 32, 24, 0.22);
   overflow: hidden;
 }
 .userMenu button {
   background: transparent;
   border: none;
-  font-family: inherit;
+  font-family: var(--font-body);
   font-size: 0.9rem;
   color: var(--color-text);
   text-align: left;
-  padding: 10px 14px;
+  padding: 11px 16px;
   cursor: pointer;
+  transition: background 0.2s;
 }
-.userMenu button:hover { background: var(--color-surface-deep); }
+.userMenu button:hover { background: var(--color-magic-soft); }

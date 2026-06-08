@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { StoryCard } from '../components/story/StoryCard'
 import { ConfirmModal } from '../components/modal/ConfirmModal'
 import { useLocale } from '../lib/LocaleContext'
@@ -40,7 +41,7 @@ export function ArchivePage() {
   }, [deleteId])
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
       <div className={styles.inner}>
         <div className={styles.pageHeader}>
           <div className={styles.label}>{t.archive.label}</div>

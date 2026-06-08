@@ -45,5 +45,5 @@
 .chipInput button:disabled { opacity: 0.4; cursor: not-allowed; }
 .error { color: #ef4444; font-size: 14px; }
 .submit { padding: 10px 16px; background: var(--color-magic); color: #fff; border: 0; border-radius: 6px; cursor: pointer; font-weight: 600; align-self: flex-start; }
-.submit:hover:not(:disabled) { background: #6D28D9; }
+.submit:hover:not(:disabled) { background: #6A2129; }
 .submit:disabled { opacity: 0.5; cursor: not-allowed; }

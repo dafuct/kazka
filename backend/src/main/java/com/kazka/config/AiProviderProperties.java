@@ -1,5 +1,7 @@
 package com.kazka.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
@@ -14,6 +16,8 @@ import java.util.List;
  * 2026-05-31 when comics replaced single-cover illustrations.
  */
 @ConfigurationProperties("kazka.ai")
+@Getter
+@Setter
 public class AiProviderProperties {
 
     private String apiToken = null;        // Gemini key (GOOGLE_API_KEY env slot)
@@ -42,61 +46,11 @@ public class AiProviderProperties {
     private double editorPresencePenalty = 0.0;
     private int editorMaxTokens = 4096;
 
-    public String getApiToken() { return apiToken; }
-    public void setApiToken(String apiToken) { this.apiToken = apiToken; }
-
-    public String getTextModel() { return textModel; }
-    public void setTextModel(String textModel) { this.textModel = textModel; }
-
-    public String getEditorModel() { return editorModel; }
-    public void setEditorModel(String editorModel) { this.editorModel = editorModel; }
-
-    public String getSceneModel() { return sceneModel; }
-    public void setSceneModel(String sceneModel) { this.sceneModel = sceneModel; }
-
-    public String getTextBaseUrl() { return textBaseUrl; }
-    public void setTextBaseUrl(String textBaseUrl) { this.textBaseUrl = textBaseUrl; }
-
-    public String getNanoBananaModel() { return nanoBananaModel; }
-    public void setNanoBananaModel(String nanoBananaModel) { this.nanoBananaModel = nanoBananaModel; }
-
-    public String getNanoBananaBaseUrl() { return nanoBananaBaseUrl; }
-    public void setNanoBananaBaseUrl(String nanoBananaBaseUrl) { this.nanoBananaBaseUrl = nanoBananaBaseUrl; }
-
-    public double getTextTemperature() { return textTemperature; }
-    public void setTextTemperature(double textTemperature) { this.textTemperature = textTemperature; }
-
-    public double getTextTopP() { return textTopP; }
-    public void setTextTopP(double textTopP) { this.textTopP = textTopP; }
-
-    public double getTextFrequencyPenalty() { return textFrequencyPenalty; }
-    public void setTextFrequencyPenalty(double textFrequencyPenalty) { this.textFrequencyPenalty = textFrequencyPenalty; }
-
-    public double getTextPresencePenalty() { return textPresencePenalty; }
-    public void setTextPresencePenalty(double textPresencePenalty) { this.textPresencePenalty = textPresencePenalty; }
-
-    public int getTextMaxTokens() { return textMaxTokens; }
-    public void setTextMaxTokens(int textMaxTokens) { this.textMaxTokens = textMaxTokens; }
-
-    public double getEditorTemperature() { return editorTemperature; }
-    public void setEditorTemperature(double editorTemperature) { this.editorTemperature = editorTemperature; }
-
-    public double getEditorTopP() { return editorTopP; }
-    public void setEditorTopP(double editorTopP) { this.editorTopP = editorTopP; }
-
-    public double getEditorFrequencyPenalty() { return editorFrequencyPenalty; }
-    public void setEditorFrequencyPenalty(double editorFrequencyPenalty) { this.editorFrequencyPenalty = editorFrequencyPenalty; }
-
-    public double getEditorPresencePenalty() { return editorPresencePenalty; }
-    public void setEditorPresencePenalty(double editorPresencePenalty) { this.editorPresencePenalty = editorPresencePenalty; }
-
-    public int getEditorMaxTokens() { return editorMaxTokens; }
-    public void setEditorMaxTokens(int editorMaxTokens) { this.editorMaxTokens = editorMaxTokens; }
-
     // --- Comics pipeline config (panels per tale, aspects, timeout) ---
     private final Comics comics = new Comics();
-    public Comics getComics() { return comics; }
 
+    @Getter
+    @Setter
     public static class Comics {
         private int panelsPerTale = 4;
         private List<PanelAspectName> panelAspects =
@@ -104,18 +58,6 @@ public class AiProviderProperties {
                               PanelAspectName.SQUARE, PanelAspectName.LANDSCAPE);
         private Duration pipelineTimeout = Duration.ofSeconds(60);
         private int maxConcurrentPerUser = 1;
-
-        public int getPanelsPerTale() { return panelsPerTale; }
-        public void setPanelsPerTale(int value) { this.panelsPerTale = value; }
-
-        public List<PanelAspectName> getPanelAspects() { return panelAspects; }
-        public void setPanelAspects(List<PanelAspectName> value) { this.panelAspects = value; }
-
-        public Duration getPipelineTimeout() { return pipelineTimeout; }
-        public void setPipelineTimeout(Duration value) { this.pipelineTimeout = value; }
-
-        public int getMaxConcurrentPerUser() { return maxConcurrentPerUser; }
-        public void setMaxConcurrentPerUser(int value) { this.maxConcurrentPerUser = value; }
     }
 
     /** Lower-cased mirror of com.kazka.comics.PanelAspect for property binding. */

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { useAuthModal } from '../lib/AuthModalContext'
@@ -19,12 +20,12 @@ export function PasswordResetPage() {
   const [done, setDone] = useState(false)
 
   if (!token) {
-    return <div className={styles.page}><h1>{t.auth.errors.TOKEN_INVALID}</h1></div>
+    return <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" /><h1>{t.auth.errors.TOKEN_INVALID}</h1></div>
   }
 
   if (done) {
     return (
-      <div className={styles.page}>
+      <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
         <h1>{t.auth.messages.passwordUpdated}</h1>
         <button className={styles.btn} onClick={() => openAuth('signIn')}>
           {t.auth.tabs.signIn}
@@ -50,7 +51,7 @@ export function PasswordResetPage() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
       <h1 className={styles.heading}>{t.auth.actions.submitReset}</h1>
       <form onSubmit={handle} className={styles.form}>
         {error && <div className={styles.banner}>{error}</div>}

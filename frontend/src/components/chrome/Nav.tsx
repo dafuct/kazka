@@ -7,6 +7,7 @@ import { useAuth } from '../../lib/AuthContext'
 import { useAuthModal } from '../../lib/AuthModalContext'
 import { DONATE_URL } from '../../lib/config'
 import { ActiveChildPicker } from '../children/ActiveChildPicker'
+import { ScMotif, SCM, THREAD } from '../stitch/StitchCanvas'
 import styles from './Nav.module.css'
 
 export function Nav() {
@@ -44,16 +45,9 @@ export function Nav() {
   return (
     <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>
       <Link to="/" className={styles.logo}>
-        <svg viewBox="0 0 28 28" fill="none" className={styles.logoIcon} aria-hidden="true">
-          <defs>
-            <mask id="kazkaMoonMask">
-              <rect width="28" height="28" fill="white"/>
-              <circle cx="15" cy="11" r="6" fill="black"/>
-            </mask>
-          </defs>
-          <circle cx="11" cy="14" r="7" fill="var(--color-magic)" mask="url(#kazkaMoonMask)"/>
-          <path d="M22 2 L22.9 4.1 L25 5 L22.9 5.9 L22 8 L21.1 5.9 L19 5 L21.1 4.1 Z" fill="var(--color-gold)"/>
-        </svg>
+        <span className={styles.logoIcon} aria-hidden="true">
+          <ScMotif rule={SCM.star8} n={11} stitch={4.5} palette={THREAD} ground={null} />
+        </span>
         <span>{t.brand}</span>
       </Link>
 

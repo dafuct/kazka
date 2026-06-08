@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { Link, useParams } from 'react-router-dom'
 import { children as childrenApi, charactersApi } from '../lib/apiClient'
 import { useLocale } from '../lib/LocaleContext'
@@ -28,7 +29,7 @@ export function CharacterLibraryPage() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
       <header className={styles.header}>
         <h1>{tc.libraryTitle ?? 'Character library'}</h1>
         <Link to={`/settings/children/${id}`}>← {tc.backToProfile ?? 'Back to profile'}</Link>

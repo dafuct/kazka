@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { useParams, Link } from 'react-router-dom'
 import { ComicsReader } from '../components/comics/ComicsReader'
 import { ShowcaseCta } from './ShowcasePage'
@@ -32,7 +33,7 @@ export function ShowcaseDetailPage() {
 
   if (notFound || !tale) {
     return (
-      <div className={styles.page}>
+      <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
         <div className={styles.inner}>
           <div className={styles.topBar}>
             <Link to="/" className={styles.back}>{ts.backToGallery}</Link>
@@ -52,7 +53,7 @@ export function ShowcaseDetailPage() {
     .filter(Boolean)
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
       <div className={styles.inner}>
         <div className={styles.topBar}>
           <Link to="/" className={styles.back}>{ts.backToGallery}</Link>

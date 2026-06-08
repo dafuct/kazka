@@ -6,6 +6,8 @@ import { AvatarInitials } from '../components/children/AvatarInitials'
 import { ExtractedCharactersPanel } from '../components/children/ExtractedCharactersPanel'
 import { BranchingReader } from '../components/branching/BranchingReader'
 import { LanguageToggle } from '../components/translation/LanguageToggle'
+import { ReadAloud } from '../components/story/ReadAloud'
+import { ScMotif, ScBand, SCM, THREAD, BAND_PALETTE } from '../components/stitch/StitchCanvas'
 import { useLocale } from '../lib/LocaleContext'
 import { useChildren } from '../lib/ChildrenContext'
 import { useAuth } from '../lib/AuthContext'
@@ -136,11 +138,24 @@ export function StoryDetailPage() {
     ? story.translatedContent
     : story.content
 
+  const displayedTitle = story.title
+  const readLanguage = viewLanguage === 'translated'
+    ? (story.translatedLanguage ?? story.language)
+    : story.language
+
+  const paragraphs = displayedContent
+    .split(/\n\s*\n+/)
+    .map(p => p.trim())
+    .filter(Boolean)
+
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
         <div className={styles.topBar}>
           <Link to="/stories" className={styles.back}>← {t.story.back}</Link>
+          <span className={styles.topMotif} aria-hidden="true">
+            <ScMotif rule={SCM.star8} n={11} stitch={4.5} palette={THREAD} ground={null} />
+          </span>
           {!(story.isBranching && story.branchingState !== 'complete') && (
             <LanguageToggle
               story={story}
@@ -153,91 +168,113 @@ export function StoryDetailPage() {
           )}
         </div>
 
-        {editing ? (
-          <input
-            className={styles.titleInput}
-            value={editTitle}
-            onChange={e => setEditTitle(e.target.value)}
-          />
-        ) : (
-          <h1 className={styles.title}>{story.title}</h1>
-        )}
+        <div className={styles.layout}>
+          {/* ── Reading column ── */}
+          <div className={styles.readingCol}>
+            {editing ? (
+              <input
+                className={styles.titleInput}
+                value={editTitle}
+                onChange={e => setEditTitle(e.target.value)}
+              />
+            ) : (
+              <h1 className={styles.title}>{displayedTitle}</h1>
+            )}
 
-        {childProfile && (
-          <p className={styles.forChild}>
-            <AvatarInitials name={childProfile.name} seed={childProfile.avatarSeed} size={18} />
-            <span>{(t as any).children?.forChild ? (t as any).children.forChild(childProfile.name) : `for ${childProfile.name}`}</span>
-          </p>
-        )}
+            {childProfile && (
+              <p className={styles.forChild}>
+                <AvatarInitials name={childProfile.name} seed={childProfile.avatarSeed} size={18} />
+                <span>{(t as any).children?.forChild ? (t as any).children.forChild(childProfile.name) : `for ${childProfile.name}`}</span>
+              </p>
+            )}
 
-        <div className={styles.meta}>
-          <span className={styles.tag}>{story.ageGroup}</span>
-          <span className={styles.tag}>{story.length}</span>
-          <span className={styles.tag}>{story.language.toUpperCase()}</span>
-        </div>
+            <div className={styles.titleBand} aria-hidden="true">
+              <ScBand cols={100} H={13} P={20} D={6} stitch={6} palette={BAND_PALETTE} ground={null} />
+            </div>
 
-        <div className={styles.comicsBlock}>
-          <ComicsReader story={story} onRetry={handleRetry} />
-        </div>
+            <div className={`${styles.comicsBlock} kz-illustration`}>
+              <ComicsReader story={story} onRetry={handleRetry} />
+            </div>
 
-        {editing ? (
-          <textarea
-            className={styles.contentInput}
-            value={editContent}
-            onChange={e => setEditContent(e.target.value)}
-            rows={20}
-          />
-        ) : (
-          <div className={styles.content}>
-            {displayedContent
-              .split(/\n\s*\n+/)
-              .map(p => p.trim())
-              .filter(Boolean)
-              .map((para, i) => (
-                <p key={i}>{para}</p>
-              ))}
+            {editing ? (
+              <textarea
+                className={styles.contentInput}
+                value={editContent}
+                onChange={e => setEditContent(e.target.value)}
+                rows={20}
+              />
+            ) : (
+              <div className={styles.content}>
+                {paragraphs.map((para, i) => (
+                  <p key={i} className={i === 0 ? styles.firstPara : undefined}>{para}</p>
+                ))}
+              </div>
+            )}
           </div>
-        )}
 
-        {story.childProfileId && story.extractionStatus !== 'SKIPPED' && (
-          <ExtractedCharactersPanel
-            storyId={story.id}
-            childProfileId={story.childProfileId}
-            extractionStatus={story.extractionStatus as any}
-            language={viewLanguage === 'translated' ? (story.translatedLanguage ?? undefined) : story.language}
-            onConfirmed={() => refresh()}
-          />
-        )}
+          {/* ── Sidebar ── */}
+          <aside className={styles.aside}>
+            <div className={styles.asideMotif} aria-hidden="true">
+              <ScMotif rule={SCM.rose} n={17} stitch={6.5} palette={THREAD} ground="var(--color-surface)" />
+            </div>
 
-        <div className={styles.actions}>
-          {editing ? (
-            <>
-              <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
-                {t.story.save}
-              </button>
-              <button className={styles.cancelBtn} onClick={() => setEditing(false)}>
-                {t.story.cancel}
-              </button>
-            </>
-          ) : (
-            <>
-              <button className={styles.editBtn} onClick={() => setEditing(true)}>
-                {t.story.edit}
-              </button>
-              {isAdmin && (
-                <button
-                  className={styles.editBtn}
-                  onClick={handleToggleShowcase}
-                  disabled={showcaseBusy}
-                >
-                  {story.showcase ? t.story.removeFromExamples : t.story.featureInExamples}
-                </button>
+            {!editing && paragraphs.length > 0 && (
+              <ReadAloud
+                text={paragraphs.join('\n\n')}
+                lang={readLanguage}
+                label={(t.story as any).readAloud ?? 'Читати вголос'}
+                stopLabel={(t.story as any).readAloudStop ?? 'Stop'}
+                narrator={(t.story as any).narrator}
+              />
+            )}
+
+            <div className={styles.meta}>
+              <span className={styles.tag}>{story.ageGroup}</span>
+              <span className={styles.tag}>{story.length}</span>
+              <span className={styles.tag}>{story.language.toUpperCase()}</span>
+            </div>
+
+            {story.childProfileId && story.extractionStatus !== 'SKIPPED' && (
+              <ExtractedCharactersPanel
+                storyId={story.id}
+                childProfileId={story.childProfileId}
+                extractionStatus={story.extractionStatus as any}
+                language={viewLanguage === 'translated' ? (story.translatedLanguage ?? undefined) : story.language}
+                onConfirmed={() => refresh()}
+              />
+            )}
+
+            <div className={styles.actions}>
+              {editing ? (
+                <>
+                  <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
+                    {t.story.save}
+                  </button>
+                  <button className={styles.cancelBtn} onClick={() => setEditing(false)}>
+                    {t.story.cancel}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button className={styles.editBtn} onClick={() => setEditing(true)}>
+                    {t.story.edit}
+                  </button>
+                  {isAdmin && (
+                    <button
+                      className={styles.editBtn}
+                      onClick={handleToggleShowcase}
+                      disabled={showcaseBusy}
+                    >
+                      {story.showcase ? t.story.removeFromExamples : t.story.featureInExamples}
+                    </button>
+                  )}
+                  <button className={styles.deleteBtn} onClick={() => setShowDelete(true)}>
+                    {t.story.delete}
+                  </button>
+                </>
               )}
-              <button className={styles.deleteBtn} onClick={() => setShowDelete(true)}>
-                {t.story.delete}
-              </button>
-            </>
-          )}
+            </div>
+          </aside>
         </div>
       </div>
 

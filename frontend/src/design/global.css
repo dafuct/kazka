@@ -1,5 +1,7 @@
-/* Fraunces — variable serif (display). Loaded from Google Fonts CDN for ranged opsz + weight. */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap&subset=cyrillic,latin');
+/* Hutsul «Гуцульська» direction loads Oswald (display) + PT Sans (body) via the
+   <link> tags in index.html — same source as the design handoff preview.
+   The self-hosted @font-face blocks below (Lora/Nunito/Manrope) are legacy and
+   no longer referenced by the token set; kept to avoid churn. */
 
 /* Lora italic 400 */
 @font-face {
@@ -235,6 +237,12 @@
   padding: 0;
 }
 
+/* Hutsul is uncompromisingly square — strip ALL rounded corners across the UI
+   (avatars, pills, icons, modals, inputs…). Overrides any component radius. */
+*, *::before, *::after {
+  border-radius: 0 !important;
+}
+
 html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
@@ -247,8 +255,17 @@ body {
   line-height: 1.6;
   color: var(--color-text);
   background-color: var(--color-bg);
+  /* Subtle woven-cloth texture (Hutsul aida weave) over the linen ground */
+  background-image:
+    repeating-linear-gradient(0deg,  rgba(42,32,24,0.03) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(90deg, rgba(42,32,24,0.025) 0 1px, transparent 1px 5px);
   min-height: 100vh;
   transition: background-color var(--transition), color var(--transition);
+}
+[data-theme="dark"] body {
+  background-image:
+    repeating-linear-gradient(0deg,  rgba(220,205,170,0.035) 0 1px, transparent 1px 5px),
+    repeating-linear-gradient(90deg, rgba(220,205,170,0.03) 0 1px, transparent 1px 5px);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -298,6 +315,119 @@ input, textarea, select {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+/* ── Hutsul «Гуцульська» signature framing helpers ──────────────────────────
+   Ported from the design handoff (tokens.css). Use these to apply the
+   embroidery framing language on top of the cascading token palette. */
+
+/* Framed section panel: full maroon frame + gold inset pinline, inset from the
+   page so the darker gutter shows around it. Alternate shade with --alt. */
+.kz-panel {
+  position: relative;
+  margin: 22px 40px;
+  border: 5px solid var(--kz-maroon);
+  box-shadow: inset 0 0 0 3px var(--kz-gold);
+  background-color: var(--kz-layer-1);
+  background-image: var(--kz-grid-img);
+}
+.kz-panel--alt { background-color: var(--kz-layer-2); }
+
+/* Ornament ribbon spacing when used as a page-top accent */
+.kz-orn-top { margin: 0 auto 26px; }
+@media (max-width: 860px) {
+  .kz-panel { margin: 16px 14px; }
+}
+
+/* Page-root framed panel — clears the fixed nav, frames the whole page content.
+   Overrides each page's own nav-clearance top padding. */
+.kz-page {
+  /* auto left/right keeps each page's own `margin:0 auto` centering intact */
+  margin: calc(var(--kz-nav-h) + 22px) auto 40px !important;
+  padding-top: 40px !important;
+  border: 5px solid var(--kz-maroon) !important;
+  box-shadow: inset 0 0 0 3px var(--kz-gold);
+  background-color: var(--kz-layer-1) !important;
+  background-image: var(--kz-grid-img) !important;
+}
+@media (max-width: 860px) {
+  .kz-page {
+    margin: calc(var(--kz-nav-h) + 10px) auto 20px !important;
+    padding-top: 28px !important;
+  }
+}
+
+/* Woven cloth band: maroon bars top & bottom with gold pinlines */
+.kz-cloth-band {
+  background: var(--kz-aida);
+  border-top: 5px solid var(--kz-maroon);
+  border-bottom: 5px solid var(--kz-maroon);
+  box-shadow: inset 0 3px 0 var(--kz-gold), inset 0 -3px 0 var(--kz-gold);
+}
+
+/* Story card: maroon outline + gold top bar */
+.kz-card { background: var(--kz-aida); border: 2px solid var(--kz-maroon); }
+.kz-card__bar { height: 6px; background: var(--kz-gold); }
+
+/* Framed illustration window: 6px maroon border + 3px gold pinline.
+   Gold shows through the padding gap so the child content can't cover it. */
+.kz-illustration {
+  border: 6px solid var(--kz-maroon);
+  background: var(--kz-gold);
+  padding: 3px;
+}
+
+/* Primary button — Oswald caps on maroon */
+.kz-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--kz-maroon);
+  color: var(--kz-aida);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-size: 15px;
+  padding: 12px 24px;
+  border: 0;
+  cursor: pointer;
+  transition: filter var(--transition);
+}
+.kz-btn:hover { filter: brightness(0.92); text-decoration: none; }
+.kz-btn--outline {
+  background: transparent;
+  color: var(--kz-maroon);
+  border: 2px solid var(--kz-maroon);
+}
+.kz-btn--outline:hover { background: var(--color-magic-soft); filter: none; }
+
+/* Headings & labels — Oswald uppercase, condensed */
+.kz-h-hero {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(28px, 4vw, 38px);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--kz-maroon);
+  line-height: 1.05;
+}
+.kz-h-section {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(18px, 2.4vw, 22px);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--kz-ink);
+}
+.kz-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--kz-muted);
 }
 
 /* ── Paper grain overlay ── */
@@ -394,12 +524,12 @@ body::before {
   to   { opacity: 1; filter: none; transform: scale(1) translateY(0); }
 }
 @keyframes buttonPulse {
-  0%, 100% { box-shadow: 0 4px 16px rgba(194,65,12,0.3); }
-  50% { box-shadow: 0 4px 32px rgba(194,65,12,0.6), 0 0 0 8px rgba(194,65,12,0.08); }
+  0%, 100% { box-shadow: 0 4px 16px rgba(126,42,51,0.30); }
+  50% { box-shadow: 0 4px 32px rgba(126,42,51,0.55), 0 0 0 8px rgba(214,162,58,0.12); }
 }
 @keyframes magicBreath {
-  0%, 100% { box-shadow: 0 0 30px rgba(124,58,237,0.2), 0 0 60px rgba(124,58,237,0.1), 0 20px 40px rgba(44,24,16,0.15); }
-  50% { box-shadow: 0 0 50px rgba(124,58,237,0.35), 0 0 100px rgba(124,58,237,0.15), 0 20px 40px rgba(44,24,16,0.15); }
+  0%, 100% { box-shadow: 0 0 30px rgba(214,162,58,0.20), 0 0 60px rgba(126,42,51,0.12), 0 20px 40px rgba(42,32,24,0.15); }
+  50% { box-shadow: 0 0 50px rgba(214,162,58,0.34), 0 0 100px rgba(126,42,51,0.16), 0 20px 40px rgba(42,32,24,0.15); }
 }
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes starTwinkle {

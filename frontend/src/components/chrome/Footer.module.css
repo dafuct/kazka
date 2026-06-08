@@ -1,7 +1,12 @@
+/* Hutsul footer — cloth-band top edge (maroon bar + gold pinline) on aida. */
 .footer {
   margin-top: auto;
-  padding: 40px 48px;
-  border-top: 1px solid rgba(160,120,96,0.12);
+  background: var(--color-surface);
+  border-top: 5px solid var(--kz-maroon);
+  box-shadow: inset 0 3px 0 var(--kz-gold);
+}
+.inner {
+  padding: 32px 40px 36px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -12,19 +17,20 @@
 .left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .logoIcon {
-  width: 20px;
-  height: 20px;
-  color: var(--color-text-faint);
+  display: inline-flex;
 }
 
 .tagline {
   font-family: var(--font-display);
   font-size: 14px;
-  color: var(--color-text-faint);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
 .links {
@@ -33,24 +39,28 @@
 }
 
 .link {
+  font-family: var(--font-display);
+  font-weight: 600;
   font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--color-text-faint);
   text-decoration: none;
   transition: color 0.3s;
 }
-.link:hover { color: var(--color-text-muted); text-decoration: none; }
+.link:hover { color: var(--kz-maroon); text-decoration: none; }
 
 .bottom {
   width: 100%;
   text-align: center;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid rgba(160,120,96,0.08);
+  border-top: 1px solid var(--border);
   font-size: 13px;
   color: var(--color-text-faint);
 }
 
 @media (max-width: 860px) {
-  .footer { flex-direction: column; text-align: center; padding: 32px 20px; }
+  .inner { flex-direction: column; text-align: center; padding: 24px 20px 28px; }
   .links { flex-wrap: wrap; justify-content: center; }
 }

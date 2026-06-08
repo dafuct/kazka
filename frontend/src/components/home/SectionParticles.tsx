@@ -10,11 +10,12 @@ export function SectionParticles({ light = false }: Props) {
   useEffect(() => {
     const field = ref.current
     if (!field) return
+    // Carpathian thread tones (toned down from the old purple sparkle)
     const colors = light
-      ? ['#C4B5FD', '#EDD9A3', '#fff']
-      : ['#C4B5FD', '#EDD9A3', '#D97706', '#7C3AED']
+      ? ['#D6A23A', '#C0402C', '#9C2F4A']
+      : ['#D6A23A', '#C0402C', '#2F6B43', '#2E6E82']
 
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 16; i++) {
       const el = document.createElement('div')
       el.className = 'sectionParticle'
       const x = Math.random() * 100
