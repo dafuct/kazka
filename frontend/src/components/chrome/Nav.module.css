@@ -49,6 +49,9 @@
 }
 
 .links {
+  /* One shared height for every boxed nav control so they align top & bottom.
+     Inherits to the child-picker trigger (separate module, descendant of .links). */
+  --kz-nav-btn-h: 40px;
   display: flex;
   align-items: center;
   gap: 18px;
@@ -79,10 +82,12 @@
   align-items: center;
   gap: 6px;
   white-space: nowrap;
+  height: var(--kz-nav-btn-h);
+  box-sizing: border-box;
   background: var(--color-bg);
   border: 1.5px solid var(--border);
   border-radius: 0;
-  padding: 8px 14px;
+  padding: 0 14px;
   font-family: var(--font-body);
   font-size: 13px;
   font-weight: 700;
@@ -94,12 +99,17 @@
 .themeIcon { font-size: 14px; line-height: 1; }
 
 .langBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--kz-nav-btn-h);
+  box-sizing: border-box;
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  padding: 8px 12px;
+  padding: 0 14px;
   border-radius: 0;
   border: 1.5px solid var(--border);
   color: var(--color-text-muted);
@@ -111,6 +121,11 @@
 
 /* Primary CTA — Oswald caps on maroon, square */
 .ctaBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--kz-nav-btn-h);
+  box-sizing: border-box;
   background: var(--kz-maroon);
   color: var(--color-surface);
   font-family: var(--font-display);
@@ -118,7 +133,7 @@
   font-size: 15px;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  padding: 12px 24px;
+  padding: 0 24px;
   border-radius: 0;
   border: 0;
   text-decoration: none;
@@ -134,12 +149,14 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  height: var(--kz-nav-btn-h);
+  box-sizing: border-box;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 9px 16px;
+  padding: 0 16px;
   border-radius: 0;
   border: 2px solid var(--kz-maroon);
   color: var(--kz-maroon);
@@ -168,7 +185,7 @@
   /* No room for nav links on phones — hide them all (incl. the active one) so the
      CTA/sign-up never gets clipped. Logged-in users still have the ▾ user menu. */
   .links .link { display: none; }
-  .links { gap: 8px; flex-shrink: 0; }
+  .links { gap: 8px; flex-shrink: 0; --kz-nav-btn-h: 34px; }
   .logo { min-width: 0; flex-shrink: 0; gap: 0; }
   /* Phone: drop the wordmark, keep just the stitch-logo mark (no "КА…" truncation) */
   .logo span:last-child { display: none; }
@@ -193,10 +210,12 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  height: var(--kz-nav-btn-h);
+  box-sizing: border-box;
   background: transparent;
   border: 1.5px solid var(--border);
   border-radius: 0;
-  padding: 8px 14px;
+  padding: 0 14px;
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.9rem;
