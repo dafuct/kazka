@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/stories/{id}/narration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getNarration"];
+        put?: never;
+        post: operations["requestNarration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/stories/{id}/illustrate": {
         parameters: {
             query?: never;
@@ -768,6 +784,10 @@ export interface components {
         TranslateRequest: {
             targetLanguage: string;
         };
+        NarrationResponse: {
+            status?: string;
+            url?: string;
+        };
         BranchingChoiceRequest: {
             choiceId: string;
         };
@@ -1054,6 +1074,7 @@ export type SchemaStoryPanelDto = components['schemas']['StoryPanelDto'];
 export type SchemaBedtimeUpdateRequest = components['schemas']['BedtimeUpdateRequest'];
 export type SchemaBedtimeScheduleDto = components['schemas']['BedtimeScheduleDto'];
 export type SchemaTranslateRequest = components['schemas']['TranslateRequest'];
+export type SchemaNarrationResponse = components['schemas']['NarrationResponse'];
 export type SchemaBranchingChoiceRequest = components['schemas']['BranchingChoiceRequest'];
 export type SchemaBranchingResponse = components['schemas']['BranchingResponse'];
 export type SchemaGenerationRequest = components['schemas']['GenerationRequest'];
@@ -1253,6 +1274,50 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    getNarration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NarrationResponse"];
+                };
+            };
+        };
+    };
+    requestNarration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["NarrationResponse"];
+                };
             };
         };
     };
