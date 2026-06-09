@@ -25,7 +25,8 @@
   "overrides": {
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "scheduler": "0.26.0"
+    "scheduler": "0.26.0",
+    "shell-quote": "1.8.4"
   },
   "engines": {
     "node": ">=20"
