@@ -33,6 +33,20 @@ public class AiProviderConfig {
                 .build();
     }
 
+    /**
+     * Gemini TTS native endpoint. Same v1beta base + x-goog-api-key as Nano Banana, but a larger
+     * 32 MiB in-memory cap: Gemini returns the clip as base64 inline_data, and a few minutes of
+     * 24 kHz/16-bit PCM base64-encodes past the 20 MiB image cap.
+     */
+    @Bean
+    public WebClient geminiTtsWebClient(WebClient.Builder builder, AiProviderProperties aiProps) {
+        return builder.clone()
+                .baseUrl(aiProps.getNanoBananaBaseUrl())
+                .defaultHeader("x-goog-api-key", aiProps.getApiToken() == null ? "" : aiProps.getApiToken())
+                .codecs(c -> c.defaultCodecs().maxInMemorySize(32 * 1024 * 1024))
+                .build();
+    }
+
     @Bean
     public WebClient judgeWebClient(WebClient.Builder builder,
                                     AiProviderProperties aiProps,

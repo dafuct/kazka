@@ -220,10 +220,12 @@ export function StoryDetailPage() {
 
             {!editing && paragraphs.length > 0 && (
               <ReadAloud
+                storyId={story.id}
                 text={paragraphs.join('\n\n')}
                 lang={readLanguage}
                 label={(t.story as any).readAloud ?? 'Читати вголос'}
                 stopLabel={(t.story as any).readAloudStop ?? 'Stop'}
+                preparingLabel={(t.story as any).readAloudPreparing ?? 'Preparing…'}
                 narrator={(t.story as any).narrator}
               />
             )}

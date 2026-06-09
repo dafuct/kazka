@@ -31,6 +31,13 @@ public class AiProviderProperties {
     private String nanoBananaModel = "gemini-2.5-flash-image";
     private String nanoBananaBaseUrl = "https://generativelanguage.googleapis.com/v1beta";
 
+    // Gemini 2.5 Flash TTS — native v1beta generateContent with response_modalities=["AUDIO"].
+    // Reuses the Nano Banana base URL (same generativelanguage v1beta root) and GOOGLE_API_KEY.
+    // NOTE: the model id is a preview name and may change — verify against the live API.
+    private String ttsModel = "gemini-2.5-flash-preview-tts";
+    private String ttsVoice = "Sulafat"; // warm female; swappable
+    private String ttsStylePrompt = "Прочитай цю казку повільно й тепло, як бабуся розповідає на ніч:";
+
     private double textTemperature = 0.75;
     private double textTopP = 0.9;
     // Gemini's OpenAI-compat endpoint rejects frequency_penalty/presence_penalty with 400.

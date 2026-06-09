@@ -53,6 +53,13 @@ public class Story {
     @Column(name = "illustration_status", length = 20)
     private IllustrationStatus illustrationStatus = IllustrationStatus.PENDING;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "narration_status", length = 20, nullable = false)
+    private NarrationStatus narrationStatus = NarrationStatus.NONE;
+
+    @Column(name = "narration_key", length = 255)
+    private String narrationKey;
+
     @Column(name = "child_profile_id", length = 36)
     private String childProfileId;
 

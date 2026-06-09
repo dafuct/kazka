@@ -10,6 +10,7 @@ import type {
   BranchingStartRequest, BranchingChoiceRequest, BranchingResponse,
   TranslateRequest,
   Dashboard,
+  NarrationResponse,
 } from './types'
 
 const STORIES = '/api/stories'
@@ -51,6 +52,15 @@ export const api = {
   },
   retry(id: string): Promise<void> {
     return request(`${STORIES}/${id}/retry`, { method: 'POST' })
+  },
+}
+
+export const narration = {
+  request(id: string): Promise<NarrationResponse> {
+    return request(`${STORIES}/${id}/narration`, { method: 'POST' })
+  },
+  get(id: string): Promise<NarrationResponse> {
+    return request(`${STORIES}/${id}/narration`)
   },
 }
 

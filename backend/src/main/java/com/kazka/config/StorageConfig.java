@@ -3,6 +3,9 @@ package com.kazka.config;
 import com.kazka.illustration.FilesystemImageStorage;
 import com.kazka.illustration.ImageStorage;
 import com.kazka.illustration.R2ImageStorage;
+import com.kazka.narration.AudioStorage;
+import com.kazka.narration.FilesystemAudioStorage;
+import com.kazka.narration.R2AudioStorage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,6 +58,19 @@ public class StorageConfig {
     ImageStorage r2ImageStorage(S3Client r2S3Client, S3Presigner r2S3Presigner, StorageProperties props) {
         StorageProperties.R2 r2 = props.getR2();
         return new R2ImageStorage(r2S3Client, r2S3Presigner, r2.getBucket(), r2.getPresignTtl());
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "kazka.storage.provider", havingValue = "filesystem", matchIfMissing = true)
+    AudioStorage filesystemAudioStorage(UploadsProperties uploads) {
+        return new FilesystemAudioStorage(uploads);
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "kazka.storage.provider", havingValue = "r2")
+    AudioStorage r2AudioStorage(S3Client r2S3Client, S3Presigner r2S3Presigner, StorageProperties props) {
+        StorageProperties.R2 r2 = props.getR2();
+        return new R2AudioStorage(r2S3Client, r2S3Presigner, r2.getBucket(), r2.getPresignTtl());
     }
 
     private static StaticCredentialsProvider credentials(StorageProperties.R2 r2) {

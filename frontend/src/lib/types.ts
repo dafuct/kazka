@@ -35,3 +35,8 @@ export type {
 } from '@kazka/shared';
 
 export { ApiError } from '@kazka/shared';
+
+export interface NarrationResponse {
+  status: 'NONE' | 'GENERATING' | 'READY' | 'FAILED'
+  url: string | null
+}

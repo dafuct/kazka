@@ -65,6 +65,7 @@ export const en: Locale = {
     removeFromExamples: '★ Remove from examples',
     readAloud: 'Read aloud',
     readAloudStop: 'Stop',
+    readAloudPreparing: 'Preparing narration…',
     narrator: 'Oksana the storyteller',
     pages: 'Story pages',
     readTime: (min: number) => `~${min} min read`,

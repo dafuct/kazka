@@ -63,6 +63,7 @@ export const uk = {
     removeFromExamples: '★ Прибрати з прикладів',
     readAloud: 'Читати вголос',
     readAloudStop: 'Зупинити',
+    readAloudPreparing: 'Готую озвучення…',
     narrator: 'казкарка Оксана',
     pages: 'Сторінки казки',
     readTime: (min: number) => `~${min} хв читання`,
