@@ -141,7 +141,12 @@
 }
 
 .comicsBlock {
-  margin: 0 0 var(--spacing-8);
+  /* Shrink the maroon+gold frame to hug the comic image (centered, capped at the
+     image's own 560px) so the gold shows only as the intended 3px pinline — not a
+     thick band where the full-width container background bled past the image. */
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto var(--spacing-8);
 }
 
 .content {
@@ -164,8 +169,12 @@
   font-weight: 700;
   color: var(--kz-maroon);
   float: left;
-  line-height: 0.82;
-  margin: 6px 12px 0 0;
+  /* Raised initial. Vertical: line-height 0.8 + negative top margin lifts the cap so the wrapped
+     text begins lower beside it. Horizontal: the display font gives the glyph a wide right-side
+     bearing, so a negative right margin pulls the first line snug against the cap (reads "Був").
+     NOTE: the -16px is tuned for «Б»'s advance — other first letters may sit a touch tighter/looser. */
+  line-height: 0.8;
+  margin: -0.3em -16px 0 0;
 }
 
 .contentInput {
