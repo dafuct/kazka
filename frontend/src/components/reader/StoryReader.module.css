@@ -97,13 +97,26 @@
 /* Ukrainian typography: EVERY paragraph is indented. */
 .text p { text-indent: 1.6em; margin-bottom: .4em; }
 .dc {
-  float: left;
   font-family: var(--font-head);
-  font-size: 3.1em;
-  line-height: 0.82;
   font-weight: 700;
   color: var(--honey);
+  /* Fallback (e.g. Firefox): a tuned float drop cap spanning ~2 lines. */
+  float: left;
+  font-size: 3.4em;
+  line-height: 1;
   margin: 0.02em 0.14em 0 0;
+}
+/* Chrome/Safari: a proper 2-line initial letter that the browser sizes and
+   aligns to the text automatically — no glyph poking above the first line. */
+@supports (initial-letter: 2) or (-webkit-initial-letter: 2) {
+  .dc {
+    float: none;
+    font-size: inherit;
+    line-height: inherit;
+    margin: 0 0.14em 0 0;
+    -webkit-initial-letter: 2;
+    initial-letter: 2;
+  }
 }
 /* the drop-cap paragraph itself is not indented (the cap replaces the indent) */
 .dcPara { text-indent: 0; }
