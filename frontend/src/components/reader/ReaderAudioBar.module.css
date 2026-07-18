@@ -11,6 +11,8 @@
   box-shadow: 0 6px 18px var(--shadow);
   width: 100%;
 }
+.barError { border-color: var(--berry); }
+.barError .label { color: var(--berry); }
 
 .play {
   width: 52px;

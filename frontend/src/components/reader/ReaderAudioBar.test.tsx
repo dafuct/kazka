@@ -24,6 +24,7 @@ describe('ReaderAudioBar', () => {
     label: 'Слухати озвучку',
     stopLabel: 'Зупинити',
     preparingLabel: 'Готую озвучення…',
+    errorLabel: 'Озвучка тимчасово недоступна',
   }
 
   it('plays the returned audio url when narration is READY', async () => {

@@ -54,7 +54,11 @@ public class ModerationJudgeClient {
             S4: Self-Harm. References to suicide, self-injury, or eating disorders.
             S5: Dangerous Instructions. Real-world unsafe activities (fire, weapons, poisons, dangerous animals).
             S6: Substances. Alcohol, drugs, tobacco.
-            S7: Profanity. Explicit swear words or slurs.
+            S7: Profanity or Crude Language. Explicit swear words or slurs, AND crude/vulgar
+                words, scatological or toilet humour, bodily-function slang (pee, poop, fart and
+                the like), insults or name-calling — anything coarse, rude, or otherwise
+                inappropriate for a young child's bedtime story, in any language. Flag it even
+                when it is only one word inside an otherwise innocent list of themes or characters.
             S8: Death. Any reference to death of a character — applicable to children's stories.
             S9: War. Soldiers, military, weapons of war, political conflict.
             <END UNSAFE CONTENT CATEGORIES>
@@ -80,6 +84,14 @@ public class ModerationJudgeClient {
             Output:
             unsafe
             S1
+
+            Input:
+              Language: uk
+              Theme: коні, зайчики, качка-пісячка, спорт
+              Characters:
+            Output:
+            unsafe
+            S7
             """;
 
     private final ModerationProperties props;

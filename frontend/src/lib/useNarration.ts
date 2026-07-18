@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { narration } from './apiClient'
 
-type Phase = 'idle' | 'preparing' | 'playing'
+type Phase = 'idle' | 'preparing' | 'playing' | 'error'
 
 /** Server-side neural narration with Web Speech fallback (moved from the
     retired ReadAloud component). Warm-starts generation on mount (lesson:
@@ -31,19 +31,27 @@ export function useNarration(storyId: string, text: string, lang = 'uk') {
   }, [storyId])
 
   const fallback = () => {
+    // No browser speech synthesis at all → nothing we can do, surface it.
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      setPhase('idle')
+      setPhase('error')
       return
     }
     const synth = window.speechSynthesis
-    const u = new SpeechSynthesisUtterance(text)
     const base = lang.slice(0, 2).toLowerCase()
+    const voices = synth.getVoices()
+    const match = voices.find(v => v.lang?.toLowerCase().startsWith(base))
+    // The browser has voices loaded but none for this language (common for uk) →
+    // it would "speak" silently. Tell the user instead of pretending to play.
+    if (voices.length > 0 && !match) {
+      setPhase('error')
+      return
+    }
+    const u = new SpeechSynthesisUtterance(text)
     u.lang = base === 'uk' ? 'uk-UA' : base
-    const match = synth.getVoices().find(v => v.lang?.toLowerCase().startsWith(base))
     if (match) u.voice = match
     u.rate = 0.96
     u.onend = () => setPhase('idle')
-    u.onerror = () => setPhase('idle')
+    u.onerror = () => setPhase('error')
     synth.cancel()
     synth.speak(u)
     setPhase('playing')
@@ -99,7 +107,8 @@ export function useNarration(storyId: string, text: string, lang = 'uk') {
   }
 
   const toggle = () => {
-    if (phase === 'idle') start()
+    // idle or a prior error → (re)try; otherwise stop the current playback.
+    if (phase === 'idle' || phase === 'error') start()
     else stop()
   }
 

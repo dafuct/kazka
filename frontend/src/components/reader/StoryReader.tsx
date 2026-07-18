@@ -127,6 +127,7 @@ export function StoryReader({
             label={t.reader.listen}
             stopLabel={t.reader.reading}
             preparingLabel={t.reader.preparing}
+            errorLabel={t.reader.unavailable}
             autoStart={audio.autoPlay}
           />
         )}
