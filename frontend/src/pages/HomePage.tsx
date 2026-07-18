@@ -1,151 +1,186 @@
-import { useEffect, useRef, Fragment } from 'react'
+import { useEffect, useState } from 'react'
+import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ScMotif, SCM, THREAD } from '../components/stitch/StitchCanvas'
-import { IllustrationCarousel } from '../components/illustrations/IllustrationCarousel'
-import { HowItWorks } from '../components/home/HowItWorks'
-import { Features } from '../components/home/Features'
-import { StoryPreview } from '../components/home/StoryPreview'
-import { NightCta } from '../components/home/NightCta'
-import { AvatarInitials } from '../components/children/AvatarInitials'
-import { HolidayChip } from '../components/holidays/HolidayChip'
+import { TapedCard } from '../components/taped/TapedCard'
 import { useLocale } from '../lib/LocaleContext'
 import { useAuth } from '../lib/AuthContext'
 import { useAuthModal } from '../lib/AuthModalContext'
-import { useChildren } from '../lib/ChildrenContext'
-import { handleRipple } from '../lib/ripple'
+import { api, showcase } from '../lib/apiClient'
+import type { ShowcaseStoryDto } from '../lib/apiClient'
+import type { Story } from '../lib/types'
 import styles from './HomePage.module.css'
-
-function ParticleField() {
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const field = ref.current
-    if (!field) return
-    const types = ['star', 'dot', 'circle', 'dash'] as const
-    for (let i = 0; i < 28; i++) {
-      const el = document.createElement('div')
-      const type = types[i % 4]
-      el.className = `${styles.particle} ${styles['particle_' + type]}`
-      const x = Math.random() * 100
-      const y = Math.random() * 100
-      const dur = 8 + Math.random() * 12
-      const delay = Math.random() * 10
-      const opacity = 0.3 + Math.random() * 0.5
-      el.style.cssText = `left:${x}%;top:${y}%;--p-opacity:${opacity};`
-      if (type === 'star') {
-        el.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16"><path d="M8 0L9.5 6.5L16 8L9.5 9.5L8 16L6.5 9.5L0 8L6.5 6.5Z" fill="currentColor"/></svg>'
-        el.style.animation = `orbitalDrift ${dur}s ease-in-out ${delay}s infinite`
-      } else if (type === 'dot') {
-        const s = 2 + Math.random() * 3
-        el.style.width = s + 'px'
-        el.style.height = s + 'px'
-        el.style.animation = `floatUp ${dur}s linear ${delay}s infinite`
-      } else if (type === 'circle') {
-        const s = 6 + Math.random() * 10
-        el.style.width = s + 'px'
-        el.style.height = s + 'px'
-        el.style.animation = `expandFade ${dur * 0.6}s ease-out ${delay}s infinite`
-      } else {
-        el.style.width = (8 + Math.random() * 12) + 'px'
-        el.style.height = '2px'
-        el.style.animation = `floatUp ${dur}s linear ${delay}s infinite`
-      }
-      field.appendChild(el)
-    }
-    return () => { field.innerHTML = '' }
-  }, [])
-  return <div ref={ref} className={styles.particleField} aria-hidden="true" />
-}
-
 
 export function HomePage() {
   const { t } = useLocale()
-  const navigate = useNavigate()
   const { user } = useAuth()
   const { openAuth } = useAuthModal()
-  const { active } = useChildren()
-  const tc = (t as any).children ?? {}
-  const tryClick = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault()
-    if (!user) openAuth('signIn'); else navigate('/create')
-    handleRipple(e)
-  }
-  const heroImgRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
+  const [idea, setIdea] = useState('')
+  const [samples, setSamples] = useState<ShowcaseStoryDto[]>([])
+  const [mine, setMine] = useState<Story[]>([])
 
   useEffect(() => {
-    let ticking = false
-    const onScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          if (heroImgRef.current) {
-            heroImgRef.current.style.transform = `translateY(${window.scrollY * 0.12}px)`
-          }
-          ticking = false
-        })
-        ticking = true
-      }
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    let cancelled = false
+    showcase.list()
+      .then(list => { if (!cancelled) setSamples(list) })
+      .catch(() => null)
+    return () => { cancelled = true }
   }, [])
 
+  useEffect(() => {
+    if (!user) return
+    let cancelled = false
+    api.listStories(0, 4)
+      .then(res => { if (!cancelled) setMine(res.items) })
+      .catch(() => null)
+    return () => { cancelled = true }
+  }, [user])
+
+  const goCreate = (prefill?: string) => {
+    if (!user) { openAuth('signUp'); return }
+    const q = prefill?.trim() ? `?idea=${encodeURIComponent(prefill.trim())}` : ''
+    navigate(`/create${q}`)
+  }
+
+  const onIdeaSubmit = (e: FormEvent) => {
+    e.preventDefault()
+    goCreate(idea)
+  }
+
+  const cover = (s: { panels?: { imageUrl?: string }[] }) => s.panels?.[0]?.imageUrl ?? null
+
+  const featured = user && mine.length > 0
+    ? { heading: t.home.mineH2, seeAllTo: '/stories', items: mine.map(s => ({ id: s.id, title: s.title, cover: cover(s), to: `/stories/${s.id}` })) }
+    : { heading: t.home.featH2, seeAllTo: '/showcase', items: samples.slice(0, 4).map(s => ({ id: s.id, title: s.title, cover: cover(s), to: `/showcase/${s.id}` })) }
+
   return (
-    <div className={styles.home}>
-      {/* ── HERO ── */}
-      <section className={styles.hero}>
-        <ParticleField />
-        <div className={styles.heroInner}>
-          <div className={styles.heroMotif} aria-hidden="true">
-            <ScMotif rule={SCM.medallion} n={21} stitch={7} palette={THREAD} ground="var(--color-surface)" />
-          </div>
-          <div className={styles.heroText}>
-            <div className={styles.heroLabel}>{t.home.label}</div>
-            <h1 className={styles.heroHeadline}>
-              {t.home.headline.split(' ').map((word, i) => (
-                <Fragment key={i}>
-                  <span
-                    className={styles.heroWord}
-                    style={{ animationDelay: `${i * 0.1}s` }}
-                  >{word}</span>{' '}
-                </Fragment>
-              ))}
+    <div>
+      {/* HERO */}
+      <div className="wrap">
+        <section className={styles.hero}>
+          <div className="fadein">
+            <div className="eyebrow" style={{ marginBottom: 14 }}>{t.home.eyebrow}</div>
+            <h1 className={styles.h1}>
+              {t.home.h1a}
+              <span className={styles.hl}>{t.home.h1b}</span>
+              {t.home.h1c}
             </h1>
-            <p className={styles.heroSub}>{t.home.sub}</p>
-            {user && active && (
-              <HolidayChip onApply={(theme) => localStorage.setItem('kazka.suggestedTheme', theme)} />
-            )}
-            <div className={styles.heroButtons}>
-              <a
-                href="#"
-                className={styles.btnPrimary}
-                onClick={tryClick}
-              >
-                {t.home.cta} →
-              </a>
-              <a href="#preview" className={styles.btnSecondary}>
-                {t.home.previewBtn}
-              </a>
+            <p className={styles.sub}>{t.home.sub}</p>
+            <form className={styles.ideaBox} onSubmit={onIdeaSubmit}>
+              <input
+                value={idea}
+                onChange={e => setIdea(e.target.value)}
+                placeholder={t.home.ideaPh}
+              />
+              <button type="submit" className="btn btn-primary">{t.home.createBtn}</button>
+            </form>
+            <div className={styles.trust}>
+              <span>{t.home.trust1}</span>
+              <span>{t.home.trust2}</span>
+              <span>{t.home.trust3}</span>
             </div>
-            <div className={styles.heroProof}>{t.home.proof}</div>
-            {user && active && (
-              <div className={styles.activeChildPill}>
-                <AvatarInitials name={active.name} seed={active.avatarSeed} size={20} />
-                <span>{tc.generatingFor ? tc.generatingFor(active.name) : `For ${active.name}`}</span>
+          </div>
+          <div className={`${styles.heroArt} fadein`}>
+            <TapedCard
+              rotationKey="hero-a"
+              cover={samples[0] ? cover(samples[0]) : null}
+              coverAlt={samples[0]?.title ?? ''}
+              coverHeight={300}
+              className={styles.heroCardA}
+            />
+            <TapedCard
+              rotationKey="hero-b"
+              cover={samples[1] ? cover(samples[1]) : null}
+              coverAlt={samples[1]?.title ?? ''}
+              coverHeight={224}
+              className={styles.heroCardB}
+            />
+          </div>
+        </section>
+      </div>
+
+      {/* FEATURED */}
+      <div className="wrap" style={{ marginTop: 40 }}>
+        <section>
+          <div className="sec-head">
+            <div>
+              <div className="eyebrow">{t.home.featEyebrow}</div>
+              <h2>{featured.heading}</h2>
+            </div>
+            <span className="link-more" onClick={() => navigate(featured.seeAllTo)}>{t.home.seeAll}</span>
+          </div>
+          <div className="grid-stories">
+            {featured.items.map(item => (
+              <TapedCard
+                key={item.id}
+                rotationKey={item.id}
+                cover={item.cover}
+                coverAlt={item.title}
+                coverHeight={186}
+                title={item.title}
+                to={item.to}
+              />
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* HOW IT WORKS */}
+      <div className="wrap" style={{ marginTop: 80 }}>
+        <section>
+          <div className={styles.hiwHead}>
+            <div className="eyebrow">{t.home.hiwEyebrow}</div>
+            <h2 className={styles.hiwH2}>{t.home.hiwH2}</h2>
+          </div>
+          <div className={styles.steps}>
+            {[
+              ['1', t.home.s1t, t.home.s1d],
+              ['2', t.home.s2t, t.home.s2d],
+              ['3', t.home.s3t, t.home.s3d],
+            ].map(([n, title, desc]) => (
+              <div className={styles.step} key={n}>
+                <div className={styles.stepN}>{n}</div>
+                <h3>{title}</h3>
+                <p>{desc}</p>
               </div>
-            )}
+            ))}
           </div>
+        </section>
+      </div>
 
-          <div ref={heroImgRef} className={styles.heroImageWrap}>
-            <div className={styles.heroImage}>
-              <IllustrationCarousel section="hero" />
+      {/* FEATURES */}
+      <div className="wrap" style={{ marginTop: 80 }}>
+        <section>
+          <div className="sec-head">
+            <div>
+              <div className="eyebrow">{t.home.capEyebrow}</div>
+              <h2>{t.home.capH2}</h2>
             </div>
           </div>
-        </div>
-      </section>
+          <div className={styles.featGrid}>
+            {[
+              [t.home.f1t, t.home.f1d],
+              [t.home.f2t, t.home.f2d],
+            ].map(([title, desc]) => (
+              <div className={styles.feat} key={title}>
+                <h3>{title}</h3>
+                <p>{desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
 
-      <HowItWorks />
-      <Features />
-      <StoryPreview />
-      <NightCta />
+      {/* CTA BAND */}
+      <div className="wrap" style={{ marginTop: 80 }}>
+        <section className="band">
+          <h2>{t.home.bandH2}</h2>
+          <p>{t.home.bandP}</p>
+          <button type="button" className="btn btn-primary btn-lg" onClick={() => goCreate()}>
+            {t.home.bandBtn}
+          </button>
+        </section>
+      </div>
     </div>
   )
 }

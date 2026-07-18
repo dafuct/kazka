@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
-import { ThemeProvider } from './lib/ThemeContext'
 import { LocaleProvider } from './lib/LocaleContext'
 import { AuthProvider, useAuth } from './lib/AuthContext'
 import { ChildrenProvider } from './lib/ChildrenContext'
@@ -154,20 +153,18 @@ function AppShell() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <LocaleProvider>
-        <BrowserRouter>
-          <AuthProvider>
-            <ChildrenProvider>
-              <AuthModalProvider>
-                <ActiveStoryProvider>
-                  <AppShell />
-                </ActiveStoryProvider>
-              </AuthModalProvider>
-            </ChildrenProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </LocaleProvider>
-    </ThemeProvider>
+    <LocaleProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <ChildrenProvider>
+            <AuthModalProvider>
+              <ActiveStoryProvider>
+                <AppShell />
+              </ActiveStoryProvider>
+            </AuthModalProvider>
+          </ChildrenProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </LocaleProvider>
   )
 }
