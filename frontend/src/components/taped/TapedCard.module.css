@@ -1,0 +1,80 @@
+.taped {
+  position: relative;
+  display: block;
+  background: var(--card);
+  padding: 10px 10px 15px;
+  border-radius: 3px;
+  box-shadow: 0 8px 22px var(--shadow);
+  transform: rotate(var(--rot, -1.4deg));
+  transition: transform .32s var(--ease-pop), box-shadow .25s ease;
+  cursor: pointer;
+}
+.taped:hover {
+  transform: rotate(0deg) translateY(-6px) scale(1.03);
+  box-shadow: 0 20px 42px var(--shadow);
+  z-index: 3;
+}
+
+.tape {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 106px;
+  height: 30px;
+  z-index: 5;
+  transform: translateX(-50%) rotate(var(--trot, -3deg));
+  background: var(--tape);
+  transition: transform .32s var(--ease-pop);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .22);
+}
+.tape::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 7px, rgba(255, 255, 255, .14) 7px 8px);
+}
+.taped:hover .tape { transform: translateX(-50%) rotate(0deg) scaleX(1.06); }
+
+.photo {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06);
+}
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 140px;
+  background: var(--card-warm);
+  color: var(--ink-faint);
+  font-size: 34px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 14px 4px 4px;
+  transition: color .2s;
+}
+.taped:hover .title { color: var(--honey); }
+
+.meta {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  margin: 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
