@@ -38,14 +38,16 @@ class PromptBuilderTest {
     void should_include_folk_tale_style_when_building_uk_system_prompt() {
         String system = new PromptBuilder().buildStorySystem("uk");
         assertThat(system).contains("народна казка");
-        assertThat(system).contains("Жили собі");
+        // The folk voice is kept, but openings must be varied — not the same
+        // «Жили собі» formula every time.
+        assertThat(system).contains("No two tales should begin the same way");
     }
 
     @Test
     void should_include_folk_tale_style_when_building_en_system_prompt() {
         String system = new PromptBuilder().buildStorySystem("en");
         assertThat(system.toLowerCase()).contains("folk tale");
-        assertThat(system).contains("Long ago");
+        assertThat(system).contains("No two tales should begin the same way");
     }
 
     @Test

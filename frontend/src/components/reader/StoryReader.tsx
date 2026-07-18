@@ -80,16 +80,7 @@ export function StoryReader({
           )}
           <div className={`${styles.textCol} fadein`} key={page}>
             <div className={styles.text}>
-              {paras.map((p, i) =>
-                page === 0 && i === 0 ? (
-                  <p key={i} className={styles.dcPara}>
-                    <span className={styles.dc}>{p.charAt(0)}</span>
-                    {p.slice(1)}
-                  </p>
-                ) : (
-                  <p key={i}>{p}</p>
-                ),
-              )}
+              {paras.map((p, i) => <p key={i}>{p}</p>)}
             </div>
 
             {last && choices && choices.length > 0 && onPickChoice && (

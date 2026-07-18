@@ -94,25 +94,8 @@
   line-height: 1.75;
   color: var(--ink);
 }
-/* Ukrainian typography: EVERY paragraph is indented. */
+/* Ukrainian typography: every paragraph indented (no drop cap). */
 .text p { text-indent: 1.6em; margin-bottom: .4em; }
-.dc {
-  float: left;
-  font-family: var(--font-head);
-  font-weight: 700;
-  color: var(--honey);
-  /* Verified in-browser: font-size × line-height ≈ 3.5 makes the cap box span
-     exactly two text lines (line-height 1.75), and this size/line-height pair
-     lands the cap's top flush with the first line — no sink, no glyph poking
-     above it, no stray edge. em-based so it scales with the mobile text size.
-     initial-letter is deliberately avoided: engine support is buggy and renders
-     it barely enlarged. */
-  font-size: 4.8em;
-  line-height: 0.73;
-  margin: 0 0.12em 0 0;
-}
-/* the drop-cap paragraph itself is not indented (the cap replaces the indent) */
-.dcPara { text-indent: 0; }
 
 .lastActions { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
 
@@ -147,6 +130,4 @@
 @media (max-width: 560px) {
   .top { padding: 14px 16px; }
   .bottom { padding: 12px 16px 20px; }
-  /* .dc stays em-based (4.8em of the mobile text size) so it keeps the
-     exact 2-line span without a separate override. */
 }
