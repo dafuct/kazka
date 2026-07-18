@@ -102,15 +102,15 @@ export function Nav() {
                 </button>
                 {menuOpen && (
                   <div className={styles.userMenu}>
-                    <button onClick={() => { setMenuOpen(false); navigate('/stories') }}>{t.auth.actions.myArchive}</button>
-                    <button onClick={() => { setMenuOpen(false); navigate('/settings') }}>{t.auth.actions.settings}</button>
+                    <button type="button" onClick={() => { setMenuOpen(false); navigate('/stories') }}>{t.auth.actions.myArchive}</button>
+                    <button type="button" onClick={() => { setMenuOpen(false); navigate('/settings') }}>{t.auth.actions.settings}</button>
                     {user.role === 'ADMIN' && (
-                      <button onClick={() => { setMenuOpen(false); navigate('/admin/users') }}>{t.auth.actions.adminUsers}</button>
+                      <button type="button" onClick={() => { setMenuOpen(false); navigate('/admin/users') }}>{t.auth.actions.adminUsers}</button>
                     )}
                     {user.role === 'ADMIN' && (
-                      <button onClick={() => { setMenuOpen(false); navigate('/admin/moderation') }}>Admin → Moderation</button>
+                      <button type="button" onClick={() => { setMenuOpen(false); navigate('/admin/moderation') }}>Admin → Moderation</button>
                     )}
-                    <button onClick={async () => { setMenuOpen(false); await signOut(); navigate('/') }}>{t.auth.actions.signOut}</button>
+                    <button type="button" onClick={async () => { setMenuOpen(false); await signOut(); navigate('/') }}>{t.auth.actions.signOut}</button>
                   </div>
                 )}
               </div>

@@ -129,11 +129,6 @@ section { position: relative; }
   0% { opacity: .9; transform: translate(-50%, -50%) scale(.4) rotate(0deg); }
   100% { opacity: 0; transform: translate(-50%, -160%) scale(1.1) rotate(40deg); }
 }
-@keyframes twinkle {
-  0%, 100% { opacity: .15; transform: scale(.7); }
-  50% { opacity: .9; transform: scale(1); }
-}
-
 /* ── Scroll progress bar (kept from previous design, recolored) ── */
 .scrollProgress {
   position: fixed; top: 0; left: 0; height: 3px; width: 0;

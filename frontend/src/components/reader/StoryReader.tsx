@@ -91,7 +91,7 @@ export function StoryReader({
             {last && choices && choices.length > 0 && onPickChoice && (
               <div className={styles.choiceWrap}>
                 {choiceBusy ? (
-                  <p className={styles.choiceBusy}>{(t as any).branching?.loading ?? '…'}</p>
+                  <p className={styles.choiceBusy}>{t.branching.loading}</p>
                 ) : (
                   <BranchingChoiceButtons
                     choices={choices}
