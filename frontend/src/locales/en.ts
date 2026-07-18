@@ -377,4 +377,13 @@ export const en: Locale = {
     retry: 'Try again',
     drawing: 'Drawing the comic…',
   },
+  reader: {
+    eyebrow: '✦ Kazkar',
+    listen: 'Listen to narration',
+    reading: 'Kazkar is reading…',
+    preparing: 'Preparing…',
+    restart: '↺ Restart',
+    close: 'Close',
+    pageOf: (p: number, total: number) => `${p}/${total}`,
+  },
 }

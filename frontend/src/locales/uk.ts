@@ -375,6 +375,15 @@ export const uk = {
     retry: 'Спробувати ще раз',
     drawing: 'Малюємо комікс…',
   },
+  reader: {
+    eyebrow: '✦ Казкар',
+    listen: 'Слухати озвучку',
+    reading: 'Читає Казкар…',
+    preparing: 'Готую озвучення…',
+    restart: '↺ Спочатку',
+    close: 'Закрити',
+    pageOf: (p: number, total: number) => `${p}/${total}`,
+  },
 }
 
 export type Locale = typeof uk
