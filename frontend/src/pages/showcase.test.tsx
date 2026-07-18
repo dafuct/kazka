@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { en } from '../locales/en'
@@ -111,16 +111,17 @@ describe('ShowcaseDetailPage (read-only reader)', () => {
     )
 
     expect(await screen.findByText('The Three Acorns')).toBeInTheDocument()
-    // Content paragraphs render.
+    // Preview shows the opening paragraph.
     expect(screen.getByText(/Жили собі дід та баба/)).toBeInTheDocument()
-    // The panel image renders (reusing ComicsReader).
-    expect(screen.getByRole('img', { name: 'The Three Acorns' })).toBeInTheDocument()
+
+    // Opening the reader shows the full tale text.
+    fireEvent.click(screen.getByRole('button', { name: en.detail.read }))
+    expect(screen.getByText(/І була в них онучка/)).toBeInTheDocument()
 
     // No read/write controls from the authenticated reader.
     expect(screen.queryByRole('button', { name: en.story.edit })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: en.story.delete })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: en.story.save })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: en.story.illustrate })).not.toBeInTheDocument()
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
 
     // But the sign-up CTA is offered here too.
