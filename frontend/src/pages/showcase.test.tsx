@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { en } from '../locales/en'
@@ -15,6 +15,10 @@ vi.mock('../lib/LocaleContext', () => ({
 const openAuth = vi.fn()
 vi.mock('../lib/AuthModalContext', () => ({
   useAuthModal: () => ({ openAuth, closeAuth: vi.fn(), open: false, tab: 'signIn', setTab: vi.fn() }),
+}))
+
+vi.mock('../lib/AuthContext', () => ({
+  useAuth: () => ({ user: null, loading: false, refresh: vi.fn(), signOut: vi.fn(), resendVerification: vi.fn() }),
 }))
 
 const list = vi.fn()
@@ -63,10 +67,8 @@ describe('ShowcasePage (gallery, logged out)', () => {
 
     expect(await screen.findByText('The Three Acorns')).toBeInTheDocument()
     expect(screen.getByText('The Wise Rooster')).toBeInTheDocument()
-
-    // The cards link to the read-only reader route.
-    const link = screen.getByText('The Three Acorns').closest('a')
-    expect(link).toHaveAttribute('href', '/showcase/s1')
+    const link = screen.getByText('The Wise Rooster').closest('a')
+    expect(link).toHaveAttribute('href', '/showcase/s2')
 
     // The prominent sign-up CTA is present and wired to open the sign-up modal.
     const cta = screen.getByRole('button', { name: en.showcase.cta.button })
@@ -109,16 +111,17 @@ describe('ShowcaseDetailPage (read-only reader)', () => {
     )
 
     expect(await screen.findByText('The Three Acorns')).toBeInTheDocument()
-    // Content paragraphs render.
+    // Preview shows the opening paragraph.
     expect(screen.getByText(/Жили собі дід та баба/)).toBeInTheDocument()
-    // The panel image renders (reusing ComicsReader).
-    expect(screen.getByRole('img', { name: 'The Three Acorns' })).toBeInTheDocument()
+
+    // Opening the reader shows the full tale text.
+    fireEvent.click(screen.getByRole('button', { name: en.detail.read }))
+    expect(screen.getByText(/І була в них онучка/)).toBeInTheDocument()
 
     // No read/write controls from the authenticated reader.
     expect(screen.queryByRole('button', { name: en.story.edit })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: en.story.delete })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: en.story.save })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: en.story.illustrate })).not.toBeInTheDocument()
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
 
     // But the sign-up CTA is offered here too.

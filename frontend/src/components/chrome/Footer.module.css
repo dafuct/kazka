@@ -1,66 +1,80 @@
-/* Hutsul footer — cloth-band top edge (maroon bar + gold pinline) on aida. */
 .footer {
-  margin-top: auto;
-  background: var(--color-surface);
-  border-top: 5px solid var(--kz-maroon);
-  box-shadow: inset 0 3px 0 var(--kz-gold);
-}
-.inner {
-  padding: 32px 40px 36px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 80px;
+  padding: 52px 0 40px;
 }
 
-.left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 36px;
 }
 
-.logoIcon {
-  display: inline-flex;
+.col h4 {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-family: var(--font-body);
+  margin-bottom: 14px;
+}
+
+.logo {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 21px;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.mark {
+  width: 30px; height: 30px; border-radius: 10px;
+  display: grid; place-items: center; font-size: 16px;
+  background: linear-gradient(140deg, var(--honey), var(--coral));
+  color: #fff;
 }
 
 .tagline {
-  font-family: var(--font-display);
-  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--ink-soft);
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 280px;
 }
 
-.links {
-  display: flex;
-  gap: 24px;
+.flink {
+  display: block;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
 }
-
-.link {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-text-faint);
-  text-decoration: none;
-  transition: color 0.3s;
-}
-.link:hover { color: var(--kz-maroon); text-decoration: none; }
+.flink:hover { color: var(--honey); }
 
 .bottom {
-  width: 100%;
-  text-align: center;
-  margin-top: 16px;
-  padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24px;
   border-top: 1px solid var(--border);
-  font-size: 13px;
-  color: var(--color-text-faint);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  flex-wrap: wrap;
+  gap: 12px;
 }
+.legal { display: flex; gap: 18px; }
+.legal .flink { margin-bottom: 0; }
 
-@media (max-width: 860px) {
-  .inner { flex-direction: column; text-align: center; padding: 24px 20px 28px; }
-  .links { flex-wrap: wrap; justify-content: center; }
+@media (max-width: 820px) {
+  .grid { grid-template-columns: 1fr 1fr; }
 }

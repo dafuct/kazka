@@ -1,264 +1,135 @@
-/* Hutsul nav — solid aida bar, 5px maroon bottom border + gold pinline below. */
 .nav {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  min-height: var(--kz-nav-h);
-  padding: 8px 40px;
-  background: var(--color-surface);
-  border-bottom: 5px solid var(--kz-maroon);
-  box-shadow: 0 5px 0 var(--kz-gold);
-  transition: box-shadow 0.3s;
+  z-index: 50;
+  background: var(--nav);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border-bottom: 1px solid var(--border);
 }
 
-.nav.scrolled {
-  box-shadow: 0 5px 0 var(--kz-gold), 0 10px 22px rgba(42, 32, 24, 0.16);
-}
+.inner { display: flex; align-items: center; gap: 20px; height: 70px; }
 
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-  color: var(--kz-maroon);
-  flex-shrink: 0;
-}
-.logo:hover { text-decoration: none; opacity: 0.88; }
-
-.logoIcon {
-  display: inline-flex;
-  width: auto;
-  height: auto;
-  transition: transform 0.4s;
-}
-.nav.scrolled .logoIcon { transform: scale(0.92); }
-
-.logo span:last-child {
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--kz-maroon);
-}
-
-.links {
-  /* One shared height for every boxed nav control so they align top & bottom.
-     Inherits to the child-picker trigger (separate module, descendant of .links). */
-  --kz-nav-btn-h: 40px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.link {
-  font-family: var(--font-display);
+  font-family: var(--font-head);
   font-weight: 600;
-  font-size: 16px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  text-decoration: none;
-  padding: 6px 4px;
-  border-bottom: 3px solid transparent;
-  background: none;
-  cursor: pointer;
-  transition: color 0.3s, border-color 0.3s;
-}
-.link:hover { color: var(--kz-ink); text-decoration: none; }
-.link.active { color: var(--kz-maroon); border-bottom-color: var(--kz-gold); }
-
-.themeToggle {
-  display: inline-flex;
+  font-size: 23px;
+  color: var(--ink);
+  display: flex;
   align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  height: var(--kz-nav-btn-h);
-  box-sizing: border-box;
-  background: var(--color-bg);
-  border: 1.5px solid var(--border);
-  border-radius: 0;
-  padding: 0 14px;
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition: all 0.3s;
+  gap: 8px;
 }
-.themeToggle:hover { border-color: var(--kz-maroon); color: var(--kz-maroon); }
-.themeIcon { font-size: 14px; line-height: 1; }
-
-.langBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--kz-nav-btn-h);
-  box-sizing: border-box;
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 0 14px;
-  border-radius: 0;
-  border: 1.5px solid var(--border);
-  color: var(--color-text-muted);
-  background: none;
-  cursor: pointer;
-  transition: all 0.3s;
+.mark {
+  width: 34px; height: 34px; border-radius: 11px;
+  display: grid; place-items: center; font-size: 18px;
+  background: linear-gradient(140deg, var(--honey), var(--coral));
+  color: #fff;
+  box-shadow: 0 3px 8px var(--shadow);
 }
-.langBtn:hover { border-color: var(--kz-maroon); color: var(--kz-maroon); }
 
-/* Primary CTA — Oswald caps on maroon, square */
-.ctaBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--kz-nav-btn-h);
-  box-sizing: border-box;
-  background: var(--kz-maroon);
-  color: var(--color-surface);
-  font-family: var(--font-display);
+.links { display: flex; gap: 6px; margin-left: 8px; }
+.link {
+  padding: 9px 15px;
+  border-radius: 999px;
   font-weight: 700;
   font-size: 15px;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  padding: 0 24px;
-  border-radius: 0;
-  border: 0;
-  text-decoration: none;
-  white-space: nowrap;
-  flex-shrink: 0;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
   cursor: pointer;
-  transition: filter 0.3s;
+  transition: .2s;
 }
-.ctaBtn:hover { filter: brightness(0.92); text-decoration: none; }
+.link:hover, .on { background: var(--honey-soft); color: var(--honey); }
 
-/* Donate — outline maroon, square */
-.donateBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: var(--kz-nav-btn-h);
-  box-sizing: border-box;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0 16px;
-  border-radius: 0;
-  border: 2px solid var(--kz-maroon);
-  color: var(--kz-maroon);
+.right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+.langPill {
+  display: flex; gap: 2px;
+  background: var(--card-warm);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px;
+}
+.langOpt {
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: none;
   background: transparent;
-  text-decoration: none;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: all 0.3s;
+  cursor: pointer;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink-soft);
 }
-.donateBtn:hover {
-  background: var(--kz-maroon);
-  color: var(--color-surface);
-  text-decoration: none;
-}
+.langOn { background: var(--honey); color: #fff; }
 
-@media (max-width: 860px) {
-  .nav { padding: 8px 20px; }
-  .links .link:not(.active) { display: none; }
-  .links li:nth-child(1),
-  .links li:nth-child(2) { display: none; }
-  .links { gap: 12px; }
-}
+.donate { color: var(--berry); text-decoration: none; }
 
-@media (max-width: 600px) {
-  .nav { padding: 6px 12px; min-height: 64px; gap: 10px; }
-  /* No room for nav links on phones — hide them all (incl. the active one) so the
-     CTA/sign-up never gets clipped. Logged-in users still have the ▾ user menu. */
-  .links .link { display: none; }
-  .links { gap: 8px; flex-shrink: 0; --kz-nav-btn-h: 34px; }
-  .logo { min-width: 0; flex-shrink: 0; gap: 0; }
-  /* Phone: drop the wordmark, keep just the stitch-logo mark (no "КА…" truncation) */
-  .logo span:last-child { display: none; }
-  .themeToggle { padding: 6px 9px; }
-  .themeLabel { display: none; }
-  .langBtn { padding: 6px 8px; font-size: 11px; }
-  .ctaBtn { padding: 9px 13px; font-size: 13px; }
-  .donateBtn { padding: 8px 12px; font-size: 12px; }
-  .userBtn { padding: 6px 10px; font-size: 0.85rem; }
+.signIn {
+  background: none; border: none; cursor: pointer;
+  font-weight: 700; font-size: 15px; color: var(--ink-soft);
+  padding: 9px 12px; border-radius: 999px; transition: .2s;
 }
+.signIn:hover { color: var(--honey); }
 
-@media (max-width: 440px) {
-  /* Tightest phones: donate collapses to the heart only, so the sign-up CTA fits */
-  .donateBtn { padding: 8px 11px; font-size: 0; gap: 0; }
-  .donateBtn::before { content: '\2665'; font-size: 14px; }
-  .langBtn { padding: 6px 7px; }
-  .ctaBtn { padding: 9px 11px; font-size: 12px; }
-}
+.cta { padding: 11px 20px; font-size: 15px; }
 
 .userWrap { position: relative; }
 .userBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: var(--kz-nav-btn-h);
-  box-sizing: border-box;
-  background: transparent;
-  border: 1.5px solid var(--border);
-  border-radius: 0;
-  padding: 0 14px;
-  font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--color-text);
-  cursor: pointer;
-  transition: border-color 0.3s;
+  display: flex; align-items: center; gap: 7px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 999px; padding: 8px 14px; cursor: pointer;
+  font-weight: 700; font-size: 14px; color: var(--ink);
 }
-.userBtn:hover { border-color: var(--kz-maroon); }
-.proBadge {
-  font-family: var(--font-display);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  padding: 3px 8px;
-  border-radius: 0;
-  background: var(--kz-maroon);
-  color: var(--color-surface);
+.adminBadge {
+  padding: 2px 8px; border-radius: 999px;
+  background: var(--plum-soft); color: var(--plum);
+  font-size: 11px; font-weight: 800;
 }
 .userMenu {
-  position: absolute;
-  right: 0;
-  top: 100%;
-  margin-top: 8px;
-  background: var(--color-surface);
-  border: 2px solid var(--kz-maroon);
-  border-radius: 0;
-  min-width: 190px;
-  display: flex;
-  flex-direction: column;
-  z-index: 100;
-  box-shadow: 0 12px 32px rgba(42, 32, 24, 0.22);
-  overflow: hidden;
+  position: absolute; right: 0; top: calc(100% + 8px);
+  min-width: 210px;
+  background: var(--sheet);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  padding: 6px;
+  display: flex; flex-direction: column;
+  z-index: 60;
 }
 .userMenu button {
-  background: transparent;
-  border: none;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  color: var(--color-text);
-  text-align: left;
-  padding: 11px 16px;
-  cursor: pointer;
-  transition: background 0.2s;
+  text-align: left; background: none; border: none; cursor: pointer;
+  padding: 10px 12px; border-radius: 10px;
+  font-weight: 700; font-size: 14px; color: var(--ink-soft);
 }
-.userMenu button:hover { background: var(--color-magic-soft); }
+.userMenu button:hover { background: var(--honey-soft); color: var(--honey); }
+
+.burger { display: none; }
+
+.mmenu {
+  position: fixed;
+  inset: 70px 0 0;
+  z-index: 49;
+  background: var(--bg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: fadeUp .25s ease;
+}
+.mmenu .link {
+  padding: 16px;
+  border-radius: 16px;
+  font-family: var(--font-head);
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--ink);
+  background: var(--card-warm);
+}
+
+@media (max-width: 820px) {
+  .links { display: none; }
+  .burger { display: grid; }
+  .cta { display: none; }
+  .signIn { display: none; }
+}

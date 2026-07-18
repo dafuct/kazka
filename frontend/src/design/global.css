@@ -1,574 +1,203 @@
-/* Hutsul «Гуцульська» direction loads Oswald (display) + PT Sans (body) via the
-   <link> tags in index.html — same source as the design handoff preview.
-   The self-hosted @font-face blocks below (Lora/Nunito/Manrope) are legacy and
-   no longer referenced by the token set; kept to avoid churn. */
+/* Казкар global styles — shared primitives from the paper-craft handoff.
+   Page-specific styling lives in CSS modules; this file holds resets, type,
+   the button/chip/badge system, atmosphere FX, and restyled legacy helpers. */
 
-/* Lora italic 400 */
-@font-face {
-  font-family: 'Lora';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/asset_0_c2bbcacc.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Lora';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/asset_1_719592f0.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* Lora italic 600 */
-@font-face {
-  font-family: 'Lora';
-  font-style: italic;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/asset_2_cc3fe31e.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Lora';
-  font-style: italic;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/asset_3_3982861f.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* Lora normal 400 */
-@font-face {
-  font-family: 'Lora';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/asset_4_841f590d.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Lora';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/asset_5_b644d2ec.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* Lora normal 600 */
-@font-face {
-  font-family: 'Lora';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/asset_6_dd723ad1.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Lora';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/asset_7_e4e3d7e6.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* Lora normal 700 */
-@font-face {
-  font-family: 'Lora';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/asset_8_cc51b6f2.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Lora';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/asset_9_a9ba363e.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* Nunito 300 */
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url('/fonts/asset_10_f31297a3.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url('/fonts/asset_11_62577583.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* Nunito 400 */
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/asset_12_40966958.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/asset_13_37121838.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* Nunito 500 */
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/asset_14_8930aed5.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/asset_15_04eccb75.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* Nunito 600 */
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/asset_16_c1f7793f.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/asset_17_30267d0f.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* Nunito 700 */
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/asset_18_5448b113.woff2') format('woff2');
-  unicode-range: U+0000-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F, U+FEFF, U+FFFD;
-}
-
-/* Manrope is shipped as a variable font — same bytes serve all weights per subset. */
-/* Manrope 400 */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/manrope/manrope-cyrillic.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/manrope/manrope-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* Manrope 600 */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/manrope/manrope-cyrillic.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/manrope/manrope-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* Manrope 700 */
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/manrope/manrope-cyrillic.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/manrope/manrope-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* Reset + base */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* Hutsul is uncompromisingly square — strip ALL rounded corners across the UI
-   (avatars, pills, icons, modals, inputs…). Overrides any component radius. */
-*, *::before, *::after {
-  border-radius: 0 !important;
-}
-
-html {
-  font-size: 16px;
-  -webkit-text-size-adjust: 100%;
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
+  background: var(--bg);
+  color: var(--ink);
   font-family: var(--font-body);
-  font-size: 1rem;
-  line-height: 1.6;
-  color: var(--color-text);
-  background-color: var(--color-bg);
-  /* Subtle woven-cloth texture (Hutsul aida weave) over the linen ground */
-  background-image:
-    repeating-linear-gradient(0deg,  rgba(42,32,24,0.03) 0 1px, transparent 1px 5px),
-    repeating-linear-gradient(90deg, rgba(42,32,24,0.025) 0 1px, transparent 1px 5px);
   min-height: 100vh;
-  transition: background-color var(--transition), color var(--transition);
-}
-[data-theme="dark"] body {
-  background-image:
-    repeating-linear-gradient(0deg,  rgba(220,205,170,0.035) 0 1px, transparent 1px 5px),
-    repeating-linear-gradient(90deg, rgba(220,205,170,0.03) 0 1px, transparent 1px 5px);
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-display);
-  line-height: 1.25;
+  font-family: var(--font-head);
   font-weight: 600;
-  color: var(--color-text);
+  line-height: 1.12;
+  letter-spacing: -.01em;
 }
 
-a {
-  color: var(--color-magic);
-  text-decoration: none;
+a { color: inherit; text-decoration: none; }
+
+button { font-family: inherit; }
+
+img { max-width: 100%; }
+
+main { min-height: 60vh; }
+
+/* Content sits above the fixed StarField (z-index: 0) */
+.appContent { position: relative; z-index: 1; }
+
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+.serif { font-family: var(--font-story); }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  border: none; cursor: pointer;
+  font-family: var(--font-head); font-weight: 600;
+  border-radius: 999px;
+  transition: transform .22s var(--ease-pop), box-shadow .2s ease, filter .2s ease;
+  padding: 13px 24px; font-size: 16px; white-space: nowrap;
+}
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn-primary {
+  background: linear-gradient(180deg, var(--honey), var(--honey-deep));
+  color: #fff; box-shadow: 0 4px 12px var(--shadow);
+}
+.btn-primary:hover:not(:disabled) { transform: translateY(-3px) scale(1.04); box-shadow: 0 14px 28px var(--shadow); filter: brightness(1.07); }
+.btn-soft { background: var(--honey-soft); color: var(--honey); }
+.btn-ghost { background: transparent; color: var(--ink-soft); border: 1.5px solid var(--border-strong); }
+.btn-lg { padding: 17px 30px; font-size: 18px; }
+.btn-sm { padding: 9px 18px; font-size: 14px; }
+
+.icon-btn {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--card);
+  display: grid; place-items: center; cursor: pointer;
+  font-size: 18px; color: var(--ink-soft); transition: .2s;
+}
+.icon-btn:hover { border-color: var(--border-strong); }
+
+/* ── Chips ── */
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 17px;
+  border-radius: 999px; cursor: pointer;
+  font-family: var(--font-head); font-weight: 500; font-size: 15px;
+  border: 1.5px solid transparent;
+  background: var(--card-warm); color: var(--ink);
+  transition: .2s; white-space: nowrap;
+}
+.chip:hover { transform: scale(1.06); background: var(--honey-soft); color: var(--honey); box-shadow: 0 4px 12px var(--shadow); }
+.chip.active { background: var(--honey); color: #fff; border-color: var(--honey); }
+
+/* ── Labels / badges ── */
+.eyebrow {
+  font-family: var(--font-body); font-size: 13px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--honey);
+}
+.badge {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px;
+  border-radius: 999px; background: var(--card-warm); border: 1px solid var(--border);
+  font-size: 13.5px; font-weight: 700; color: var(--ink-soft);
+}
+.field-label {
+  font-size: 13px; font-weight: 800; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px;
 }
 
-a:hover {
-  text-decoration: underline;
+/* ── Inputs ── */
+.ta, .inp {
+  width: 100%; border: 1.5px solid var(--border-strong);
+  background: var(--card); color: var(--ink); border-radius: 18px;
+  padding: 16px 18px; font-family: var(--font-body); font-size: 17px; font-weight: 600;
+  outline: none;
 }
+.ta { min-height: 140px; resize: none; line-height: 1.5; }
+.ta:focus, .inp:focus { border-color: var(--honey); }
+.ta::placeholder, .inp::placeholder { color: var(--ink-faint); }
 
-button {
-  cursor: pointer;
-  font-family: var(--font-body);
-  border: none;
-  background: none;
-}
+/* ── Section layout ── */
+section { position: relative; }
+.sec-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 22px; gap: 16px; flex-wrap: wrap; }
+.sec-head h2 { font-size: 32px; color: var(--ink); }
+.link-more { font-family: var(--font-head); font-weight: 600; color: var(--honey); cursor: pointer; font-size: 16px; }
+.grid-stories { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+.row-scroll { display: flex; gap: 22px; overflow-x: auto; overflow-y: hidden; padding: 8px 2px 12px; scrollbar-width: none; }
+.row-scroll::-webkit-scrollbar { display: none; }
 
-img {
-  max-width: 100%;
-  display: block;
+.band {
+  border-radius: 32px; padding: 56px 40px; text-align: center;
+  position: relative; overflow: hidden;
+  background: linear-gradient(150deg, var(--honey-soft), var(--card));
+  border: 1px solid var(--border);
 }
+.band h2 { font-size: 40px; color: var(--ink); margin-bottom: 14px; }
+.band p { font-size: 18px; font-weight: 600; color: var(--ink-soft); margin-bottom: 26px; }
 
-input, textarea, select {
-  font-family: var(--font-body);
-  font-size: 1rem;
+/* ── Atmosphere FX (StarField + cursor trail) ── */
+.star-fx {
+  position: absolute; pointer-events: none; color: var(--honey); font-size: 14px;
+  animation: starTrail .9s ease-out forwards; will-change: transform, opacity; z-index: 4;
 }
-
-:focus-visible {
-  outline: 2px solid var(--color-magic);
-  outline-offset: 2px;
+@keyframes starTrail {
+  0% { opacity: .9; transform: translate(-50%, -50%) scale(.4) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-50%, -160%) scale(1.1) rotate(40deg); }
 }
-
-::selection {
-  background: var(--color-magic-soft);
-  color: var(--color-text);
-}
-
-#root {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-/* ── Hutsul «Гуцульська» signature framing helpers ──────────────────────────
-   Ported from the design handoff (tokens.css). Use these to apply the
-   embroidery framing language on top of the cascading token palette. */
-
-/* Framed section panel: full maroon frame + gold inset pinline, inset from the
-   page so the darker gutter shows around it. Alternate shade with --alt. */
-.kz-panel {
-  position: relative;
-  margin: 22px 40px;
-  border: 5px solid var(--kz-maroon);
-  box-shadow: inset 0 0 0 3px var(--kz-gold);
-  background-color: var(--kz-layer-1);
-  background-image: var(--kz-grid-img);
-}
-.kz-panel--alt { background-color: var(--kz-layer-2); }
-
-/* Ornament ribbon spacing when used as a page-top accent */
-.kz-orn-top { margin: 0 auto 26px; }
-@media (max-width: 860px) {
-  .kz-panel { margin: 16px 14px; }
-}
-
-/* Page-root framed panel — clears the fixed nav, frames the whole page content.
-   Overrides each page's own nav-clearance top padding. */
-.kz-page {
-  /* auto left/right keeps each page's own `margin:0 auto` centering intact */
-  margin: calc(var(--kz-nav-h) + 22px) auto 40px !important;
-  padding-top: 40px !important;
-  border: 5px solid var(--kz-maroon) !important;
-  box-shadow: inset 0 0 0 3px var(--kz-gold);
-  background-color: var(--kz-layer-1) !important;
-  background-image: var(--kz-grid-img) !important;
-}
-@media (max-width: 860px) {
-  .kz-page {
-    margin: calc(var(--kz-nav-h) + 10px) auto 20px !important;
-    padding-top: 28px !important;
-  }
-}
-
-/* Woven cloth band: maroon bars top & bottom with gold pinlines */
-.kz-cloth-band {
-  background: var(--kz-aida);
-  border-top: 5px solid var(--kz-maroon);
-  border-bottom: 5px solid var(--kz-maroon);
-  box-shadow: inset 0 3px 0 var(--kz-gold), inset 0 -3px 0 var(--kz-gold);
-}
-
-/* Story card: maroon outline + gold top bar */
-.kz-card { background: var(--kz-aida); border: 2px solid var(--kz-maroon); }
-.kz-card__bar { height: 6px; background: var(--kz-gold); }
-
-/* Framed illustration window: 6px maroon border + 3px gold pinline.
-   Gold shows through the padding gap so the child content can't cover it. */
-.kz-illustration {
-  border: 6px solid var(--kz-maroon);
-  background: var(--kz-gold);
-  padding: 3px;
-}
-
-/* Primary button — Oswald caps on maroon */
-.kz-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: var(--kz-maroon);
-  color: var(--kz-aida);
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  font-size: 15px;
-  padding: 12px 24px;
-  border: 0;
-  cursor: pointer;
-  transition: filter var(--transition);
-}
-.kz-btn:hover { filter: brightness(0.92); text-decoration: none; }
-.kz-btn--outline {
-  background: transparent;
-  color: var(--kz-maroon);
-  border: 2px solid var(--kz-maroon);
-}
-.kz-btn--outline:hover { background: var(--color-magic-soft); filter: none; }
-
-/* Headings & labels — Oswald uppercase, condensed */
-.kz-h-hero {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(28px, 4vw, 38px);
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--kz-maroon);
-  line-height: 1.05;
-}
-.kz-h-section {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(18px, 2.4vw, 22px);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--kz-ink);
-}
-.kz-label {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--kz-muted);
-}
-
-/* ── Paper grain overlay ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  opacity: 0.5;
-}
-[data-theme="dark"] body::before { opacity: 1; }
-
-/* ── Scroll progress bar ── */
+/* ── Scroll progress bar (kept from previous design, recolored) ── */
 .scrollProgress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 3px;
-  z-index: 10001;
-  width: 0%;
-  background: linear-gradient(90deg, var(--color-ember), var(--color-magic), var(--color-gold));
-  transition: width 0.05s linear;
-  pointer-events: none;
-}
-.scrollProgress::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  box-shadow: 0 0 8px var(--color-magic), 0 0 4px var(--color-ember);
+  position: fixed; top: 0; left: 0; height: 3px; width: 0;
+  background: linear-gradient(90deg, var(--honey), var(--coral));
+  z-index: 200; pointer-events: none;
 }
 
-/* ── Cursor star trail ── */
+/* ── Cursor star trail host class (elements created in App.tsx) ── */
 .cursorStar {
-  position: fixed;
-  pointer-events: none;
-  z-index: 9998;
-  animation: cursorStarFade 0.8s ease-out forwards;
+  position: fixed; pointer-events: none; z-index: 9998;
+  animation: starTrail .8s ease-out forwards;
 }
 
-/* ── Scroll reveal utilities ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
-}
+/* ── Scroll reveal utilities (used via useReveal) ── */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
-
-.revealLeft {
-  opacity: 0;
-  transform: translateX(-32px);
-  transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
-}
+.revealLeft { opacity: 0; transform: translateX(-24px); transition: opacity .6s ease, transform .6s ease; }
 .revealLeft.visible { opacity: 1; transform: translateX(0); }
-
-.revealRight {
-  opacity: 0;
-  transform: translateX(32px);
-  transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
-}
+.revealRight { opacity: 0; transform: translateX(24px); transition: opacity .6s ease, transform .6s ease; }
 .revealRight.visible { opacity: 1; transform: translateX(0); }
 
-/* ── Section particles ── */
-.sectionParticles {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
+/* ── Restyled legacy helpers (pages not yet rebuilt keep using these) ── */
+.kz-page { background: transparent; }
+.kz-panel { background: var(--sheet); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.kz-panel--alt { background: var(--card); }
+.kz-orn-top { display: none; }
+.kz-cloth-band { background: var(--card); border-radius: var(--radius-md); }
+.kz-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+.kz-card__bar { height: 4px; background: var(--honey); border-radius: 2px; }
+.kz-illustration { border-radius: var(--radius-md); overflow: hidden; }
+.kz-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: none; cursor: pointer; font-family: var(--font-head); font-weight: 600;
+  border-radius: 999px; padding: 12px 22px; font-size: 15px;
+  background: linear-gradient(180deg, var(--honey), var(--honey-deep)); color: #fff;
+  box-shadow: 0 4px 12px var(--shadow);
+  transition: transform .22s var(--ease-pop), filter .2s ease;
 }
-.sectionParticle { position: absolute; will-change: transform, opacity; }
+.kz-btn:hover { transform: translateY(-2px); filter: brightness(1.07); text-decoration: none; }
+.kz-btn--outline { background: transparent; color: var(--honey); border: 1.5px solid var(--border-strong); box-shadow: none; }
+.kz-btn--outline:hover { background: var(--honey-soft); }
+.kz-h-hero { font-family: var(--font-head); font-weight: 600; font-size: clamp(34px, 5vw, 54px); line-height: 1.12; color: var(--ink); }
+.kz-h-section { font-family: var(--font-head); font-weight: 600; font-size: clamp(24px, 3.2vw, 34px); line-height: 1.15; color: var(--ink); }
+.kz-label {
+  font-family: var(--font-body); font-size: 13px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--honey);
+}
 
-/* ── Keyframes ── */
-@keyframes floatUp {
-  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
-  10%  { opacity: var(--p-opacity, 0.7); }
-  90%  { opacity: calc(var(--p-opacity, 0.7) * 0.6); }
-  100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+/* ── Animations ── */
+.fadein { animation: fadeUp .5s ease both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+/* ── Responsive ── */
+@media (max-width: 1000px) {
+  .grid-stories { grid-template-columns: repeat(3, 1fr); }
 }
-@keyframes orbitalDrift {
-  0%   { transform: translate(0,0) rotate(0deg) scale(1); }
-  25%  { transform: translate(20px,-30px) rotate(90deg) scale(1.2); }
-  50%  { transform: translate(-15px,-50px) rotate(180deg) scale(0.8); }
-  75%  { transform: translate(30px,-30px) rotate(270deg) scale(1.1); }
-  100% { transform: translate(0,0) rotate(360deg) scale(1); }
+@media (max-width: 820px) {
+  .grid-stories { grid-template-columns: repeat(2, 1fr); }
 }
-@keyframes expandFade {
-  0%   { transform: scale(0.5); opacity: 0.6; }
-  100% { transform: scale(2); opacity: 0; }
+@media (max-width: 560px) {
+  .wrap { padding: 0 18px; }
+  .grid-stories { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .sec-head h2 { font-size: 26px; }
+  .band { padding: 40px 24px; }
+  .band h2 { font-size: 30px; }
 }
-@keyframes inkBleed {
-  from { opacity: 0; filter: blur(6px); transform: scale(1.06) translateY(4px); }
-  to   { opacity: 1; filter: none; transform: scale(1) translateY(0); }
-}
-@keyframes buttonPulse {
-  0%, 100% { box-shadow: 0 4px 16px rgba(126,42,51,0.30); }
-  50% { box-shadow: 0 4px 32px rgba(126,42,51,0.55), 0 0 0 8px rgba(214,162,58,0.12); }
-}
-@keyframes magicBreath {
-  0%, 100% { box-shadow: 0 0 30px rgba(214,162,58,0.20), 0 0 60px rgba(126,42,51,0.12), 0 20px 40px rgba(42,32,24,0.15); }
-  50% { box-shadow: 0 0 50px rgba(214,162,58,0.34), 0 0 100px rgba(126,42,51,0.16), 0 20px 40px rgba(42,32,24,0.15); }
-}
-@keyframes blink { 50% { opacity: 0; } }
-@keyframes starTwinkle {
-  0%, 100% { opacity: 0.15; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.4); }
-}
-@keyframes shootingStar {
-  0%   { transform: translateX(0) translateY(0) rotate(-45deg); opacity: 0; width: 0; }
-  2%   { opacity: 1; }
-  8%   { transform: translateX(-400px) translateY(400px) rotate(-45deg); opacity: 0; width: 120px; }
-  100% { opacity: 0; width: 0; }
-}
-@keyframes moonPulse {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.1); }
-}
-@keyframes bookDrop {
-  0%   { transform: translateY(-60px) rotate(var(--tilt, 0deg)); opacity: 0; }
-  70%  { transform: translateY(4px) rotate(var(--tilt, 0deg)); opacity: 1; }
-  85%  { transform: translateY(-2px) rotate(var(--tilt, 0deg)); }
-  100% { transform: translateY(0) rotate(var(--tilt, 0deg)); opacity: 1; }
-}
-@keyframes pageOpen {
-  from { transform: perspective(1200px) rotateY(-90deg); opacity: 0; }
-  to   { transform: perspective(1200px) rotateY(0); opacity: 1; }
-}
-@keyframes cursorStarFade {
-  0%   { transform: scale(1) rotate(0deg); opacity: 0.8; }
-  100% { transform: scale(0) rotate(180deg); opacity: 0; }
-}
-@keyframes sectionFloat {
-  0%, 100% { transform: translateY(0) rotate(0deg); opacity: var(--sp-opacity, 0.4); }
-  50% { transform: translateY(-30px) rotate(180deg); opacity: calc(var(--sp-opacity, 0.4) * 0.5); }
-}
-@keyframes sectionTwinkle {
-  0%, 100% { opacity: 0.15; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.3); }
-}
-@keyframes ripple { to { transform: scale(2.5); opacity: 0; } }
 
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
@@ -576,9 +205,5 @@ body::before {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-  .reveal, .revealLeft, .revealRight {
-    opacity: 1 !important;
-    transform: none !important;
   }
 }

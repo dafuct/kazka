@@ -1,18 +1,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { ReadAloud } from './ReadAloud'
+import { ReaderAudioBar } from './ReaderAudioBar'
 import { narration } from '../../lib/apiClient'
 
 vi.mock('../../lib/apiClient', () => ({
   narration: { request: vi.fn(), get: vi.fn() },
 }))
 
-describe('ReadAloud', () => {
+describe('ReaderAudioBar', () => {
   let playSpy: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     playSpy = vi.fn().mockResolvedValue(undefined)
-    // jsdom doesn't implement media playback
     window.HTMLMediaElement.prototype.play = playSpy as never
     window.HTMLMediaElement.prototype.pause = vi.fn() as never
   })
@@ -22,7 +21,7 @@ describe('ReadAloud', () => {
     storyId: 'story-1',
     text: 'Жила собі лисичка.',
     lang: 'uk',
-    label: 'Читати вголос',
+    label: 'Слухати озвучку',
     stopLabel: 'Зупинити',
     preparingLabel: 'Готую озвучення…',
   }
@@ -30,7 +29,7 @@ describe('ReadAloud', () => {
   it('plays the returned audio url when narration is READY', async () => {
     vi.mocked(narration.request).mockResolvedValue({ status: 'READY', url: '/uploads/story-1.wav' })
 
-    render(<ReadAloud {...props} />)
+    render(<ReaderAudioBar {...props} />)
     fireEvent.click(screen.getByRole('button'))
 
     await waitFor(() => expect(playSpy).toHaveBeenCalled())
@@ -40,11 +39,9 @@ describe('ReadAloud', () => {
   it('warm-starts narration generation on mount without auto-playing', async () => {
     vi.mocked(narration.request).mockResolvedValue({ status: 'GENERATING', url: null })
 
-    render(<ReadAloud {...props} />)
+    render(<ReaderAudioBar {...props} />)
 
-    // generation is kicked off as soon as the tale opens (before any tap)…
     await waitFor(() => expect(narration.request).toHaveBeenCalledWith('story-1'))
-    // …but audio must not auto-play without a user gesture
     expect(playSpy).not.toHaveBeenCalled()
   })
 
@@ -54,7 +51,7 @@ describe('ReadAloud', () => {
     vi.stubGlobal('speechSynthesis', { speak, cancel: vi.fn(), getVoices: () => [] })
     vi.stubGlobal('SpeechSynthesisUtterance', class { lang = ''; rate = 1; pitch = 1; onend = null; onerror = null } as never)
 
-    render(<ReadAloud {...props} />)
+    render(<ReaderAudioBar {...props} />)
     fireEvent.click(screen.getByRole('button'))
 
     await waitFor(() => expect(speak).toHaveBeenCalled())

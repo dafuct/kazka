@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { useParams, Link } from 'react-router-dom'
 import { ComicsReader } from '../components/comics/ComicsReader'
+import { TapedCard } from '../components/taped/TapedCard'
+import { StoryReader } from '../components/reader/StoryReader'
 import { ShowcaseCta } from './ShowcasePage'
 import { useLocale } from '../lib/LocaleContext'
 import { showcase } from '../lib/apiClient'
@@ -16,6 +17,7 @@ export function ShowcaseDetailPage() {
   const [tale, setTale] = useState<ShowcaseStoryDto | null>(null)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const [readerOpen, setReaderOpen] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -33,56 +35,70 @@ export function ShowcaseDetailPage() {
 
   if (notFound || !tale) {
     return (
-      <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
-        <div className={styles.inner}>
-          <div className={styles.topBar}>
-            <Link to="/" className={styles.back}>{ts.backToGallery}</Link>
-          </div>
-          <p className={styles.state}>{ts.notFound}</p>
-          <div className={styles.ctaWrap}>
-            <ShowcaseCta />
-          </div>
+      <div className="wrap">
+        <div className={styles.topBar}>
+          <Link to="/showcase" className="link-more">{ts.backToGallery}</Link>
         </div>
+        <p className={styles.state}>{ts.notFound}</p>
+        <ShowcaseCta />
       </div>
     )
   }
 
-  const paragraphs = tale.content
-    .split(/\n\s*\n+/)
-    .map(p => p.trim())
-    .filter(Boolean)
+  const firstParagraph = tale.content.split(/\n\s*\n+/).map(p => p.trim()).filter(Boolean)[0] ?? ''
+  const cover = tale.panels?.[0]?.imageUrl ?? null
 
   return (
-    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
-      <div className={styles.inner}>
-        <div className={styles.topBar}>
-          <Link to="/" className={styles.back}>{ts.backToGallery}</Link>
-          <span className={styles.readonlyBadge}>{ts.readonlyNote}</span>
-        </div>
-
-        <h1 className={styles.title}>{tale.title}</h1>
-
-        <div className={styles.meta}>
-          <span className={styles.tag}>{tale.ageGroup}</span>
-          <span className={styles.tag}>{tale.length}</span>
-          <span className={styles.tag}>{tale.language.toUpperCase()}</span>
-        </div>
-
-        <div className={styles.comicsBlock}>
-          {/* Read-only: no onRetry handler — visitors cannot regenerate anything. */}
-          <ComicsReader story={tale} />
-        </div>
-
-        <div className={styles.content}>
-          {paragraphs.map((para, i) => (
-            <p key={i}>{para}</p>
-          ))}
-        </div>
-
-        <div className={styles.ctaWrap}>
-          <ShowcaseCta />
-        </div>
+    <div className="wrap">
+      <div className={styles.topBar}>
+        <Link to="/showcase" className="link-more">{ts.backToGallery}</Link>
+        <span className="badge">{ts.readonlyNote}</span>
       </div>
+
+      <section className={styles.top}>
+        <div className="fadein">
+          <TapedCard rotationKey={tale.id} className={styles.coverCard}>
+            {/* Read-only: no onRetry — visitors cannot regenerate anything. */}
+            <ComicsReader story={tale} />
+          </TapedCard>
+        </div>
+
+        <div className="fadein">
+          {tale.theme && <div className="eyebrow">{tale.theme}</div>}
+          <h1 className={styles.title}>{tale.title}</h1>
+
+          <div className={styles.meta}>
+            <span className="badge">{t.form.ageGroups[tale.ageGroup as '3-5' | '6-8' | '9-12']}</span>
+            <span className="badge">{t.form.lengths[tale.length as 'short' | 'medium' | 'long']}</span>
+            <span className="badge">{t.form.languages[tale.language as 'uk' | 'en'] ?? tale.language.toUpperCase()}</span>
+            {tale.panels.length > 0 && <span className="badge">{t.detail.illustrated}</span>}
+          </div>
+
+          <div className={styles.cta}>
+            <button type="button" className="btn btn-primary btn-lg" onClick={() => setReaderOpen(true)}>
+              {t.detail.read}
+            </button>
+          </div>
+
+          {firstParagraph && (
+            <>
+              <div className="field-label">{t.detail.about}</div>
+              <p className={`serif ${styles.blurb}`}>{firstParagraph}</p>
+            </>
+          )}
+        </div>
+      </section>
+
+      <ShowcaseCta />
+
+      {readerOpen && (
+        <StoryReader
+          title={tale.title}
+          text={tale.content}
+          cover={cover}
+          onClose={() => setReaderOpen(false)}
+        />
+      )}
     </div>
   )
 }

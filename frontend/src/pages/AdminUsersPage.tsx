@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { admin } from '../lib/apiClient'
 import type { AdminUser } from '../lib/apiClient'
 import styles from './AdminUsersPage.module.css'
@@ -19,7 +18,7 @@ export function AdminUsersPage() {
   if (!users) return <p className={styles.msg}>...</p>
 
   return (
-    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
+    <div className={`${styles.page} kz-page`}>
       <h1 className={styles.heading}>Users ({users.length})</h1>
       <table className={styles.table}>
         <thead>

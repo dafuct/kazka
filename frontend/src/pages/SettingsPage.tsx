@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext'
 import { useLocale } from '../lib/LocaleContext'
@@ -40,7 +39,7 @@ export function SettingsPage() {
   }
 
   return (
-    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
+    <div className={`${styles.page} kz-page`}>
       <h1 className={styles.title}>{t.settings.title}</h1>
 
       <section className={styles.section}>

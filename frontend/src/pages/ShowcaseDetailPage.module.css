@@ -1,99 +1,42 @@
-.page {
-  padding: calc(64px + 60px) 48px 80px;
-  min-height: 100vh;
-  max-width: min(1100px, calc(100% - 80px));
-}
-
-.inner {
-  max-width: 760px;
-  margin: 0 auto;
-}
+.state { padding: 60px 24px; text-align: center; font-weight: 600; color: var(--ink-soft); }
 
 .topBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  gap: 14px;
+  padding-top: 24px;
+  margin-bottom: 6px;
 }
 
-.back {
-  color: var(--color-magic);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9375rem;
+.top {
+  display: grid;
+  grid-template-columns: .85fr 1.15fr;
+  gap: 44px;
+  align-items: start;
+  padding-top: 20px;
 }
 
-.back:hover { text-decoration: underline; }
-
-.readonlyBadge {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--color-text-muted);
-  background: var(--color-surface-2);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 4px 12px;
-}
+.coverCard { cursor: default; }
 
 .title {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: clamp(28px, 4vw, 40px);
-  line-height: 1.2;
-  color: var(--color-text);
-  margin: 0 0 16px;
+  font-size: clamp(32px, 4.5vw, 50px);
+  margin: 10px 0 4px;
+  color: var(--ink);
 }
 
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.meta { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 24px; }
+
+.cta { display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
+
+.blurb {
+  font-size: 19px;
+  line-height: 1.65;
+  color: var(--ink);
   margin-bottom: 24px;
+  max-width: 560px;
 }
 
-.tag {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  background: var(--color-surface-2);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 4px 12px;
-}
-
-.comicsBlock {
-  margin-bottom: 32px;
-}
-
-.content {
-  font-family: var(--font-story);
-  font-size: 1.125rem;
-  line-height: 1.7;
-  color: var(--color-text);
-}
-
-.content p {
-  margin: 0 0 1.1em;
-  text-indent: 1.6em;
-}
-
-.content p:first-child {
-  text-indent: 1.6em;
-}
-
-.state {
-  text-align: center;
-  padding: 96px 0;
-  color: var(--color-text-muted);
-  font-family: var(--font-display);
-  font-size: 1.0625rem;
-}
-
-.ctaWrap {
-  margin-top: 48px;
-}
-
-@media (max-width: 860px) {
-  .page { padding: calc(64px + 40px) 20px 60px; }
+@media (max-width: 820px) {
+  .top { grid-template-columns: 1fr; gap: 24px; }
 }

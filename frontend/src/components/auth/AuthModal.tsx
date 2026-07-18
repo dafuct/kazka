@@ -8,8 +8,6 @@ import { SignUpForm } from './SignUpForm'
 import { ForgotPasswordForm } from './ForgotPasswordForm'
 import { GoogleButton } from './GoogleButton'
 import { AppleButton } from './AppleButton'
-import { OrnamentBand } from '../stitch/OrnamentBand'
-import storyStyles from '../modal/StoryModal.module.css'
 import styles from './AuthModal.module.css'
 
 export function AuthModal() {
@@ -37,11 +35,10 @@ export function AuthModal() {
   if (!open) return null
 
   return createPortal(
-    <div className={storyStyles.backdrop} onClick={closeAuth} role="dialog" aria-modal="true">
-      <div className={storyStyles.panel} onClick={e => e.stopPropagation()}>
-        <OrnamentBand stitch={5} />
-        <div className={storyStyles.header}>
-          <button className={storyStyles.closeBtn} onClick={closeAuth} aria-label="Close">✕</button>
+    <div className={styles.backdrop} onClick={closeAuth} role="dialog" aria-modal="true">
+      <div className={styles.panel} onClick={e => e.stopPropagation()}>
+        <div className={styles.header}>
+          <button className={styles.closeBtn} onClick={closeAuth} aria-label="Close">✕</button>
         </div>
         <div className={styles.tabs}>
           <button className={`${styles.tab} ${tab === 'signIn' ? styles.tabActive : ''}`} onClick={() => setTab('signIn')}>
@@ -51,7 +48,7 @@ export function AuthModal() {
             {t.auth.tabs.signUp}
           </button>
         </div>
-        <div className={storyStyles.body}>
+        <div className={styles.body}>
           {tab === 'signIn' && <SignInForm onSuccess={handleSuccess} />}
           {tab === 'signUp' && <SignUpForm onSuccess={handleSuccess} />}
           {tab === 'forgot' && <ForgotPasswordForm />}
