@@ -109,6 +109,11 @@ class NarrationServiceTest {
         assertThat(resp.status()).isEqualTo("GENERATING");
         verify(repository).findById("s4");
         verify(repository, never()).findByIdAndUserId(any(), any());
+        // Synthesis is fire-and-forget on boundedElastic; await its completion so the
+        // synthesize/encode/store/markReady stubs are consumed before strict-stubbing
+        // verification runs (otherwise this races and flakes as UnnecessaryStubbing).
+        await().atMost(ofSeconds(3)).untilAsserted(() ->
+                verify(repository).markNarrationReady("s4", "narration/s4.wav"));
     }
 
     @Test

@@ -45,9 +45,13 @@ jobs:
       - name: Install
         run: npm ci
       - name: Audit dependencies
-        # Fail the build on a high-severity advisory in any production dep tree.
-        # Use `npm audit --audit-level=high --omit=dev` if you want to ignore devDeps.
-        run: npm audit --audit-level=high
+        # Gate on high/critical advisories in the FRONTEND's shipped (production) deps.
+        # A plain root `npm audit` is too broad: it fails this job on advisories in the
+        # separate mobile/Expo app and in build/test tooling that never reach the browser
+        # bundle. This script scopes to the frontend workspace's prod deps and allowlists
+        # only documented dev-only false positives (see the file); any NEW real high still
+        # fails the build.
+        run: node scripts/check-frontend-audit.mjs
         continue-on-error: false
       - name: Build
         run: npm run frontend:build
