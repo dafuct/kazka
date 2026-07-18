@@ -1,87 +1,107 @@
-/* Казкар — A3 «Гуцульська» design tokens.
-   Hutsul counted cross-stitch direction: warm Carpathian linen + aida cloth,
-   dark-red (maroon) frames with gold pinlines, multicolour stitch threads.
-   The existing semantic token NAMES are preserved so every var() reference
-   across the app cascades to the new palette automatically. */
+/* Казкар — "paper craft night" design tokens (raw/assets/design_handoff_kazkar_web).
+   Build target: dark theme + warm (terracotta) palette + teal night background.
+   Single dark theme — no [data-theme] switching.
+   Legacy semantic token NAMES are preserved so every var() reference across
+   the app cascades to the new palette automatically. */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  /* ── Surfaces ── */
-  --color-bg:           #DBD2BD;  /* page gutter — deepest linen so framed boards pop */
-  --color-surface:      #F5F2E9;  /* aida cloth — nav, cards, sidebar, modals */
-  --color-surface-2:    #EFEADB;  /* slightly deeper cloth (hover) */
-  --color-surface-deep: #E3DAC5;  /* deepest linen (wells, insets) */
+  /* ── Handoff-native surfaces ── */
+  --bg: #122726;
+  --bg-top: #183332;
+  --sheet: #1D3B39;
+  --card: #204240;
+  --card-warm: #2A524F;
+  --reader-bg: #0E201F;
+  --nav: rgba(18, 39, 38, 0.85);
 
-  /* Alternating section "layers" — clearly brighter than the gutter */
-  --kz-layer-1: #ECE4D2;  /* darker layer */
-  --kz-layer-2: #FBF7EC;  /* lighter layer (warmer/brighter) */
+  /* ── Ink ── */
+  --ink: #ECE8F7;
+  --ink-soft: #B4AECB;
+  --ink-faint: #847E9E;
 
-  /* Faint aida square-grid texture for boards */
-  --kz-grid-img:
-    repeating-linear-gradient(0deg,  rgba(42,32,24,0.05) 0 1px, transparent 1px 6px),
-    repeating-linear-gradient(90deg, rgba(42,32,24,0.045) 0 1px, transparent 1px 6px);
+  /* ── Accents (warm / terracotta on dark) ── */
+  --honey: #E07142;
+  --honey-deep: #C85B30;
+  --honey-soft: #302A48;
+  --coral: #4FA79A;
+  --coral-soft: #25352F;
+  --berry: #D27596;
+  --berry-soft: #3F2730;
+  --sky: #5FA8C4;
+  --sky-soft: #22333B;
+  --leaf: #84B562;
+  --leaf-soft: #283620;
+  --plum: #A98BDD;
+  --plum-soft: #2C2340;
 
-  /* ── Text ── */
-  --color-text:       #2A211A;  /* ink */
-  --color-text-muted: #7A6446;
-  --color-text-faint: #A6906B;
+  /* ── Lines / shadow / tape ── */
+  --border: rgba(236, 232, 247, 0.13);
+  --border-strong: rgba(236, 232, 247, 0.22);
+  --shadow: rgba(0, 0, 0, 0.45);
+  --tape: rgba(150, 140, 190, 0.42);
 
-  /* ── Brand ──
-     --color-magic was the old purple accent; it now carries maroon so every
-     accent/link/focus reference becomes maroon without touching components. */
-  --color-magic:      #7E2A33;  /* maroon — frames, bars, buttons, headings, links */
-  --color-magic-soft: rgba(126, 42, 51, 0.10);  /* soft maroon panel tint */
-  --color-magic-glow: rgba(214, 162, 58, 0.45); /* gold glow */
-  --color-ember:      #C0402C;  /* thread red — secondary warm accent */
-  --color-gold:       #D6A23A;  /* pinlines, accents, active underline */
-  --color-forest:     #2F6B43;  /* thread green */
-  --color-night:      #1A1410;  /* deep Carpathian night (bedtime sections) */
+  /* ── Legacy semantic aliases (cascade to the new palette) ── */
+  --color-bg: var(--bg);
+  --color-surface: var(--sheet);
+  --color-surface-2: var(--card);
+  --color-surface-deep: var(--card-warm);
+  --kz-layer-1: var(--bg-top);
+  --kz-layer-2: var(--sheet);
+  --kz-grid-img: none;
+  --color-text: var(--ink);
+  --color-text-muted: var(--ink-soft);
+  --color-text-faint: var(--ink-faint);
+  --color-magic: var(--honey);
+  --color-magic-soft: var(--honey-soft);
+  --color-magic-glow: rgba(224, 113, 66, 0.35);
+  --color-ember: var(--honey-deep);
+  --color-gold: #E2B454;
+  --color-forest: var(--leaf);
+  --color-night: var(--reader-bg);
 
-  /* ── Aliases used by feature components — must resolve in both themes ── */
-  --surface:       var(--color-surface);
-  --surface-hover: var(--color-surface-2);
-  --border:        rgba(42, 32, 24, 0.20);   /* --kz-line: input/card hairline */
-  --muted:         var(--color-text-muted);
-  --accent:        var(--color-magic);
-  --text:          var(--color-text);
-  --text-1:        var(--color-text);
+  --surface: var(--sheet);
+  --surface-hover: var(--card);
+  --muted: var(--ink-soft);
+  --accent: var(--honey);
+  --text: var(--ink);
+  --text-1: var(--ink);
 
-  /* ── Hutsul-native tokens (signature framing) ── */
-  --kz-page:   var(--color-bg);
-  --kz-aida:   var(--color-surface);
-  --kz-ink:    var(--color-text);
-  --kz-muted:  var(--color-text-muted);
-  --kz-faint:  var(--color-text-faint);
-  --kz-maroon: var(--color-magic);
-  --kz-gold:   var(--color-gold);
-  --kz-line:   var(--border);
-  --kz-aida-grid: rgba(120, 110, 90, 0.18); /* fabric grid drawn by StitchCanvas */
+  --kz-page: var(--bg);
+  --kz-aida: var(--sheet);
+  --kz-ink: var(--ink);
+  --kz-muted: var(--ink-soft);
+  --kz-faint: var(--ink-faint);
+  --kz-maroon: var(--honey);
+  --kz-gold: var(--color-gold);
+  --kz-line: var(--border);
+  --kz-aida-grid: transparent;
 
-  /* ── Thread palette (cross-stitch rings) ── */
-  --kz-thread-red:    #C0402C;
-  --kz-thread-gold:   #D6A23A;
-  --kz-thread-green:  #2F6B43;
-  --kz-thread-teal:   #2E6E82;
-  --kz-thread-maroon: #7E2A33;
-  --kz-thread-black:  #211C18;
-  --kz-thread-berry:  #9C2F4A;
+  --kz-thread-red: #E07142;
+  --kz-thread-gold: #E2B454;
+  --kz-thread-green: #84B562;
+  --kz-thread-teal: #4FA79A;
+  --kz-thread-maroon: #C85B30;
+  --kz-thread-black: #B4AECB;
+  --kz-thread-berry: #D27596;
 
   /* ── Type ── */
-  --font-display: 'Oswald', 'Arial Narrow', sans-serif;        /* UPPERCASE, condensed */
-  --font-body:    'PT Sans', system-ui, sans-serif;
-  --font-story:   'PT Sans', Georgia, serif;
-  --font-mono:    ui-monospace, monospace;
+  --font-display: 'Comfortaa', system-ui, sans-serif;
+  --font-head: var(--font-display);
+  --font-body: 'Nunito', -apple-system, system-ui, sans-serif;
+  --font-story: 'Lora', Georgia, serif;
+  --font-mono: ui-monospace, monospace;
 
-  /* ── Radii — Hutsul is square-edged; corners flattened ── */
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
+  /* ── Radii — soft rounded UI; taped cards use their own 3px ── */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
 
-  /* ── Shadows — warm, ink-based ── */
-  --shadow-sm: 0 1px 4px rgba(42,32,24,.10);
-  --shadow-md: 0 4px 16px rgba(42,32,24,.14);
-  --shadow-lg: 0 8px 32px rgba(42,32,24,.18);
+  /* ── Shadows ── */
+  --shadow-sm: 0 4px 12px var(--shadow);
+  --shadow-md: 0 8px 22px var(--shadow);
+  --shadow-lg: 0 20px 42px var(--shadow);
 
   /* ── Spacing ── */
   --spacing-1: 4px;
@@ -95,56 +115,13 @@
   --spacing-12: 48px;
   --spacing-16: 64px;
 
-  /* ── Layout (reference px from handoff) ── */
-  --kz-nav-h: 78px;
+  /* ── Layout ── */
+  --kz-nav-h: 70px;
   --kz-reader-nav-h: 66px;
   --kz-sidebar-w: 320px;
   --kz-reader-col-w: 720px;
 
+  /* ── Motion ── */
+  --ease-pop: cubic-bezier(.34, 1.56, .64, 1);
   --transition: 200ms ease;
-}
-
-/* ── Dark Carpathian night ──
-   Not specified in the handoff — derived so the embroidery reads at night:
-   stained-wood ground, dark warm cloth, warm-cream ink, brightened threads. */
-[data-theme="dark"] {
-  color-scheme: dark;
-
-  --color-bg:           #15100A;  /* page gutter — darkest warm wood-black */
-  --color-surface:      #2C2115;  /* dark cloth (aida at night) */
-  --color-surface-2:    #372A1A;
-  --color-surface-deep: #44351F;
-
-  /* Alternating section "layers" — clearly brighter than the gutter so boards pop */
-  --kz-layer-1: #281E13;  /* darker layer */
-  --kz-layer-2: #352716;  /* lighter layer (warmer) */
-
-  /* Faint aida square-grid texture for boards (light threads on dark cloth) */
-  --kz-grid-img:
-    repeating-linear-gradient(0deg,  rgba(232,214,176,0.05) 0 1px, transparent 1px 6px),
-    repeating-linear-gradient(90deg, rgba(232,214,176,0.04) 0 1px, transparent 1px 6px);
-
-  --color-text:       #ECE3D2;  /* warm cream */
-  --color-text-muted: #B59B78;
-  --color-text-faint: #8A7350;
-
-  --color-magic:      #C85761;  /* maroon brightened to read on dark */
-  --color-magic-soft: rgba(200, 87, 97, 0.20);
-  --color-magic-glow: rgba(226, 180, 84, 0.40);
-  --color-ember:      #D4543E;
-  --color-gold:       #E2B454;
-  --color-forest:     #4E9A66;
-  --color-night:      #0E0A07;
-
-  --border:       rgba(230, 210, 170, 0.16);
-  --kz-aida-grid: rgba(220, 205, 170, 0.14);
-
-  /* Brightened thread palette for dark cloth */
-  --kz-thread-red:    #DA5A44;
-  --kz-thread-gold:   #E2B454;
-  --kz-thread-green:  #4E9A66;
-  --kz-thread-teal:   #4A98AE;
-  --kz-thread-maroon: #C85761;
-  --kz-thread-black:  #C9BCA6;  /* "black" thread inverts to a warm light on dark */
-  --kz-thread-berry:  #C9547A;
 }
