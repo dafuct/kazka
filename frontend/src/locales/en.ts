@@ -49,6 +49,18 @@ export const en: Locale = {
     generating: 'Generating...',
     generatingHint: 'Good tales take their time to unfold — this may take a few minutes',
   },
+  create: {
+    placeholder: 'Write me a story about…',
+    quick: 'Quick settings',
+    chAge: 'Age',
+    chLength: 'Length',
+    chLang: 'Language',
+    more: 'More options',
+    charactersName: 'Characters',
+    submit: '✦ Create',
+    genTitle: 'Weaving your story…',
+    genSub: 'This can take a minute — a good tale hates to be rushed',
+  },
   story: {
     illustrate: 'Generate illustration',
     illustrating: 'Drawing...',

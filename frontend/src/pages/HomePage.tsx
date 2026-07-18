@@ -1,4 +1,5 @@
 import { useEffect, useRef, Fragment } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ScMotif, SCM, THREAD } from '../components/stitch/StitchCanvas'
 import { IllustrationCarousel } from '../components/illustrations/IllustrationCarousel'
 import { HowItWorks } from '../components/home/HowItWorks'
@@ -8,7 +9,6 @@ import { NightCta } from '../components/home/NightCta'
 import { AvatarInitials } from '../components/children/AvatarInitials'
 import { HolidayChip } from '../components/holidays/HolidayChip'
 import { useLocale } from '../lib/LocaleContext'
-import { useStoryModal } from '../lib/StoryModalContext'
 import { useAuth } from '../lib/AuthContext'
 import { useAuthModal } from '../lib/AuthModalContext'
 import { useChildren } from '../lib/ChildrenContext'
@@ -59,14 +59,14 @@ function ParticleField() {
 
 export function HomePage() {
   const { t } = useLocale()
-  const { openModal } = useStoryModal()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { openAuth } = useAuthModal()
   const { active } = useChildren()
   const tc = (t as any).children ?? {}
   const tryClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault()
-    if (!user) openAuth('signIn'); else openModal()
+    if (!user) openAuth('signIn'); else navigate('/create')
     handleRipple(e)
   }
   const heroImgRef = useRef<HTMLDivElement>(null)

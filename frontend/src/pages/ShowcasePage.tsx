@@ -1,24 +1,23 @@
 import { useEffect, useState } from 'react'
 import { OrnamentBand } from '../components/stitch/OrnamentBand'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useLocale } from '../lib/LocaleContext'
 import { useAuthModal } from '../lib/AuthModalContext'
 import { useAuth } from '../lib/AuthContext'
-import { useStoryModal } from '../lib/StoryModalContext'
 import { showcase } from '../lib/apiClient'
 import type { ShowcaseStoryDto } from '../lib/apiClient'
 import styles from './ShowcasePage.module.css'
 
-/** Prominent CTA: logged-out → sign up; logged-in → open the create-tale modal. */
+/** Prominent CTA: logged-out → sign up; logged-in → navigate to the create-tale page. */
 export function ShowcaseCta() {
   const { t } = useLocale()
   const { openAuth } = useAuthModal()
   const { user } = useAuth()
-  const { openModal } = useStoryModal()
+  const navigate = useNavigate()
   const ts = t.showcase
   const handleClick = () => {
     if (!user) openAuth('signUp')
-    else openModal()
+    else navigate('/create')
   }
   return (
     <section className={styles.cta}>

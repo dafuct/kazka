@@ -2,13 +2,11 @@ import { useEffect, useRef } from 'react'
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { ThemeProvider } from './lib/ThemeContext'
 import { LocaleProvider } from './lib/LocaleContext'
-import { StoryModalProvider } from './lib/StoryModalContext'
 import { AuthProvider, useAuth } from './lib/AuthContext'
 import { ChildrenProvider } from './lib/ChildrenContext'
 import { AuthModalProvider } from './lib/AuthModalContext'
 import { ActiveStoryProvider, useActiveStory } from './lib/ActiveStoryContext'
 import { StarField } from './components/atmosphere/StarField'
-import { StoryModal } from './components/modal/StoryModal'
 import { ProgressWidget } from './components/comics/ProgressWidget'
 import { AuthModal } from './components/auth/AuthModal'
 import { Nav } from './components/chrome/Nav'
@@ -32,6 +30,7 @@ import { ChildrenListPage } from './pages/ChildrenListPage'
 import { CharacterLibraryPage } from './pages/CharacterLibraryPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { LegalPage } from './pages/legal/LegalPage'
+import { CreatePage } from './pages/CreatePage'
 
 function ScrollProgress() {
   const barRef = useRef<HTMLDivElement>(null)
@@ -127,6 +126,7 @@ function AppShell() {
             <Route path="/" element={<HomeOrShowcase />} />
             <Route path="/showcase" element={<ShowcasePage />} />
             <Route path="/showcase/:id" element={<ShowcaseDetailPage />} />
+            <Route path="/create" element={<RequireAuth><RequireChild><CreatePage /></RequireChild></RequireAuth>} />
             <Route path="/stories" element={<RequireAuth><RequireChild><ArchivePage /></RequireChild></RequireAuth>} />
             <Route path="/stories/:id" element={<RequireAuth><RequireChild><StoryDetailPage /></RequireChild></RequireAuth>} />
             <Route path="/verify-email" element={<EmailVerifiedPage />} />
@@ -145,7 +145,6 @@ function AppShell() {
           </Routes>
         </main>
         <Footer />
-        <StoryModal />
         <AuthModal />
         <ActiveStoryProgressWidget />
       </div>
@@ -161,11 +160,9 @@ export default function App() {
           <AuthProvider>
             <ChildrenProvider>
               <AuthModalProvider>
-                <StoryModalProvider>
-                  <ActiveStoryProvider>
-                    <AppShell />
-                  </ActiveStoryProvider>
-                </StoryModalProvider>
+                <ActiveStoryProvider>
+                  <AppShell />
+                </ActiveStoryProvider>
               </AuthModalProvider>
             </ChildrenProvider>
           </AuthProvider>

@@ -1,0 +1,119 @@
+.wrap { max-width: 680px; margin: 0 auto; padding: 48px 24px 80px; }
+
+.card {
+  background: var(--sheet);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 34px var(--shadow);
+}
+
+.input {
+  width: 100%;
+  min-height: 120px;
+  border: none;
+  background: transparent;
+  resize: none;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 24px 22px 6px;
+  line-height: 1.5;
+}
+.input::placeholder { color: var(--ink-faint); }
+
+.charsRow { padding: 6px 20px 16px; }
+.charsLabel {
+  font-size: 12px; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px;
+}
+
+.qset { padding: 18px 20px; border-top: 1px solid var(--border); }
+.qlbl {
+  font-size: 12px; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px;
+}
+.qrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.qchip {
+  padding: 10px 16px; border-radius: 999px;
+  background: var(--card-warm); border: 1px solid var(--border);
+  font-weight: 700; font-size: 14px; color: var(--ink-soft);
+  cursor: pointer; transition: .2s;
+}
+.qchip:hover { border-color: var(--border-strong); }
+.qchip b { color: var(--ink); font-weight: 800; }
+.qsubmit { margin-left: auto; }
+
+.moreHead {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; cursor: pointer;
+  color: var(--honey);
+  font-family: var(--font-head); font-weight: 600; font-size: 16px;
+  border-top: 1px solid var(--border);
+  background: none; border-left: none; border-right: none; border-bottom: none;
+  width: 100%;
+}
+.chev { transition: transform .2s; font-size: 18px; }
+.chevOpen { transform: rotate(180deg); }
+
+.orow { padding: 15px 20px; border-top: 1px solid var(--border); }
+.orowHead { display: flex; align-items: center; gap: 11px; cursor: pointer; }
+.orowName { font-family: var(--font-head); font-weight: 600; font-size: 17px; color: var(--ink); }
+.orowVal {
+  padding: 4px 12px; border-radius: 999px;
+  background: var(--honey-soft); color: var(--honey);
+  font-weight: 700; font-size: 13px;
+}
+.opts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.oopt {
+  padding: 9px 15px; border-radius: 999px;
+  background: var(--card-warm); border: 1.5px solid var(--border);
+  font-weight: 700; font-size: 14px; color: var(--ink-soft);
+  cursor: pointer; transition: .15s;
+}
+.oopt:hover { border-color: var(--border-strong); }
+.ooptOn { background: var(--honey); border-color: var(--honey); color: #fff; }
+
+.magicToggle {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 9px 15px; border-radius: 999px;
+  background: var(--card-warm); border: 1.5px solid var(--border);
+  font-weight: 700; font-size: 14px; color: var(--ink-soft);
+  cursor: pointer; transition: .15s; margin-top: 14px;
+}
+.magicToggleOn { background: var(--plum-soft); border-color: var(--plum); color: var(--plum); }
+.magicToggle input { display: none; }
+
+.error {
+  margin: 14px 0 0;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--berry-soft);
+  color: var(--berry);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.holiday { margin-bottom: 14px; }
+
+/* generating state */
+.genWrap { min-height: 70vh; display: grid; place-items: center; position: relative; overflow: hidden; }
+.genEmoji { position: absolute; opacity: .5; }
+.genCenter { text-align: center; position: relative; }
+.genOrb {
+  width: 110px; height: 110px; border-radius: 50%;
+  margin: 0 auto 28px; display: grid; place-items: center;
+  background: var(--card);
+  box-shadow: 0 12px 34px var(--honey);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.genStar { font-size: 50px; animation: spin 3s linear infinite; color: var(--honey); }
+.genTitle { font-size: 30px; margin-bottom: 8px; }
+.genSub { font-size: 16px; font-weight: 600; color: var(--ink-soft); max-width: 320px; margin: 0 auto; }
+
+/* verify-email panel */
+.verify { text-align: center; padding: 48px 24px; }
+.verifyTitle { font-size: 24px; margin-bottom: 10px; }
+.verifyBody { font-weight: 600; color: var(--ink-soft); margin-bottom: 20px; }

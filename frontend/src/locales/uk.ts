@@ -47,6 +47,18 @@ export const uk = {
     generating: 'Створюємо казку...',
     generatingHint: 'Це може зайняти декілька хвилин — добра казка не любить поспіху',
   },
+  create: {
+    placeholder: 'Напиши мені казку про…',
+    quick: 'Швидкі налаштування',
+    chAge: 'Вік',
+    chLength: 'Довжина',
+    chLang: 'Мова',
+    more: 'Більше опцій',
+    charactersName: 'Персонажі',
+    submit: '✦ Створити',
+    genTitle: 'Плетемо казку…',
+    genSub: 'Це може зайняти хвилину — добра казка не любить поспіху',
+  },
   story: {
     illustrate: 'Намалювати ілюстрацію',
     illustrating: 'Малюємо...',

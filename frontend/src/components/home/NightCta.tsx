@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useReveal } from '../../lib/useReveal'
 import { handleRipple } from '../../lib/ripple'
-import { useStoryModal } from '../../lib/StoryModalContext'
 import { useAuth } from '../../lib/AuthContext'
 import { useAuthModal } from '../../lib/AuthModalContext'
 import { useLocale } from '../../lib/LocaleContext'
@@ -26,12 +26,12 @@ function StarLayer() {
 
 export function NightCta() {
   const { t } = useLocale()
-  const { openModal } = useStoryModal()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const { openAuth } = useAuthModal()
   const tryClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault()
-    if (!user) openAuth('signIn'); else openModal()
+    if (!user) openAuth('signIn'); else navigate('/create')
     handleRipple(e)
   }
   const { ref: r1, visible: v1 } = useReveal()
