@@ -361,10 +361,11 @@ export const en: Locale = {
     loading: 'Loading tales…',
     empty: 'No sample tales yet. Please check back soon.',
     error: 'Could not load the tales. Please try again.',
-    read: 'Read the tale',
     readonlyNote: 'This is a read-only sample tale. Sign up to create your own.',
     notFound: 'This tale could not be found. It may no longer be a sample.',
     backToGallery: '← Back to samples',
+    week: '✦ Story of the week',
+    read: 'Read the story →',
     cta: {
       title: 'Create a tale just for your child',
       subtitle: 'With their real name, favourite heroes, and illustrations.',

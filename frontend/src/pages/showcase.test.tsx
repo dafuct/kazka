@@ -17,6 +17,10 @@ vi.mock('../lib/AuthModalContext', () => ({
   useAuthModal: () => ({ openAuth, closeAuth: vi.fn(), open: false, tab: 'signIn', setTab: vi.fn() }),
 }))
 
+vi.mock('../lib/AuthContext', () => ({
+  useAuth: () => ({ user: null, loading: false, refresh: vi.fn(), signOut: vi.fn(), resendVerification: vi.fn() }),
+}))
+
 const list = vi.fn()
 const get = vi.fn()
 vi.mock('../lib/apiClient', () => ({
@@ -63,10 +67,8 @@ describe('ShowcasePage (gallery, logged out)', () => {
 
     expect(await screen.findByText('The Three Acorns')).toBeInTheDocument()
     expect(screen.getByText('The Wise Rooster')).toBeInTheDocument()
-
-    // The cards link to the read-only reader route.
-    const link = screen.getByText('The Three Acorns').closest('a')
-    expect(link).toHaveAttribute('href', '/showcase/s1')
+    const link = screen.getByText('The Wise Rooster').closest('a')
+    expect(link).toHaveAttribute('href', '/showcase/s2')
 
     // The prominent sign-up CTA is present and wired to open the sign-up modal.
     const cta = screen.getByRole('button', { name: en.showcase.cta.button })
