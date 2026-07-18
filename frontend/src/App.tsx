@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from './lib/AuthContext'
 import { ChildrenProvider } from './lib/ChildrenContext'
 import { AuthModalProvider } from './lib/AuthModalContext'
 import { ActiveStoryProvider, useActiveStory } from './lib/ActiveStoryContext'
+import { StarField } from './components/atmosphere/StarField'
 import { StoryModal } from './components/modal/StoryModal'
 import { ProgressWidget } from './components/comics/ProgressWidget'
 import { AuthModal } from './components/auth/AuthModal'
@@ -50,26 +51,25 @@ function ScrollProgress() {
 
 function CursorTrail() {
   useEffect(() => {
-    // Carpathian thread tones, sparser than the old purple trail
-    const colors = ['#C0402C', '#D6A23A', '#2F6B43', '#2E6E82', '#9C2F4A']
     let lastX = 0, lastY = 0, lastTime = 0
     const onMove = (e: MouseEvent) => {
       const now = Date.now()
       const dx = e.clientX - lastX
       const dy = e.clientY - lastY
-      if (now - lastTime < 70 || Math.sqrt(dx * dx + dy * dy) < 32) return
+      if (now - lastTime < 40 || Math.sqrt(dx * dx + dy * dy) < 24) return
       lastX = e.clientX
       lastY = e.clientY
       lastTime = now
-      const size = 8 + Math.random() * 10
-      const color = colors[Math.floor(Math.random() * colors.length)]
-      const star = document.createElement('div')
-      star.className = 'cursorStar'
-      star.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="none"><path d="M8 0L9.5 6.5L16 8L9.5 9.5L8 16L6.5 9.5L0 8L6.5 6.5Z" fill="${color}"/></svg>`
-      star.style.left = (e.clientX - size / 2 + (Math.random() - 0.5) * 10) + 'px'
-      star.style.top = (e.clientY - size / 2 + (Math.random() - 0.5) * 10) + 'px'
+      const star = document.createElement('span')
+      star.className = 'star-fx'
+      star.textContent = '✦'
+      star.style.position = 'fixed'
+      star.style.zIndex = '9998'
+      star.style.left = e.clientX + 'px'
+      star.style.top = e.clientY + 'px'
+      star.style.fontSize = 9 + Math.random() * 11 + 'px'
       document.body.appendChild(star)
-      setTimeout(() => star.remove(), 800)
+      star.addEventListener('animationend', () => star.remove())
     }
     document.addEventListener('mousemove', onMove)
     return () => document.removeEventListener('mousemove', onMove)
@@ -115,37 +115,40 @@ function HomeOrShowcase() {
 function AppShell() {
   return (
     <>
-      <ScrollProgress />
-      <CursorTrail />
-      <GoogleAuthLanding />
-      <Nav />
-      <SuspensionBanner />
-      <main>
-        <Routes>
-          <Route path="/" element={<HomeOrShowcase />} />
-          <Route path="/showcase" element={<ShowcasePage />} />
-          <Route path="/showcase/:id" element={<ShowcaseDetailPage />} />
-          <Route path="/stories" element={<RequireAuth><RequireChild><ArchivePage /></RequireChild></RequireAuth>} />
-          <Route path="/stories/:id" element={<RequireAuth><RequireChild><StoryDetailPage /></RequireChild></RequireAuth>} />
-          <Route path="/verify-email" element={<EmailVerifiedPage />} />
-          <Route path="/reset-password" element={<PasswordResetPage />} />
-          <Route path="/admin/users" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
-          <Route path="/admin/moderation" element={<RequireAdmin><AdminModerationPage /></RequireAdmin>} />
-          <Route path="/settings" element={<RequireAuth><SettingsPage /></RequireAuth>} />
-          <Route path="/settings/children" element={<RequireAuth><ChildrenListPage /></RequireAuth>} />
-          <Route path="/settings/children/new" element={<RequireAuth><ChildProfileEditPage /></RequireAuth>} />
-          <Route path="/settings/children/:id" element={<RequireAuth><ChildProfileEditPage /></RequireAuth>} />
-          <Route path="/settings/children/:id/characters" element={<RequireAuth><CharacterLibraryPage /></RequireAuth>} />
-          <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
-          <Route path="/legal/terms"   element={<LegalPage slug="terms" />} />
-          <Route path="/legal/privacy" element={<LegalPage slug="privacy" />} />
-          <Route path="/legal/support" element={<LegalPage slug="support" />} />
-        </Routes>
-      </main>
-      <Footer />
-      <StoryModal />
-      <AuthModal />
-      <ActiveStoryProgressWidget />
+      <StarField />
+      <div className="appContent">
+        <ScrollProgress />
+        <CursorTrail />
+        <GoogleAuthLanding />
+        <Nav />
+        <SuspensionBanner />
+        <main>
+          <Routes>
+            <Route path="/" element={<HomeOrShowcase />} />
+            <Route path="/showcase" element={<ShowcasePage />} />
+            <Route path="/showcase/:id" element={<ShowcaseDetailPage />} />
+            <Route path="/stories" element={<RequireAuth><RequireChild><ArchivePage /></RequireChild></RequireAuth>} />
+            <Route path="/stories/:id" element={<RequireAuth><RequireChild><StoryDetailPage /></RequireChild></RequireAuth>} />
+            <Route path="/verify-email" element={<EmailVerifiedPage />} />
+            <Route path="/reset-password" element={<PasswordResetPage />} />
+            <Route path="/admin/users" element={<RequireAdmin><AdminUsersPage /></RequireAdmin>} />
+            <Route path="/admin/moderation" element={<RequireAdmin><AdminModerationPage /></RequireAdmin>} />
+            <Route path="/settings" element={<RequireAuth><SettingsPage /></RequireAuth>} />
+            <Route path="/settings/children" element={<RequireAuth><ChildrenListPage /></RequireAuth>} />
+            <Route path="/settings/children/new" element={<RequireAuth><ChildProfileEditPage /></RequireAuth>} />
+            <Route path="/settings/children/:id" element={<RequireAuth><ChildProfileEditPage /></RequireAuth>} />
+            <Route path="/settings/children/:id/characters" element={<RequireAuth><CharacterLibraryPage /></RequireAuth>} />
+            <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
+            <Route path="/legal/terms"   element={<LegalPage slug="terms" />} />
+            <Route path="/legal/privacy" element={<LegalPage slug="privacy" />} />
+            <Route path="/legal/support" element={<LegalPage slug="support" />} />
+          </Routes>
+        </main>
+        <Footer />
+        <StoryModal />
+        <AuthModal />
+        <ActiveStoryProgressWidget />
+      </div>
     </>
   )
 }
