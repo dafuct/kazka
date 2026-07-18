@@ -31,20 +31,25 @@ export function ShowcaseCta() {
 }
 
 export function ShowcasePage() {
-  const { t } = useLocale()
+  const { t, lang } = useLocale()
   const ts = t.showcase
-  const [tales, setTales] = useState<ShowcaseStoryDto[]>([])
+  const [allTales, setAllTales] = useState<ShowcaseStoryDto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   useEffect(() => {
     let cancelled = false
     showcase.list()
-      .then(list => { if (!cancelled) setTales(list) })
+      .then(list => { if (!cancelled) setAllTales(list) })
       .catch(() => { if (!cancelled) setError(true) })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [])
+
+  // Show tales in the active site language; fall back to all if none match
+  // (avoids an empty gallery when the curated set is single-language).
+  const inLang = allTales.filter(tale => tale.language === lang)
+  const tales = inLang.length > 0 ? inLang : allTales
 
   const cover = (tale: ShowcaseStoryDto) => tale.panels?.[0]?.imageUrl ?? null
   const spot = tales[0]

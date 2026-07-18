@@ -55,21 +55,37 @@
 
 .page {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   gap: 44px;
   align-items: center;
-  max-width: 1000px;
+  max-width: 1040px;
   width: 100%;
 }
 .pageNoIllus { grid-template-columns: 1fr; max-width: 680px; }
 
+/* Holds the persistent illustration, vertically centred, never cropped. */
+.illusWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 80vh;
+}
 .illus {
-  border-radius: 28px;
-  box-shadow: 0 20px 50px var(--shadow);
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
   width: 100%;
-  background: var(--card-warm);
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px var(--shadow);
+}
+
+.textCol {
+  min-width: 0;
+  align-self: center;
+  max-height: 82vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--card-warm) transparent;
 }
 
 .text {
@@ -83,11 +99,11 @@
 .dc {
   float: left;
   font-family: var(--font-head);
-  font-size: 76px;
-  line-height: .8;
-  font-weight: 600;
+  font-size: 3.1em;
+  line-height: 0.82;
+  font-weight: 700;
   color: var(--honey);
-  margin: 6px 12px 0 0;
+  margin: 0.02em 0.14em 0 0;
 }
 /* the drop-cap paragraph itself is not indented (the cap replaces the indent) */
 .dcPara { text-indent: 0; }
@@ -114,12 +130,16 @@
 .dotOn { width: 24px; background: var(--honey); }
 
 @media (max-width: 820px) {
-  .page { grid-template-columns: 1fr; gap: 20px; max-width: 520px; }
-  .illus { aspect-ratio: 16 / 10; max-height: 34vh; }
+  .page { grid-template-columns: 1fr; gap: 18px; max-width: 560px; }
+  .illusWrap { max-height: 42vh; }
+  .illus { max-height: 42vh; }
+  .textCol { max-height: none; overflow-y: visible; }
   .arrow { width: 46px; height: 46px; }
-  .stage { gap: 12px; padding: 6px 14px; }
+  .stage { gap: 10px; padding: 6px 12px; align-items: flex-start; }
   .text { font-size: 19px; }
 }
 @media (max-width: 560px) {
-  .dc { font-size: 60px; }
+  .top { padding: 14px 16px; }
+  .bottom { padding: 12px 16px 20px; }
+  .dc { font-size: 2.8em; }
 }

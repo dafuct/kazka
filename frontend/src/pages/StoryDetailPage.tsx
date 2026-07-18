@@ -4,7 +4,6 @@ import { ComicsReader } from '../components/comics/ComicsReader'
 import { ConfirmModal } from '../components/modal/ConfirmModal'
 import { AvatarInitials } from '../components/children/AvatarInitials'
 import { ExtractedCharactersPanel } from '../components/children/ExtractedCharactersPanel'
-import { LanguageToggle } from '../components/translation/LanguageToggle'
 import { TapedCard } from '../components/taped/TapedCard'
 import { StoryReader } from '../components/reader/StoryReader'
 import { useLocale } from '../lib/LocaleContext'
@@ -31,7 +30,6 @@ export function StoryDetailPage() {
   const [editContent, setEditContent] = useState('')
   const [saving, setSaving] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
-  const [viewLanguage, setViewLanguage] = useState<'original' | 'translated'>('original')
   const [showcaseBusy, setShowcaseBusy] = useState(false)
   const [reader, setReader] = useState<{ open: boolean; autoPlay: boolean }>({ open: false, autoPlay: false })
   const [choiceBusy, setChoiceBusy] = useState(false)
@@ -151,12 +149,8 @@ export function StoryDetailPage() {
     ? childProfiles.find(p => p.id === story.childProfileId) ?? null
     : null
 
-  const displayedContent = viewLanguage === 'translated' && story.translatedContent
-    ? story.translatedContent
-    : story.content
-  const readLanguage = viewLanguage === 'translated'
-    ? (story.translatedLanguage ?? story.language)
-    : story.language
+  const displayedContent = story.content
+  const readLanguage = story.language
 
   const branchingActive = story.isBranching === true && story.branchingState !== 'complete'
   const pendingChoices = branchingActive ? (story.pendingChoices ?? []) : []
@@ -168,14 +162,6 @@ export function StoryDetailPage() {
     <div className="wrap">
       <div className={styles.topBar}>
         <Link to="/stories" className="link-more">{t.detail.back}</Link>
-        <LanguageToggle
-          story={story}
-          active={viewLanguage}
-          onSwitch={(active, updated) => {
-            setViewLanguage(active)
-            if (updated) setStory(updated)
-          }}
-        />
       </div>
 
       <section className={styles.top}>
@@ -238,15 +224,13 @@ export function StoryDetailPage() {
           )}
 
           {story.childProfileId && story.extractionStatus !== 'SKIPPED' && (
-            <div className={styles.panelBlock}>
-              <ExtractedCharactersPanel
-                storyId={story.id}
-                childProfileId={story.childProfileId}
-                extractionStatus={story.extractionStatus as any}
-                language={viewLanguage === 'translated' ? (story.translatedLanguage ?? undefined) : story.language}
-                onConfirmed={() => refresh()}
-              />
-            </div>
+            <ExtractedCharactersPanel
+              storyId={story.id}
+              childProfileId={story.childProfileId}
+              extractionStatus={story.extractionStatus as any}
+              language={story.language}
+              onConfirmed={() => refresh()}
+            />
           )}
 
           <div className={styles.actions}>

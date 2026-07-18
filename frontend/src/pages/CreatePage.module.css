@@ -30,21 +30,12 @@
   text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px;
 }
 
-.qset { padding: 18px 20px; border-top: 1px solid var(--border); }
-.qlbl {
-  font-size: 12px; font-weight: 800; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px;
+.submitRow {
+  display: flex;
+  justify-content: flex-end;
+  padding: 18px 20px;
+  border-top: 1px solid var(--border);
 }
-.qrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.qchip {
-  padding: 10px 16px; border-radius: 999px;
-  background: var(--card-warm); border: 1px solid var(--border);
-  font-weight: 700; font-size: 14px; color: var(--ink-soft);
-  cursor: pointer; transition: .2s;
-}
-.qchip:hover { border-color: var(--border-strong); }
-.qchip b { color: var(--ink); font-weight: 800; }
-.qsubmit { margin-left: auto; }
 
 .moreHead {
   display: flex; align-items: center; justify-content: space-between;

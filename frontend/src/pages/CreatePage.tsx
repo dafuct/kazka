@@ -47,11 +47,6 @@ export function CreatePage() {
   const [branchBusy, setBranchBusy] = useState(false)
   const [branchError, setBranchError] = useState<string | null>(null)
 
-  const openOption = (row: OptionRow) => {
-    setMore(true)
-    setOpenRow(row)
-  }
-
   const canSubmit = !!idea.trim() && characters.length > 0 && !!active && !isSuspended
 
   async function handleSubmit(e: FormEvent) {
@@ -164,22 +159,10 @@ export function CreatePage() {
           />
         </div>
 
-        <div className={styles.qset}>
-          <div className={styles.qlbl}>{t.create.quick}</div>
-          <div className={styles.qrow}>
-            <button type="button" className={styles.qchip} onClick={() => openOption('age')}>
-              {t.create.chAge}: <b>{t.form.ageGroups[ageGroup]}</b>
-            </button>
-            <button type="button" className={styles.qchip} onClick={() => openOption('length')}>
-              {t.create.chLength}: <b>{t.form.lengths[length]}</b>
-            </button>
-            <button type="button" className={styles.qchip} onClick={() => openOption('lang')}>
-              {t.create.chLang}: <b>{t.form.languages[language]}</b>
-            </button>
-            <button type="submit" className={`btn btn-primary ${styles.qsubmit}`} disabled={!canSubmit}>
-              {t.create.submit}
-            </button>
-          </div>
+        <div className={styles.submitRow}>
+          <button type="submit" className="btn btn-primary" disabled={!canSubmit}>
+            {t.create.submit}
+          </button>
         </div>
 
         <button type="button" className={styles.moreHead} onClick={() => setMore(m => !m)}>
