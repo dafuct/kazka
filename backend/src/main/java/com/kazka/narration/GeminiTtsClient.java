@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.Base64;
@@ -65,8 +66,18 @@ public class GeminiTtsClient {
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(String.class)
-                .doOnError(e -> log.warn("geminiTts.synthesize failed (model={}): {}",
-                        props.getTtsModel(), e.getMessage()))
+                .doOnError(e -> {
+                    // For HTTP errors, e.getMessage() only carries the status line — the actual
+                    // cause (RESOURCE_EXHAUSTED / quota, INVALID_ARGUMENT, etc.) is in the body.
+                    if (e instanceof WebClientResponseException httpError) {
+                        log.warn("geminiTts.synthesize failed (model={}, status={}): {}",
+                                props.getTtsModel(), httpError.getStatusCode(),
+                                httpError.getResponseBodyAsString());
+                    } else {
+                        log.warn("geminiTts.synthesize failed (model={}): {}",
+                                props.getTtsModel(), e.getMessage());
+                    }
+                })
                 .map(this::extractFirstAudio);
     }
 

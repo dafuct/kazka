@@ -9,11 +9,12 @@ interface ReaderAudioBarProps {
   label: string
   stopLabel: string
   preparingLabel: string
+  errorLabel: string
   /** Start narration on mount (the opening click is the user gesture). */
   autoStart?: boolean
 }
 
-export function ReaderAudioBar({ storyId, text, lang = 'uk', label, stopLabel, preparingLabel, autoStart }: ReaderAudioBarProps) {
+export function ReaderAudioBar({ storyId, text, lang = 'uk', label, stopLabel, preparingLabel, errorLabel, autoStart }: ReaderAudioBarProps) {
   const { phase, progress, toggle, start } = useNarration(storyId, text, lang)
   const autoStarted = useRef(false)
 
@@ -25,15 +26,19 @@ export function ReaderAudioBar({ storyId, text, lang = 'uk', label, stopLabel, p
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStart])
 
-  const title = phase === 'preparing' ? preparingLabel : phase === 'playing' ? stopLabel : label
+  const title =
+    phase === 'preparing' ? preparingLabel :
+    phase === 'playing' ? stopLabel :
+    phase === 'error' ? errorLabel :
+    label
 
   return (
-    <div className={styles.bar}>
+    <div className={`${styles.bar} ${phase === 'error' ? styles.barError : ''}`}>
       <button
         type="button"
         className={styles.play}
         onClick={toggle}
-        aria-pressed={phase !== 'idle'}
+        aria-pressed={phase === 'playing'}
         aria-busy={phase === 'preparing'}
         aria-label={title}
       >

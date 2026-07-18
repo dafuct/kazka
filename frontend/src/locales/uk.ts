@@ -380,6 +380,7 @@ export const uk = {
     listen: 'Слухати озвучку',
     reading: 'Читає Казкар…',
     preparing: 'Готую озвучення…',
+    unavailable: 'Озвучка тимчасово недоступна',
     restart: '↺ Спочатку',
     close: 'Закрити',
     pageOf: (p: number, total: number) => `${p}/${total}`,

@@ -382,6 +382,7 @@ export const en: Locale = {
     listen: 'Listen to narration',
     reading: 'Kazkar is reading…',
     preparing: 'Preparing…',
+    unavailable: 'Narration is temporarily unavailable',
     restart: '↺ Restart',
     close: 'Close',
     pageOf: (p: number, total: number) => `${p}/${total}`,
