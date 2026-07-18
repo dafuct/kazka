@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { OrnamentBand } from '../../components/stitch/OrnamentBand'
 import ReactMarkdown from 'react-markdown'
 import { useLocale } from '../../lib/LocaleContext'
 import styles from './LegalPage.module.css'
@@ -36,7 +35,7 @@ export function LegalPage({ slug }: { slug: Slug }) {
   }, [title, t.brand])
 
   return (
-    <main className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
+    <main className={`${styles.page} kz-page`}>
       <article className={styles.prose}>
         <ReactMarkdown>{text}</ReactMarkdown>
       </article>

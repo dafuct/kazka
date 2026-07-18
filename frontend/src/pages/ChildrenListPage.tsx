@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { useChildren } from '../lib/ChildrenContext'
 import { children as childrenApi } from '../lib/apiClient'
 import { useLocale } from '../lib/LocaleContext'
@@ -18,7 +17,7 @@ export function ChildrenListPage() {
   }
 
   return (
-    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
+    <div className={`${styles.page} kz-page`}>
       <header className={styles.header}>
         <h1>{tc.listTitle ?? 'Children'}</h1>
         <Link to="/settings/children/new" className={styles.addBtn}>+ {tc.addChild ?? 'Add child'}</Link>

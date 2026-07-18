@@ -1,5 +1,4 @@
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { OrnamentBand } from '../components/stitch/OrnamentBand'
 import { useLocale } from '../lib/LocaleContext'
 import { useAuth } from '../lib/AuthContext'
 import { useAuthModal } from '../lib/AuthModalContext'
@@ -17,7 +16,7 @@ export function EmailVerifiedPage() {
   useEffect(() => { if (ok) refresh() }, [ok, refresh])
 
   return (
-    <div className={`${styles.page} kz-page`}><OrnamentBand framed={false} stitch={5} cols={120} className="kz-orn-top" />
+    <div className={`${styles.page} kz-page`}>
       <h1 className={styles.heading}>
         {ok ? t.auth.messages.verifySuccess : t.auth.messages.verifyError}
       </h1>

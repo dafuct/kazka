@@ -8,7 +8,6 @@ import { SignUpForm } from './SignUpForm'
 import { ForgotPasswordForm } from './ForgotPasswordForm'
 import { GoogleButton } from './GoogleButton'
 import { AppleButton } from './AppleButton'
-import { OrnamentBand } from '../stitch/OrnamentBand'
 import styles from './AuthModal.module.css'
 
 export function AuthModal() {
@@ -38,7 +37,6 @@ export function AuthModal() {
   return createPortal(
     <div className={styles.backdrop} onClick={closeAuth} role="dialog" aria-modal="true">
       <div className={styles.panel} onClick={e => e.stopPropagation()}>
-        <OrnamentBand stitch={5} />
         <div className={styles.header}>
           <button className={styles.closeBtn} onClick={closeAuth} aria-label="Close">✕</button>
         </div>
