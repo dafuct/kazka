@@ -1,242 +1,96 @@
-.page {
-  padding: calc(var(--kz-nav-h) + 36px) 40px 80px;
-}
-
-.inner {
-  max-width: 1120px;
-  margin: 0 auto;
-}
-
-.state {
-  padding: var(--spacing-16);
-  text-align: center;
-  color: var(--color-text-muted);
-}
+.state { padding: 60px 24px; text-align: center; font-weight: 600; color: var(--ink-soft); }
 
 .topBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-4);
-  margin-bottom: var(--spacing-6);
-  padding-bottom: var(--spacing-4);
-  border-bottom: 2px solid var(--border);
+  gap: 14px;
+  padding-top: 24px;
+  margin-bottom: 6px;
 }
 
-.back {
-  display: inline-flex;
-  align-items: center;
-  color: var(--kz-maroon);
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.back:hover { color: var(--kz-maroon); filter: brightness(0.85); text-decoration: none; }
-
-.topMotif { display: inline-flex; }
-
-/* ── Two-pane reader ── */
-.layout {
+.top {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--kz-sidebar-w);
-  gap: var(--spacing-10);
+  grid-template-columns: .85fr 1.15fr;
+  gap: 44px;
   align-items: start;
+  padding-top: 20px;
 }
 
-.readingCol {
-  max-width: var(--kz-reader-col-w);
-  width: 100%;
-  margin: 0 auto;
-}
-
-.aside {
-  background: var(--color-surface);
-  border-left: 2px solid var(--kz-maroon);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-5);
-  position: sticky;
-  top: calc(var(--kz-nav-h) + 24px);
-}
-
-.asideMotif {
-  display: flex;
-  justify-content: center;
-}
-
-@media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; }
-  .aside { position: static; border-left: 0; border-top: 2px solid var(--kz-maroon); }
-}
+.coverCard { cursor: default; }
 
 .title {
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  text-align: center;
-  color: var(--kz-maroon);
-  line-height: 1.1;
-  margin-bottom: var(--spacing-4);
-  overflow-wrap: break-word;
+  font-size: clamp(32px, 4.5vw, 50px);
+  margin: 10px 0 4px;
+  color: var(--ink);
 }
-
-@media (max-width: 860px) {
-  .page { padding: calc(var(--kz-nav-h) + 24px) 18px 60px; }
-}
-
-.titleBand {
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
-  margin-bottom: var(--spacing-6);
-}
-
 .titleInput {
-  font-family: var(--font-display);
-  font-size: 1.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
   width: 100%;
-  padding: var(--spacing-2) var(--spacing-3);
-  border: 1.5px solid var(--kz-maroon);
-  border-radius: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  margin-bottom: var(--spacing-4);
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: clamp(26px, 3.5vw, 40px);
+  color: var(--ink);
+  background: var(--card);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin: 10px 0 4px;
+  outline: none;
 }
+.titleInput:focus { border-color: var(--honey); }
 
 .forChild {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin: -4px 0 12px 0;
-  font-size: 0.875rem;
-  font-style: italic;
-  color: var(--color-text-muted);
-}
-
-.meta {
-  display: flex;
-  gap: var(--spacing-2);
-  flex-wrap: wrap;
-}
-
-.tag {
-  font-family: var(--font-display);
-  font-size: 0.72rem;
+  gap: 7px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 4px var(--spacing-2);
-  background: var(--color-bg);
-  border: 1.5px solid var(--border);
-  border-radius: 0;
-  color: var(--color-text-muted);
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin-top: 6px;
 }
 
-.comicsBlock {
-  /* Shrink the maroon+gold frame to hug the comic image (centered, capped at the
-     image's own 560px) so the gold shows only as the intended 3px pinline — not a
-     thick band where the full-width container background bled past the image. */
-  width: fit-content;
-  max-width: 100%;
-  margin: 0 auto var(--spacing-8);
-}
+.meta { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0 24px; }
 
-.content {
-  font-family: var(--font-story);
-  font-size: 1.1875rem;
-  line-height: 1.72;
-  color: var(--color-text);
-  margin-bottom: var(--spacing-8);
-}
+.cta { display: flex; gap: 12px; margin-bottom: 30px; flex-wrap: wrap; }
 
-.content p {
-  text-indent: 1.6em;
-  margin: 0;
-}
-
-.firstPara { text-indent: 0; }
-.firstPara::first-letter {
-  font-family: var(--font-display);
-  font-size: 3.4em;
-  font-weight: 700;
-  color: var(--kz-maroon);
-  float: left;
-  /* Raised initial. Vertical: line-height 0.8 + negative top margin lifts the cap so the wrapped
-     text begins lower beside it. Horizontal: the display font gives the glyph a wide right-side
-     bearing, so a negative right margin pulls the first line snug against the cap (reads "Був").
-     NOTE: the -16px is tuned for «Б»'s advance — other first letters may sit a touch tighter/looser. */
-  line-height: 0.8;
-  margin: -0.3em -16px 0 0;
+.blurb {
+  font-size: 19px;
+  line-height: 1.65;
+  color: var(--ink);
+  margin-bottom: 24px;
+  max-width: 560px;
 }
 
 .contentInput {
   width: 100%;
-  padding: var(--spacing-4);
-  border: 1.5px solid var(--kz-maroon);
-  border-radius: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
   font-family: var(--font-story);
-  font-size: 1rem;
-  line-height: 1.8;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--card);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 20px;
+  outline: none;
   resize: vertical;
-  margin-bottom: var(--spacing-6);
+}
+.contentInput:focus { border-color: var(--honey); }
+
+.panelBlock {
+  background: var(--card-warm);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 20px 22px;
+  margin-bottom: 24px;
 }
 
-.actions {
-  display: flex;
-  gap: var(--spacing-3);
-  flex-wrap: wrap;
-  margin-top: var(--spacing-2);
-}
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.deleteBtn { color: var(--berry); border-color: var(--berry); }
 
-.editBtn,
-.saveBtn,
-.cancelBtn,
-.deleteBtn {
-  padding: 10px var(--spacing-5);
-  border-radius: 0;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: background var(--transition), color var(--transition), filter var(--transition);
+@media (max-width: 820px) {
+  .top { grid-template-columns: 1fr; gap: 24px; }
 }
-
-.editBtn {
-  border: 2px solid var(--kz-maroon);
-  color: var(--kz-maroon);
-  background: transparent;
+@media (max-width: 560px) {
+  .cta { flex-direction: column; }
 }
-.editBtn:hover { background: var(--kz-maroon); color: var(--color-surface); }
-
-.saveBtn {
-  border: 0;
-  background: var(--kz-maroon);
-  color: var(--color-surface);
-}
-.saveBtn:hover { filter: brightness(0.92); }
-.saveBtn:disabled { opacity: 0.6; cursor: default; }
-
-.cancelBtn {
-  border: 2px solid var(--border);
-  background: transparent;
-  color: var(--color-text-muted);
-}
-
-.deleteBtn {
-  border: 2px solid var(--color-ember);
-  color: var(--color-ember);
-  background: transparent;
-}
-.deleteBtn:hover { background: var(--color-ember); color: #fff; }

@@ -4,14 +4,13 @@ import { ComicsReader } from '../components/comics/ComicsReader'
 import { ConfirmModal } from '../components/modal/ConfirmModal'
 import { AvatarInitials } from '../components/children/AvatarInitials'
 import { ExtractedCharactersPanel } from '../components/children/ExtractedCharactersPanel'
-import { BranchingReader } from '../components/branching/BranchingReader'
 import { LanguageToggle } from '../components/translation/LanguageToggle'
-import { ReadAloud } from '../components/story/ReadAloud'
-import { ScMotif, ScBand, SCM, THREAD, BAND_PALETTE } from '../components/stitch/StitchCanvas'
+import { TapedCard } from '../components/taped/TapedCard'
+import { StoryReader } from '../components/reader/StoryReader'
 import { useLocale } from '../lib/LocaleContext'
 import { useChildren } from '../lib/ChildrenContext'
 import { useAuth } from '../lib/AuthContext'
-import { api, admin } from '../lib/apiClient'
+import { api, admin, branching } from '../lib/apiClient'
 import type { Story } from '../lib/types'
 import styles from './StoryDetailPage.module.css'
 
@@ -22,6 +21,7 @@ export function StoryDetailPage() {
   const { children: childProfiles } = useChildren()
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
+  const tb = (t as any).branching ?? {}
 
   const [story, setStory] = useState<Story | null>(null)
   const [loading, setLoading] = useState(true)
@@ -33,6 +33,9 @@ export function StoryDetailPage() {
   const [showDelete, setShowDelete] = useState(false)
   const [viewLanguage, setViewLanguage] = useState<'original' | 'translated'>('original')
   const [showcaseBusy, setShowcaseBusy] = useState(false)
+  const [reader, setReader] = useState<{ open: boolean; autoPlay: boolean }>({ open: false, autoPlay: false })
+  const [choiceBusy, setChoiceBusy] = useState(false)
+  const [choiceError, setChoiceError] = useState<string | null>(null)
 
   const refresh = useCallback(() => {
     if (!id) return
@@ -65,7 +68,7 @@ export function StoryDetailPage() {
     return () => clearInterval(interval)
   }, [story?.extractionStatus, story?.id])
 
-  // Poll while illustrations are being generated (panels filling in or status still PENDING).
+  // Poll while illustrations are being generated.
   useEffect(() => {
     if (!story) return
     if (story.illustrationStatus !== 'PENDING') return
@@ -119,16 +122,30 @@ export function StoryDetailPage() {
     }
   }, [story, t])
 
+  const pickChoice = useCallback(async (choiceId: string) => {
+    if (!story) return
+    setChoiceBusy(true)
+    setChoiceError(null)
+    try {
+      const resp = await branching.choose(story.id, choiceId)
+      setStory(prev => prev
+        ? {
+            ...prev,
+            content: resp.content ?? '',
+            pendingChoices: resp.isFinal ? [] : (resp.choices ?? []),
+            branchingState: (resp.isFinal ? 'complete' : prev.branchingState) as Story['branchingState'],
+          }
+        : prev)
+      if (resp.isFinal) refresh()
+    } catch (e: any) {
+      setChoiceError(e?.message ?? (tb.errorRetry ?? 'Something went wrong. Please refresh.'))
+    } finally {
+      setChoiceBusy(false)
+    }
+  }, [story, refresh, tb])
+
   if (loading) return <div className={styles.state}>...</div>
   if (error || !story) return <div className={styles.state}>{error ?? t.errors.loadFailed}</div>
-
-  if (story.isBranching === true && story.branchingState !== 'complete') {
-    return (
-      <div className={styles.page}>
-        <BranchingReader story={story} onComplete={refresh} />
-      </div>
-    )
-  }
 
   const childProfile = story.childProfileId
     ? childProfiles.find(p => p.id === story.childProfileId) ?? null
@@ -137,106 +154,91 @@ export function StoryDetailPage() {
   const displayedContent = viewLanguage === 'translated' && story.translatedContent
     ? story.translatedContent
     : story.content
-
-  const displayedTitle = story.title
   const readLanguage = viewLanguage === 'translated'
     ? (story.translatedLanguage ?? story.language)
     : story.language
 
-  const paragraphs = displayedContent
-    .split(/\n\s*\n+/)
-    .map(p => p.trim())
-    .filter(Boolean)
+  const branchingActive = story.isBranching === true && story.branchingState !== 'complete'
+  const pendingChoices = branchingActive ? (story.pendingChoices ?? []) : []
+  const cover = story.panels?.[0]?.imageUrl ?? null
+  const firstParagraph = displayedContent.split(/\n\s*\n+/).map(p => p.trim()).filter(Boolean)[0] ?? ''
+  const hasIllustration = story.panels.length > 0
 
   return (
-    <div className={styles.page}>
-      <div className={styles.inner}>
-        <div className={styles.topBar}>
-          <Link to="/stories" className={styles.back}>← {t.story.back}</Link>
-          <span className={styles.topMotif} aria-hidden="true">
-            <ScMotif rule={SCM.star8} n={11} stitch={4.5} palette={THREAD} ground={null} />
-          </span>
-          {!(story.isBranching && story.branchingState !== 'complete') && (
-            <LanguageToggle
-              story={story}
-              active={viewLanguage}
-              onSwitch={(active, updated) => {
-                setViewLanguage(active)
-                if (updated) setStory(updated)
-              }}
-            />
-          )}
+    <div className="wrap">
+      <div className={styles.topBar}>
+        <Link to="/stories" className="link-more">{t.detail.back}</Link>
+        <LanguageToggle
+          story={story}
+          active={viewLanguage}
+          onSwitch={(active, updated) => {
+            setViewLanguage(active)
+            if (updated) setStory(updated)
+          }}
+        />
+      </div>
+
+      <section className={styles.top}>
+        {/* Cover */}
+        <div className="fadein">
+          <TapedCard rotationKey={story.id} className={styles.coverCard}>
+            <ComicsReader story={story} onRetry={handleRetry} />
+          </TapedCard>
         </div>
 
-        <div className={styles.layout}>
-          {/* ── Reading column ── */}
-          <div className={styles.readingCol}>
-            {editing ? (
-              <input
-                className={styles.titleInput}
-                value={editTitle}
-                onChange={e => setEditTitle(e.target.value)}
-              />
-            ) : (
-              <h1 className={styles.title}>{displayedTitle}</h1>
-            )}
+        {/* Info */}
+        <div className="fadein">
+          {story.theme && <div className="eyebrow">{story.theme}</div>}
+          {editing ? (
+            <input className={styles.titleInput} value={editTitle} onChange={e => setEditTitle(e.target.value)} />
+          ) : (
+            <h1 className={styles.title}>{story.title}</h1>
+          )}
 
-            {childProfile && (
-              <p className={styles.forChild}>
-                <AvatarInitials name={childProfile.name} seed={childProfile.avatarSeed} size={18} />
-                <span>{(t as any).children?.forChild ? (t as any).children.forChild(childProfile.name) : `for ${childProfile.name}`}</span>
-              </p>
-            )}
+          {childProfile && (
+            <p className={styles.forChild}>
+              <AvatarInitials name={childProfile.name} seed={childProfile.avatarSeed} size={18} />
+              <span>{(t as any).children?.forChild ? (t as any).children.forChild(childProfile.name) : `for ${childProfile.name}`}</span>
+            </p>
+          )}
 
-            <div className={styles.titleBand} aria-hidden="true">
-              <ScBand cols={100} H={13} P={20} D={6} stitch={6} palette={BAND_PALETTE} ground={null} />
-            </div>
-
-            <div className={`${styles.comicsBlock} kz-illustration`}>
-              <ComicsReader story={story} onRetry={handleRetry} />
-            </div>
-
-            {editing ? (
-              <textarea
-                className={styles.contentInput}
-                value={editContent}
-                onChange={e => setEditContent(e.target.value)}
-                rows={20}
-              />
-            ) : (
-              <div className={styles.content}>
-                {paragraphs.map((para, i) => (
-                  <p key={i} className={i === 0 ? styles.firstPara : undefined}>{para}</p>
-                ))}
-              </div>
-            )}
+          <div className={styles.meta}>
+            <span className="badge">{t.form.ageGroups[story.ageGroup as '3-5' | '6-8' | '9-12']}</span>
+            <span className="badge">{t.form.lengths[story.length as 'short' | 'medium' | 'long']}</span>
+            <span className="badge">{t.form.languages[story.language as 'uk' | 'en'] ?? story.language.toUpperCase()}</span>
+            <span className="badge">{t.detail.audio}</span>
+            {hasIllustration && <span className="badge">{t.detail.illustrated}</span>}
           </div>
 
-          {/* ── Sidebar ── */}
-          <aside className={styles.aside}>
-            <div className={styles.asideMotif} aria-hidden="true">
-              <ScMotif rule={SCM.rose} n={17} stitch={6.5} palette={THREAD} ground="var(--color-surface)" />
+          {!editing && (
+            <div className={styles.cta}>
+              <button type="button" className="btn btn-primary btn-lg" onClick={() => setReader({ open: true, autoPlay: false })}>
+                {t.detail.read}
+              </button>
+              <button type="button" className="btn btn-soft btn-lg" onClick={() => setReader({ open: true, autoPlay: true })}>
+                {t.detail.listen}
+              </button>
             </div>
+          )}
 
-            {!editing && paragraphs.length > 0 && (
-              <ReadAloud
-                storyId={story.id}
-                text={paragraphs.join('\n\n')}
-                lang={readLanguage}
-                label={(t.story as any).readAloud ?? 'Читати вголос'}
-                stopLabel={(t.story as any).readAloudStop ?? 'Stop'}
-                preparingLabel={(t.story as any).readAloudPreparing ?? 'Preparing…'}
-                narrator={(t.story as any).narrator}
-              />
-            )}
+          {!editing && firstParagraph && (
+            <>
+              <div className="field-label">{t.detail.about}</div>
+              <p className={`serif ${styles.blurb}`}>{firstParagraph}</p>
+            </>
+          )}
 
-            <div className={styles.meta}>
-              <span className={styles.tag}>{story.ageGroup}</span>
-              <span className={styles.tag}>{story.length}</span>
-              <span className={styles.tag}>{story.language.toUpperCase()}</span>
-            </div>
+          {editing && (
+            <textarea
+              className={styles.contentInput}
+              value={editContent}
+              onChange={e => setEditContent(e.target.value)}
+              rows={20}
+            />
+          )}
 
-            {story.childProfileId && story.extractionStatus !== 'SKIPPED' && (
+          {story.childProfileId && story.extractionStatus !== 'SKIPPED' && (
+            <div className={styles.panelBlock}>
               <ExtractedCharactersPanel
                 storyId={story.id}
                 childProfileId={story.childProfileId}
@@ -244,41 +246,46 @@ export function StoryDetailPage() {
                 language={viewLanguage === 'translated' ? (story.translatedLanguage ?? undefined) : story.language}
                 onConfirmed={() => refresh()}
               />
-            )}
-
-            <div className={styles.actions}>
-              {editing ? (
-                <>
-                  <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
-                    {t.story.save}
-                  </button>
-                  <button className={styles.cancelBtn} onClick={() => setEditing(false)}>
-                    {t.story.cancel}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button className={styles.editBtn} onClick={() => setEditing(true)}>
-                    {t.story.edit}
-                  </button>
-                  {isAdmin && (
-                    <button
-                      className={styles.editBtn}
-                      onClick={handleToggleShowcase}
-                      disabled={showcaseBusy}
-                    >
-                      {story.showcase ? t.story.removeFromExamples : t.story.featureInExamples}
-                    </button>
-                  )}
-                  <button className={styles.deleteBtn} onClick={() => setShowDelete(true)}>
-                    {t.story.delete}
-                  </button>
-                </>
-              )}
             </div>
-          </aside>
+          )}
+
+          <div className={styles.actions}>
+            {editing ? (
+              <>
+                <button className="btn btn-primary btn-sm" onClick={handleSave} disabled={saving}>{t.story.save}</button>
+                <button className="btn btn-ghost btn-sm" onClick={() => setEditing(false)}>{t.story.cancel}</button>
+              </>
+            ) : (
+              <>
+                <button className="btn btn-ghost btn-sm" onClick={() => setEditing(true)}>{t.story.edit}</button>
+                {isAdmin && (
+                  <button className="btn btn-ghost btn-sm" onClick={handleToggleShowcase} disabled={showcaseBusy}>
+                    {story.showcase ? t.story.removeFromExamples : t.story.featureInExamples}
+                  </button>
+                )}
+                <button className={`btn btn-ghost btn-sm ${styles.deleteBtn}`} onClick={() => setShowDelete(true)}>
+                  {t.story.delete}
+                </button>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      </section>
+
+      {reader.open && (
+        <StoryReader
+          title={story.title}
+          text={displayedContent}
+          cover={cover}
+          onClose={() => setReader({ open: false, autoPlay: false })}
+          audio={{ storyId: story.id, lang: readLanguage, autoPlay: reader.autoPlay }}
+          choices={pendingChoices}
+          onPickChoice={pickChoice}
+          choiceBusy={choiceBusy}
+          choicePrompt={tb.choicePrompt ?? 'What happens next?'}
+          choiceError={choiceError}
+        />
+      )}
 
       {showDelete && (
         <ConfirmModal

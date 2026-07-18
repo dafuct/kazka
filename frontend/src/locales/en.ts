@@ -386,4 +386,12 @@ export const en: Locale = {
     close: 'Close',
     pageOf: (p: number, total: number) => `${p}/${total}`,
   },
+  detail: {
+    back: '← All stories',
+    read: '📖 Read the story',
+    listen: '▶ Listen',
+    about: 'What it’s about',
+    audio: '🔊 With narration',
+    illustrated: '🎨 Illustrated',
+  },
 }

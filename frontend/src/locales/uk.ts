@@ -384,6 +384,14 @@ export const uk = {
     close: 'Закрити',
     pageOf: (p: number, total: number) => `${p}/${total}`,
   },
+  detail: {
+    back: '← Усі казки',
+    read: '📖 Читати казку',
+    listen: '▶ Слухати',
+    about: 'Про що ця казка',
+    audio: '🔊 З озвучкою',
+    illustrated: '🎨 Ілюстрована',
+  },
 }
 
 export type Locale = typeof uk
