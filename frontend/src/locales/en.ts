@@ -1,7 +1,7 @@
 import type { Locale } from './uk'
 
 export const en: Locale = {
-  brand: 'Storybook World',
+  brand: 'Kazkar',
   nav: {
     home: 'Home',
     stories: 'Stories',
