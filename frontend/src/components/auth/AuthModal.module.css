@@ -13,19 +13,18 @@
 }
 
 .panel {
-  background: var(--color-surface);
+  background: var(--sheet);
   width: 100%;
-  max-width: 680px;
+  max-width: 480px;
   max-height: 90vh;
   overflow-y: auto;
-  border: 5px solid var(--kz-maroon);
-  box-shadow:
-    inset 0 0 0 3px var(--kz-gold),
-    0 40px 100px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
   animation: panelIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   scrollbar-width: thin;
-  scrollbar-color: var(--color-surface-deep) transparent;
+  scrollbar-color: var(--card-warm) transparent;
 }
 
 .header {
@@ -82,63 +81,67 @@
 }
 .tabs {
   display: flex;
-  gap: 0;
+  gap: 8px;
   padding: 0 24px 12px;
 }
 .tab {
   flex: 1;
-  border: 2px solid var(--kz-maroon);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 999px;
   background: transparent;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.95rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 12px;
-  color: var(--kz-maroon);
+  color: var(--ink-soft);
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
-.tab + .tab { border-left: 0; }
-.tab:hover { background: var(--color-magic-soft); }
+.tab:hover { background: var(--honey-soft); color: var(--honey); border-color: var(--honey); }
 .tabActive {
-  background: var(--kz-maroon);
-  color: var(--color-surface);
+  background: var(--honey);
+  color: #fff;
+  border-color: var(--honey);
 }
-.tabActive:hover { background: var(--kz-maroon); }
+.tabActive:hover { background: var(--honey); color: #fff; }
 .form { display: flex; flex-direction: column; gap: 14px; padding: 6px 24px 4px; }
 .field { display: flex; flex-direction: column; gap: 6px; }
 .label { font-size: 0.85rem; color: var(--color-text-muted); font-weight: 500; }
 .input {
-  border: 1.5px solid var(--border);
-  background: var(--color-bg);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 14px;
+  background: var(--card);
   color: var(--color-text);
   padding: 12px 14px;
   font-size: 0.95rem;
   font-family: var(--font-body);
 }
-.input:focus { outline: 2px solid var(--kz-maroon); outline-offset: 1px; border-color: var(--kz-maroon); }
+.input:focus { outline: none; border-color: var(--honey); }
 .fieldError { color: var(--color-ember); font-size: 0.8rem; }
 .submit {
-  background: var(--kz-maroon);
-  color: var(--color-surface);
+  background: linear-gradient(180deg, var(--honey), var(--honey-deep));
+  color: #fff;
   border: 0;
-  padding: 14px 16px;
+  border-radius: 999px;
+  padding: 15px 16px;
   font-size: 1rem;
   font-family: var(--font-display);
   font-weight: 700;
-  letter-spacing: 0.10em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: filter 0.15s;
+  box-shadow: 0 4px 12px var(--shadow);
+  transition: transform 0.2s var(--ease-pop), filter 0.15s;
 }
 .submit:disabled { opacity: 0.6; cursor: progress; }
-.submit:hover:not(:disabled) { filter: brightness(0.92); }
+.submit:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.06); }
 .googleBtn {
   background: var(--color-surface-deep);
   color: var(--color-text);
   border: 1px solid var(--color-surface-deep);
-  border-radius: 12px;
+  border-radius: 999px;
   padding: 11px 16px;
   font-size: 0.95rem;
   text-decoration: none;
@@ -151,7 +154,7 @@
   background: #000;
   color: #fff;
   border: 1px solid #000;
-  border-radius: 12px;
+  border-radius: 999px;
   padding: 11px 16px;
   font-size: 0.95rem;
   font-weight: 500;
@@ -196,14 +199,16 @@
   margin: -6px 0 0;
 }
 .banner {
-  background: #FEE2E2;
-  color: #991B1B;
+  background: var(--berry-soft);
+  color: var(--berry);
+  border: 1px solid var(--berry);
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 12px;
   margin: 0 24px 6px;
   font-size: 0.88rem;
 }
 .bannerInfo {
-  background: #DCFCE7;
-  color: #14532D;
+  background: var(--leaf-soft);
+  color: var(--leaf);
+  border-color: var(--leaf);
 }
