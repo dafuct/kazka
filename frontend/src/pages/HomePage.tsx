@@ -74,11 +74,6 @@ export function HomePage() {
               />
               <button type="submit" className="btn btn-primary">{t.home.createBtn}</button>
             </form>
-            <div className={styles.trust}>
-              <span>{t.home.trust1}</span>
-              <span>{t.home.trust2}</span>
-              <span>{t.home.trust3}</span>
-            </div>
           </div>
           <div className={`${styles.heroArt} fadein`}>
             <TapedCard

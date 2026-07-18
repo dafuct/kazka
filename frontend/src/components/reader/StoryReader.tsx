@@ -58,7 +58,7 @@ export function StoryReader({
 
   const paras = pages[page] ?? []
   const last = page === total - 1
-  const showIllus = page === 0 && !!cover
+  const showIllus = !!cover
 
   return (
     <div className={styles.reader} role="dialog" aria-modal="true" aria-label={title}>
@@ -71,10 +71,14 @@ export function StoryReader({
       <div className={styles.stage}>
         <button type="button" className={page === 0 ? `${styles.arrow} ${styles.hide}` : styles.arrow} onClick={() => go(-1)} aria-label="‹">‹</button>
 
-        <div className={showIllus ? styles.page : `${styles.page} ${styles.pageNoIllus}`} key={page}>
-          {showIllus && <img className={`${styles.illus} fadein`} src={cover!} alt="" aria-hidden="true" />}
-          <div className="fadein">
-            {page === 0 && <div className="eyebrow" style={{ marginBottom: 10 }}>{t.reader.eyebrow}</div>}
+        <div className={showIllus ? styles.page : `${styles.page} ${styles.pageNoIllus}`}>
+          {/* Illustration persists across pages — only the text column paginates. */}
+          {showIllus && (
+            <div className={styles.illusWrap}>
+              <img className={styles.illus} src={cover!} alt="" aria-hidden="true" />
+            </div>
+          )}
+          <div className={`${styles.textCol} fadein`} key={page}>
             <div className={styles.text}>
               {paras.map((p, i) =>
                 page === 0 && i === 0 ? (

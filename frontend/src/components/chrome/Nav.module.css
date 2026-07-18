@@ -38,6 +38,7 @@
   border: none;
   cursor: pointer;
   transition: .2s;
+  white-space: nowrap;
 }
 .link:hover, .on { background: var(--honey-soft); color: var(--honey); }
 
