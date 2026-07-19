@@ -57,9 +57,11 @@ class BranchingControllerIT extends AbstractIT {
 
     @Test
     void full_three_call_flow_persists_complete_tale() {
-        // Three canned responses for the three LLM calls (in order).
+        // Three canned responses for the three LLM calls (in order). The opening carries a title
+        // line (the opening prompt asks for one); continuations are pure prose — matching the
+        // branching prompt contract, so the tale must NOT be re-titled or restarted per segment.
         when(aiClient.streamText(anyString(), anyString())).thenReturn(
-                Flux.just("Opening text.\n\n---\n\nCHOICE_A: Go left\nCHOICE_B: Go right"),
+                Flux.just("Місячний Сад\n\nOpening text.\n\n---\n\nCHOICE_A: Go left\nCHOICE_B: Go right"),
                 Flux.just("Middle text.\n\n---\n\nCHOICE_A: Climb the tree\nCHOICE_B: Cross the bridge"),
                 Flux.just("Closing text. The tale ends happily."));
         when(comicsBuilder.build(anyString())).thenReturn(Mono.empty());
@@ -106,14 +108,13 @@ class BranchingControllerIT extends AbstractIT {
         var saved = stories.findById(storyId).orElseThrow();
         assertThat(saved.getBranchingState()).isEqualTo("complete");
         assertThat(saved.getPendingChoices()).isNull();
-        // The three narrative segments are stitched together...
-        assertThat(saved.getContent()).contains("Opening text.");
-        assertThat(saved.getContent()).contains("Middle text.");
-        assertThat(saved.getContent()).contains("Closing text. The tale ends happily.");
-        // ...but NO choice labels or CHOICE_ markers leak into the tale (the old behaviour
-        // baked "— Лія обрала: Go left —" into the content).
+        // The title is lifted from the opening — NOT left inside the tale, NOT repeated per segment.
+        assertThat(saved.getTitle()).isEqualTo("Місячний Сад");
+        // The three narrative segments are stitched together EXACTLY once each — no tripling, no
+        // title inside the body, no choice labels / CHOICE_ markers / "chose:" breadcrumb.
         assertThat(saved.getContent())
-                .doesNotContain("Go left", "Cross the bridge", "CHOICE_", "обрал", "chose");
+                .isEqualTo("Opening text.\n\nMiddle text.\n\nClosing text. The tale ends happily.")
+                .doesNotContain("Місячний Сад", "Go left", "Cross the bridge", "CHOICE_", "обрал", "chose");
         // The finished interactive tale kicks off its comic cover build.
         verify(comicsBuilder).build(storyId);
     }

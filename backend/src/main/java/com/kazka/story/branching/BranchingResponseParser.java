@@ -26,6 +26,33 @@ public class BranchingResponseParser {
 
     public record Parsed(String body, List<BranchingChoice> choices) {}
 
+    /** A body with an optional leading title line lifted out. */
+    public record TitleBody(String title, String body) {}
+
+    /**
+     * Split a leading "book title" line off an opening body, mirroring the linear flow's rule
+     * (a short, punctuation-free line of ≤6 words followed by real body). The branching opening
+     * prompt asks the model to start with a title; this lifts it out so it isn't rendered inside
+     * the tale. If the first line isn't title-shaped (e.g. it's already prose), nothing is stripped.
+     */
+    public static TitleBody splitLeadingTitle(String body) {
+        if (body == null || body.isBlank()) return new TitleBody("", "");
+        String[] parts = body.strip().split("\n", 2);
+        String first = parts[0].strip();
+        String rest = parts.length > 1 ? parts[1].strip() : "";
+        if (!rest.isEmpty() && looksLikeTitle(first)) {
+            return new TitleBody(first, rest);
+        }
+        return new TitleBody("", body.strip());
+    }
+
+    private static boolean looksLikeTitle(String line) {
+        if (line.isEmpty() || line.length() > 60) return false;
+        if (line.contains(". ") || line.contains("! ") || line.contains("? ")) return false;
+        if (line.endsWith(".") || line.endsWith("!") || line.endsWith("?")) return false;
+        return line.split("\\s+").length <= 6;
+    }
+
     /**
      * Parse a mid-tale segment into its narrative body and the two branching choices.
      * The narrative body is guaranteed free of {@code CHOICE_A/CHOICE_B} markers and

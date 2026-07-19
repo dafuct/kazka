@@ -9,6 +9,7 @@ import com.kazka.story.branching.dto.BranchingResponse;
 import com.kazka.story.branching.dto.BranchingStartRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -36,7 +37,6 @@ class BranchingServiceTest {
     @Mock com.kazka.ai.AiClient aiClient;
     @Mock BranchingPromptBuilder promptBuilder;
     @Mock com.kazka.child.CharacterExtractionWorker extractionWorker;
-    @Mock com.kazka.story.PromptBuilder systemPromptBuilder;
     @Mock com.kazka.comics.ComicsBuilder comicsBuilder;
     @InjectMocks BranchingService svc;
 
@@ -57,7 +57,7 @@ class BranchingServiceTest {
     @Test
     void start_creates_story_for_any_user() {
         when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
-        when(systemPromptBuilder.buildStorySystem(anyString())).thenReturn("system prompt");
+        when(promptBuilder.buildBranchingSystem()).thenReturn("branching system");
         when(promptBuilder.buildOpeningUserMessage(any(), any(), any())).thenReturn("opening prompt");
         when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
                 "Opening body.\n\n---\n\nCHOICE_A: Option A\nCHOICE_B: Option B"));
@@ -78,7 +78,7 @@ class BranchingServiceTest {
     @Test
     void start_creates_story_in_awaiting_choice_1_state() {
         when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
-        when(systemPromptBuilder.buildStorySystem(anyString())).thenReturn("system prompt");
+        when(promptBuilder.buildBranchingSystem()).thenReturn("branching system");
         when(promptBuilder.buildOpeningUserMessage(any(), any(), any())).thenReturn("opening prompt");
         when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
                 "Opening body.\n\n---\n\nCHOICE_A: Option A\nCHOICE_B: Option B"));
@@ -93,6 +93,31 @@ class BranchingServiceTest {
         assertThat(resp.isFinal()).isFalse();
         assertThat(resp.choices()).hasSize(2);
         assertThat(resp.content()).isEqualTo("Opening body.");
+    }
+
+    @Test
+    void start_lifts_the_title_out_of_the_opening_body() {
+        // Regression: branching reused the one-shot "Line 1: title" prompt but never stripped the
+        // title, so it stayed inside the tale (and the model re-emitted it every segment). The
+        // opening's title line must become the story title and NOT appear in the content.
+        when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
+        when(promptBuilder.buildBranchingSystem()).thenReturn("branching system");
+        when(promptBuilder.buildOpeningUserMessage(any(), any(), any())).thenReturn("opening prompt");
+        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
+                "Матвійко та Червона Машинка\n\nЖив-був Матвійко, що катав червону машинку.\n\n"
+                        + "---\n\nCHOICE_A: Піти в сад\nCHOICE_B: Лишитися вдома"));
+        when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
+
+        BranchingResponse resp = svc.start(
+                new BranchingStartRequest("машинка", List.of("Матвійко"), "3-5", "short", "uk", "p1", List.of()),
+                user("u1")).block();
+
+        ArgumentCaptor<Story> saved = ArgumentCaptor.forClass(Story.class);
+        verify(stories).save(saved.capture());
+        assertThat(saved.getValue().getTitle()).isEqualTo("Матвійко та Червона Машинка");
+        assertThat(resp.content())
+                .isEqualTo("Жив-був Матвійко, що катав червону машинку.")
+                .doesNotContain("Червона Машинка", "CHOICE_");
     }
 
     @Test
@@ -152,7 +177,7 @@ class BranchingServiceTest {
         when(stories.findById("s1")).thenReturn(Optional.of(story));
         // child is resolved by the STORY owner, not the admin caller
         when(childProfiles.requireOwned("p1", "owner")).thenReturn(profile());
-        when(systemPromptBuilder.buildStorySystem(anyString())).thenReturn("system prompt");
+        when(promptBuilder.buildBranchingSystem()).thenReturn("branching system");
         when(promptBuilder.buildMiddleUserMessage(anyString(), anyString())).thenReturn("middle prompt");
         when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
                 "Middle body.\n\n---\n\nCHOICE_A: A2\nCHOICE_B: B2"));
@@ -183,7 +208,7 @@ class BranchingServiceTest {
                 new BranchingChoice("B", "Піти праворуч")));
         when(stories.findByIdAndUserId("s1", "u1")).thenReturn(Optional.of(story));
         when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
-        when(systemPromptBuilder.buildStorySystem(anyString())).thenReturn("system prompt");
+        when(promptBuilder.buildBranchingSystem()).thenReturn("branching system");
         when(promptBuilder.buildClosingUserMessage(anyString(), anyString())).thenReturn("closing prompt");
         when(aiClient.streamText(anyString(), anyString()))
                 .thenReturn(Flux.just("Closing text. The tale ends happily."));

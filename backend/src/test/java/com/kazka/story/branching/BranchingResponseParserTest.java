@@ -105,4 +105,28 @@ class BranchingResponseParserTest {
         assertThat(p.body()).isEqualTo("The tale ends happily.").doesNotContain("CHOICE_", "---");
         assertThat(p.choices()).isEmpty();
     }
+
+    @Test
+    void splitLeadingTitle_lifts_a_title_line() {
+        BranchingResponseParser.TitleBody tb =
+                BranchingResponseParser.splitLeadingTitle("Матвійко та Червона Машинка\n\nЖив-був Матвійко.");
+        assertThat(tb.title()).isEqualTo("Матвійко та Червона Машинка");
+        assertThat(tb.body()).isEqualTo("Жив-був Матвійко.");
+    }
+
+    @Test
+    void splitLeadingTitle_leaves_prose_untouched() {
+        // First line ends with a period → a sentence, not a title.
+        BranchingResponseParser.TitleBody tb =
+                BranchingResponseParser.splitLeadingTitle("Жив-був Матвійко.\n\nВін катав машинку.");
+        assertThat(tb.title()).isEmpty();
+        assertThat(tb.body()).isEqualTo("Жив-був Матвійко.\n\nВін катав машинку.");
+    }
+
+    @Test
+    void splitLeadingTitle_does_not_strip_a_single_line_body() {
+        BranchingResponseParser.TitleBody tb = BranchingResponseParser.splitLeadingTitle("Opening body");
+        assertThat(tb.title()).isEmpty();
+        assertThat(tb.body()).isEqualTo("Opening body");
+    }
 }

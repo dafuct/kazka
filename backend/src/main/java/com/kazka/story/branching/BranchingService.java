@@ -10,7 +10,6 @@ import com.kazka.child.ExtractionStatus;
 import com.kazka.ai.AiClient;
 import com.kazka.comics.ComicsBuilder;
 import com.kazka.story.IllustrationStatus;
-import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
 import com.kazka.story.branching.dto.BranchingChoice;
@@ -42,7 +41,6 @@ public class BranchingService {
     private final BranchingPromptBuilder promptBuilder;
     private final BranchingResponseParser parser = new BranchingResponseParser();
     private final CharacterExtractionWorker extractionWorker;
-    private final PromptBuilder systemPromptBuilder;
     private final ComicsBuilder comicsBuilder;
 
     public Mono<BranchingResponse> start(BranchingStartRequest req, CurrentUser cu) {
@@ -53,23 +51,28 @@ public class BranchingService {
                 req.theme(), req.characters(), req.ageGroup(), req.length(), req.language(),
                 req.childProfileId(), req.includeCharacterIds());
 
-        String storySystem = systemPromptBuilder.buildStorySystem(req.language());
+        String storySystem = promptBuilder.buildBranchingSystem();
         String userMessage = promptBuilder.buildOpeningUserMessage(genReq, child, recurringCast);
 
         return aiClient.streamText(storySystem, userMessage)
                 .reduce("", String::concat)
                 .map(raw -> parser.parse(raw, req.language()))
                 .flatMap(parsed -> Mono.fromCallable(() -> {
+                    // The opening carries a title on its first line — lift it out so it isn't
+                    // rendered inside the tale, and set it as the story title now (no longer
+                    // guessed at completion, where the tripled title made it unreliable).
+                    BranchingResponseParser.TitleBody titled =
+                            BranchingResponseParser.splitLeadingTitle(parsed.body());
                     Story story = new Story();
                     story.setId(UUID.randomUUID().toString());
                     story.setUserId(cu.userId());
-                    story.setTitle("");
+                    story.setTitle(titled.title().isBlank() ? req.theme() : titled.title());
                     story.setTheme(req.theme());
                     story.setCharacters(req.characters());
                     story.setAgeGroup(req.ageGroup());
                     story.setLength(req.length());
                     story.setLanguage(req.language());
-                    story.setContent(parsed.body());
+                    story.setContent(titled.body());
                     story.setIllustrationStatus(IllustrationStatus.PENDING);
                     story.setChildProfileId(child.getId());
                     story.setExtractionStatus(ExtractionStatus.PENDING);
@@ -119,7 +122,7 @@ public class BranchingService {
             String priorContent = story.getContent();
 
             boolean isLastSegment = "awaiting_choice_2".equals(story.getBranchingState());
-            String storySystem = systemPromptBuilder.buildStorySystem(story.getLanguage());
+            String storySystem = promptBuilder.buildBranchingSystem();
             String userMessage = isLastSegment
                     ? promptBuilder.buildClosingUserMessage(priorContent, chosen.text())
                     : promptBuilder.buildMiddleUserMessage(priorContent, chosen.text());
@@ -132,9 +135,7 @@ public class BranchingService {
                         if (isLastSegment) {
                             story.setBranchingState("complete");
                             story.setPendingChoices(null);
-                            // Derive a title from the first line if it looks like one
-                            String first = story.getContent().split("\n", 2)[0].strip();
-                            story.setTitle(first.length() <= 60 && !first.endsWith(".") ? first : story.getTheme());
+                            // Title was set from the opening in start(); nothing to derive here.
                             stories.save(story);
                             extractionWorker.enqueue(story.getId(), story.getChildProfileId(), story.getUserId());
                             // The tale is whole now — build its comic cover. Branching never did
