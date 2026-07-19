@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -59,8 +58,8 @@ class BranchingServiceTest {
         when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
         when(promptBuilder.buildBranchingSystem()).thenReturn("branching system");
         when(promptBuilder.buildOpeningUserMessage(any(), any(), any())).thenReturn("opening prompt");
-        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
-                "Opening body.\n\n---\n\nCHOICE_A: Option A\nCHOICE_B: Option B"));
+        when(aiClient.generateStoryJson(anyString(), anyString())).thenReturn(Mono.just(
+                "{\"segment\":\"Opening body.\",\"choiceA\":\"Option A\",\"choiceB\":\"Option B\"}"));
         when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
 
         BranchingResponse resp = svc.start(
@@ -80,8 +79,8 @@ class BranchingServiceTest {
         when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
         when(promptBuilder.buildBranchingSystem()).thenReturn("branching system");
         when(promptBuilder.buildOpeningUserMessage(any(), any(), any())).thenReturn("opening prompt");
-        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
-                "Opening body.\n\n---\n\nCHOICE_A: Option A\nCHOICE_B: Option B"));
+        when(aiClient.generateStoryJson(anyString(), anyString())).thenReturn(Mono.just(
+                "{\"segment\":\"Opening body.\",\"choiceA\":\"Option A\",\"choiceB\":\"Option B\"}"));
         when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
 
         BranchingResponse resp = svc.start(
@@ -96,16 +95,16 @@ class BranchingServiceTest {
     }
 
     @Test
-    void start_lifts_the_title_out_of_the_opening_body() {
-        // Regression: branching reused the one-shot "Line 1: title" prompt but never stripped the
-        // title, so it stayed inside the tale (and the model re-emitted it every segment). The
-        // opening's title line must become the story title and NOT appear in the content.
+    void start_takes_title_from_json_and_keeps_body_clean() {
+        // Structured JSON: the title is its own field, the segment is pure prose — the title must
+        // become the story title and never appear inside the tale body.
         when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
         when(promptBuilder.buildBranchingSystem()).thenReturn("branching system");
         when(promptBuilder.buildOpeningUserMessage(any(), any(), any())).thenReturn("opening prompt");
-        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
-                "Матвійко та Червона Машинка\n\nЖив-був Матвійко, що катав червону машинку.\n\n"
-                        + "---\n\nCHOICE_A: Піти в сад\nCHOICE_B: Лишитися вдома"));
+        when(aiClient.generateStoryJson(anyString(), anyString())).thenReturn(Mono.just(
+                "{\"title\":\"Матвійко та Червона Машинка\","
+                        + "\"segment\":\"Жив-був Матвійко, що катав червону машинку.\","
+                        + "\"choiceA\":\"Піти в сад\",\"choiceB\":\"Лишитися вдома\"}"));
         when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
 
         BranchingResponse resp = svc.start(
@@ -117,7 +116,26 @@ class BranchingServiceTest {
         assertThat(saved.getValue().getTitle()).isEqualTo("Матвійко та Червона Машинка");
         assertThat(resp.content())
                 .isEqualTo("Жив-був Матвійко, що катав червону машинку.")
-                .doesNotContain("Червона Машинка", "CHOICE_");
+                .doesNotContain("Червона Машинка", "CHOICE_", "title", "segment");
+    }
+
+    @Test
+    void start_scrubs_a_leaked_label_even_inside_the_json_segment() {
+        // Belt-and-suspenders: even if the model sneaks a "Ukrainian:" label into the segment
+        // field, cleanBody strips it so it never reaches the reader.
+        when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
+        when(promptBuilder.buildBranchingSystem()).thenReturn("branching system");
+        when(promptBuilder.buildOpeningUserMessage(any(), any(), any())).thenReturn("opening prompt");
+        when(aiClient.generateStoryJson(anyString(), anyString())).thenReturn(Mono.just(
+                "{\"title\":\"Матвій і машинка\",\"segment\":\"Ukrainian: Матвійко ступив на стежку.\","
+                        + "\"choiceA\":\"Піти в ліс\",\"choiceB\":\"Лишитися\"}"));
+        when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
+
+        BranchingResponse resp = svc.start(
+                new BranchingStartRequest("машинка", List.of("Матвійко"), "3-5", "short", "uk", "p1", List.of()),
+                user("u1")).block();
+
+        assertThat(resp.content()).isEqualTo("Матвійко ступив на стежку.").doesNotContain("Ukrainian");
     }
 
     @Test
@@ -178,9 +196,9 @@ class BranchingServiceTest {
         // child is resolved by the STORY owner, not the admin caller
         when(childProfiles.requireOwned("p1", "owner")).thenReturn(profile());
         when(promptBuilder.buildBranchingSystem()).thenReturn("branching system");
-        when(promptBuilder.buildMiddleUserMessage(anyString(), anyString())).thenReturn("middle prompt");
-        when(aiClient.streamText(anyString(), anyString())).thenReturn(Flux.just(
-                "Middle body.\n\n---\n\nCHOICE_A: A2\nCHOICE_B: B2"));
+        when(promptBuilder.buildMiddleUserMessage(anyString(), anyString(), anyString())).thenReturn("middle prompt");
+        when(aiClient.generateStoryJson(anyString(), anyString())).thenReturn(Mono.just(
+                "{\"segment\":\"Middle body.\",\"choiceA\":\"A2\",\"choiceB\":\"B2\"}"));
         when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
 
         BranchingResponse resp = svc.choose("s1", "A", admin("admin-1")).block();
@@ -209,9 +227,9 @@ class BranchingServiceTest {
         when(stories.findByIdAndUserId("s1", "u1")).thenReturn(Optional.of(story));
         when(childProfiles.requireOwned("p1", "u1")).thenReturn(profile());
         when(promptBuilder.buildBranchingSystem()).thenReturn("branching system");
-        when(promptBuilder.buildClosingUserMessage(anyString(), anyString())).thenReturn("closing prompt");
-        when(aiClient.streamText(anyString(), anyString()))
-                .thenReturn(Flux.just("Closing text. The tale ends happily."));
+        when(promptBuilder.buildClosingUserMessage(anyString(), anyString(), anyString())).thenReturn("closing prompt");
+        when(aiClient.generateStoryJson(anyString(), anyString()))
+                .thenReturn(Mono.just("{\"segment\":\"Closing text. The tale ends happily.\"}"));
         when(stories.save(any(Story.class))).thenAnswer(i -> i.getArgument(0));
         when(comicsBuilder.build(anyString())).thenReturn(Mono.empty());
 

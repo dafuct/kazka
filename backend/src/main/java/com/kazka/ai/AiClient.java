@@ -55,6 +55,36 @@ public class AiClient {
                 props.getEditorMaxTokens());
     }
 
+    /**
+     * Non-streaming generation with the creative TEXT model, for structured (JSON) output.
+     * Branching tales use this instead of {@link #streamText}: the SSE stream occasionally drops
+     * a buffer (truncating the tale mid-word), and parsing free-form streamed prose let the model
+     * leak meta-text ("Ukrainian:", "* * *", lead-in questions). A single non-streamed JSON
+     * response is both reliable against truncation and immune to that format drift.
+     */
+    public Mono<String> generateStoryJson(String system, String user) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("model", props.getTextModel());
+        body.put("messages", List.of(
+                Map.of("role", "system", "content", system),
+                Map.of("role", "user", "content", user)
+        ));
+        body.put("stream", false);
+        body.put("max_tokens", props.getTextMaxTokens());
+        body.put("temperature", props.getTextTemperature());
+        body.put("top_p", props.getTextTopP());
+        body.put("reasoning_effort", "none");
+        return textClient.post()
+                .uri("/chat/completions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(String.class)
+                .defaultIfEmpty("")
+                .doOnError(e -> log.warn("generateStoryJson failed (model={}): {}", props.getTextModel(), e.getMessage()))
+                .map(AiClient::extractChatContent);
+    }
+
     public Mono<String> generateText(String system, String user) {
         // `reasoning_effort: "none"` disables Gemini 2.5's chain-of-thought. Without it,
         // thinking can consume most of the max_tokens budget and the visible JSON output

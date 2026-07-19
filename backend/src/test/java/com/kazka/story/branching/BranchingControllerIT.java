@@ -21,7 +21,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.MultiValueMap;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -57,13 +56,13 @@ class BranchingControllerIT extends AbstractIT {
 
     @Test
     void full_three_call_flow_persists_complete_tale() {
-        // Three canned responses for the three LLM calls (in order). The opening carries a title
-        // line (the opening prompt asks for one); continuations are pure prose — matching the
-        // branching prompt contract, so the tale must NOT be re-titled or restarted per segment.
-        when(aiClient.streamText(anyString(), anyString())).thenReturn(
-                Flux.just("Місячний Сад\n\nOpening text.\n\n---\n\nCHOICE_A: Go left\nCHOICE_B: Go right"),
-                Flux.just("Middle text.\n\n---\n\nCHOICE_A: Climb the tree\nCHOICE_B: Cross the bridge"),
-                Flux.just("Closing text. The tale ends happily."));
+        // Three canned STRUCTURED-JSON responses for the three LLM calls (in order): the opening
+        // carries its title in a field, continuations are pure "segment" prose — so no title,
+        // label, or marker can leak into the tale, and it is never re-titled or restarted.
+        when(aiClient.generateStoryJson(anyString(), anyString())).thenReturn(
+                Mono.just("{\"title\":\"Місячний Сад\",\"segment\":\"Opening text.\",\"choiceA\":\"Go left\",\"choiceB\":\"Go right\"}"),
+                Mono.just("{\"segment\":\"Middle text.\",\"choiceA\":\"Climb the tree\",\"choiceB\":\"Cross the bridge\"}"),
+                Mono.just("{\"segment\":\"Closing text. The tale ends happily.\"}"));
         when(comicsBuilder.build(anyString())).thenReturn(Mono.empty());
 
         var cli = authedClient(userId);

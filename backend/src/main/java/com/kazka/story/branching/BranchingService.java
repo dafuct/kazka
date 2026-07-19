@@ -54,25 +54,21 @@ public class BranchingService {
         String storySystem = promptBuilder.buildBranchingSystem();
         String userMessage = promptBuilder.buildOpeningUserMessage(genReq, child, recurringCast);
 
-        return aiClient.streamText(storySystem, userMessage)
-                .reduce("", String::concat)
-                .map(raw -> parser.parse(raw, req.language()))
+        return aiClient.generateStoryJson(storySystem, userMessage)
+                .map(raw -> parser.parseJson(raw, true, req.language()))
                 .flatMap(parsed -> Mono.fromCallable(() -> {
-                    // The opening carries a title on its first line — lift it out so it isn't
-                    // rendered inside the tale, and set it as the story title now (no longer
-                    // guessed at completion, where the tripled title made it unreliable).
-                    BranchingResponseParser.TitleBody titled =
-                            BranchingResponseParser.splitLeadingTitle(parsed.body());
+                    // Structured JSON: title, segment (clean prose) and choices come as separate
+                    // fields — no title/label/marker can leak into the tale body.
                     Story story = new Story();
                     story.setId(UUID.randomUUID().toString());
                     story.setUserId(cu.userId());
-                    story.setTitle(titled.title().isBlank() ? req.theme() : titled.title());
+                    story.setTitle(parsed.title().isBlank() ? req.theme() : parsed.title());
                     story.setTheme(req.theme());
                     story.setCharacters(req.characters());
                     story.setAgeGroup(req.ageGroup());
                     story.setLength(req.length());
                     story.setLanguage(req.language());
-                    story.setContent(titled.body());
+                    story.setContent(parsed.body());
                     story.setIllustrationStatus(IllustrationStatus.PENDING);
                     story.setChildProfileId(child.getId());
                     story.setExtractionStatus(ExtractionStatus.PENDING);
@@ -124,12 +120,11 @@ public class BranchingService {
             boolean isLastSegment = "awaiting_choice_2".equals(story.getBranchingState());
             String storySystem = promptBuilder.buildBranchingSystem();
             String userMessage = isLastSegment
-                    ? promptBuilder.buildClosingUserMessage(priorContent, chosen.text())
-                    : promptBuilder.buildMiddleUserMessage(priorContent, chosen.text());
+                    ? promptBuilder.buildClosingUserMessage(priorContent, chosen.text(), story.getLanguage())
+                    : promptBuilder.buildMiddleUserMessage(priorContent, chosen.text(), story.getLanguage());
 
-            return aiClient.streamText(storySystem, userMessage)
-                    .reduce("", String::concat)
-                    .map(raw -> isLastSegment ? parser.parseFinal(raw) : parser.parse(raw, story.getLanguage()))
+            return aiClient.generateStoryJson(storySystem, userMessage)
+                    .map(raw -> parser.parseJson(raw, !isLastSegment, story.getLanguage()))
                     .flatMap(parsed -> Mono.fromCallable(() -> {
                         story.setContent(priorContent + "\n\n" + parsed.body());
                         if (isLastSegment) {

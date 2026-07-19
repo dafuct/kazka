@@ -36,19 +36,23 @@ public class BranchingPromptBuilder {
         return branchingSystem;
     }
 
+    private static String languageName(String code) {
+        return "en".equalsIgnoreCase(code) ? "English" : "Ukrainian";
+    }
+
     public String buildOpeningUserMessage(GenerationRequest req, ChildProfile child, List<Character> recurringCast) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Write the OPENING of a branching fairy tale (100-150 words).\n\n")
-          .append("Language: ").append(req.language()).append('\n')
+        sb.append("Write the OPENING of a branching fairy tale (100-150 words), in ")
+          .append(languageName(req.language())).append(".\n\n")
           .append("Theme: ").append(req.theme()).append('\n')
           .append("Characters: ").append(String.join(", ", req.characters())).append('\n')
-          .append("Age: ").append(req.ageGroup()).append('\n');
+          .append("Age group: ").append(req.ageGroup()).append('\n');
 
         if (child != null && child.getName() != null && !child.getName().isBlank()) {
-            sb.append("Child name: ").append(child.getName()).append('\n');
+            sb.append("Hero's name: ").append(child.getName()).append('\n');
             if (child.getBirthYear() != null) {
                 int age = Year.now().getValue() - child.getBirthYear();
-                sb.append("Approximate age: ").append(age).append('\n');
+                sb.append("Hero's approximate age: ").append(age).append('\n');
             }
         }
         if (recurringCast != null && !recurringCast.isEmpty()) {
@@ -61,34 +65,28 @@ public class BranchingPromptBuilder {
                 sb.append('\n');
             }
         }
-        sb.append('\n').append("Begin with a short 2–4 word book title on the very first line ")
-          .append("(no punctuation at the end, no quotes), then a blank line, then the opening.\n")
-          .append("Do NOT echo or restate any of the fields above (Language, Theme, Characters, Age) ")
-          .append("and do NOT write the language's name anywhere in your output.\n")
-          .append("End the opening at a natural decision point. ")
-          .append("After the opening, write EXACTLY this format:\n\n")
-          .append("---\n\n")
-          .append("CHOICE_A: <8-15 word description>\n")
-          .append("CHOICE_B: <8-15 word description>\n");
+        sb.append('\n').append("End the opening at a natural decision point. ")
+          .append("Return the OPENING JSON object with keys \"title\", \"segment\", \"choiceA\", \"choiceB\".");
         return sb.toString();
     }
 
-    public String buildMiddleUserMessage(String accumulatedContent, String chosenOption) {
-        return "You are continuing an interactive fairy tale.\n\n"
+    public String buildMiddleUserMessage(String accumulatedContent, String chosenOption, String language) {
+        return "You are continuing an interactive fairy tale, written in " + languageName(language) + ".\n\n"
                 + "CONTEXT — the story so far (do NOT repeat, quote, or restate any of it):\n\n"
                 + accumulatedContent + "\n\n"
                 + "The reader chose: " + chosenOption + "\n\n"
-                + "Write ONLY the MIDDLE (100-150 words) that comes next. Continue seamlessly from the "
-                + "last sentence above — no title, do not restart, do not re-introduce the hero. "
-                + "End at another decision point, then the CHOICE_A/CHOICE_B block.";
+                + "Write ONLY the MIDDLE (100-150 words) that comes next — continue seamlessly from the "
+                + "last sentence above, do not restart, do not re-introduce the hero, end at another decision point. "
+                + "Return the MIDDLE JSON object with keys \"segment\", \"choiceA\", \"choiceB\".";
     }
 
-    public String buildClosingUserMessage(String accumulatedContent, String chosenOption) {
-        return "You are finishing an interactive fairy tale.\n\n"
+    public String buildClosingUserMessage(String accumulatedContent, String chosenOption, String language) {
+        return "You are finishing an interactive fairy tale, written in " + languageName(language) + ".\n\n"
                 + "CONTEXT — the story so far (do NOT repeat, quote, or restate any of it):\n\n"
                 + accumulatedContent + "\n\n"
                 + "The reader chose: " + chosenOption + "\n\n"
-                + "Write ONLY the CLOSING (100-150 words) that comes next. Continue seamlessly from the "
-                + "last sentence above — no title, do not restart. Resolve the tale warmly. No choice block at the end.";
+                + "Write ONLY the CLOSING (100-150 words) that comes next — continue seamlessly from the "
+                + "last sentence above, do not restart, and resolve the tale warmly. "
+                + "Return the CLOSING JSON object with the single key \"segment\".";
     }
 }

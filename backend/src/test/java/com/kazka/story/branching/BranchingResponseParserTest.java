@@ -130,6 +130,58 @@ class BranchingResponseParserTest {
                 .doesNotContain("Theme:", "Language:");
     }
 
+    // ---- structured-JSON path (primary) ----
+
+    @Test
+    void parseJson_extracts_title_segment_and_choices() {
+        String raw = "{\"title\":\"Місячний Сад\",\"segment\":\"Жив-був Матвій.\","
+                + "\"choiceA\":\"Піти в сад\",\"choiceB\":\"Лишитися вдома\"}";
+        BranchingResponseParser.ParsedSegment s = parser.parseJson(raw, true, "uk");
+        assertThat(s.title()).isEqualTo("Місячний Сад");
+        assertThat(s.body()).isEqualTo("Жив-був Матвій.");
+        assertThat(s.choices()).extracting(BranchingChoice::text).containsExactly("Піти в сад", "Лишитися вдома");
+    }
+
+    @Test
+    void parseJson_closing_has_no_choices() {
+        BranchingResponseParser.ParsedSegment s =
+                parser.parseJson("{\"segment\":\"І жили вони довго й щасливо.\"}", false, "uk");
+        assertThat(s.body()).isEqualTo("І жили вони довго й щасливо.");
+        assertThat(s.choices()).isEmpty();
+    }
+
+    @Test
+    void parseJson_unwraps_code_fences() {
+        String raw = "```json\n{\"segment\":\"Текст.\",\"choiceA\":\"А\",\"choiceB\":\"Б\"}\n```";
+        BranchingResponseParser.ParsedSegment s = parser.parseJson(raw, true, "uk");
+        assertThat(s.body()).isEqualTo("Текст.");
+        assertThat(s.choices()).hasSize(2);
+    }
+
+    @Test
+    void parseJson_scrubs_a_leaked_label_inside_the_segment() {
+        String raw = "{\"segment\":\"Ukrainian: Матвій ступив на стежку.\",\"choiceA\":\"А\",\"choiceB\":\"Б\"}";
+        BranchingResponseParser.ParsedSegment s = parser.parseJson(raw, true, "uk");
+        assertThat(s.body()).isEqualTo("Матвій ступив на стежку.").doesNotContain("Ukrainian");
+    }
+
+    @Test
+    void parseJson_scrubs_a_star_scene_break_from_the_segment() {
+        String raw = "{\"segment\":\"Матвій пішов далі.\\n\\n* * *\\n\\nАж раптом стало темно.\","
+                + "\"choiceA\":\"А\",\"choiceB\":\"Б\"}";
+        BranchingResponseParser.ParsedSegment s = parser.parseJson(raw, true, "uk");
+        assertThat(s.body()).isEqualTo("Матвій пішов далі.\n\nАж раптом стало темно.").doesNotContain("*");
+    }
+
+    @Test
+    void parseJson_falls_back_to_text_parse_on_non_json() {
+        // If the model ignores the JSON contract, we must be no worse than the old text parser.
+        String raw = "Body text.\n\n---\n\nCHOICE_A: Go left\nCHOICE_B: Go right";
+        BranchingResponseParser.ParsedSegment s = parser.parseJson(raw, true, "uk");
+        assertThat(s.body()).isEqualTo("Body text.").doesNotContain("CHOICE_");
+        assertThat(s.choices()).extracting(BranchingChoice::text).containsExactly("Go left", "Go right");
+    }
+
     @Test
     void splitLeadingTitle_lifts_a_title_line() {
         BranchingResponseParser.TitleBody tb =
