@@ -8,6 +8,7 @@ import com.kazka.child.ChildProfile;
 import com.kazka.child.ChildProfileService;
 import com.kazka.child.ExtractionStatus;
 import com.kazka.ai.AiClient;
+import com.kazka.comics.ComicsBuilder;
 import com.kazka.story.IllustrationStatus;
 import com.kazka.story.PromptBuilder;
 import com.kazka.story.Story;
@@ -42,6 +43,7 @@ public class BranchingService {
     private final BranchingResponseParser parser = new BranchingResponseParser();
     private final CharacterExtractionWorker extractionWorker;
     private final PromptBuilder systemPromptBuilder;
+    private final ComicsBuilder comicsBuilder;
 
     public Mono<BranchingResponse> start(BranchingStartRequest req, CurrentUser cu) {
         ChildProfile child = childProfiles.requireOwned(req.childProfileId(), cu.userId());
@@ -56,7 +58,7 @@ public class BranchingService {
 
         return aiClient.streamText(storySystem, userMessage)
                 .reduce("", String::concat)
-                .map(parser::parse)
+                .map(raw -> parser.parse(raw, req.language()))
                 .flatMap(parsed -> Mono.fromCallable(() -> {
                     Story story = new Story();
                     story.setId(UUID.randomUUID().toString());
@@ -106,24 +108,27 @@ public class BranchingService {
         .flatMap(arr -> {
             Story story = (Story) ((Object[]) arr)[0];
             BranchingChoice chosen = (BranchingChoice) ((Object[]) arr)[1];
-            // The child belongs to whoever owns the story, not the caller (an
-            // admin advancing another user's tale is resolved by story.userId).
-            ChildProfile child = childProfiles.requireOwned(story.getChildProfileId(), story.getUserId());
+            // Authorization/consistency: the child belongs to whoever owns the story, not the
+            // caller (an admin advancing another user's tale is resolved by story.userId). The
+            // return value is unused — the tale no longer carries a "chose: X" breadcrumb.
+            childProfiles.requireOwned(story.getChildProfileId(), story.getUserId());
 
-            // Append transition line to existing content
-            String contentWithTransition = story.getContent() + promptBuilder.transitionLine(child, chosen.text());
+            // The narrative so far, kept clean — no choice breadcrumb baked in (that leaked the
+            // choice label into the reader). The model still learns which branch was taken via
+            // the prompt's explicit "The reader chose: …" line.
+            String priorContent = story.getContent();
 
             boolean isLastSegment = "awaiting_choice_2".equals(story.getBranchingState());
             String storySystem = systemPromptBuilder.buildStorySystem(story.getLanguage());
             String userMessage = isLastSegment
-                    ? promptBuilder.buildClosingUserMessage(contentWithTransition, chosen.text())
-                    : promptBuilder.buildMiddleUserMessage(contentWithTransition, chosen.text());
+                    ? promptBuilder.buildClosingUserMessage(priorContent, chosen.text())
+                    : promptBuilder.buildMiddleUserMessage(priorContent, chosen.text());
 
             return aiClient.streamText(storySystem, userMessage)
                     .reduce("", String::concat)
-                    .map(raw -> isLastSegment ? parser.parseFinal(raw) : parser.parse(raw))
+                    .map(raw -> isLastSegment ? parser.parseFinal(raw) : parser.parse(raw, story.getLanguage()))
                     .flatMap(parsed -> Mono.fromCallable(() -> {
-                        story.setContent(contentWithTransition + parsed.body());
+                        story.setContent(priorContent + "\n\n" + parsed.body());
                         if (isLastSegment) {
                             story.setBranchingState("complete");
                             story.setPendingChoices(null);
@@ -132,6 +137,11 @@ public class BranchingService {
                             story.setTitle(first.length() <= 60 && !first.endsWith(".") ? first : story.getTheme());
                             stories.save(story);
                             extractionWorker.enqueue(story.getId(), story.getChildProfileId(), story.getUserId());
+                            // The tale is whole now — build its comic cover. Branching never did
+                            // this, so interactive tales sat at PENDING with no cover forever.
+                            // build() no-ops unless the story is PENDING with no page, so firing
+                            // once here is safe against a stray re-trigger.
+                            comicsBuilder.build(story.getId()).subscribe();
                             return new BranchingResponse(story.getId(), 3, story.getContent(),
                                     null, "complete", true);
                         } else {

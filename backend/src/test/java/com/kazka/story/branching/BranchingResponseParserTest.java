@@ -3,8 +3,6 @@ package com.kazka.story.branching;
 import com.kazka.story.branching.dto.BranchingChoice;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class BranchingResponseParserTest {
@@ -22,7 +20,7 @@ class BranchingResponseParserTest {
                 CHOICE_B: Stay by the river and wait for the moon to rise
                 """;
 
-        BranchingResponseParser.Parsed p = parser.parse(raw);
+        BranchingResponseParser.Parsed p = parser.parse(raw, "en");
 
         assertThat(p.body()).isEqualTo("Oleh stepped into the forest. The trees whispered above him.");
         assertThat(p.choices()).containsExactly(
@@ -33,24 +31,51 @@ class BranchingResponseParserTest {
     @Test
     void tolerates_extra_whitespace() {
         String raw = "  Body text here.  \n\n\n  ---  \n\n  CHOICE_A:    Option A text  \n  CHOICE_B:   Option B text  ";
-        BranchingResponseParser.Parsed p = parser.parse(raw);
+        BranchingResponseParser.Parsed p = parser.parse(raw, "en");
         assertThat(p.body()).isEqualTo("Body text here.");
         assertThat(p.choices()).extracting(BranchingChoice::text)
                 .containsExactly("Option A text", "Option B text");
     }
 
+    // Regression: the model returned no "---" separator AND put both choices on one line, so the
+    // old parser fell back and baked "CHOICE_A: … CHOICE_B: …" straight into the tale body.
     @Test
-    void falls_back_when_separator_missing() {
-        String raw = "Body text with no separator and no choices at all.";
-        BranchingResponseParser.Parsed p = parser.parse(raw);
-        assertThat(p.body()).isEqualTo("Body text with no separator and no choices at all.");
+    void extracts_choices_and_scrubs_markers_when_separator_missing() {
+        String raw = "Опинившись у Місячному Саду, Матвій побачив квіти.\n\n"
+                + "Що ж робити Матвієві?\n\n"
+                + "CHOICE_A: Матвій вирішує підійти до Зайчика і запитати, що трапилось. "
+                + "CHOICE_B: Матвій вирішує спочатку дослідити сад.";
+
+        BranchingResponseParser.Parsed p = parser.parse(raw, "uk");
+
+        assertThat(p.body())
+                .doesNotContain("CHOICE_A", "CHOICE_B", "CHOICE_")
+                .isEqualTo("Опинившись у Місячному Саду, Матвій побачив квіти.\n\nЩо ж робити Матвієві?");
         assertThat(p.choices()).containsExactly(
-                new BranchingChoice("A", "Continue"),
-                new BranchingChoice("B", "End the tale"));
+                new BranchingChoice("A", "Матвій вирішує підійти до Зайчика і запитати, що трапилось."),
+                new BranchingChoice("B", "Матвій вирішує спочатку дослідити сад."));
     }
 
     @Test
-    void falls_back_when_only_one_choice_present() {
+    void parses_choices_that_share_a_single_line_with_separator() {
+        String raw = "Body.\n\n---\n\nCHOICE_A: Go left CHOICE_B: Go right";
+        BranchingResponseParser.Parsed p = parser.parse(raw, "en");
+        assertThat(p.body()).isEqualTo("Body.");
+        assertThat(p.choices()).extracting(BranchingChoice::text).containsExactly("Go left", "Go right");
+    }
+
+    @Test
+    void falls_back_to_localized_choices_when_no_choices_present() {
+        String raw = "Тіло казки без роздільника і без варіантів вибору.";
+        BranchingResponseParser.Parsed p = parser.parse(raw, "uk");
+        assertThat(p.body()).isEqualTo("Тіло казки без роздільника і без варіантів вибору.");
+        assertThat(p.choices()).containsExactly(
+                new BranchingChoice("A", "Продовжити"),
+                new BranchingChoice("B", "Завершити казку"));
+    }
+
+    @Test
+    void falls_back_and_scrubs_markers_when_only_one_choice_present() {
         String raw = """
                 Body text.
 
@@ -58,8 +83,8 @@ class BranchingResponseParserTest {
 
                 CHOICE_A: Only one option here
                 """;
-        BranchingResponseParser.Parsed p = parser.parse(raw);
-        assertThat(p.body()).isEqualTo("Body text.");
+        BranchingResponseParser.Parsed p = parser.parse(raw, "en");
+        assertThat(p.body()).isEqualTo("Body text.").doesNotContain("CHOICE_");
         assertThat(p.choices()).containsExactly(
                 new BranchingChoice("A", "Continue"),
                 new BranchingChoice("B", "End the tale"));
@@ -70,6 +95,14 @@ class BranchingResponseParserTest {
         String raw = "And so Oleh returned home, smiling, and slept until morning.";
         BranchingResponseParser.Parsed p = parser.parseFinal(raw);
         assertThat(p.body()).isEqualTo("And so Oleh returned home, smiling, and slept until morning.");
+        assertThat(p.choices()).isEmpty();
+    }
+
+    @Test
+    void final_segment_scrubs_a_stray_choice_line() {
+        String raw = "The tale ends happily.\n\n---\n\nCHOICE_A: leftover";
+        BranchingResponseParser.Parsed p = parser.parseFinal(raw);
+        assertThat(p.body()).isEqualTo("The tale ends happily.").doesNotContain("CHOICE_", "---");
         assertThat(p.choices()).isEmpty();
     }
 }

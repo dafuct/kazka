@@ -58,13 +58,4 @@ public class BranchingPromptBuilder {
                 + "The reader chose: " + chosenOption + "\n\n"
                 + "Write the CLOSING (100-150 words). Resolve the tale. No choice block at the end.";
     }
-
-    public String transitionLine(ChildProfile child, String chosenOption) {
-        String name = child != null && child.getName() != null ? child.getName() : "the reader";
-        String lang = child != null ? child.getPreferredLanguage() : "uk";
-        if ("en".equals(lang)) {
-            return "\n\n— " + name + " chose: " + chosenOption + " —\n\n";
-        }
-        return "\n\n— " + name + " обрала: " + chosenOption + " —\n\n";
-    }
 }

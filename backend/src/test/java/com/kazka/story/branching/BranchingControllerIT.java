@@ -22,6 +22,7 @@ import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @Tag("integration")
@@ -40,6 +42,9 @@ class BranchingControllerIT extends AbstractIT {
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder passwordEncoder;
     @MockitoBean AiClient aiClient;
+    // Branching now triggers the comic build on completion; mock it so the IT stays hermetic
+    // (no real image pipeline / Nano Banana HTTP call) and we can assert the trigger fires.
+    @MockitoBean com.kazka.comics.ComicsBuilder comicsBuilder;
 
     String userId;
     String profileId;
@@ -57,6 +62,7 @@ class BranchingControllerIT extends AbstractIT {
                 Flux.just("Opening text.\n\n---\n\nCHOICE_A: Go left\nCHOICE_B: Go right"),
                 Flux.just("Middle text.\n\n---\n\nCHOICE_A: Climb the tree\nCHOICE_B: Cross the bridge"),
                 Flux.just("Closing text. The tale ends happily."));
+        when(comicsBuilder.build(anyString())).thenReturn(Mono.empty());
 
         var cli = authedClient(userId);
 
@@ -100,11 +106,16 @@ class BranchingControllerIT extends AbstractIT {
         var saved = stories.findById(storyId).orElseThrow();
         assertThat(saved.getBranchingState()).isEqualTo("complete");
         assertThat(saved.getPendingChoices()).isNull();
+        // The three narrative segments are stitched together...
         assertThat(saved.getContent()).contains("Opening text.");
-        assertThat(saved.getContent()).contains("Go left");
         assertThat(saved.getContent()).contains("Middle text.");
-        assertThat(saved.getContent()).contains("Cross the bridge");
         assertThat(saved.getContent()).contains("Closing text. The tale ends happily.");
+        // ...but NO choice labels or CHOICE_ markers leak into the tale (the old behaviour
+        // baked "— Лія обрала: Go left —" into the content).
+        assertThat(saved.getContent())
+                .doesNotContain("Go left", "Cross the bridge", "CHOICE_", "обрал", "chose");
+        // The finished interactive tale kicks off its comic cover build.
+        verify(comicsBuilder).build(storyId);
     }
 
     private String seedUser() {

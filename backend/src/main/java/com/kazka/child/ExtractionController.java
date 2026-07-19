@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @RestController
@@ -22,6 +23,7 @@ public class ExtractionController {
 
     private final CharacterExtractionService extraction;
     private final StoryRepository stories;
+    private final StoryCharacterRepository storyCharacters;
     private final CurrentUserResolver currentUserResolver;
 
     @GetMapping("/api/stories/{id}/extraction-candidates")
@@ -31,9 +33,16 @@ public class ExtractionController {
                 .flatMap(cu -> Mono.fromCallable(() -> {
                     Story story = stories.findByIdAndUserId(id, cu.userId())
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-                    return story;
+                    // Once the user confirms characters for this tale, StoryCharacter join rows
+                    // exist (see CharacterService.upsertConfirmed) — a persistent "already saved"
+                    // signal that survives a page reload. Suppress the panel from then on instead
+                    // of re-deriving (and re-offering) the same candidates via a fresh LLM call.
+                    boolean alreadyConfirmed = !storyCharacters.findById_StoryId(id).isEmpty();
+                    return alreadyConfirmed ? Optional.<Story>empty() : Optional.of(story);
                 }).subscribeOn(Schedulers.boundedElastic()))
-                .flatMap(story -> extraction.extract(story.getContent(),
-                        lang != null && !lang.isBlank() ? lang : story.getLanguage()));
+                .flatMap(maybeStory -> maybeStory
+                        .map(story -> extraction.extract(story.getContent(),
+                                lang != null && !lang.isBlank() ? lang : story.getLanguage()))
+                        .orElseGet(() -> Mono.just(List.<ExtractedCandidateDto>of())));
     }
 }
