@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -19,6 +20,8 @@ class GeminiTtsClientTest {
 
     private WireMockServer wm;
     private GeminiTtsClient client;
+    private AiProviderProperties props;
+    private final WavEncoder wavEncoder = new WavEncoder();
     private static final byte[] FAKE_PCM = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
     private static final String PATH = "/models/gemini-2.5-flash-preview-tts:generateContent";
 
@@ -27,7 +30,7 @@ class GeminiTtsClientTest {
         wm = new WireMockServer(options().dynamicPort());
         wm.start();
 
-        AiProviderProperties props = new AiProviderProperties();
+        props = new AiProviderProperties();
         props.setApiToken("test-key");
         props.setTtsModel("gemini-2.5-flash-preview-tts");
         props.setTtsVoice("Sulafat");
@@ -38,7 +41,7 @@ class GeminiTtsClientTest {
                 .codecs(c -> c.defaultCodecs().maxInMemorySize(32 * 1024 * 1024))
                 .build();
 
-        client = new GeminiTtsClient(props, web, new ObjectMapper());
+        client = new GeminiTtsClient(props, web, new ObjectMapper(), wavEncoder);
     }
 
     @AfterEach
@@ -76,6 +79,23 @@ class GeminiTtsClientTest {
         assertThatThrownBy(() -> client.synthesizePcm("anything", "Sulafat").block())
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("no inline audio");
+    }
+
+    @Test
+    void should_returnWavAudio_withStylePromptPrepended_when_synthesize() {
+        props.setTtsStylePrompt("СТИЛЬ:");
+        wm.stubFor(post(urlEqualTo(PATH)).willReturn(okJson(ttsResponse(FAKE_PCM))));
+
+        TtsAudio audio = client.synthesize("Жила лисичка.", "uk").block();
+
+        assertThat(audio).isNotNull();
+        assertThat(audio.contentType()).isEqualTo("audio/wav");
+        assertThat(audio.fileExtension()).isEqualTo("wav");
+        assertThat(new String(audio.bytes(), 0, 4, StandardCharsets.US_ASCII)).isEqualTo("RIFF");
+        assertThat(audio.bytes()).hasSize(44 + FAKE_PCM.length);
+        wm.verify(postRequestedFor(urlEqualTo(PATH))
+                .withRequestBody(containing("СТИЛЬ:"))
+                .withRequestBody(containing("Жила лисичка.")));
     }
 
     private static String ttsResponse(byte[] pcm) {

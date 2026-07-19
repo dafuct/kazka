@@ -37,13 +37,14 @@ class NarrationIT extends AbstractIT {
     @Autowired StoryRepository stories;
     @Autowired PasswordEncoder passwordEncoder;
 
-    @MockitoBean GeminiTtsClient ttsClient;
+    @MockitoBean TtsClient ttsClient;
 
     @BeforeEach
     void clean() {
         stories.deleteAll();
         users.deleteAll();
-        when(ttsClient.synthesizePcm(any(), any())).thenReturn(Mono.just(new byte[]{1, 2, 3, 4}));
+        when(ttsClient.synthesize(any(), any()))
+                .thenReturn(Mono.just(new TtsAudio(new byte[]{1, 2, 3, 4}, "audio/mpeg", "mp3")));
     }
 
     @Test

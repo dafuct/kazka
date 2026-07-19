@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kazka.config.AiProviderProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,21 +26,38 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-public class GeminiTtsClient {
+@ConditionalOnProperty(name = "kazka.ai.tts-provider", havingValue = "gemini")
+public class GeminiTtsClient implements TtsClient {
 
     private final AiProviderProperties props;
     private final WebClient geminiTtsWebClient;
     private final ObjectMapper mapper;
+    private final WavEncoder wavEncoder;
 
     public GeminiTtsClient(AiProviderProperties props,
                            @Qualifier("geminiTtsWebClient") WebClient geminiTtsWebClient,
-                           ObjectMapper mapper) {
+                           ObjectMapper mapper,
+                           WavEncoder wavEncoder) {
         this.props = props;
         this.geminiTtsWebClient = geminiTtsWebClient;
         this.mapper = mapper;
+        this.wavEncoder = wavEncoder;
         if (props.getApiToken() == null || props.getApiToken().isBlank()) {
             log.warn("kazka.ai.api-token is not set — Gemini TTS calls will fail with 401");
         }
+    }
+
+    /**
+     * {@link TtsClient} entry point: prepend the storyteller style prompt, synthesize with the
+     * single configured Gemini voice ({@code language} is ignored — Gemini is the fallback
+     * provider with one voice), then wrap the raw PCM as a playable WAV.
+     */
+    @Override
+    public Mono<TtsAudio> synthesize(String text, String language) {
+        String prompt = props.getTtsStylePrompt() + "\n\n" + text;
+        return synthesizePcm(prompt, props.getTtsVoice())
+                .map(wavEncoder::wrap24kMono16)
+                .map(wav -> new TtsAudio(wav, "audio/wav", "wav"));
     }
 
     /**

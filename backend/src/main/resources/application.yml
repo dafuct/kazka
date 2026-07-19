@@ -77,6 +77,23 @@ kazka:
     text-base-url: ${AI_TEXT_BASE_URL:https://generativelanguage.googleapis.com/v1beta/openai}
     nano-banana-model: ${AI_NANO_BANANA_MODEL:gemini-2.5-flash-image}
     nano-banana-base-url: ${AI_NANO_BANANA_BASE_URL:https://generativelanguage.googleapis.com/v1beta}
+    # Read-aloud narration voice. ElevenLabs (lifelike, bilingual) is the default provider;
+    # set tts-provider=gemini to fall back to Gemini TTS. Voice is chosen per tale language.
+    tts-provider: ${TTS_PROVIDER:elevenlabs}
+    elevenlabs:
+      api-key: ${ELEVENLABS_API_KEY:}
+      base-url: ${ELEVENLABS_BASE_URL:https://api.elevenlabs.io}
+      model: ${ELEVENLABS_MODEL:eleven_multilingual_v2}
+      output-format: ${ELEVENLABS_OUTPUT_FORMAT:mp3_44100_128}
+      voices:
+        uk: ${ELEVENLABS_VOICE_UK:}
+        en: ${ELEVENLABS_VOICE_EN:}
+      voice-settings:
+        stability: ${ELEVENLABS_STABILITY:0.45}
+        similarity-boost: ${ELEVENLABS_SIMILARITY_BOOST:0.75}
+        style: ${ELEVENLABS_STYLE:0.30}
+        speed: ${ELEVENLABS_SPEED:0.92}
+        use-speaker-boost: ${ELEVENLABS_USE_SPEAKER_BOOST:true}
     comics:
       panels-per-tale: 4
       panel-aspects: [LANDSCAPE, SQUARE, SQUARE, LANDSCAPE]

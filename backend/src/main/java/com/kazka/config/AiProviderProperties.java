@@ -5,7 +5,9 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Config slot for LLM + image providers. Text/editor/scene/judge use Google Gemini 2.5 Flash
@@ -38,6 +40,12 @@ public class AiProviderProperties {
     private String ttsVoice = "Sulafat"; // warm female; swappable
     private String ttsStylePrompt = "Прочитай цю казку повільно й тепло, як бабуся розповідає на ніч:";
 
+    // --- TTS provider selection + ElevenLabs (lifelike neural narration voice, bilingual) ---
+    // Read-aloud synthesizes via this provider. ElevenLabs is the default; the Gemini fields
+    // above are retained for the fallback provider (kazka.ai.tts-provider=gemini).
+    private String ttsProvider = "elevenlabs";             // elevenlabs | gemini
+    private final ElevenLabs elevenlabs = new ElevenLabs();
+
     private double textTemperature = 0.75;
     private double textTopP = 0.9;
     // Gemini's OpenAI-compat endpoint rejects frequency_penalty/presence_penalty with 400.
@@ -69,4 +77,36 @@ public class AiProviderProperties {
 
     /** Lower-cased mirror of com.kazka.comics.PanelAspect for property binding. */
     public enum PanelAspectName { LANDSCAPE, SQUARE }
+
+    /** ElevenLabs TTS config. Voices are keyed by tale language (e.g. uk/en). */
+    @Getter
+    @Setter
+    public static class ElevenLabs {
+        private String apiKey = null;                          // ELEVENLABS_API_KEY
+        private String baseUrl = "https://api.elevenlabs.io";
+        private String model = "eleven_multilingual_v2";
+        private String outputFormat = "mp3_44100_128";
+        private Map<String, String> voices = new HashMap<>();  // language -> voiceId
+        private final VoiceSettings voiceSettings = new VoiceSettings();
+
+        /** Voice id for a tale language, falling back to the uk voice when unset. */
+        public String voiceFor(String language) {
+            String v = language == null ? null : voices.get(language);
+            if (v == null || v.isBlank()) {
+                v = voices.get("uk");
+            }
+            return v;
+        }
+    }
+
+    /** ElevenLabs voice_settings — tuned for warm bedtime storytelling; adjust by ear via config. */
+    @Getter
+    @Setter
+    public static class VoiceSettings {
+        private double stability = 0.45;
+        private double similarityBoost = 0.75;
+        private double style = 0.30;
+        private double speed = 0.92;
+        private boolean useSpeakerBoost = true;
+    }
 }

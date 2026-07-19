@@ -1,7 +1,6 @@
 package com.kazka.narration;
 
 import com.kazka.auth.CurrentUserResolver.CurrentUser;
-import com.kazka.config.AiProviderProperties;
 import com.kazka.story.NarrationStatus;
 import com.kazka.story.Story;
 import com.kazka.story.StoryRepository;
@@ -14,27 +13,23 @@ import reactor.core.scheduler.Schedulers;
 
 /**
  * Orchestrates lazy, cached read-aloud narration. First request for a tale atomically claims it,
- * synthesizes via Gemini TTS off the request thread (fire-and-forget), wraps to WAV, and caches it;
- * later requests return the cached presigned URL. Admins may narrate any tale (admin-aware lookup).
+ * synthesizes via the configured {@link TtsClient} off the request thread (fire-and-forget),
+ * stores the audio, and caches its key; later requests return the cached presigned URL. Admins
+ * may narrate any tale (admin-aware lookup). The active client owns voice selection (per tale
+ * language) and audio container, so this service stays provider-agnostic.
  */
 @Slf4j
 @Service
 public class NarrationService {
 
     private final StoryRepository repository;
-    private final GeminiTtsClient ttsClient;
-    private final WavEncoder wavEncoder;
+    private final TtsClient ttsClient;
     private final AudioStorage audioStorage;
-    private final AiProviderProperties props;
 
-    public NarrationService(StoryRepository repository, GeminiTtsClient ttsClient,
-                            WavEncoder wavEncoder, AudioStorage audioStorage,
-                            AiProviderProperties props) {
+    public NarrationService(StoryRepository repository, TtsClient ttsClient, AudioStorage audioStorage) {
         this.repository = repository;
         this.ttsClient = ttsClient;
-        this.wavEncoder = wavEncoder;
         this.audioStorage = audioStorage;
-        this.props = props;
     }
 
     /** POST: return cached URL if READY, else claim + trigger async synthesis and report GENERATING. */
@@ -69,10 +64,10 @@ public class NarrationService {
     }
 
     private Mono<Void> synthesizeAndStore(Story story) {
-        String text = props.getTtsStylePrompt() + "\n\n" + story.getContent();
-        return ttsClient.synthesizePcm(text, props.getTtsVoice())
-                .map(wavEncoder::wrap24kMono16)
-                .flatMap(wav -> Mono.fromCallable(() -> audioStorage.storeNarration(story.getId(), wav))
+        return ttsClient.synthesize(story.getContent(), story.getLanguage())
+                .flatMap(audio -> Mono.fromCallable(() ->
+                                audioStorage.storeNarration(story.getId(), audio.bytes(),
+                                        audio.contentType(), audio.fileExtension()))
                         .subscribeOn(Schedulers.boundedElastic()))
                 .flatMap(key -> Mono.fromCallable(() -> repository.markNarrationReady(story.getId(), key))
                         .subscribeOn(Schedulers.boundedElastic()))

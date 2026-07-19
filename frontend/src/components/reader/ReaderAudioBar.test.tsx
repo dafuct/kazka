@@ -46,7 +46,7 @@ describe('ReaderAudioBar', () => {
     expect(playSpy).not.toHaveBeenCalled()
   })
 
-  it('falls back to speechSynthesis when the narration request fails', async () => {
+  it('shows the error state when the narration request fails, without falling back to speechSynthesis', async () => {
     vi.mocked(narration.request).mockRejectedValue(new Error('network'))
     const speak = vi.fn()
     vi.stubGlobal('speechSynthesis', { speak, cancel: vi.fn(), getVoices: () => [] })
@@ -55,7 +55,8 @@ describe('ReaderAudioBar', () => {
     render(<ReaderAudioBar {...props} />)
     fireEvent.click(screen.getByRole('button'))
 
-    await waitFor(() => expect(speak).toHaveBeenCalled())
+    await waitFor(() => expect(screen.getByRole('button', { name: props.errorLabel })).toBeInTheDocument())
+    expect(speak).not.toHaveBeenCalled()
     vi.unstubAllGlobals()
   })
 })

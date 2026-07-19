@@ -3,10 +3,15 @@ import { narration } from './apiClient'
 
 type Phase = 'idle' | 'preparing' | 'playing' | 'error'
 
-/** Server-side neural narration with Web Speech fallback (moved from the
-    retired ReadAloud component). Warm-starts generation on mount (lesson:
-    gemini-tts-whole-tale-latency-needs-warm-start); playback needs a tap. */
-export function useNarration(storyId: string, text: string, lang = 'uk') {
+/** Server-side neural narration only — no Web Speech fallback. Warm-starts
+    generation on mount (lesson: gemini-tts-whole-tale-latency-needs-warm-start);
+    playback needs a tap. Any failure (request, poll, or audio playback) surfaces
+    honestly as phase 'error' instead of silently degrading to the browser's
+    robotic voice; the caller can retry via toggle()/start(). */
+// text/lang are unused now that the Web Speech fallback (their only consumer) is gone;
+// kept for signature stability with the ReaderAudioBar call site.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function useNarration(storyId: string, _text: string, _lang = 'uk') {
   const [phase, setPhase] = useState<Phase>('idle')
   const [progress, setProgress] = useState(0) // 0..100 of the audio clip
   const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -19,9 +24,6 @@ export function useNarration(storyId: string, text: string, lang = 'uk') {
       cancelledRef.current = true
       if (pollRef.current) clearTimeout(pollRef.current)
       audioRef.current?.pause()
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel()
-      }
     }
   }, [storyId])
 
@@ -30,46 +32,19 @@ export function useNarration(storyId: string, text: string, lang = 'uk') {
     narration.request(storyId).catch(() => {})
   }, [storyId])
 
-  const fallback = () => {
-    // No browser speech synthesis at all → nothing we can do, surface it.
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      setPhase('error')
-      return
-    }
-    const synth = window.speechSynthesis
-    const base = lang.slice(0, 2).toLowerCase()
-    const voices = synth.getVoices()
-    const match = voices.find(v => v.lang?.toLowerCase().startsWith(base))
-    // The browser has voices loaded but none for this language (common for uk) →
-    // it would "speak" silently. Tell the user instead of pretending to play.
-    if (voices.length > 0 && !match) {
-      setPhase('error')
-      return
-    }
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = base === 'uk' ? 'uk-UA' : base
-    if (match) u.voice = match
-    u.rate = 0.96
-    u.onend = () => setPhase('idle')
-    u.onerror = () => setPhase('error')
-    synth.cancel()
-    synth.speak(u)
-    setPhase('playing')
-  }
-
   const play = (url: string) => {
     if (cancelledRef.current) return
     if (!audioRef.current) {
       audioRef.current = new Audio()
       audioRef.current.onended = () => { setPhase('idle'); setProgress(0) }
-      audioRef.current.onerror = () => fallback()
+      audioRef.current.onerror = () => setPhase('error')
       audioRef.current.ontimeupdate = () => {
         const a = audioRef.current
         if (a && a.duration > 0) setProgress(Math.min(100, (a.currentTime / a.duration) * 100))
       }
     }
     audioRef.current.src = url
-    audioRef.current.play().then(() => setPhase('playing')).catch(() => fallback())
+    audioRef.current.play().then(() => setPhase('playing')).catch(() => setPhase('error'))
   }
 
   const poll = async () => {
@@ -77,10 +52,10 @@ export function useNarration(storyId: string, text: string, lang = 'uk') {
       const res = await narration.get(storyId)
       if (cancelledRef.current) return
       if (res.status === 'READY' && res.url) play(res.url)
-      else if (res.status === 'FAILED') fallback()
+      else if (res.status === 'FAILED') setPhase('error')
       else pollRef.current = setTimeout(poll, 2000)
     } catch {
-      fallback()
+      setPhase('error')
     }
   }
 
@@ -90,19 +65,16 @@ export function useNarration(storyId: string, text: string, lang = 'uk') {
       const res = await narration.request(storyId)
       if (cancelledRef.current) return
       if (res.status === 'READY' && res.url) play(res.url)
-      else if (res.status === 'FAILED') fallback()
+      else if (res.status === 'FAILED') setPhase('error')
       else pollRef.current = setTimeout(poll, 2000)
     } catch {
-      fallback()
+      setPhase('error')
     }
   }
 
   const stop = () => {
     if (pollRef.current) clearTimeout(pollRef.current)
     audioRef.current?.pause()
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel()
-    }
     setPhase('idle')
   }
 

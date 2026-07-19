@@ -28,12 +28,13 @@ public class FilesystemAudioStorage implements AudioStorage {
     }
 
     @Override
-    public String storeNarration(String storyId, byte[] wav) {
-        String key = storyId + ".wav";
+    public String storeNarration(String storyId, byte[] bytes, String contentType, String fileExtension) {
+        // contentType is unused on the filesystem — the static server sets it from the extension.
+        String key = storyId + "." + fileExtension;
         try {
-            Files.write(uploadsDir.resolve(key), wav);
+            Files.write(uploadsDir.resolve(key), bytes);
         } catch (IOException ioException) {
-            throw new UncheckedIOException("Cannot save narration WAV for story " + storyId, ioException);
+            throw new UncheckedIOException("Cannot save narration for story " + storyId, ioException);
         }
         return key;
     }

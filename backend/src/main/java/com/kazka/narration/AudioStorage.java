@@ -7,8 +7,8 @@ package com.kazka.narration;
  */
 public interface AudioStorage extends AudioUrlResolver {
 
-    /** Persist one story's narration WAV and return its storage key. */
-    String storeNarration(String storyId, byte[] wav);
+    /** Persist one story's narration audio and return its storage key. */
+    String storeNarration(String storyId, byte[] bytes, String contentType, String fileExtension);
 
     /** Delete one stored narration by key. */
     void deleteByKey(String key);

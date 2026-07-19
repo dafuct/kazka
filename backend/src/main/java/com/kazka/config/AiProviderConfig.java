@@ -47,6 +47,21 @@ public class AiProviderConfig {
                 .build();
     }
 
+    /**
+     * ElevenLabs TTS endpoint. Auth via the {@code xi-api-key} header; base
+     * {@code https://api.elevenlabs.io}. The 16 MiB in-memory cap comfortably holds a whole-tale
+     * MP3 (ElevenLabs returns raw audio bytes, not base64-in-JSON).
+     */
+    @Bean
+    public WebClient elevenLabsWebClient(WebClient.Builder builder, AiProviderProperties aiProps) {
+        AiProviderProperties.ElevenLabs el = aiProps.getElevenlabs();
+        return builder.clone()
+                .baseUrl(el.getBaseUrl())
+                .defaultHeader("xi-api-key", el.getApiKey() == null ? "" : el.getApiKey())
+                .codecs(c -> c.defaultCodecs().maxInMemorySize(16 * 1024 * 1024))
+                .build();
+    }
+
     @Bean
     public WebClient judgeWebClient(WebClient.Builder builder,
                                     AiProviderProperties aiProps,

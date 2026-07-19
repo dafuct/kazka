@@ -32,11 +32,11 @@ public class R2AudioStorage implements AudioStorage {
     }
 
     @Override
-    public String storeNarration(String storyId, byte[] wav) {
-        String key = "narration/" + storyId + ".wav";
+    public String storeNarration(String storyId, byte[] bytes, String contentType, String fileExtension) {
+        String key = "narration/" + storyId + "." + fileExtension;
         s3.putObject(
-                PutObjectRequest.builder().bucket(bucket).key(key).contentType("audio/wav").build(),
-                RequestBody.fromBytes(wav));
+                PutObjectRequest.builder().bucket(bucket).key(key).contentType(contentType).build(),
+                RequestBody.fromBytes(bytes));
         return key;
     }
 
