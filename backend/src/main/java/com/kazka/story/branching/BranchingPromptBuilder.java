@@ -63,6 +63,8 @@ public class BranchingPromptBuilder {
         }
         sb.append('\n').append("Begin with a short 2–4 word book title on the very first line ")
           .append("(no punctuation at the end, no quotes), then a blank line, then the opening.\n")
+          .append("Do NOT echo or restate any of the fields above (Language, Theme, Characters, Age) ")
+          .append("and do NOT write the language's name anywhere in your output.\n")
           .append("End the opening at a natural decision point. ")
           .append("After the opening, write EXACTLY this format:\n\n")
           .append("---\n\n")

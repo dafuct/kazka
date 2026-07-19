@@ -24,6 +24,13 @@ public class BranchingResponseParser {
             Pattern.compile("(?im)^[ \\t]*(?:-{3,}|CHOICE[_ ]?[AB]\\s*[:\\-].*)[ \\t]*$");
     private static final Pattern TRAILING_SEPARATOR = Pattern.compile("(?s)\\s*\\n\\s*-{3,}\\s*$");
 
+    // The model sometimes echoes the prompt's labelled fields (e.g. "Language: uk" → "Українська:")
+    // as a standalone line in the tale. These are meta, never narrative — scrub them out.
+    // (?u) = UNICODE_CASE so the case-insensitive match also folds Cyrillic ("Українська" == "українська").
+    private static final Pattern LEAKED_LABEL = Pattern.compile(
+            "(?imu)^[ \\t]*(?:language|theme|characters?|age|child\\s*name|approximate\\s*age"
+                    + "|українськ\\p{L}*|англійськ\\p{L}*|english)\\s*:.*$");
+
     public record Parsed(String body, List<BranchingChoice> choices) {}
 
     /** A body with an optional leading title line lifted out. */
@@ -94,6 +101,7 @@ public class BranchingResponseParser {
 
     private String cleanBody(String body) {
         String scrubbed = STRAY_MARKER.matcher(body).replaceAll("");
+        scrubbed = LEAKED_LABEL.matcher(scrubbed).replaceAll("");
         scrubbed = TRAILING_SEPARATOR.matcher(scrubbed).replaceAll("");
         return scrubbed.strip();
     }

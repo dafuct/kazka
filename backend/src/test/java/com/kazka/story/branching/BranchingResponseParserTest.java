@@ -106,6 +106,30 @@ class BranchingResponseParserTest {
         assertThat(p.choices()).isEmpty();
     }
 
+    // Regression: the model echoed the "Language: uk" prompt field as a trailing "Українська:"
+    // label into the opening (before the ---), so it leaked into the tale body.
+    @Test
+    void scrubs_a_leaked_language_label_from_the_body() {
+        String raw = "Жив-був Матвійко, що катав машинку.\n\nУкраїнська:\n\n"
+                + "---\n\nCHOICE_A: Піти в сад\nCHOICE_B: Лишитися вдома";
+        BranchingResponseParser.Parsed p = parser.parse(raw, "uk");
+        assertThat(p.body())
+                .isEqualTo("Жив-був Матвійко, що катав машинку.")
+                .doesNotContain("Українська");
+        assertThat(p.choices()).extracting(BranchingChoice::text)
+                .containsExactly("Піти в сад", "Лишитися вдома");
+    }
+
+    @Test
+    void scrubs_leaked_field_labels_anywhere_in_the_body() {
+        String raw = "Theme: adventure\n\nOnce upon a time a boy played.\n\nLanguage: en\n\n"
+                + "---\n\nCHOICE_A: Go out\nCHOICE_B: Stay in";
+        BranchingResponseParser.Parsed p = parser.parse(raw, "en");
+        assertThat(p.body())
+                .isEqualTo("Once upon a time a boy played.")
+                .doesNotContain("Theme:", "Language:");
+    }
+
     @Test
     void splitLeadingTitle_lifts_a_title_line() {
         BranchingResponseParser.TitleBody tb =

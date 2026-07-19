@@ -28,12 +28,16 @@
 .stage {
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: center;        /* fallback for browsers without `safe` */
+  align-items: safe center;   /* a page taller than the stage aligns to the TOP (scrollable)
+                                 instead of centring and clipping its top off-screen */
   justify-content: center;
   gap: 34px;
   padding: 10px 28px;
   min-height: 0;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--card-warm) transparent;
 }
 
 .arrow {
@@ -81,11 +85,9 @@
 
 .textCol {
   min-width: 0;
-  align-self: center;
-  max-height: 82vh;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--card-warm) transparent;
+  /* No capped height / own scrollbar: the .stage scrolls the whole page. A fixed 82vh column
+     centred in the stage clipped the top of long final segments and pushed the "restart"
+     button down behind the audio bar. */
 }
 
 .text {
